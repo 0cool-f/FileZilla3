@@ -2063,14 +2063,14 @@ void CRemoteListView::ReselectItems(std::vector<std::wstring>& selectedNames, st
 				SetItemState(firstSelected, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
 			}
 			else {
-				if (focusedItem != -1 && GetItemCount() != 0) {
-					if (focusedItem >= GetItemCount()) {
-						--focusedItem;
+				if (GetItemCount() != 0) {
+					if (focusedItem == -1) {
+						focusedItem = 0;
+					}
+					else if (focusedItem >= GetItemCount()) {
+						focusedItem = GetItemCount() - 1;
 					}
 					SetItemState(focusedItem, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
-				}
-				else {
-					SetItemState(0, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
 				}
 			}
 		}
