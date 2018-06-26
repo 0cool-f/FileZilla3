@@ -134,6 +134,13 @@ bool CWindowStateManager::Restore(const unsigned int optionId, const wxSize& def
 #endif //__WXGTK__
 	}
 	else {
+		if (m_pWindow->GetSizer()) {
+			wxSize minSize = m_pWindow->GetSizer()->GetMinSize();
+			if (minSize.IsFullySpecified()) {
+				size.x = std::max(size.x, minSize.x);
+				size.y = std::max(size.y, minSize.y);
+			}
+		}
 		if (read) {
 			m_pWindow->Move(position.x, position.y);
 		}

@@ -61,6 +61,7 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 	if (m_pCharsetPage) {
 		m_charsetPageIndex = FindPage(m_pCharsetPage);
 		m_charsetPageText = GetPageText(m_charsetPageIndex);
+		wxGetApp().GetWrapEngine()->WrapRecursive(XRCCTRL(*this, "ID_CHARSET_AUTO", wxWindow)->GetParent(), 1.3);
 	}
 
 	auto generalSizer = static_cast<wxGridBagSizer*>(xrc_call(*this, "ID_PROTOCOL", &wxWindow::GetContainingSizer));
