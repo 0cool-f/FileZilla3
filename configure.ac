@@ -649,9 +649,6 @@ if test "$buildmain" = "yes"; then
   # Some platforms, e.g. OS X, lack posix_fadvise
   AC_CHECK_FUNCS(posix_fadvise)
 
-  # Some platforms have no d_type entry in their dirent structure
-  gl_CHECK_TYPE_STRUCT_DIRENT_D_TYPE
-
   CHECK_THREADSAFE_LOCALTIME
   CHECK_THREADSAFE_GMTIME
   CHECK_INVERSE_GMTIME
