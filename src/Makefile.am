@@ -25,3 +25,11 @@ dist-hook:
 	mv -f $(distdir)/fzshellext/64/* $(distdir)/fzshellext
 	rm -rf $(distdir)/config
 	rm -rf $(distdir)/m4
+
+if MACAPPBUNDLE
+noinst_DATA = dylibs.copied
+
+dylibs.copied: $(top_builddir)/FileZilla.app/Contents/MacOS/*
+	"$(top_srcdir)/data/dylibcopy.sh" "$(top_builddir)/FileZilla.app"
+	@touch dylibs.copied
+fi
