@@ -155,7 +155,7 @@ void wxListCtrlEx::HandlePrefixSearch(wxChar character)
 	if (!m_prefixSearch_lastKeyPress.empty()) {
 		fz::duration span = now - m_prefixSearch_lastKeyPress;
 		if (span.get_seconds() >= 1) {
-			m_prefixSearch_prefix = _T("");
+			m_prefixSearch_prefix.clear();
 		}
 	}
 	m_prefixSearch_lastKeyPress = now;
@@ -376,7 +376,7 @@ void wxListCtrlEx::SaveSetItemCount(long count)
 
 void wxListCtrlEx::ResetSearchPrefix()
 {
-	m_prefixSearch_prefix = _T("");
+	m_prefixSearch_prefix.clear();
 }
 
 void wxListCtrlEx::ShowColumn(unsigned int col, bool show)

@@ -309,7 +309,7 @@ void CLocalTreeView::SetDir(wxString const& localDir)
 
 	if (localDir.Left(2) == _T("\\\\")) {
 		// TODO: UNC path, don't display it yet
-		m_currentDir = _T("");
+		m_currentDir.clear();
 		SafeSelectItem(wxTreeItemId());
 		return;
 	}
@@ -587,7 +587,7 @@ wxTreeItemId CLocalTreeView::MakeSubdirs(wxTreeItemId parent, wxString dirname, 
 		}
 		else if (pos == -1) {
 			segment = subDir;
-			subDir = _T("");
+			subDir.clear();
 		}
 		else {
 			segment = subDir.Left(pos);

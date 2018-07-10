@@ -345,7 +345,7 @@ void CLocalViewHeader::OnTextChanged(wxCommandEvent&)
 	// This function handles auto-completion
 
 #ifdef __WXGTK__
-	m_autoCompletionText = _T("");
+	m_autoCompletionText.clear();
 #endif
 
 	wxString str = m_pComboBox->GetValue();
@@ -450,7 +450,7 @@ void CLocalViewHeader::OnSelectTextEvent(wxCommandEvent&)
 
 	const wxString& oldValue = m_pComboBox->GetValue();
 	const wxString completionText = m_autoCompletionText;
-	m_autoCompletionText = _T("");
+	m_autoCompletionText.clear();
 
 	if (m_pComboBox->GetInsertionPoint() != (int)oldValue.Len())
 		return;
@@ -463,7 +463,7 @@ void CLocalViewHeader::OnSelectTextEvent(wxCommandEvent&)
 void CLocalViewHeader::OnSelectionChanged(wxCommandEvent& event)
 {
 #ifdef __WXGTK__
-	m_autoCompletionText = _T("");
+	m_autoCompletionText.clear();
 #endif
 
 	std::wstring dir = event.GetString().ToStdWstring();
@@ -488,7 +488,7 @@ void CLocalViewHeader::OnSelectionChanged(wxCommandEvent& event)
 void CLocalViewHeader::OnTextEnter(wxCommandEvent&)
 {
 #ifdef __WXGTK__
-	m_autoCompletionText = _T("");
+	m_autoCompletionText.clear();
 #endif
 
 	std::wstring dir = m_pComboBox->GetValue().ToStdWstring();
@@ -512,7 +512,7 @@ void CLocalViewHeader::OnStateChange(t_statechange_notifications notification, c
 	}
 	else if (notification == STATECHANGE_LOCAL_DIR) {
 #ifdef __WXGTK__
-		m_autoCompletionText = _T("");
+		m_autoCompletionText.clear();
 #endif
 
 		wxString dir = m_state.GetLocalDir().GetPath();

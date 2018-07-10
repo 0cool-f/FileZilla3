@@ -475,7 +475,7 @@ int CLocalListView::OnGetItemImage(long item) const
 	int &icon = data->icon;
 
 	if (icon == -2) {
-		wxString path = _T("");
+		wxString path;
 		if (data->name != _T("..")) {
 #ifdef __WXMSW__
 			if (m_dir.GetPath() == _T("\\")) {
@@ -641,7 +641,7 @@ void CLocalListView::DisplayDrives()
 		data.label = fz::sparse_optional<std::wstring>(data.name);
 		data.dir = true;
 		data.size = -1;
-		data.icon = GetIconIndex(iconType::dir, _T(""), false);
+		data.icon = GetIconIndex(iconType::dir, wxString(), false);
 
 		m_fileData.push_back(data);
 		m_indexMapping.push_back(count);
@@ -965,7 +965,7 @@ wxString CLocalListView::MenuMkdir()
 		return wxString();
 	}
 
-	wxFileName fn(dlg.GetValue(), _T(""));
+	wxFileName fn(dlg.GetValue(), wxString());
 	fn.Normalize(wxPATH_NORM_ALL, m_dir.GetPath());
 
 	bool res;

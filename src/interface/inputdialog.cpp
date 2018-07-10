@@ -58,7 +58,7 @@ bool CInputDialog::Create(wxWindow* parent, const wxString& title, wxString text
 void CInputDialog::AllowEmpty(bool allowEmpty)
 {
 	m_allowEmpty = allowEmpty;
-	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(m_allowEmpty ? true : (m_pTextCtrl->GetValue() != _T("")));
+	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(m_allowEmpty ? true : (!m_pTextCtrl->GetValue().empty()));
 }
 
 void CInputDialog::OnValueChanged(wxCommandEvent&)

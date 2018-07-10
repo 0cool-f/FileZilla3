@@ -436,7 +436,7 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 					wxMessageBoxEx(_("Selected global bookmark and current server use a different server type.\nUse site-specific bookmarks for this server."), _("Bookmark"), wxICON_EXCLAMATION, this);
 					return;
 				}
-				pState->ChangeRemoteDir(remote_dir, _T(""), 0, false, comparison);
+				pState->ChangeRemoteDir(remote_dir, std::wstring(), 0, false, comparison);
 			}
 		}
 		if (!local_dir.empty()) {

@@ -93,7 +93,7 @@ protected:
 	virtual void OnPreEmitPostScrollEvent() final;
 	void EmitPostScrollEvent();
 
-	virtual wxString GetItemText(int, unsigned int) { return _T(""); }
+	virtual wxString GetItemText(int, unsigned int) { return wxString(); }
 
 	virtual wxString OnGetItemText(long item, long column) const;
 	void ResetSearchPrefix();

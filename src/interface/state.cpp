@@ -318,7 +318,7 @@ bool CState::SetLocalDir(CLocalPath const& dir, std::wstring *error, bool rememb
 			m_previouslyVisitedLocalSubdir = m_localDir.GetLastSegment();
 	}
 	else {
-		m_previouslyVisitedLocalSubdir = _T("");
+		m_previouslyVisitedLocalSubdir.clear();
 	}
 
 
@@ -344,7 +344,7 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 			m_pDirectoryListing = 0;
 			NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &modified);
 		}
-		m_previouslyVisitedRemoteSubdir = _T("");
+		m_previouslyVisitedRemoteSubdir.clear();
 		return true;
 	}
 
@@ -356,7 +356,7 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 		m_previouslyVisitedRemoteSubdir = m_pDirectoryListing->path.GetLastSegment();
 	}
 	else {
-		m_previouslyVisitedRemoteSubdir = _T("");
+		m_previouslyVisitedRemoteSubdir.clear();
 	}
 
 	if (modified) {

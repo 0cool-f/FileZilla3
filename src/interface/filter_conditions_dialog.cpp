@@ -266,7 +266,7 @@ void CFilterConditionsDialog::MakeControls(CFilterCondition const& condition, si
 
 	if (!controls.pValue) {
 		controls.pValue = std::make_unique<wxTextCtrlEx>();
-		controls.pValue->Create(m_pListCtrl, wxID_ANY, _T(""));
+		controls.pValue->Create(m_pListCtrl, wxID_ANY, wxString());
 		controls.pValue->Hide();
 		controls.sizer->Add(controls.pValue.get(), 1, wxALIGN_CENTER_VERTICAL | wxLEFT, 5);
 	}

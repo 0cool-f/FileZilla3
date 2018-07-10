@@ -78,7 +78,7 @@ static std::string mkstr(const char* str)
 int main(int argc, char** argv)
 {
 	std::string locale = CInitializer::GetLocaleOption();
-	if (locale != "")
+	if (!locale.empty())
 	{
 		if (!CInitializer::SetLocale(locale))
 		{

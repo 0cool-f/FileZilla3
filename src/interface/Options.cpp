@@ -693,7 +693,7 @@ bool COptions::GetServer(std::wstring path, ServerWithCredentials& server)
 		}
 		else {
 			sub = path;
-			path = _T("");
+			path.clear();
 		}
 		std::string utf8 = fz::to_utf8(sub);
 		element = element.child(utf8.c_str());

@@ -173,7 +173,7 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 
 bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde)
 {
-	arguments = _T("");
+	arguments.clear();
 
 	if (command.empty())
 		return true;

@@ -120,34 +120,37 @@ bool CWrapEngine::WrapTextChinese(wxWindow* parent, wxString &text, unsigned lon
 				}
 			}
 
-			if (lineLength > maxLength && wrappable)
-			{
+			if (lineLength > maxLength && wrappable) {
 				wxString tmp = wxString(str, wrappable - str);
-				if (!tmp.empty() && tmp.Last() == ' ')
+				if (!tmp.empty() && tmp.Last() == ' ') {
 					tmp.RemoveLast();
+				}
 				wrappedText += tmp + _T("\n");
-				if (*wrappable != ' ')
+				if (*wrappable != ' ') {
 					str = wrappable;
-				else
+				}
+				else {
 					str = wrappable + 1;
+				}
 				break;
 			}
 
 			p++;
 		}
-		if (!*p)
-		{
-			if (lineLength > maxLength)
-			{
-				if (!wrappable)
+		if (!*p) {
+			if (lineLength > maxLength) {
+				if (!wrappable) {
 					return false;
+				}
 
 				const wxString& tmp = wxString(str, wrappable - str);
 				wrappedText += tmp + _T("\n");
-				if (*wrappable != ' ')
+				if (*wrappable != ' ') {
 					str = wrappable;
-				else
+				}
+				else {
 					str = wrappable + 1;
+				}
 			}
 			wrappedText += str;
 			break;
@@ -162,14 +165,12 @@ bool CWrapEngine::WrapTextChinese(wxWindow* parent, wxString &text, unsigned lon
 	wxASSERT(temp.empty() || temp.Last() != ' ');
 	wxASSERT(temp.empty() || temp.Last() != '\n');
 	temp.Replace(_T("&"), _T(""));
-	while (!temp.empty())
-	{
+	while (!temp.empty()) {
 		wxString piece;
 		int pos = temp.Find(_T("\n"));
-		if (pos == -1)
-		{
+		if (pos == -1) {
 			piece = temp;
-			temp = _T("");
+			temp.clear();
 		}
 		else
 		{

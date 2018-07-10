@@ -17,14 +17,14 @@ void CAutoAsciiFiles::SettingsChanged()
 			if (!ext.empty()) {
 				ext.Replace(_T("\\\\"), _T("\\"));
 				m_ascii_extensions.push_back(ext);
-				ext = _T("");
+				ext.clear();
 			}
 		}
 		else if (extensions.c_str()[pos - 1] != '\\') {
 			ext += extensions.Left(pos);
 			ext.Replace(_T("\\\\"), _T("\\"));
 			m_ascii_extensions.push_back(ext);
-			ext = _T("");
+			ext.clear();
 		}
 		else {
 			ext += extensions.Left(pos - 1) + _T("|");

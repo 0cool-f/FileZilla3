@@ -601,7 +601,7 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 		cmd.optional = true;
 		cmd.hide_arguments = true;
 		cmd.type = loginCommandType::pass;
-		cmd.command = L"";
+		cmd.command.clear();
 		loginSequence.push_back(cmd);
 
 		// Optional account
@@ -635,7 +635,7 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 
 		// User
 		cmd.type = loginCommandType::user;
-		cmd.command = L"";
+		cmd.command.clear();
 		loginSequence.push_back(cmd);
 
 		// Password

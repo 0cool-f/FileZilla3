@@ -254,7 +254,7 @@ int CBookmarksDialog::Run()
 
 	m_pTree->AssignImageList(pImageList);
 
-	wxTreeItemId root = m_pTree->AddRoot(_T(""));
+	wxTreeItemId root = m_pTree->AddRoot(wxString());
 	m_bookmarks_global = m_pTree->AppendItem(root, _("Global bookmarks"), 0, 0);
 	LoadGlobalBookmarks();
 	m_pTree->Expand(m_bookmarks_global);

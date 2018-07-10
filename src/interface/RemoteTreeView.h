@@ -38,7 +38,7 @@ protected:
 	CQueueView* m_pQueue;
 
 	void CreateImageList();
-	wxBitmap CreateIcon(int index, const wxString& overlay = _T(""));
+	wxBitmap CreateIcon(int index, wxString const& overlay = wxString());
 	wxImageList* m_pImageList{};
 
 	// Set to true in SetDirectoryListing.
