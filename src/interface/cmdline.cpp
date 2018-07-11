@@ -105,8 +105,9 @@ bool CCommandLine::Parse()
 		}
 	}
 
-	if (m_parser.Found(_T("verbose")))
+	if (m_parser.Found(_T("verbose"))) {
 		wxLog::SetVerbose(true);
+	}
 
 	return true;
 }
@@ -118,8 +119,18 @@ void CCommandLine::DisplayUsage()
 
 wxString CCommandLine::GetParameter() const
 {
-	if (!m_parser.GetParamCount())
+	if (!m_parser.GetParamCount()) {
 		return wxString();
+	}
 
 	return m_parser.GetParam();
+}
+
+bool CCommandLine::BlocksReconnectAtStartup() const
+{
+	if (HasSwitch(CCommandLine::sitemanager) || !GetOption(CCommandLine::site).empty() || !GetParameter().empty()) {
+		return true;
+	}
+
+	return false;
 }

@@ -132,16 +132,6 @@ void COptionsPageInterface::SavePasswordOption()
 	}
 
 	// Now actually change stored passwords
-
-	{
-		ServerWithCredentials last;
-		if (m_pOptions->GetLastServer(last)) {
-			loginManager.AskDecryptor(last.credentials.encrypted_, true, false);
-			last.credentials.Unprotect(loginManager.GetDecryptor(last.credentials.encrypted_), true);
-			m_pOptions->SetLastServer(last);
-		}
-	}
-
 	{
 		auto recentServers = CRecentServerList::GetMostRecentServers();
 		for (auto & server : recentServers) {
@@ -158,6 +148,8 @@ void COptionsPageInterface::SavePasswordOption()
 		site.server_.credentials.Unprotect(loginManager.GetDecryptor(site.server_.credentials.encrypted_), true);
 		state->SetLastSite(site, path);
 	}
+
+	COptions::Get()->RequireCleanup();
 
 	CSiteManager::Rewrite(loginManager, true);
 

@@ -57,15 +57,18 @@ CState* CContextManager::CreateState(CMainFrame &mainFrame)
 void CContextManager::DestroyState(CState* pState)
 {
 	for (unsigned int i = 0; i < m_contexts.size(); ++i) {
-		if (m_contexts[i] != pState)
+		if (m_contexts[i] != pState) {
 			continue;
+		}
 
 		m_contexts.erase(m_contexts.begin() + i);
-		if ((int)i < m_current_context)
-			m_current_context--;
+		if ((int)i < m_current_context) {
+			--m_current_context;
+		}
 		else if ((int)i == m_current_context) {
-			if (i >= m_contexts.size())
-				m_current_context--;
+			if (i >= m_contexts.size()) {
+				--m_current_context;
+			}
 			NotifyHandlers(GetCurrentContext(), STATECHANGE_CHANGEDCONTEXT, _T(""), 0);
 		}
 
@@ -78,12 +81,14 @@ void CContextManager::DestroyState(CState* pState)
 
 void CContextManager::SetCurrentContext(CState* pState)
 {
-	if (GetCurrentContext() == pState)
+	if (GetCurrentContext() == pState) {
 		return;
+	}
 
 	for (unsigned int i = 0; i < m_contexts.size(); ++i) {
-		if (m_contexts[i] != pState)
+		if (m_contexts[i] != pState) {
 			continue;
+		}
 
 		m_current_context = i;
 		NotifyHandlers(GetCurrentContext(), STATECHANGE_CHANGEDCONTEXT, _T(""), 0);
@@ -324,8 +329,6 @@ bool CState::SetLocalDir(CLocalPath const& dir, std::wstring *error, bool rememb
 
 	m_localDir = dir;
 
-	COptions::Get()->SetOption(OPTION_LASTLOCALDIR, m_localDir.GetPath());
-
 	NotifyHandlers(STATECHANGE_LOCAL_DIR);
 
 	return true;
@@ -413,8 +416,6 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 				}
 				else {
 					m_localDir = local_path;
-
-					COptions::Get()->SetOption(OPTION_LASTLOCALDIR, m_localDir.GetPath());
 
 					NotifyHandlers(STATECHANGE_LOCAL_DIR);
 				}
@@ -554,7 +555,7 @@ bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 	SetSyncBrowse(false);
 
 	m_pCommandQueue->ProcessCommand(new CConnectCommand(site.server_.server, site.server_.credentials));
-	m_pCommandQueue->ProcessCommand(new CListCommand(path, _T(""), LIST_FLAG_FALLBACK_CURRENT));
+	m_pCommandQueue->ProcessCommand(new CListCommand(path, std::wstring(), LIST_FLAG_FALLBACK_CURRENT));
 
 	SetSite(site, path);
 

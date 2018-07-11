@@ -22,47 +22,45 @@ CClearPrivateDataDialog::CClearPrivateDataDialog(CMainFrame* pMainFrame)
 
 void CClearPrivateDataDialog::Run()
 {
-	if (!Load(m_pMainFrame, _T("ID_CLEARPRIVATEDATA")))
+	if (!Load(m_pMainFrame, _T("ID_CLEARPRIVATEDATA"))) {
 		return;
+	}
 
-	if (ShowModal() != wxID_OK)
+	if (ShowModal() != wxID_OK) {
 		return;
+	}
 
 	wxCheckBox *pSitemanagerCheck = XRCCTRL(*this, "ID_CLEARSITEMANAGER", wxCheckBox);
 	wxCheckBox *pQueueCheck = XRCCTRL(*this, "ID_CLEARQUEUE", wxCheckBox);
-	if (pSitemanagerCheck->GetValue() && pQueueCheck->GetValue())
-	{
+	if (pSitemanagerCheck->GetValue() && pQueueCheck->GetValue()) {
 		int res = wxMessageBoxEx(_("Do you really want to delete all Site Manager entries and the transfer queue?"), _("Clear private data"), wxYES | wxNO | wxICON_QUESTION);
-		if (res != wxYES)
+		if (res != wxYES) {
 			return;
+		}
 	}
-	else if (pQueueCheck->GetValue())
-	{
+	else if (pQueueCheck->GetValue()) {
 		int res = wxMessageBoxEx(_("Do you really want to delete the transfer queue?"), _("Clear private data"), wxYES | wxNO | wxICON_QUESTION);
-		if (res != wxYES)
+		if (res != wxYES) {
 			return;
+		}
 	}
-	else if (pSitemanagerCheck->GetValue())
-	{
+	else if (pSitemanagerCheck->GetValue()) {
 		int res = wxMessageBoxEx(_("Do you really want to delete all Site Manager entries?"), _("Clear private data"), wxYES | wxNO | wxICON_QUESTION);
-		if (res != wxYES)
+		if (res != wxYES) {
 			return;
+		}
 	}
 
 	wxCheckBox *pCheck = XRCCTRL(*this, "ID_CLEARQUICKCONNECT", wxCheckBox);
-	if (!pCheck)
-		return;
-
-	if (pCheck->GetValue())
-	{
+	if (pCheck && pCheck->GetValue()) {
 		CRecentServerList::Clear();
-		if (m_pMainFrame->GetQuickconnectBar())
+		if (m_pMainFrame->GetQuickconnectBar()) {
 			m_pMainFrame->GetQuickconnectBar()->ClearFields();
+		}
 	}
 
 	pCheck = XRCCTRL(*this, "ID_CLEARRECONNECT", wxCheckBox);
-
-	if (pCheck->GetValue()) {
+	if (pCheck && pCheck->GetValue()) {
 		bool asked = false;
 
 		const std::vector<CState*> *states = CContextManager::Get()->GetAllStates();
@@ -72,8 +70,9 @@ void CClearPrivateDataDialog::Run()
 			if (pState->IsRemoteConnected() || !pState->IsRemoteIdle()) {
 				if (!asked) {
 					int res = wxMessageBoxEx(_("Reconnect information cannot be cleared while connected to a server.\nIf you continue, your connection will be disconnected."), _("Clear private data"), wxOK | wxCANCEL);
-					if (res != wxOK)
+					if (res != wxOK) {
 						return;
+					}
 					asked = true;
 				}
 
@@ -83,8 +82,9 @@ void CClearPrivateDataDialog::Run()
 					m_timer.SetOwner(this);
 					m_timer.Start(250, true);
 				}
-				else
+				else {
 					pState->Disconnect();
+				}
 			}
 		}
 
@@ -149,8 +149,9 @@ void CClearPrivateDataDialog::Delete()
 
 bool CClearPrivateDataDialog::ClearReconnect()
 {
-	COptions::Get()->SetLastServer(ServerWithCredentials());
-	COptions::Get()->SetOption(OPTION_LASTSERVERPATH, std::wstring());
+	COptions::Get()->SetOptionXml(OPTION_TAB_DATA, pugi::xml_node());
+	COptions::Get()->RequireCleanup();
+	COptions::Get()->SaveIfNeeded();
 
 	const std::vector<CState*> *states = CContextManager::Get()->GetAllStates();
 	for (std::vector<CState*>::const_iterator iter = states->begin(); iter != states->end(); ++iter) {
@@ -172,7 +173,7 @@ void CClearPrivateDataDialog::RemoveXmlFile(const wxString& name)
 		}
 	}
 	{
-		wxFileName fn(COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR), name + _T("xml~"));
+		wxFileName fn(COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR), name + _T(".xml~"));
 		if (fn.FileExists()) {
 			wxRemoveFile(fn.GetFullPath());
 		}

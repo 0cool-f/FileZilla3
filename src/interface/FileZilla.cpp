@@ -70,8 +70,9 @@ extern "C"
 static void SetAppId()
 {
 	wxDynamicLibrary dll;
-	if (!dll.Load(_T("shell32.dll")))
+	if (!dll.Load(_T("shell32.dll"))) {
 		return;
+	}
 
 	if (!dll.HasSymbol(_T("SetCurrentProcessExplicitAppUserModelID"))) {
 		return;

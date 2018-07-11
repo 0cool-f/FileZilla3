@@ -399,14 +399,15 @@ CMainFrame::CMainFrame()
 
 	m_pStateEventHandler = new CMainFrameStateEventHandler(this);
 
-	m_pContextControl->CreateTab();
+	m_pContextControl->RestoreTabs();
 
 	switch (message_log_position) {
 	case 1:
 		m_pTopSplitter->Initialize(m_pBottomSplitter);
 		if (COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG)) {
-			if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE))
+			if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
 				m_pQueueLogSplitter->SplitVertically(m_pQueuePane, m_pStatusView);
+			}
 			else {
 				m_pQueueLogSplitter->Initialize(m_pStatusView);
 				m_pQueuePane->Hide();
@@ -426,8 +427,9 @@ CMainFrame::CMainFrame()
 		break;
 	case 2:
 		m_pTopSplitter->Initialize(m_pBottomSplitter);
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE))
+		if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
 			m_pQueueLogSplitter->Initialize(m_pQueuePane);
+		}
 		else {
 			m_pQueueLogSplitter->Hide();
 			m_pQueuePane->Hide();
@@ -435,14 +437,16 @@ CMainFrame::CMainFrame()
 		m_pQueuePane->AddPage(m_pStatusView, _("Message log"));
 		break;
 	default:
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE))
+		if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
 			m_pQueueLogSplitter->Initialize(m_pQueuePane);
+		}
 		else {
 			m_pQueuePane->Hide();
 			m_pQueueLogSplitter->Hide();
 		}
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG))
+		if (COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG)) {
 			m_pTopSplitter->SplitHorizontally(m_pStatusView, m_pBottomSplitter);
+		}
 		else {
 			m_pStatusView->Hide();
 			m_pTopSplitter->Initialize(m_pBottomSplitter);
@@ -450,8 +454,9 @@ CMainFrame::CMainFrame()
 		break;
 	}
 
-	if (m_pQueueLogSplitter->IsShown())
+	if (m_pQueueLogSplitter->IsShown()) {
 		m_pBottomSplitter->SplitHorizontally(m_pContextControl, m_pQueueLogSplitter);
+	}
 	else {
 		m_pQueueLogSplitter->Hide();
 		m_pBottomSplitter->Initialize(m_pContextControl);
@@ -463,8 +468,9 @@ CMainFrame::CMainFrame()
 	Layout();
 	HandleResize();
 
-	if (!RestoreSplitterPositions())
+	if (!RestoreSplitterPositions()) {
 		SetDefaultSplitterPositions();
+	}
 
 	SetupKeyboardAccelerators();
 
@@ -753,8 +759,9 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		COptions::Get()->SetOption(OPTION_PRESERVE_TIMESTAMPS, event.IsChecked() ? 1 : 0);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_PROCESSQUEUE")) {
-		if (m_pQueueView)
+		if (m_pQueueView) {
 			m_pQueueView->SetActive(event.IsChecked());
+		}
 	}
 	else if (event.GetId() == XRCID("ID_MENU_HELP_GETTINGHELP") ||
 			 event.GetId() == XRCID("ID_MENU_HELP_BUGREPORT"))
@@ -1096,11 +1103,13 @@ bool CMainFrame::CreateMainToolBar()
 void CMainFrame::OnDisconnect(wxCommandEvent&)
 {
 	CState* pState = CContextManager::Get()->GetCurrentContext();
-	if (!pState || !pState->IsRemoteConnected())
+	if (!pState || !pState->IsRemoteConnected()) {
 		return;
+	}
 
-	if (!pState->IsRemoteIdle())
+	if (!pState->IsRemoteIdle()) {
 		return;
+	}
 
 	pState->Disconnect();
 }
@@ -1108,8 +1117,9 @@ void CMainFrame::OnDisconnect(wxCommandEvent&)
 void CMainFrame::OnCancel(wxCommandEvent&)
 {
 	CState* pState = CContextManager::Get()->GetCurrentContext();
-	if (!pState || pState->m_pCommandQueue->Idle())
+	if (!pState || pState->m_pCommandQueue->Idle()) {
 		return;
+	}
 
 	if (wxMessageBoxEx(_("Really cancel current operation?"), _T("FileZilla"), wxYES_NO | wxICON_QUESTION) == wxYES) {
 		pState->m_pCommandQueue->Cancel();
@@ -1336,12 +1346,14 @@ void CMainFrame::OnClose(wxCloseEvent &event)
 		return;
 	}
 
-	CContextControl::_context_controls* controls = m_pContextControl ? m_pContextControl->GetCurrentControls() : 0;
-	if (controls) {
-		Site site = controls->pState->GetLastSite();
-		COptions::Get()->SetLastServer(site.server_);
-		COptions::Get()->SetOption(OPTION_LASTSERVERPATH, controls->pState->GetLastServerPath().GetSafePath());
-		COptions::Get()->SetOption(OPTION_LAST_CONNECTED_SITE, site.m_path);
+	if (m_pContextControl) {
+		CContextControl::_context_controls* controls = m_pContextControl->GetCurrentControls();
+		if (controls) {
+			controls->pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
+			controls->pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
+		}
+
+		m_pContextControl->SaveTabs();
 	}
 
 	for (std::vector<CState*>::const_iterator iter = pStates->begin(); iter != pStates->end(); ++iter) {
@@ -1350,11 +1362,6 @@ void CMainFrame::OnClose(wxCloseEvent &event)
 	}
 
 	CSiteManager::ClearIdMap();
-
-	if (controls) {
-		controls->pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
-		controls->pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
-	}
 
 	bool filters_toggled = CFilterManager::HasActiveFilters(true) && !CFilterManager::HasActiveFilters(false);
 	COptions::Get()->SetOption(OPTION_FILTERTOGGLESTATE, filters_toggled ? 1 : 0);
@@ -1985,7 +1992,7 @@ void CMainFrame::OnSitemanagerDropdown(wxCommandEvent& event)
 	}
 }
 
-bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark)
+bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pState)
 {
 	// First check if we need to ask user for a password
 	if (!CLoginManager::Get().GetPassword(data.server_, false, data.server_.server.GetName())) {
@@ -1993,9 +2000,11 @@ bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark)
 	}
 
 	// Check if current state is already connected and if needed ask whether to open in new tab
-	CState* pState = CContextManager::Get()->GetCurrentContext();
 	if (!pState) {
-		return false;
+		pState = CContextManager::Get()->GetCurrentContext();
+		if (!pState) {
+			return false;
+		}
 	}
 
 	if (pState->IsRemoteConnected() || !pState->IsRemoteIdle()) {
@@ -2243,8 +2252,9 @@ void CMainFrame::SetDefaultSplitterPositions()
 
 	wxSize size = m_pBottomSplitter->GetClientSize();
 	int h = size.GetHeight() - 135;
-	if (h < 50)
+	if (h < 50) {
 		h = 50;
+	}
 	m_pBottomSplitter->SetSashPosition(h);
 
 	m_pQueueLogSplitter->SetSashPosition(0);
@@ -2262,24 +2272,28 @@ void CMainFrame::OnActivate(wxActivateEvent& event)
 	// According to the wx docs we should do this
 	event.Skip();
 
-	if (!event.GetActive())
+	if (!event.GetActive()) {
 		return;
+	}
 
 #ifdef __WXMAC__
 	// wxMac looses focus information if the window becomes inactive.
 	// Restore focus to the previously focused child, otherwise focus ends up
 	// in the quickconnect bar.
 	// Go via ID of the last focused child to avoid issues with window lifetime.
-	if (m_lastFocusedChild != -1)
+	if (m_lastFocusedChild != -1) {
 		m_winLastFocused = FindWindow(m_lastFocusedChild);
+}
 #endif
 
 	CEditHandler* pEditHandler = CEditHandler::Get();
-	if (pEditHandler)
+	if (pEditHandler) {
 		pEditHandler->CheckForModifications(true);
+	}
 
-	if (m_pAsyncRequestQueue)
+	if (m_pAsyncRequestQueue) {
 		m_pAsyncRequestQueue->TriggerProcessing();
+	}
 }
 
 void CMainFrame::OnToolbarComparison(wxCommandEvent&)
@@ -2372,8 +2386,7 @@ void CMainFrame::OnToolbarComparisonDropdown(wxCommandEvent& event)
 void CMainFrame::ShowDropdownMenu(wxMenu* pMenu, wxToolBar* pToolBar, wxCommandEvent& event)
 {
 #ifdef EVT_TOOL_DROPDOWN
-	if (event.GetEventType() == wxEVT_COMMAND_TOOL_DROPDOWN_CLICKED)
-	{
+	if (event.GetEventType() == wxEVT_COMMAND_TOOL_DROPDOWN_CLICKED) {
 		pToolBar->SetDropdownMenu(event.GetId(), pMenu);
 		event.Skip();
 	}
@@ -2382,8 +2395,9 @@ void CMainFrame::ShowDropdownMenu(wxMenu* pMenu, wxToolBar* pToolBar, wxCommandE
 	{
 #ifdef __WXMSW__
 		RECT r;
-		if (::SendMessage((HWND)pToolBar->GetHandle(), TB_GETITEMRECT, pToolBar->GetToolPos(event.GetId()), (LPARAM)&r))
+		if (::SendMessage((HWND)pToolBar->GetHandle(), TB_GETITEMRECT, pToolBar->GetToolPos(event.GetId()), (LPARAM)&r)) {
 			pToolBar->PopupMenu(pMenu, r.left, r.bottom);
+		}
 		else
 #endif
 			pToolBar->PopupMenu(pMenu);
@@ -2427,7 +2441,7 @@ void CMainFrame::OnDropdownComparisonHide(wxCommandEvent&)
 
 void CMainFrame::ProcessCommandLine()
 {
-	const CCommandLine* pCommandLine = wxGetApp().GetCommandLine();
+	CCommandLine const* pCommandLine = wxGetApp().GetCommandLine();
 	if (!pCommandLine) {
 		return;
 	}
@@ -2443,17 +2457,14 @@ void CMainFrame::ProcessCommandLine()
 		}
 
 		CState *pState = CContextManager::Get()->GetCurrentContext();
-		if (!pState) {
-			return;
+		if (pState) {
+			pState->SetLocalDir(local);
 		}
-
-		pState->SetLocalDir(local);
 	}
 
 	std::wstring site;
 	if (pCommandLine->HasSwitch(CCommandLine::sitemanager)) {
 		if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) == 0) {
-			Show();
 			OpenSiteManager();
 		}
 	}
@@ -2489,9 +2500,6 @@ void CMainFrame::ProcessCommandLine()
 		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && server.credentials.logonType_ == LogonType::normal) {
 			server.SetLogonType(LogonType::ask);
 			CLoginManager::Get().RememberPassword(server);
-		}
-		else if (!CLoginManager::Get().GetPassword(server, false)) {
-			return;
 		}
 
 		Site site;
@@ -2678,9 +2686,37 @@ void CMainFrame::PostInitialize()
 	}
 #endif
 
-	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {
-		Show();
+	bool startupReconnect = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) != 0;
+
+	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {;
 		OpenSiteManager();
+		startupReconnect = false;
+	}
+
+	CCommandLine const* pCommandLine = wxGetApp().GetCommandLine();
+	if (pCommandLine && pCommandLine->BlocksReconnectAtStartup()) {
+		startupReconnect = false;
+	}
+
+	if (m_pContextControl && startupReconnect) {
+		for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
+			auto controls = m_pContextControl->GetControlsFromTabIndex(i);
+
+			if (controls && controls->pState) {
+				CState* pState = controls->pState;
+				if (pState->IsRemoteConnected() || !pState->IsRemoteIdle()) {
+					continue;
+				}
+
+				Site site = pState->GetLastSite();
+				CServerPath path = pState->GetLastServerPath();
+				Bookmark bm;
+				bm.m_remoteDir = path;
+				if (!ConnectToSite(site, bm, pState)) {
+					break;
+				}
+			}
+		}
 	}
 }
 

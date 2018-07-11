@@ -119,7 +119,6 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Auto Ascii no extension", number, _T("1"), normal },
 	{ "Auto Ascii dotfiles", number, _T("1"), normal },
 	{ "Language Code", string, _T(""), normal },
-	{ "Last Server Path", string, _T(""), normal },
 	{ "Concurrent download limit", number, _T("0"), normal },
 	{ "Concurrent upload limit", number, _T("0"), normal },
 	{ "Update Check", number, _T("1"), normal },
@@ -139,7 +138,6 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Show Tree Remote", number, _T("1"), normal },
 	{ "File Pane Layout", number, _T("0"), normal },
 	{ "File Pane Swap", number, _T("0"), normal },
-	{ "Last local directory", string, _T(""), normal },
 	{ "Filelist directory sort", number, _T("0"), normal },
 	{ "Filelist name sort", number, DEFAULT_FILENAME_SORT, normal },
 	{ "Queue successful autoclear", number, _T("0"), normal },
@@ -173,9 +171,8 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Filter toggle state", number, _T("0"), normal },
 	{ "Show quickconnect bar", number, _T("1"), normal },
 	{ "Messagelog position", number, _T("0"), normal },
-	{ "Last connected site", string, _T(""), normal },
-	{ "File doubleclock action", number, _T("0"), normal },
-	{ "Dir doubleclock action", number, _T("0"), normal },
+	{ "File doubleclick action", number, _T("0"), normal },
+	{ "Dir doubleclick action", number, _T("0"), normal },
 	{ "Minimize to tray", number, _T("0"), normal },
 	{ "Search column widths", string, _T(""), normal },
 	{ "Search column shown", string, _T(""), normal },
@@ -201,6 +198,8 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Drag and Drop disabled", number, _T("0"), normal },
 	{ "Disable update footer", number, _T("0"), normal },
 	{ "Master password encryptor", string, _T(""), normal },
+	{ "Restore tabs", number, _T("0"), normal },
+	{ "Tab data", xml, std::wstring(), normal },
 
 	// Default/internal options
 	{ "Config Location", string, _T(""), default_only },
@@ -338,7 +337,12 @@ bool COptions::SetOption(unsigned int nID, std::wstring const& value)
 	return true;
 }
 
-bool COptions::SetOptionXml(unsigned int nID, std::unique_ptr<pugi::xml_document> const& value)
+bool COptions::SetOptionXml(unsigned int nID, pugi::xml_document const& value)
+{
+	return SetOptionXml(nID, value.first_child());
+}
+
+bool COptions::SetOptionXml(unsigned int nID, pugi::xml_node const& value)
 {
 	if (nID >= OPTIONS_NUM) {
 		return false;
@@ -349,7 +353,9 @@ bool COptions::SetOptionXml(unsigned int nID, std::unique_ptr<pugi::xml_document
 	}
 
 	auto doc = std::make_unique<pugi::xml_document>();
-	doc->append_copy(value->first_child());
+	if (value) {
+		doc->append_copy(value);
+	}
 
 	ContinueSetOption(nID, doc);
 
@@ -494,10 +500,12 @@ void COptions::SetXmlValue(unsigned int nID, std::unique_ptr<pugi::xml_document>
 		if (setting) {
 			settings.remove_child(setting);
 		}
-		setting = settings.append_child("Setting");
-		SetTextAttribute(setting, "name", options[nID].name);
+		if (value && value->first_child()) {
+			setting = settings.append_child("Setting");
+			SetTextAttribute(setting, "name", options[nID].name);
 
-		setting.append_copy(value->first_child());
+			setting.append_copy(value->first_child());
+		}
 	}
 }
 
@@ -627,114 +635,6 @@ std::unique_ptr<pugi::xml_document> COptions::Validate(unsigned int, std::unique
 	res->append_copy(value->first_child());
 
 	return res;
-}
-
-void COptions::SetServer(std::wstring path, ServerWithCredentials const& server)
-{
-	if (!xmlFile_) {
-		return;
-	}
-
-	if (path.empty()) {
-		return;
-	}
-
-	auto element = xmlFile_->GetElement();
-
-	while (!path.empty()) {
-		std::wstring sub;
-		size_t pos = path.find('/');
-		if (pos != std::wstring::npos) {
-			sub = path.substr(0, pos);
-			path = path.substr(pos + 1);
-		}
-		else {
-			sub = path;
-			path.clear();
-		}
-
-		std::string utf8 = fz::to_utf8(sub);
-		auto newElement = element.child(utf8.c_str());
-		if (newElement) {
-			element = newElement;
-		}
-		else {
-			element = element.append_child(utf8.c_str());
-		}
-	}
-
-	::SetServer(element, server);
-
-	if (GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
-		return;
-	}
-
-	CInterProcessMutex mutex(MUTEX_OPTIONS);
-	xmlFile_->Save(true);
-}
-
-bool COptions::GetServer(std::wstring path, ServerWithCredentials& server)
-{
-	if (path.empty()) {
-		return false;
-	}
-
-	if (!xmlFile_) {
-		return false;
-	}
-	auto element = xmlFile_->GetElement();
-
-	while (!path.empty()) {
-		std::wstring sub;
-		size_t pos = path.find('/');
-		if (pos != std::wstring::npos) {
-			sub = path.substr(0, pos);
-			path = path.substr(pos + 1);
-		}
-		else {
-			sub = path;
-			path.clear();
-		}
-		std::string utf8 = fz::to_utf8(sub);
-		element = element.child(utf8.c_str());
-		if (!element) {
-			return false;
-		}
-	}
-
-	bool res = ::GetServer(element, server);
-
-	return res;
-}
-
-void COptions::SetLastServer(ServerWithCredentials const& server)
-{
-	if (!lastServer_) {
-		lastServer_ = std::make_unique<ServerWithCredentials>(server);
-	}
-	else {
-		*lastServer_ = server;
-	}
-	SetServer(_T("Settings/LastServer"), server);
-}
-
-bool COptions::GetLastServer(ServerWithCredentials& server)
-{
-	if (!lastServer_) {
-		bool res = GetServer(_T("Settings/LastServer"), server);
-		if (res) {
-			lastServer_ = std::make_unique<ServerWithCredentials>(server);
-		}
-		return res;
-	}
-	else {
-		server = *lastServer_;
-		if (!server) {
-			return false;
-		}
-
-		return true;
-	}
 }
 
 void COptions::Init()
@@ -873,10 +773,62 @@ void COptions::Save()
 	xmlFile_->Save(true);
 }
 
+bool COptions::Cleanup()
+{
+	bool ret = false;
+
+	needsCleanup_ = false;
+	auto element = xmlFile_->GetElement();
+	auto child = element.first_child();
+
+	// Remove all but the one settings element
+	while (child) {
+		auto next = child.next_sibling();
+
+		if (child.name() == std::string("Settings")) {
+			break;
+		}
+		element.remove_child(child);
+		child = next;
+		ret = true;
+	}
+
+	pugi::xml_node next;
+	while ((next = child.next_sibling())) {
+		element.remove_child(next);
+	}
+
+	auto settings = child;
+	child = settings.first_child();
+
+	auto const nameOptionMap = GetNameOptionMap();
+
+	// Remove unknown settings
+	while (child) {
+		auto next = child.next_sibling();
+
+		if (child.name() == std::string("Setting")) {
+			if (nameOptionMap.find(child.attribute("name").value()) == nameOptionMap.cend()) {
+				settings.remove_child(child);
+				ret = true;
+			}
+		}
+		else {
+			settings.remove_child(child);
+			ret = true;
+		}
+		child = next;
+	}
+
+	return ret;
+}
+
 void COptions::SaveIfNeeded()
 {
-	if (!m_save_timer.IsRunning()) {
-		return;
+	bool save = m_save_timer.IsRunning();
+
+	if (needsCleanup_) {
+		save |= Cleanup();
 	}
 
 	m_save_timer.Stop();
@@ -1032,4 +984,10 @@ void COptions::SetDefaultValues()
 			m_optionsCache[i] = options[i].defaultValue;
 		}
 	}
+}
+
+
+void COptions::RequireCleanup()
+{
+	needsCleanup_ = true;
 }

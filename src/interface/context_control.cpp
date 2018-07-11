@@ -1,4 +1,5 @@
 #include <filezilla.h>
+#include "cmdline.h"
 #include "commandqueue.h"
 #include "context_control.h"
 #include "filelist_statusbar.h"
@@ -18,6 +19,7 @@
 #include "splitter.h"
 #include "view.h"
 #include "viewheader.h"
+#include "xmlfunctions.h"
 
 #include <wx/wupdlock.h>
 
@@ -38,6 +40,7 @@ CContextControl::CContextControl(CMainFrame& mainFrame)
 	wxASSERT(!CContextManager::Get()->HandlerCount(STATECHANGE_CHANGEDCONTEXT));
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_CHANGEDCONTEXT, false);
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_SERVER, false);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REWRITE_CREDENTIALS, false);
 }
 
 CContextControl::~CContextControl()
@@ -50,6 +53,21 @@ void CContextControl::Create(wxWindow *parent)
 }
 
 void CContextControl::CreateTab()
+{
+	CLocalPath localPath;
+	Site site;
+	CServerPath remotePath;
+
+	auto const* controls = GetCurrentControls();
+	if (controls && controls->pState) {
+		localPath = controls->pState->GetLocalDir();
+		site = controls->pState->GetLastSite();
+		remotePath = controls->pState->GetLastServerPath();
+	}
+	CreateTab(localPath, site, remotePath);
+}
+
+void CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath)
 {
 	wxGetApp().AddStartupProfileRecord("CContextControl::CreateTab");
 
@@ -88,36 +106,14 @@ void CContextControl::CreateTab()
 			}
 		}
 
-		// Restore last server and path
-		auto * current = GetCurrentControls();
-		if (current) {
-			pState->SetLastSite(current->pState->GetLastSite(), current->pState->GetLastServerPath());
-		}
-		else {
-			ServerWithCredentials last_server;
-			CServerPath last_path;
-			if (COptions::Get()->GetLastServer(last_server) && last_path.SetSafePath(COptions::Get()->GetOption(OPTION_LASTSERVERPATH))) {
-				std::wstring last_site_path = COptions::Get()->GetOption(OPTION_LAST_CONNECTED_SITE);
-
-				std::unique_ptr<Site> site;
-				if (!last_site_path.empty()) {
-					site = CSiteManager::GetSiteByPath(last_site_path, false).first;
-				}
-				if (!site || site->server_ != last_server) {
-					site.reset(new Site);
-					site->server_ = last_server;
-				}
-				pState->SetLastSite(*site, last_path);
-			}
-		}
+		pState->SetLastSite(site, remotePath);
 
 		CreateContextControls(*pState);
 
 		pState->GetLocalRecursiveOperation()->SetQueue(m_mainFrame.GetQueue());
 		pState->GetRemoteRecursiveOperation()->SetQueue(m_mainFrame.GetQueue());
 
-		std::wstring const localDir = COptions::Get()->GetOption(OPTION_LASTLOCALDIR);
-		if (!pState->SetLocalDir(localDir)) {
+		if (localPath.empty() || !pState->SetLocalDir(localPath)) {
 			std::wstring const homeDir = wxGetHomeDir().ToStdWstring();
 			if (!pState->SetLocalDir(homeDir)) {
 				pState->SetLocalDir(_T("/"));
@@ -127,11 +123,13 @@ void CContextControl::CreateTab()
 		CContextManager::Get()->SetCurrentContext(pState);
 	}
 
-	if (!m_mainFrame.RestoreSplitterPositions())
+	if (!m_mainFrame.RestoreSplitterPositions()) {
 		m_mainFrame.SetDefaultSplitterPositions();
+	}
 
-	if (m_tabs)
+	if (m_tabs) {
 		m_tabs->SetSelection(m_tabs->GetPageCount() - 1);
+	}
 }
 
 void CContextControl::CreateContextControls(CState& state)
@@ -211,15 +209,17 @@ void CContextControl::CreateContextControls(CState& state)
 	bool show_filelist_statusbars = COptions::Get()->GetOptionVal(OPTION_FILELIST_STATUSBAR) != 0;
 
 	CFilelistStatusBar* pLocalFilelistStatusBar = new CFilelistStatusBar(context_controls.pLocalListViewPanel);
-	if (!show_filelist_statusbars)
+	if (!show_filelist_statusbars) {
 		pLocalFilelistStatusBar->Hide();
+	}
 	context_controls.pLocalListViewPanel->SetStatusBar(pLocalFilelistStatusBar);
 	context_controls.pLocalListView->SetFilelistStatusBar(pLocalFilelistStatusBar);
 	pLocalFilelistStatusBar->SetConnected(true);
 
 	CFilelistStatusBar* pRemoteFilelistStatusBar = new CFilelistStatusBar(context_controls.pRemoteListViewPanel);
-	if (!show_filelist_statusbars)
+	if (!show_filelist_statusbars) {
 		pRemoteFilelistStatusBar->Hide();
+	}
 	context_controls.pRemoteListViewPanel->SetStatusBar(pRemoteFilelistStatusBar);
 	context_controls.pRemoteListView->SetFilelistStatusBar(pRemoteFilelistStatusBar);
 
@@ -239,27 +239,34 @@ void CContextControl::CreateContextControls(CState& state)
 	const int swap = COptions::Get()->GetOptionVal(OPTION_FILEPANE_SWAP);
 
 	if (layout == 1) {
-		if (swap)
+		if (swap) {
 			context_controls.pViewSplitter->SplitHorizontally(context_controls.pRemoteSplitter, context_controls.pLocalSplitter);
-		else
+		}
+		else {
 			context_controls.pViewSplitter->SplitHorizontally(context_controls.pLocalSplitter, context_controls.pRemoteSplitter);
+		}
 	}
 	else {
-		if (swap)
+		if (swap) {
 			context_controls.pViewSplitter->SplitVertically(context_controls.pRemoteSplitter, context_controls.pLocalSplitter);
-		else
+		}
+		else {
 			context_controls.pViewSplitter->SplitVertically(context_controls.pLocalSplitter, context_controls.pRemoteSplitter);
+		}
 	}
 
 	if (COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_LOCAL)) {
 		context_controls.pLocalViewHeader = new CLocalViewHeader(context_controls.pLocalTreeViewPanel, state);
 		context_controls.pLocalTreeViewPanel->SetHeader(context_controls.pLocalViewHeader);
-		if (layout == 3 && swap)
+		if (layout == 3 && swap) {
 			context_controls.pLocalSplitter->SplitVertically(context_controls.pLocalListViewPanel, context_controls.pLocalTreeViewPanel);
-		else if (layout)
+		}
+		else if (layout) {
 			context_controls.pLocalSplitter->SplitVertically(context_controls.pLocalTreeViewPanel, context_controls.pLocalListViewPanel);
-		else
+		}
+		else {
 			context_controls.pLocalSplitter->SplitHorizontally(context_controls.pLocalTreeViewPanel, context_controls.pLocalListViewPanel);
+		}
 	}
 	else {
 		context_controls.pLocalTreeViewPanel->Hide();
@@ -271,12 +278,15 @@ void CContextControl::CreateContextControls(CState& state)
 	if (COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_REMOTE)) {
 		context_controls.pRemoteViewHeader = new CRemoteViewHeader(context_controls.pRemoteTreeViewPanel, state);
 		context_controls.pRemoteTreeViewPanel->SetHeader(context_controls.pRemoteViewHeader);
-		if (layout == 3 && !swap)
+		if (layout == 3 && !swap) {
 			context_controls.pRemoteSplitter->SplitVertically(context_controls.pRemoteListViewPanel, context_controls.pRemoteTreeViewPanel);
-		else if (layout)
+		}
+		else if (layout) {
 			context_controls.pRemoteSplitter->SplitVertically(context_controls.pRemoteTreeViewPanel, context_controls.pRemoteListViewPanel);
-		else
+		}
+		else {
 			context_controls.pRemoteSplitter->SplitHorizontally(context_controls.pRemoteTreeViewPanel, context_controls.pRemoteListViewPanel);
+		}
 	}
 	else {
 		context_controls.pRemoteTreeViewPanel->Hide();
@@ -286,10 +296,12 @@ void CContextControl::CreateContextControls(CState& state)
 	}
 
 	if (layout == 3) {
-		if (!swap)
+		if (!swap) {
 			context_controls.pRemoteSplitter->SetSashGravity(1.0);
-		else
+		}
+		else {
 			context_controls.pLocalSplitter->SetSashGravity(1.0);
+		}
 	}
 
 	m_mainFrame.ConnectNavigationHandler(context_controls.pLocalListView);
@@ -326,8 +338,9 @@ void CContextControl::OnTabRefresh(wxCommandEvent&)
 
  CContextControl::_context_controls* CContextControl::GetCurrentControls()
 {
-	if (m_current_context_controls == -1)
+	if (m_current_context_controls == -1) {
 		return 0;
+	}
 
 	return &m_context_controls[m_current_context_controls];
 }
@@ -357,8 +370,9 @@ bool CContextControl::CloseTab(int tab)
 	CState *const pState = removeControls->pState;
 
 	if (!pState->m_pCommandQueue->Idle()) {
-		if (wxMessageBoxEx(_("Cannot close tab while busy.\nCancel current operation and close tab?"), _T("FileZilla"), wxYES_NO | wxICON_QUESTION) != wxYES)
+		if (wxMessageBoxEx(_("Cannot close tab while busy.\nCancel current operation and close tab?"), _T("FileZilla"), wxYES_NO | wxICON_QUESTION) != wxYES) {
 			return false;
+		}
 	}
 
 #ifndef __WXMAC__
@@ -444,8 +458,9 @@ void CContextControl::OnTabRightclick(wxAuiNotebookEvent& event)
 
 void CContextControl::OnTabContextClose(wxCommandEvent&)
 {
-	if (m_right_clicked_tab == -1)
+	if (m_right_clicked_tab == -1) {
 		return;
+	}
 
 	// Need to defer event, wxAUI would write to free'd memory
 	// if we'd actually delete tab and potenially the notebook with it
@@ -461,7 +476,7 @@ void CContextControl::OnTabClosing_Deferred(wxCommandEvent& event)
 {
 	int tab = event.GetId();
 	if (tab < 0) {
-		tab++;
+		++tab;
 		int count = GetTabCount();
 		for (int i = count - 1; i >= 0; --i) {
 			if (i != -tab) {
@@ -469,8 +484,9 @@ void CContextControl::OnTabClosing_Deferred(wxCommandEvent& event)
 			}
 		}
 	}
-	else
+	else {
 		CloseTab(tab);
+	}
 }
 
 
@@ -591,9 +607,103 @@ void CContextControl::OnStateChange(CState* pState, t_statechange_notifications 
 			}
 		}
 	}
+	else if (notification == STATECHANGE_REWRITE_CREDENTIALS) {
+		SaveTabs();
+	}
 }
 
 void CContextControl::OnTabContextNew(wxCommandEvent&)
 {
 	CreateTab();
+}
+
+void CContextControl::SaveTabs()
+{
+	pugi::xml_document xml;
+	auto tabs = xml.append_child("Tabs");
+
+	auto selected = GetCurrentControls();
+
+	bool selectedOnly = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) == 0;
+
+	for (auto const& controls : m_context_controls) {
+		if (!controls.pState) {
+			continue;
+		}
+
+		if (selectedOnly && &controls != selected) {
+			continue;
+		}
+
+		Site const site = controls.pState->GetLastSite();
+
+		auto tab = tabs.append_child("Tab");
+		SetServer(tab, site.server_);
+		tab.append_child("Site").text().set(fz::to_utf8(site.m_path).c_str());
+		tab.append_child("RemotePath").text().set(fz::to_utf8(controls.pState->GetLastServerPath().GetSafePath()).c_str());
+		tab.append_child("LocalPath").text().set(fz::to_utf8(controls.pState->GetLocalDir().GetPath()).c_str());
+
+		if (&controls == selected) {
+			tab.append_attribute("selected").set_value(1);
+		}
+	}
+
+	COptions::Get()->SetOptionXml(OPTION_TAB_DATA, xml);
+}
+
+void CContextControl::RestoreTabs()
+{
+	int selected = 0;
+
+	auto xml = COptions::Get()->GetOptionXml(OPTION_TAB_DATA);
+
+	bool selectedOnly = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) == 0;
+
+	CCommandLine const* pCommandLine = wxGetApp().GetCommandLine();
+	if (pCommandLine && pCommandLine->BlocksReconnectAtStartup()) {
+		selectedOnly = true;
+	}
+	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {
+		selectedOnly = true;
+	}
+
+	pugi::xml_node tabs = xml ? xml->child("Tabs") : pugi::xml_node();
+	if (tabs) {
+		for (auto tab = tabs.child("Tab"); tab; tab = tab.next_sibling("Tab")) {
+
+			if (tab.attribute("selected").as_int()) {
+				selected = m_context_controls.size();
+			}
+			else if (selectedOnly) {
+				continue;
+			}
+
+			CLocalPath localPath(fz::to_wstring_from_utf8(tab.child("LocalPath").child_value()));
+
+			Site site;
+
+			ServerWithCredentials last_server;
+			CServerPath last_path;
+
+			if (GetServer(tab, site.server_) && last_path.SetSafePath(fz::to_wstring_from_utf8(tab.child("RemotePath").child_value()))) {
+				std::wstring last_site_path = fz::to_wstring_from_utf8(tab.child("Site").child_value());
+
+				std::unique_ptr<Site> ssite;
+				if (!last_site_path.empty()) {
+					auto ssite = CSiteManager::GetSiteByPath(last_site_path, false).first;
+					if (ssite && ssite->server_ == site.server_) {
+						site = *ssite;
+					}
+				}
+			}
+
+			CreateTab(localPath, site, last_path);
+		}
+	}
+
+	if (m_context_controls.empty()) {
+		CreateTab();
+	}
+
+	SelectTab(selected);
 }

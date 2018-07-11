@@ -29,6 +29,8 @@ public:
 	wxString GetOption(t_option option) const;
 	wxString GetParameter() const;
 
+	bool BlocksReconnectAtStartup() const;
+
 protected:
 	wxCmdLineParser m_parser;
 };

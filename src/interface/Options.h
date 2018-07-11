@@ -19,7 +19,6 @@ enum interfaceOptions
 	OPTION_ASCIINOEXT,
 	OPTION_ASCIIDOTFILE,
 	OPTION_LANGUAGE,
-	OPTION_LASTSERVERPATH,
 	OPTION_CONCURRENTDOWNLOADLIMIT,
 	OPTION_CONCURRENTUPLOADLIMIT,
 	OPTION_UPDATECHECK,
@@ -39,7 +38,6 @@ enum interfaceOptions
 	OPTION_SHOW_TREE_REMOTE,
 	OPTION_FILEPANE_LAYOUT,
 	OPTION_FILEPANE_SWAP,
-	OPTION_LASTLOCALDIR,
 	OPTION_FILELIST_DIRSORT,
 	OPTION_FILELIST_NAMESORT,
 	OPTION_QUEUE_SUCCESSFUL_AUTOCLEAR,
@@ -73,7 +71,6 @@ enum interfaceOptions
 	OPTION_FILTERTOGGLESTATE,
 	OPTION_SHOW_QUICKCONNECT,
 	OPTION_MESSAGELOG_POSITION,
-	OPTION_LAST_CONNECTED_SITE,
 	OPTION_DOUBLECLICK_ACTION_FILE,
 	OPTION_DOUBLECLICK_ACTION_DIRECTORY,
 	OPTION_MINIMIZE_TRAY,
@@ -101,6 +98,8 @@ enum interfaceOptions
 	OPTION_DND_DISABLED,
 	OPTION_DISABLE_UPDATE_FOOTER,
 	OPTION_MASTERPASSWORDENCRYPTOR,
+	OPTION_RESTORE_TABS,
+	OPTION_TAB_DATA,
 
 	// Default/internal options
 	OPTION_DEFAULT_SETTINGSDIR, // guaranteed to be (back)slash-terminated
@@ -137,12 +136,10 @@ public:
 
 	virtual bool SetOption(unsigned int nID, int value);
 	virtual bool SetOption(unsigned int nID, std::wstring const& value);
-	virtual bool SetOptionXml(unsigned int nID, std::unique_ptr<pugi::xml_document> const& value);
+	virtual bool SetOptionXml(unsigned int nID, pugi::xml_node const& value);
+	virtual bool SetOptionXml(unsigned int nID, pugi::xml_document const& value);
 
 	bool OptionFromFzDefaultsXml(unsigned int nID);
-
-	void SetLastServer(const ServerWithCredentials& server);
-	bool GetLastServer(ServerWithCredentials& server);
 
 	static COptions* Get();
 	static void Init();
@@ -150,6 +147,7 @@ public:
 
 	void Import(pugi::xml_node element);
 
+	void RequireCleanup();
 	void SaveIfNeeded();
 
 	static CLocalPath GetUnadjustedSettingsDir();
@@ -168,10 +166,6 @@ protected:
 	void SetXmlValue(unsigned int nID, std::wstring const& value);
 	void SetXmlValue(unsigned int nID, std::unique_ptr<pugi::xml_document> const& value);
 
-	// path is element path below document root, separated by slashes
-	void SetServer(std::wstring path, ServerWithCredentials const& server);
-	bool GetServer(std::wstring path, ServerWithCredentials& server);
-
 	pugi::xml_node CreateSettingsXmlElement();
 
 	std::map<std::string, unsigned int> GetNameOptionMap() const;
@@ -181,6 +175,7 @@ protected:
 	CLocalPath InitSettingsDir();
 	void SetDefaultValues();
 
+	bool Cleanup(); // Removes all unknown elements from the XML
 	void Save();
 
 	void NotifyChangedOptions();
@@ -194,6 +189,7 @@ protected:
 	static COptions* m_theOptions;
 
 	wxTimer m_save_timer;
+	bool needsCleanup_{};
 
 	DECLARE_EVENT_TABLE()
 	void OnTimer(wxTimerEvent& event);
