@@ -628,15 +628,9 @@ void CContextControl::SaveTabs()
 
 	int const currentTab = GetCurrentTab();
 
-	bool selectedOnly = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) == 0;
-
 	for (int i = 0; i < GetTabCount(); ++i) {
 		auto controls = GetControlsFromTabIndex(i);
 		if (!controls || !controls->pState) {
-			continue;
-		}
-
-		if (selectedOnly && i != currentTab) {
 			continue;
 		}
 

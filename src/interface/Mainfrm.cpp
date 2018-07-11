@@ -2682,8 +2682,8 @@ void CMainFrame::PostInitialize()
 		update_dialog_timer_.SetOwner(this);
 		m_pUpdater = new CUpdater(*this, m_engineContext,
 			[this](CActiveNotification const& notification) {
-				UpdateActivityLed(notification.GetDirection());
-			}
+			UpdateActivityLed(notification.GetDirection());
+		}
 		);
 		m_pUpdater->Init();
 	}
@@ -2691,7 +2691,8 @@ void CMainFrame::PostInitialize()
 
 	bool startupReconnect = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) != 0;
 
-	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {;
+	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {
+		;
 		OpenSiteManager();
 		startupReconnect = false;
 	}
@@ -2702,23 +2703,30 @@ void CMainFrame::PostInitialize()
 	}
 
 	if (m_pContextControl && startupReconnect) {
-		for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
-			auto controls = m_pContextControl->GetControlsFromTabIndex(i);
+		auto xml = COptions::Get()->GetOptionXml(OPTION_TAB_DATA);
+		pugi::xml_node tabs = xml ? xml->child("Tabs") : pugi::xml_node();
+		int i = 0;
+		for (auto tab = tabs.child("Tab"); tab; tab = tab.next_sibling("Tab")) {
+			if (tab.attribute("connected").as_int()) {
+				auto controls = m_pContextControl->GetControlsFromTabIndex(i);
 
-			if (controls && controls->pState) {
-				CState* pState = controls->pState;
-				if (pState->IsRemoteConnected() || !pState->IsRemoteIdle()) {
-					continue;
-				}
+				if (controls && controls->pState) {
+					CState* pState = controls->pState;
+					if (pState->IsRemoteConnected() || !pState->IsRemoteIdle()) {
+						continue;
+					}
 
-				Site site = pState->GetLastSite();
-				CServerPath path = pState->GetLastServerPath();
-				Bookmark bm;
-				bm.m_remoteDir = path;
-				if (!ConnectToSite(site, bm, pState)) {
-					break;
+					Site site = pState->GetLastSite();
+					CServerPath path = pState->GetLastServerPath();
+					Bookmark bm;
+					bm.m_remoteDir = path;
+					if (!ConnectToSite(site, bm, pState)) {
+						break;
+					}
 				}
 			}
+
+			++i;
 		}
 	}
 }
