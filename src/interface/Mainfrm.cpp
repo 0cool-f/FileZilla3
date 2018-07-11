@@ -2083,8 +2083,9 @@ void CMainFrame::CheckChangedSettings()
 
 void CMainFrame::ConnectNavigationHandler(wxEvtHandler* handler)
 {
-	if (!handler)
+	if (!handler) {
 		return;
+	}
 
 	handler->Connect(wxEVT_NAVIGATION_KEY, wxNavigationKeyEventHandler(CMainFrame::OnNavigationKeyEvent), 0, this);
 }
@@ -2092,8 +2093,9 @@ void CMainFrame::ConnectNavigationHandler(wxEvtHandler* handler)
 void CMainFrame::OnNavigationKeyEvent(wxNavigationKeyEvent& event)
 {
 	if (wxGetKeyState(WXK_CONTROL) && event.IsFromTab()) {
-		if (m_pContextControl)
+		if (m_pContextControl) {
 			m_pContextControl->AdvanceTab(event.GetDirection());
+		}
 		return;
 	}
 
@@ -2110,8 +2112,9 @@ void CMainFrame::OnChar(wxKeyEvent& event)
 	// Jump between quickconnect bar and view headers
 
 	std::list<wxWindow*> windowOrder;
-	if (m_pQuickconnectBar)
+	if (m_pQuickconnectBar) {
 		windowOrder.push_back(m_pQuickconnectBar);
+	}
 	CContextControl::_context_controls* controls = m_pContextControl->GetCurrentControls();
 	if (controls) {
 		windowOrder.push_back(controls->pLocalViewHeader);

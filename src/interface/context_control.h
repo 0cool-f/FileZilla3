@@ -21,7 +21,7 @@ class CListSearchPanel;
 class CContextControl final : public wxSplitterWindow, public CGlobalStateEventHandler
 {
 public:
-	struct _context_controls
+	struct _context_controls final
 	{
 		bool used() const { return pViewSplitter != 0; }
 

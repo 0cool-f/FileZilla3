@@ -349,8 +349,9 @@ CContextControl::_context_controls* CContextControl::GetControlsFromState(CState
 {
 	size_t i = 0;
 	for (i = 0; i < m_context_controls.size(); ++i) {
-		if (m_context_controls[i].pState == pState)
+		if (m_context_controls[i].pState == pState) {
 			return &m_context_controls[i];
+		}
 	}
 	return 0;
 }
@@ -405,6 +406,7 @@ bool CContextControl::CloseTab(int tab)
 		wxAuiNotebookEx *tabs = m_tabs;
 		m_tabs = 0;
 
+		// We don't actually delete the controls outselves, that's done by wx as part of the RemovePage call.
 		removeControls->pViewSplitter = 0;
 
 		CContextManager::Get()->SetCurrentContext(keptControls->pState);
@@ -581,17 +583,19 @@ void CContextControl::OnStateChange(CState* pState, t_statechange_notifications 
 {
 	if (notification == STATECHANGE_CHANGEDCONTEXT) {
 		if (!pState) {
-			m_current_context_controls = 0;
+			m_current_context_controls = m_context_controls.empty() ? -1 : 0;
 			return;
 		}
 
 		// Get current controls for new current context
-		for (m_current_context_controls = 0; m_current_context_controls < (int)m_context_controls.size(); ++m_current_context_controls) {
-			if (m_context_controls[m_current_context_controls].pState == pState)
+		for (m_current_context_controls = 0; m_current_context_controls < static_cast<int>(m_context_controls.size()); ++m_current_context_controls) {
+			if (m_context_controls[m_current_context_controls].pState == pState) {
 				break;
+			}
 		}
-		if (m_current_context_controls == (int)m_context_controls.size())
+		if (m_current_context_controls == static_cast<int>(m_context_controls.size())) {
 			m_current_context_controls = -1;
+		}
 	}
 	else if (notification == STATECHANGE_SERVER) {
 		if (!m_tabs) {
@@ -622,28 +626,32 @@ void CContextControl::SaveTabs()
 	pugi::xml_document xml;
 	auto tabs = xml.append_child("Tabs");
 
-	auto selected = GetCurrentControls();
+	int const currentTab = GetCurrentTab();
 
 	bool selectedOnly = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) == 0;
 
-	for (auto const& controls : m_context_controls) {
-		if (!controls.pState) {
+	for (int i = 0; i < GetTabCount(); ++i) {
+		auto controls = GetControlsFromTabIndex(i);
+		if (!controls || !controls->pState) {
 			continue;
 		}
 
-		if (selectedOnly && &controls != selected) {
+		if (selectedOnly && i != currentTab) {
 			continue;
 		}
 
-		Site const site = controls.pState->GetLastSite();
+		Site const site = controls->pState->GetLastSite();
 
 		auto tab = tabs.append_child("Tab");
 		SetServer(tab, site.server_);
 		tab.append_child("Site").text().set(fz::to_utf8(site.m_path).c_str());
-		tab.append_child("RemotePath").text().set(fz::to_utf8(controls.pState->GetLastServerPath().GetSafePath()).c_str());
-		tab.append_child("LocalPath").text().set(fz::to_utf8(controls.pState->GetLocalDir().GetPath()).c_str());
+		tab.append_child("RemotePath").text().set(fz::to_utf8(controls->pState->GetLastServerPath().GetSafePath()).c_str());
+		tab.append_child("LocalPath").text().set(fz::to_utf8(controls->pState->GetLocalDir().GetPath()).c_str());
 
-		if (&controls == selected) {
+		if (controls->pState->IsRemoteConnected()) {
+			tab.append_attribute("connected").set_value(1);
+		}
+		if (i == currentTab) {
 			tab.append_attribute("selected").set_value(1);
 		}
 	}
@@ -653,6 +661,10 @@ void CContextControl::SaveTabs()
 
 void CContextControl::RestoreTabs()
 {
+	if (!m_context_controls.empty()) {
+		return;
+	}
+
 	int selected = 0;
 
 	auto xml = COptions::Get()->GetOptionXml(OPTION_TAB_DATA);
