@@ -177,10 +177,11 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 #endif
 
 	if (COptions::Get()->GetOptionVal(OPTION_DEBUG_MENU)) {
-		wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_DEBUG"));
-		if (pMenu) {
-			menubar->Append(pMenu, _("&Debug"));
-		}
+		wxMenu * debug = new wxMenu;
+		debug->Append(XRCID("ID_CLEARCACHE_LAYOUT"), _("Clear &layout cache"));
+		debug->Append(XRCID("ID_CIPHERS"), _("&TLS Ciphers"), _("Shows available TLS ciphers"));
+		debug->Append(XRCID("ID_CLEAR_UPDATER"), _("Clear auto&update data"));
+		menubar->Append(debug, _("&Debug"));
 	}
 
 	menubar->UpdateBookmarkMenu();
