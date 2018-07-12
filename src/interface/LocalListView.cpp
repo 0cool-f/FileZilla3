@@ -783,16 +783,34 @@ void CLocalListView::OnContextMenu(wxContextMenuEvent& event)
 		return;
 	}
 
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_LOCALFILELIST"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
 
+	auto item = new wxMenuItem(&menu, XRCID("ID_UPLOAD"), _("&Upload"), _("Upload selected files and directories"));
+	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_UPLOAD"), wxART_MENU));
+	menu.Append(item);
+	item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add files to queue"), _("Add selected files and folders to the transfer queue"));
+	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_UPLOADADD"), wxART_MENU));
+	menu.Append(item);
+	menu.Append(XRCID("ID_ENTER"), _("E&nter directory"), _("Enter selected directory"));
+	
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_OPEN"), _("&Open"), _("Open the file."));		
+	menu.Append(XRCID("ID_EDIT"), _("&Edit"), _("Edit the file with the configured editor and upload changes to the server."));
+		
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));		
+	menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
+	menu.Append(XRCID("ID_CONTEXT_REFRESH"), _("Re&fresh"));
+		
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_DELETE"),_("&Delete"), _("Delete selected files and directories"));
+	menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected files and directories"));
+		
 	const bool connected = m_state.IsRemoteConnected();
 	if (!connected) {
-		pMenu->Enable(XRCID("ID_EDIT"), COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL) == 0);
-		pMenu->Enable(XRCID("ID_UPLOAD"), false);
-		pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
+		menu.Enable(XRCID("ID_EDIT"), COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL) == 0);
+		menu.Enable(XRCID("ID_UPLOAD"), false);
+		menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
 	}
 
 	int index = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -803,9 +821,9 @@ void CLocalListView::OnContextMenu(wxContextMenuEvent& event)
 		++count;
 		const CLocalFileData* const data = GetData(index);
 		if (!data || (!index && m_hasParent)) {
-			pMenu->Enable(XRCID("ID_OPEN"), false);
-			pMenu->Enable(XRCID("ID_RENAME"), false);
-			pMenu->Enable(XRCID("ID_EDIT"), false);
+			menu.Enable(XRCID("ID_OPEN"), false);
+			menu.Enable(XRCID("ID_RENAME"), false);
+			menu.Enable(XRCID("ID_EDIT"), false);
 		}
 		if ((data && data->comparison_flags == fill) || (!index && m_hasParent)) {
 			fillCount++;
@@ -816,33 +834,32 @@ void CLocalListView::OnContextMenu(wxContextMenuEvent& event)
 		index = GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	}
 	if (!count || fillCount == count) {
-		pMenu->Delete(XRCID("ID_ENTER"));
-		pMenu->Enable(XRCID("ID_UPLOAD"), false);
-		pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
-		pMenu->Enable(XRCID("ID_DELETE"), false);
-		pMenu->Enable(XRCID("ID_RENAME"), false);
-		pMenu->Enable(XRCID("ID_EDIT"), false);
+		menu.Delete(XRCID("ID_ENTER"));
+		menu.Enable(XRCID("ID_UPLOAD"), false);
+		menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
+		menu.Enable(XRCID("ID_DELETE"), false);
+		menu.Enable(XRCID("ID_RENAME"), false);
+		menu.Enable(XRCID("ID_EDIT"), false);
 	}
 	else if (count > 1) {
-		pMenu->Delete(XRCID("ID_ENTER"));
-		pMenu->Enable(XRCID("ID_RENAME"), false);
+		menu.Delete(XRCID("ID_ENTER"));
+		menu.Enable(XRCID("ID_RENAME"), false);
 	}
 	else {
 		// Exactly one item selected
 		if (!selectedDir) {
-			pMenu->Delete(XRCID("ID_ENTER"));
+			menu.Delete(XRCID("ID_ENTER"));
 		}
 	}
 	if (selectedDir) {
-		pMenu->Enable(XRCID("ID_EDIT"), false);
+		menu.Enable(XRCID("ID_EDIT"), false);
 		if (m_state.GetLocalRecursiveOperation() && m_state.GetLocalRecursiveOperation()->IsActive()) {
-			pMenu->Enable(XRCID("ID_UPLOAD"), false);
-			pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
+			menu.Enable(XRCID("ID_UPLOAD"), false);
+			menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
 		}
 	}
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CLocalListView::OnMenuUpload(wxCommandEvent& event)

@@ -220,8 +220,9 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 
 	menubar->UpdateSpeedLimitMenuItem();
 
-	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2)
+	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
 		menubar->HideItem(XRCID("ID_VIEW_MESSAGELOG"));
+	}
 
 	menubar->UpdateMenubarState();
 
@@ -373,8 +374,9 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 		CContextControl* pContextControl = m_pMainFrame ? m_pMainFrame->GetContextControl() : 0;
 		CContextControl::_context_controls* controls = pContextControl ? pContextControl->GetCurrentControls() : 0;
 		CState* pState = controls ? controls->pState : 0;
-		if (!pState)
+		if (!pState) {
 			return;
+		}
 
 		Site site = pState->GetSite();
 		if (!site.server_) {
@@ -538,14 +540,17 @@ void CMenuBar::OnOptionsChanged(changed_options_t const& options)
 		Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0);
 	}
 	if (options.test(OPTION_COMPARISONMODE)) {
-		if (COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE) != 1)
+		if (COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE) != 1) {
 			Check(XRCID("ID_COMPARE_SIZE"), true);
-		else
+		}
+		else {
 			Check(XRCID("ID_COMPARE_DATE"), true);
+		}
 	}
 	if (options.test(OPTION_MESSAGELOG_POSITION)) {
-		if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2)
+		if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
 			HideItem(XRCID("ID_VIEW_MESSAGELOG"));
+		}
 		else {
 			ShowItem(XRCID("ID_VIEW_MESSAGELOG"));
 			Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
@@ -563,8 +568,9 @@ void CMenuBar::UpdateSpeedLimitMenuItem()
 	int downloadLimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_INBOUND);
 	int uploadLimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_OUTBOUND);
 
-	if (!downloadLimit && !uploadLimit)
+	if (!downloadLimit && !uploadLimit) {
 		enable = false;
+	}
 
 	Check(XRCID("ID_MENU_TRANSFER_SPEEDLIMITS_ENABLE"), enable);
 }
@@ -589,8 +595,9 @@ void CMenuBar::UpdateMenubarState()
 	Check(XRCID("ID_TOOLBAR_SYNCHRONIZED_BROWSING"), pState->GetSyncBrowse());
 
 	bool canReconnect;
-	if (server || !idle)
+	if (server || !idle) {
 		canReconnect = false;
+	}
 	else {
 		canReconnect = static_cast<bool>(pState->GetLastSite().server_);
 	}
@@ -614,8 +621,9 @@ bool CMenuBar::ShowItem(int id)
 
 			menu_iter->first->Insert(iter->first - offset, iter->second);
 			menu_iter->second.erase(iter);
-			if (menu_iter->second.empty())
+			if (menu_iter->second.empty()) {
 				m_hidden_items.erase(menu_iter);
+			}
 
 			return true;
 		}
@@ -627,26 +635,29 @@ bool CMenuBar::HideItem(int id)
 {
 	wxMenu* pMenu = 0;
 	wxMenuItem* pItem = FindItem(id, &pMenu);
-	if (!pItem || !pMenu)
+	if (!pItem || !pMenu) {
 		return false;
+	}
 
 	size_t pos;
 	pItem = pMenu->FindChildItem(id, &pos);
-	if (!pItem)
+	if (!pItem) {
 		return false;
+	}
 
 	pMenu->Remove(pItem);
 
 	auto menu_iter = m_hidden_items.insert(std::make_pair(pMenu, std::map<int, wxMenuItem*>())).first;
 
 	for (auto iter = menu_iter->second.begin(); iter != menu_iter->second.end(); ++iter) {
-		if (iter->first > (int)pos)
+		if (iter->first > static_cast<int>(pos)) {
 			break;
+		}
 
 		pos++;
 	}
 
-	menu_iter->second[(int)pos] = pItem;
+	menu_iter->second[static_cast<int>(pos)] = pItem;
 
 	return true;
 }

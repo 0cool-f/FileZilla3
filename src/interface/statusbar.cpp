@@ -486,8 +486,9 @@ void CStatusBar::UpdateSizeFormat()
 	// 0 equals bytes, however just use IEC binary prefixes instead,
 	// exact byte counts for queue make no sense.
 	m_sizeFormat = CSizeFormat::_format(COptions::Get()->GetOptionVal(OPTION_SIZE_FORMAT));
-	if (!m_sizeFormat)
+	if (!m_sizeFormat) {
 		m_sizeFormat = CSizeFormat::iec;
+	}
 
 	m_sizeFormatThousandsSep = COptions::Get()->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0;
 	m_sizeFormatDecimalPlaces = COptions::Get()->GetOptionVal(OPTION_SIZE_DECIMALPLACES);
@@ -512,8 +513,9 @@ void CStatusBar::OnHandleLeftClick(wxWindow* pWnd)
 			CSftpEncryptioInfoDialog dlg;
 			dlg.ShowDialog(pSftpEncryptionNotification);
 		}
-		else
+		else {
 			wxMessageBoxEx(_("Certificate and session data are not available yet."), _("Security information"));
+		}
 	}
 	else if (pWnd == m_pSpeedLimitsIndicator) {
 		CSpeedLimitsDialog dlg;
@@ -530,27 +532,28 @@ void CStatusBar::OnHandleRightClick(wxWindow* pWnd)
 		ShowDataTypeMenu();
 	}
 	else if (pWnd == m_pSpeedLimitsIndicator) {
-		wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_SPEEDLIMITCONTEXT"));
-		if (!pMenu)
-			return;
 
 		int downloadlimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_INBOUND);
 		int uploadlimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_OUTBOUND);
 		bool enable = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_ENABLE) != 0;
-		if (!downloadlimit && !uploadlimit)
+		if (!downloadlimit && !uploadlimit) {
 			enable = false;
-		pMenu->Check(XRCID("ID_SPEEDLIMITCONTEXT_ENABLE"), enable);
+		}
 
-		PopupMenu(pMenu);
-		delete pMenu;
+		wxMenu menu;
+		menu.Append(XRCID("ID_SPEEDLIMITCONTEXT_ENABLE"), _("&Enable"), wxString(), wxITEM_CHECK)->Check(enable);
+		menu.Append(XRCID("ID_SPEEDLIMITCONTEXT_CONFIGURE"), _("&Configure speed limits..."));
+
+		PopupMenu(&menu);
 	}
 }
 
 void CStatusBar::ShowDataTypeMenu()
 {
 	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_TRANSFER_TYPE_CONTEXT"));
-	if (!pMenu)
+	if (!pMenu) {
 		return;
+	}
 
 	const int type = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
 	switch (type)
