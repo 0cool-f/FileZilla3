@@ -8,8 +8,8 @@ BEGIN_EVENT_TABLE(CConditionalDialog, wxDialog)
 EVT_BUTTON(wxID_ANY, CConditionalDialog::OnButton)
 END_EVENT_TABLE()
 
-CConditionalDialog::CConditionalDialog(wxWindow* parent, DialogType type, Modes mode, bool checked /*=false*/)
-	: wxDialog(parent, wxID_ANY, _T(""), wxDefaultPosition), m_type(type)
+CConditionalDialog::CConditionalDialog(wxWindow* parent, DialogType type, Modes mode, bool checked)
+	: wxDialog(parent, wxID_ANY, wxString(), wxDefaultPosition), m_type(type)
 {
 	wxSizer* pVertSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -55,8 +55,9 @@ CConditionalDialog::CConditionalDialog(wxWindow* parent, DialogType type, Modes 
 bool CConditionalDialog::Run()
 {
 	wxString dialogs = COptions::Get()->GetOption(OPTION_ONETIME_DIALOGS);
-	if (dialogs.Len() > (unsigned int)m_type && dialogs[m_type] == '1')
+	if (dialogs.size() > static_cast<size_t>(m_type) && dialogs[m_type] == '1') {
 		return true;
+	}
 
 	Fit();
 	wxGetApp().GetWrapEngine()->WrapRecursive(this, 3);
@@ -67,14 +68,16 @@ bool CConditionalDialog::Run()
 
 	auto cb = dynamic_cast<wxCheckBox*>(FindWindow(wxID_HIGHEST + 1));
 	if (cb && cb->GetValue()) {
-		while (dialogs.Len() <= (unsigned int)m_type)
+		while (dialogs.size() <= static_cast<size_t>(m_type)) {
 			dialogs += _T("0");
+		}
 		dialogs[m_type] = '1';
 		COptions::Get()->SetOption(OPTION_ONETIME_DIALOGS, dialogs.ToStdWstring());
 	}
 
-	if (id == wxID_OK || id == wxID_YES)
+	if (id == wxID_OK || id == wxID_YES) {
 		return true;
+	}
 
 	return false;
 }

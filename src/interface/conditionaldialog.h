@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_INTERFACE_CONDITIONALDIALOG_HEADER
 #define FILEZILLA_INTERFACE_CONDITIONALDIALOG_HEADER
 
+#include <wx/dialog.h>
+
 class CConditionalDialog final : public wxDialog
 {
 public:
