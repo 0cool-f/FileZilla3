@@ -29,30 +29,29 @@
 
 void InitHandlers(wxXmlResource& res)
 {
-	res.AddHandler(new wxMenuXmlHandler);
-	res.AddHandler(new wxMenuBarXmlHandler);
-	res.AddHandler(new wxDialogXmlHandler);
-	res.AddHandler(new wxPanelXmlHandler);
 	res.AddHandler(new wxSizerXmlHandler);
 	res.AddHandler(new wxButtonXmlHandler);
+	res.AddHandler(new wxRadioButtonXmlHandler);
+	res.AddHandler(new wxMenuXmlHandler);
+	res.AddHandler(new wxTextCtrlXmlHandlerEx);
+	res.AddHandler(new wxCheckBoxXmlHandler);
+	res.AddHandler(new wxStaticBoxXmlHandler);
+	res.AddHandler(new wxStdDialogButtonSizerXmlHandler);
+	res.AddHandler(new wxDialogXmlHandler);
+	res.AddHandler(new wxPanelXmlHandler);
+	res.AddHandler(new wxChoiceXmlHandler);
+	res.AddHandler(new wxStaticLineXmlHandler);
 	res.AddHandler(new wxBitmapButtonXmlHandler);
 	res.AddHandler(new wxStaticTextXmlHandler);
-	res.AddHandler(new wxStaticBoxXmlHandler);
 	res.AddHandler(new wxStaticBitmapXmlHandler);
 	res.AddHandler(new wxTreeCtrlXmlHandler);
 	res.AddHandler(new wxListCtrlXmlHandler);
 	res.AddHandler(new wxCheckListBoxXmlHandler);
-	res.AddHandler(new wxChoiceXmlHandler);
 	res.AddHandler(new wxGaugeXmlHandler);
-	res.AddHandler(new wxCheckBoxXmlHandler);
 	res.AddHandler(new wxSpinCtrlXmlHandler);
-	res.AddHandler(new wxRadioButtonXmlHandler);
 	res.AddHandler(new wxNotebookXmlHandler);
-	res.AddHandler(new wxTextCtrlXmlHandlerEx);
 	res.AddHandler(new wxListBoxXmlHandler);
-	res.AddHandler(new wxStaticLineXmlHandler);
 	res.AddHandler(new wxScrolledWindowXmlHandler);
 	res.AddHandler(new wxHyperlinkCtrlXmlHandler);
 	res.AddHandler(new wxAnimationCtrlXmlHandler);
-	res.AddHandler(new wxStdDialogButtonSizerXmlHandler);
 }
