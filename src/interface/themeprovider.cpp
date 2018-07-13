@@ -302,6 +302,14 @@ wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& clie
 		if (newSize.x <= 0 || newSize.y <= 0) {
 			newSize = GetIconSize(iconSizeSmall);
 		}
+#ifdef __WXMSW__
+		else {
+			// wxMSW doesn't conside the UI scale factor for menu items
+			if (client == wxART_MENU) {
+				newSize *= GetUIScaleFactor();
+			}
+		}
+#endif
 	}
 	else {
 		newSize = size;
