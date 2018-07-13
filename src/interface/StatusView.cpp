@@ -412,17 +412,20 @@ void CStatusView::InitDefAttr()
 
 void CStatusView::OnContextMenu(wxContextMenuEvent&)
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_LOG"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	menu.Append(XRCID("ID_MENU_SERVER_CMD"), _("&Enter custom command..."));
 
-	pMenu->Check(XRCID("ID_SHOW_DETAILED_LOG"), COptions::Get()->GetOptionVal(OPTION_LOGGING_SHOW_DETAILED_LOGS) != 0);
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_SHOW_DETAILED_LOG"), _("&Show detailed log"), wxString(), wxITEM_CHECK);
+	menu.Append(XRCID("ID_COPYTOCLIPBOARD"), _("&Copy to clipboard"));
+	menu.Append(XRCID("ID_CLEARALL"), _("C&lear all"));
+
+	menu.Check(XRCID("ID_SHOW_DETAILED_LOG"), COptions::Get()->GetOptionVal(OPTION_LOGGING_SHOW_DETAILED_LOGS) != 0);
 
 	ServerWithCredentials server;
 	CState* pState = CContextManager::Get()->GetCurrentContext();
 	if (pState) {
-		auto pItem = pMenu->FindItem(XRCID("ID_MENU_SERVER_CMD"));
+		auto pItem = menu.FindItem(XRCID("ID_MENU_SERVER_CMD"));
 		server = pState->GetServer();
 		if (!server || CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::EnterCommand)) {
 			pItem->Enable(true);
@@ -432,10 +435,9 @@ void CStatusView::OnContextMenu(wxContextMenuEvent&)
 		}
 	}
 
-	PopupMenu(pMenu);
+	PopupMenu(&menu);
 
-	COptions::Get()->SetOption(OPTION_LOGGING_SHOW_DETAILED_LOGS, pMenu->IsChecked(XRCID("ID_SHOW_DETAILED_LOG")) ? 1 : 0);
-	delete pMenu;
+	COptions::Get()->SetOption(OPTION_LOGGING_SHOW_DETAILED_LOGS, menu.IsChecked(XRCID("ID_SHOW_DETAILED_LOG")) ? 1 : 0);
 }
 
 void CStatusView::OnClear(wxCommandEvent&)

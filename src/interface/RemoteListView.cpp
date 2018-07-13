@@ -1096,10 +1096,29 @@ void CRemoteListView::OnContextMenu(wxContextMenuEvent& event)
 		return;
 	}
 
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_REMOTEFILELIST"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	auto item = new wxMenuItem(&menu, XRCID("ID_DOWNLOAD"), _("&Download"), _("Download selected files and directories"));
+	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_DOWNLOAD"), wxART_MENU));
+	menu.Append(item);
+    item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add files to queue"), _("Add selected files and folders to the transfer queue"));
+	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_DOWNLOADADD"), wxART_MENU));
+	menu.Append(item);
+    menu.Append(XRCID("ID_ENTER"), _("E&nter directory"), _("Enter selected directory"));
+	menu.Append(XRCID("ID_EDIT"), _("&View/Edit"));
+
+    menu.AppendSeparator();
+    menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
+    menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
+    menu.Append(XRCID("ID_NEW_FILE"), _("Crea&te new file"), _("Create a new, empty file in the current directory"));
+	menu.Append(XRCID("ID_CONTEXT_REFRESH"), _("Re&fresh"));
+
+    menu.AppendSeparator();
+    menu.Append(XRCID("ID_DELETE"), _("D&elete"), _("Delete selected files and directories"));
+    menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected files and directories"));
+    menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
+    menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
+    menu.Append(XRCID("ID_CHMOD"), _("&File permissions..."), _("Change the file permissions."));
+
 
 	bool const idle = m_state.IsRemoteIdle();
 	bool const userIdle = m_state.IsRemoteIdle(true);
@@ -1117,42 +1136,42 @@ void CRemoteListView::OnContextMenu(wxContextMenuEvent& event)
 			}
 		}
 		else {
-			pMenu->Enable(XRCID("ID_ENTER"), false);
+			menu.Enable(XRCID("ID_ENTER"), false);
 		}
 		if (!canEnter) {
-			pMenu->Delete(XRCID("ID_ENTER"));
+			menu.Delete(XRCID("ID_ENTER"));
 		}
-		pMenu->Enable(XRCID("ID_DOWNLOAD"), false);
-		pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
-		pMenu->Enable(XRCID("ID_MKDIR"), false);
-		pMenu->Enable(XRCID("ID_MKDIR_CHGDIR"), false);
-		pMenu->Enable(XRCID("ID_DELETE"), false);
-		pMenu->Enable(XRCID("ID_RENAME"), false);
-		pMenu->Enable(XRCID("ID_CHMOD"), false);
-		pMenu->Enable(XRCID("ID_EDIT"), false);
-		pMenu->Enable(XRCID("ID_GETURL"), false);
-		pMenu->Enable(XRCID("ID_GETURL_PASSWORD"), false);
-		pMenu->Enable(XRCID("ID_CONTEXT_REFRESH"), false);
-		pMenu->Enable(XRCID("ID_NEW_FILE"), false);
+		menu.Enable(XRCID("ID_DOWNLOAD"), false);
+		menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
+		menu.Enable(XRCID("ID_MKDIR"), false);
+		menu.Enable(XRCID("ID_MKDIR_CHGDIR"), false);
+		menu.Enable(XRCID("ID_DELETE"), false);
+		menu.Enable(XRCID("ID_RENAME"), false);
+		menu.Enable(XRCID("ID_CHMOD"), false);
+		menu.Enable(XRCID("ID_EDIT"), false);
+		menu.Enable(XRCID("ID_GETURL"), false);
+		menu.Enable(XRCID("ID_GETURL_PASSWORD"), false);
+		menu.Enable(XRCID("ID_CONTEXT_REFRESH"), false);
+		menu.Enable(XRCID("ID_NEW_FILE"), false);
 	}
 	else if (GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED) == -1) {
-		pMenu->Delete(XRCID("ID_ENTER"));
-		pMenu->Enable(XRCID("ID_DOWNLOAD"), false);
-		pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
-		pMenu->Enable(XRCID("ID_DELETE"), false);
-		pMenu->Enable(XRCID("ID_RENAME"), false);
-		pMenu->Enable(XRCID("ID_CHMOD"), false);
-		pMenu->Enable(XRCID("ID_EDIT"), false);
-		pMenu->Enable(XRCID("ID_GETURL"), false);
-		pMenu->Enable(XRCID("ID_GETURL_PASSWORD"), false);
+		menu.Delete(XRCID("ID_ENTER"));
+		menu.Enable(XRCID("ID_DOWNLOAD"), false);
+		menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
+		menu.Enable(XRCID("ID_DELETE"), false);
+		menu.Enable(XRCID("ID_RENAME"), false);
+		menu.Enable(XRCID("ID_CHMOD"), false);
+		menu.Enable(XRCID("ID_EDIT"), false);
+		menu.Enable(XRCID("ID_GETURL"), false);
+		menu.Enable(XRCID("ID_GETURL_PASSWORD"), false);
 	}
 	else {
 		if ((GetItemCount() && GetItemState(0, wxLIST_STATE_SELECTED))) {
-			pMenu->Enable(XRCID("ID_RENAME"), false);
-			pMenu->Enable(XRCID("ID_CHMOD"), false);
-			pMenu->Enable(XRCID("ID_EDIT"), false);
-			pMenu->Enable(XRCID("ID_GETURL"), false);
-			pMenu->Enable(XRCID("ID_GETURL_PASSWORD"), false);
+			menu.Enable(XRCID("ID_RENAME"), false);
+			menu.Enable(XRCID("ID_CHMOD"), false);
+			menu.Enable(XRCID("ID_EDIT"), false);
+			menu.Enable(XRCID("ID_GETURL"), false);
+			menu.Enable(XRCID("ID_GETURL_PASSWORD"), false);
 		}
 
 		int count = 0;
@@ -1180,44 +1199,43 @@ void CRemoteListView::OnContextMenu(wxContextMenuEvent& event)
 			}
 		}
 		if (!count || fillCount == count) {
-			pMenu->Delete(XRCID("ID_ENTER"));
-			pMenu->Enable(XRCID("ID_DOWNLOAD"), false);
-			pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
-			pMenu->Enable(XRCID("ID_DELETE"), false);
-			pMenu->Enable(XRCID("ID_RENAME"), false);
-			pMenu->Enable(XRCID("ID_CHMOD"), false);
-			pMenu->Enable(XRCID("ID_EDIT"), false);
-			pMenu->Enable(XRCID("ID_GETURL"), false);
-			pMenu->Enable(XRCID("ID_GETURL_PASSWORD"), false);
+			menu.Delete(XRCID("ID_ENTER"));
+			menu.Enable(XRCID("ID_DOWNLOAD"), false);
+			menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
+			menu.Enable(XRCID("ID_DELETE"), false);
+			menu.Enable(XRCID("ID_RENAME"), false);
+			menu.Enable(XRCID("ID_CHMOD"), false);
+			menu.Enable(XRCID("ID_EDIT"), false);
+			menu.Enable(XRCID("ID_GETURL"), false);
+			menu.Enable(XRCID("ID_GETURL_PASSWORD"), false);
 		}
 		else {
 			if (selectedDir) {
-				pMenu->Enable(XRCID("ID_EDIT"), false);
+				menu.Enable(XRCID("ID_EDIT"), false);
 				if (!CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::DirectoryRename)) {
-					pMenu->Enable(XRCID("ID_RENAME"), false);
+					menu.Enable(XRCID("ID_RENAME"), false);
 				}
 			}
 			else {
-				pMenu->Delete(XRCID("ID_ENTER"));
+				menu.Delete(XRCID("ID_ENTER"));
 			}
 			if (count > 1) {
 				if (selectedDir) {
-					pMenu->Delete(XRCID("ID_ENTER"));
+					menu.Delete(XRCID("ID_ENTER"));
 				}
-				pMenu->Enable(XRCID("ID_RENAME"), false);
+				menu.Enable(XRCID("ID_RENAME"), false);
 			}
 
 			if (!m_state.GetLocalDir().IsWriteable()) {
-				pMenu->Enable(XRCID("ID_DOWNLOAD"), false);
-				pMenu->Enable(XRCID("ID_ADDTOQUEUE"), false);
+				menu.Enable(XRCID("ID_DOWNLOAD"), false);
+				menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
 			}
 		}
 	}
 
-	pMenu->Delete(XRCID(wxGetKeyState(WXK_SHIFT) ? "ID_GETURL" : "ID_GETURL_PASSWORD"));
+	menu.Delete(XRCID(wxGetKeyState(WXK_SHIFT) ? "ID_GETURL" : "ID_GETURL_PASSWORD"));
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CRemoteListView::OnMenuDownload(wxCommandEvent& event)

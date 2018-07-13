@@ -1799,36 +1799,66 @@ void CQueueView::OnPostScroll()
 
 void CQueueView::OnContextMenu(wxContextMenuEvent&)
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_QUEUE"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+
+	menu.Append(XRCID("ID_PROCESSQUEUE"), _("Process &Queue"), wxString(), wxITEM_CHECK);
+	menu.Append(XRCID("ID_REMOVEALL"), _("Stop and remove &all"));
+
+    menu.AppendSeparator();
+	menu.Append(XRCID("ID_REMOVE"), _("&Remove selected"));
+	menu.Append(XRCID("ID_DEFAULT_FILEEXISTSACTION"), _("&Default file exists action..."));
+
+	auto menuPriority = new wxMenu;
+	menu.AppendSubMenu(menuPriority, _("Set &Priority"))->SetId(XRCID("ID_PRIORITY"));
+	menuPriority->Append(XRCID("ID_PRIORITY_HIGHEST"), _("&Highest"), wxString(), wxITEM_CHECK);
+	menuPriority->Append(XRCID("ID_PRIORITY_HIGH"), _("H&igh"), wxString(), wxITEM_CHECK);
+    menuPriority->Append(XRCID("ID_PRIORITY_NORMAL"), _("&Normal"), wxString(), wxITEM_CHECK);
+    menuPriority->Append(XRCID("ID_PRIORITY_LOW"), _("&Low"), wxString(), wxITEM_CHECK);
+    menuPriority->Append(XRCID("ID_PRIORITY_LOWEST"), _("L&owest"), wxString(), wxITEM_CHECK);
+  
+	auto menuAfter = new wxMenu;
+	menu.AppendSubMenu(menuAfter, _("Action after queue &completion"))->SetId(XRCID("ID_ACTIONAFTER"));
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_NONE"), _("&None"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_SHOW_NOTIFICATION_BUBBLE"), _("Sh&ow notification bubble"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_REQUEST_ATTENTION"), _("&Request attention"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_CLOSE"), _("&Close FileZilla"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_RUNCOMMAND"), _("&Run command..."), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_PLAYSOUND"), _("&Play sound"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_CLOSE_ONCE"), _("&Close FileZilla once"), wxString(), wxITEM_CHECK);
+#if defined(FZ_WINDOWS) || defined(FZ_MAC)
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_REBOOT"), _("R&eboot system once"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_SHUTDOWN"), _("S&hutdown system once"), wxString(), wxITEM_CHECK);
+    menuAfter->Append(XRCID("ID_ACTIONAFTER_SLEEP"), _("S&uspend system once"), wxString(), wxITEM_CHECK);
+#endif
+
+	menu.Append(XRCID("ID_EXPORT"), _("E&xport..."));
 
 	bool has_selection = HasSelection();
 
-	pMenu->Check(XRCID("ID_PROCESSQUEUE"), IsActive() ? true : false);
-	pMenu->Check(XRCID("ID_ACTIONAFTER_NONE"), IsActionAfter(ActionAfterState::None));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_SHOW_NOTIFICATION_BUBBLE"), IsActionAfter(ActionAfterState::ShowNotification));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_REQUEST_ATTENTION"), IsActionAfter(ActionAfterState::RequestAttention));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_CLOSE"), IsActionAfter(ActionAfterState::Close));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_CLOSE_ONCE"), IsActionAfter(ActionAfterState::CloseOnce));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_RUNCOMMAND"), IsActionAfter(ActionAfterState::RunCommand));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_PLAYSOUND"), IsActionAfter(ActionAfterState::PlaySound));
+	menu.Check(XRCID("ID_PROCESSQUEUE"), IsActive() ? true : false);
+	menu.Check(XRCID("ID_ACTIONAFTER_NONE"), IsActionAfter(ActionAfterState::None));
+	menu.Check(XRCID("ID_ACTIONAFTER_SHOW_NOTIFICATION_BUBBLE"), IsActionAfter(ActionAfterState::ShowNotification));
+	menu.Check(XRCID("ID_ACTIONAFTER_REQUEST_ATTENTION"), IsActionAfter(ActionAfterState::RequestAttention));
+	menu.Check(XRCID("ID_ACTIONAFTER_CLOSE"), IsActionAfter(ActionAfterState::Close));
+	menu.Check(XRCID("ID_ACTIONAFTER_CLOSE_ONCE"), IsActionAfter(ActionAfterState::CloseOnce));
+	menu.Check(XRCID("ID_ACTIONAFTER_RUNCOMMAND"), IsActionAfter(ActionAfterState::RunCommand));
+	menu.Check(XRCID("ID_ACTIONAFTER_PLAYSOUND"), IsActionAfter(ActionAfterState::PlaySound));
 #if defined(__WXMSW__) || defined(__WXMAC__)
-	pMenu->Check(XRCID("ID_ACTIONAFTER_REBOOT"), IsActionAfter(ActionAfterState::Reboot));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_SHUTDOWN"), IsActionAfter(ActionAfterState::Shutdown));
-	pMenu->Check(XRCID("ID_ACTIONAFTER_SLEEP"), IsActionAfter(ActionAfterState::Sleep));
+	menu.Check(XRCID("ID_ACTIONAFTER_REBOOT"), IsActionAfter(ActionAfterState::Reboot));
+	menu.Check(XRCID("ID_ACTIONAFTER_SHUTDOWN"), IsActionAfter(ActionAfterState::Shutdown));
+	menu.Check(XRCID("ID_ACTIONAFTER_SLEEP"), IsActionAfter(ActionAfterState::Sleep));
 #endif
-	pMenu->Enable(XRCID("ID_REMOVE"), has_selection);
+	menu.Enable(XRCID("ID_REMOVE"), has_selection);
 
-	pMenu->Enable(XRCID("ID_PRIORITY"), has_selection);
-	pMenu->Enable(XRCID("ID_DEFAULT_FILEEXISTSACTION"), has_selection);
+	menu.Enable(XRCID("ID_PRIORITY"), has_selection);
+	menu.Enable(XRCID("ID_DEFAULT_FILEEXISTSACTION"), has_selection);
 #if defined(__WXMSW__) || defined(__WXMAC__)
-	pMenu->Enable(XRCID("ID_ACTIONAFTER"), m_actionAfterWarnDialog == NULL);
+	menu.Enable(XRCID("ID_ACTIONAFTER"), m_actionAfterWarnDialog == NULL);
 #endif
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	menu.Enable(XRCID("ID_EXPORT"), GetItemCount() != 0);
+
+	PopupMenu(&menu);
 }
 
 void CQueueView::OnProcessQueue(wxCommandEvent& event)
@@ -2763,8 +2793,9 @@ void CQueueView::ActionAfter(bool warned)
 #if defined(__WXMSW__) || defined(__WXMAC__)
 void CQueueView::ActionAfterWarnUser(ActionAfterState::type s)
 {
-	if (m_actionAfterWarnDialog != NULL)
+	if (m_actionAfterWarnDialog != NULL) {
 		return;
+	}
 
 	wxString message;
 	wxString label;
