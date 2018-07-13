@@ -190,7 +190,7 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Display current speed", number, _T("0"), normal },
 	{ "Toolbar hidden", number, _T("0"), normal },
 	{ "Strip VMS revisions", number, _T("0"), normal },
-	{ "Show Site Manager on startup", number, _T("0"), normal },
+	{ "Startup action", number, _T("0"), normal },
 	{ "Prompt password save", number, _T("0"), normal },
 	{ "Persistent Choices", number, _T("0"), normal },
 	{ "Queue completion action", number, _T("1"), normal },
@@ -198,7 +198,6 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Drag and Drop disabled", number, _T("0"), normal },
 	{ "Disable update footer", number, _T("0"), normal },
 	{ "Master password encryptor", string, _T(""), normal },
-	{ "Restore tabs", number, _T("0"), normal },
 	{ "Tab data", xml, std::wstring(), normal },
 
 	// Default/internal options

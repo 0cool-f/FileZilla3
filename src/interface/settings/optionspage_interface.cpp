@@ -36,7 +36,18 @@ bool COptionsPageInterface::LoadPage()
 		XRCCTRL(*this, "ID_PREVENT_IDLESLEEP", wxCheckBox)->Hide();
 	}
 
-	SetCheckFromOption(XRCID("ID_INTERFACE_SITEMANAGER_ON_STARTUP"), OPTION_INTERFACE_SITEMANAGER_ON_STARTUP, failure);
+	int const startupAction = m_pOptions->GetOptionVal(OPTION_STARTUP_ACTION);
+	switch (startupAction) {
+	default:
+		xrc_call(*this, "ID_INTERFACE_STARTUP_NORMAL", &wxRadioButton::SetValue, true);
+		break;
+	case 1:
+		xrc_call(*this, "ID_INTERFACE_STARTUP_SITEMANAGER", &wxRadioButton::SetValue, true);
+		break;
+	case 2:
+		xrc_call(*this, "ID_INTERFACE_STARTUP_RESTORE", &wxRadioButton::SetValue, true);
+		break;
+	}
 
 	int action = m_pOptions->GetOptionVal(OPTION_ALREADYCONNECTED_CHOICE);
 	if (action & 2) {
@@ -69,7 +80,14 @@ bool COptionsPageInterface::SavePage()
 
 	SetOptionFromCheck(XRCID("ID_SPEED_DISPLAY"), OPTION_SPEED_DISPLAY);
 
-	SetOptionFromCheck(XRCID("ID_INTERFACE_SITEMANAGER_ON_STARTUP"), OPTION_INTERFACE_SITEMANAGER_ON_STARTUP);
+	int startupAction = 0;
+	if (xrc_call(*this, "ID_INTERFACE_STARTUP_SITEMANAGER", &wxRadioButton::GetValue)) {
+		startupAction = 1;
+	}
+	else if (xrc_call(*this, "ID_INTERFACE_STARTUP_RESTORE", &wxRadioButton::GetValue)) {
+		startupAction = 2;
+	}
+	m_pOptions->SetOption(OPTION_STARTUP_ACTION, startupAction);
 
 	int action = GetChoice(XRCID("ID_NEWCONN_ACTION"));
 	if (!action) {
@@ -126,7 +144,12 @@ bool COptionsPageInterface::CreateControls(wxWindow* parent)
 	boxSizer->Add(behaviour, 0, wxALL, wxDLG_UNIT(this, wxSize(3, 3)).y);
 	behaviour->Add(new wxCheckBox(box, XRCID("ID_MINIMIZE_TRAY"), _("&Minimize to tray")));
 	behaviour->Add(new wxCheckBox(box, XRCID("ID_PREVENT_IDLESLEEP"), _("P&revent system from entering idle sleep during transfers and other operations")));
-	behaviour->Add(new wxCheckBox(box, XRCID("ID_INTERFACE_SITEMANAGER_ON_STARTUP"), _("S&how the Site Manager on startup")));
+	behaviour->AddSpacer(0);
+	behaviour->Add(new wxStaticText(box, -1, _("On startup of FileZilla:")));
+	behaviour->Add(new wxRadioButton(box, XRCID("ID_INTERFACE_STARTUP_NORMAL"), _("S&tart normally"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
+	behaviour->Add(new wxRadioButton(box, XRCID("ID_INTERFACE_STARTUP_SITEMANAGER"), _("S&how the Site Manager on startup")));
+	behaviour->Add(new wxRadioButton(box, XRCID("ID_INTERFACE_STARTUP_RESTORE"), _("Restore ta&bs and reconnect")));
+	behaviour->AddSpacer(0);
 	behaviour->Add(new wxStaticText(box, -1, _("When st&arting a new connection while already connected:")));
 	choice = new wxChoice(box, XRCID("ID_NEWCONN_ACTION"));
 	choice->Append(_("Ask for action"));

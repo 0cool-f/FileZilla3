@@ -2513,7 +2513,7 @@ void CMainFrame::ProcessCommandLine()
 
 	std::wstring site;
 	if (pCommandLine->HasSwitch(CCommandLine::sitemanager)) {
-		if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) == 0) {
+		if (COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION) == 1) {
 			OpenSiteManager();
 		}
 	}
@@ -2740,10 +2740,10 @@ void CMainFrame::PostInitialize()
 	}
 #endif
 
-	bool startupReconnect = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) != 0;
+	int const startupAction = COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION);
+	bool startupReconnect = startupAction == 2;
 
-	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {
-		;
+	if (startupAction == 1) {
 		OpenSiteManager();
 		startupReconnect = false;
 	}

@@ -665,13 +665,10 @@ void CContextControl::RestoreTabs()
 
 	auto xml = COptions::Get()->GetOptionXml(OPTION_TAB_DATA);
 
-	bool selectedOnly = COptions::Get()->GetOptionVal(OPTION_RESTORE_TABS) == 0;
+	bool selectedOnly = COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION) != 2;
 
 	CCommandLine const* pCommandLine = wxGetApp().GetCommandLine();
 	if (pCommandLine && pCommandLine->BlocksReconnectAtStartup()) {
-		selectedOnly = true;
-	}
-	if (COptions::Get()->GetOptionVal(OPTION_INTERFACE_SITEMANAGER_ON_STARTUP) != 0) {
 		selectedOnly = true;
 	}
 
