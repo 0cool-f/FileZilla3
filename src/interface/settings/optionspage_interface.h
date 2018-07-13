@@ -10,6 +10,9 @@ public:
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 
+protected:
+	virtual bool CreateControls(wxWindow* parent) override;
+
 private:
 	DECLARE_EVENT_TABLE()
 	void OnLayoutChange(wxCommandEvent& event);
