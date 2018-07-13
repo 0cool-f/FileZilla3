@@ -8,13 +8,18 @@ bool COptionsPage::CreatePage(COptions* pOptions, CSettingsDialog* pOwner, wxWin
 	m_pOwner = pOwner;
 	m_pOptions = pOptions;
 
-	if (!wxXmlResource::Get()->LoadPanel(this, parent, GetResourceName())) {
+	if (!CreateControls(parent)) {
 		return false;
 	}
 
 	UpdateMaxPageSize(maxSize);
 
 	return true;
+}
+
+bool COptionsPage::CreateControls(wxWindow* parent)
+{
+	return wxXmlResource::Get()->LoadPanel(this, parent, GetResourceName());
 }
 
 void COptionsPage::UpdateMaxPageSize(wxSize& maxSize)
@@ -187,8 +192,9 @@ int COptionsPage::GetChoice(int id) const
 {
 	auto pChoice = dynamic_cast<wxChoice*>(FindWindow(id));
 	wxASSERT(pChoice);
-	if (!pChoice)
+	if (!pChoice) {
 		return 0;
+	}
 
 	return pChoice->GetSelection();
 }
@@ -196,18 +202,21 @@ int COptionsPage::GetChoice(int id) const
 bool COptionsPage::DisplayError(const wxString& controlToFocus, const wxString& error)
 {
 	int id = wxXmlResource::GetXRCID(controlToFocus);
-	if (id == -1)
+	if (id == -1) {
 		DisplayError(0, error);
-	else
+	}
+	else {
 		DisplayError(FindWindow(id), error);
+	}
 
 	return false;
 }
 
 bool COptionsPage::DisplayError(wxWindow* pWnd, const wxString& error)
 {
-	if (pWnd)
+	if (pWnd) {
 		pWnd->SetFocus();
+	}
 
 	wxMessageBoxEx(error, _("Failed to validate settings"), wxICON_EXCLAMATION, this);
 
@@ -216,10 +225,10 @@ bool COptionsPage::DisplayError(wxWindow* pWnd, const wxString& error)
 
 bool COptionsPage::Display()
 {
-	if (!m_was_selected)
-	{
-		if (!OnDisplayedFirstTime())
+	if (!m_was_selected) {
+		if (!OnDisplayedFirstTime()) {
 			return false;
+		}
 		m_was_selected = true;
 	}
 	Show();

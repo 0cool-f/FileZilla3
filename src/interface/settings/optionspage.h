@@ -10,7 +10,6 @@ public:
 
 	void UpdateMaxPageSize(wxSize& maxSize);
 
-	virtual wxString GetResourceName() = 0;
 	virtual bool LoadPage() = 0;
 	virtual bool SavePage() = 0;
 	virtual bool Validate() { return true; }
@@ -46,6 +45,12 @@ public:
 	virtual bool OnDisplayedFirstTime();
 
 protected:
+	virtual wxString GetResourceName() const {
+		return wxString();
+	}
+
+	virtual bool CreateControls(wxWindow* parent);
+
 	COptions* m_pOptions{};
 	CSettingsDialog* m_pOwner{};
 

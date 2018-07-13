@@ -469,7 +469,6 @@ bool CFileZillaApp::LoadResourceFiles()
 	pResource->LoadFile(wxString(dir + L"certificate.xrc"));
 	pResource->LoadFile(wxString(dir + L"dialogs.xrc"));
 	pResource->LoadFile(wxString(dir + L"inputdialog.xrc"));
-	pResource->LoadFile(wxString(dir + L"menus.xrc"));
 	pResource->LoadFile(wxString(dir + L"netconfwizard.xrc"));
 	pResource->LoadFile(wxString(dir + L"settings.xrc"));
 	pResource->LoadFile(wxString(dir + L"sitemanager.xrc"));

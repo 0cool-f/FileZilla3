@@ -550,27 +550,26 @@ void CStatusBar::OnHandleRightClick(wxWindow* pWnd)
 
 void CStatusBar::ShowDataTypeMenu()
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_TRANSFER_TYPE_CONTEXT"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), _("&Auto"), wxString(), wxITEM_RADIO);
+    menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), _("A&SCII"), wxString(), wxITEM_RADIO); 
+	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), _("&Binary"), wxString(), wxITEM_RADIO);
 
 	const int type = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
 	switch (type)
 	{
 	case 1:
-		pMenu->Check(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), true);
+		menu.Check(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), true);
 		break;
 	case 2:
-		pMenu->Check(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), true);
+		menu.Check(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), true);
 		break;
 	default:
-		pMenu->Check(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), true);
+		menu.Check(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), true);
 		break;
 	}
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CStatusBar::UpdateSpeedLimitsIcon()

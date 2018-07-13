@@ -819,36 +819,36 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 		return;
 	}
 
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_SEARCH"));
-	if (!pMenu) {
-		return;
-	}
-
-	if (!m_state.IsRemoteIdle() || !m_state.IsRemoteConnected()) {
-		pMenu->Enable(XRCID("ID_MENU_SEARCH_UPLOAD"), false);
-		pMenu->Enable(XRCID("ID_MENU_SEARCH_DOWNLOAD"), false);
-		if (m_results->mode_ == search_mode::remote) {
-			pMenu->Enable(XRCID("ID_MENU_SEARCH_DELETE"), false);
-		}
-		pMenu->Enable(XRCID("ID_MENU_SEARCH_EDIT"), false);
-	}
-
 	bool const localSearch = m_results->mode_ == search_mode::local;
+
+	bool const connected = !m_state.IsRemoteIdle() || !m_state.IsRemoteConnected();
+
+	wxMenu menu;
 	if (localSearch) {
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_DOWNLOAD"));
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_EDIT"));
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_GETURL"));
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_GETURL_PASSWORD"));
+		menu.Append(XRCID("ID_MENU_SEARCH_UPLOAD"), _("&Upload..."));
+		menu.Append(XRCID("ID_MENU_SEARCH_OPEN"), _("O&pen"));
+		menu.Append(XRCID("ID_MENU_SEARCH_FILEMANAGER"), _("Show in file &manager"));
+
+		menu.Enable(XRCID("ID_MENU_SEARCH_UPLOAD"), connected);
 	}
 	else {
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_UPLOAD"));
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_OPEN"));
-		pMenu->Delete(XRCID("ID_MENU_SEARCH_FILEMANAGER"));
-		pMenu->Delete(XRCID(wxGetKeyState(WXK_SHIFT) ? "ID_MENU_SEARCH_GETURL" : "ID_MENU_SEARCH_GETURL_PASSWORD"));
+		menu.Append(XRCID("ID_MENU_SEARCH_DOWNLOAD"), _("&Download..."));
+		menu.Append(XRCID("ID_MENU_SEARCH_EDIT"), _("&View/Edit"));
+		menu.Append(XRCID("ID_MENU_SEARCH_DELETE"), _("D&elete"));
+
+		if (wxGetKeyState(WXK_SHIFT)) {
+			menu.Append(XRCID("ID_MENU_SEARCH_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"));
+		}
+		else {
+			menu.Append(XRCID("ID_MENU_SEARCH_GETURL"), _("C&opy URL(s) to clipboard"));
+		}
+
+		menu.Enable(XRCID("ID_MENU_SEARCH_DOWNLOAD"), connected);
+		menu.Enable(XRCID("ID_MENU_SEARCH_DELETE"), connected);
+		menu.Enable(XRCID("ID_MENU_SEARCH_EDIT"), connected);
 	}
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 

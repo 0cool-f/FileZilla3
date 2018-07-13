@@ -26,10 +26,14 @@ CQueueViewFailed::CQueueViewFailed(CQueue* parent, int index, const wxString& ti
 
 void CQueueViewFailed::OnContextMenu(wxContextMenuEvent&)
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_QUEUE_FAILED"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	menu.Append(XRCID("ID_REMOVEALL"), _("Remove &all"));
+	menu.Append(XRCID("ID_REQUEUEALL"), _("&Reset and requeue all"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_REMOVE"), _("Remove &selected"));
+	menu.Append(XRCID("ID_REQUEUE"), _("R&eset and requeue selected files"));
+	menu.Append(XRCID("ID_EXPORT"), _("E&xport..."));
 
 #ifndef __WXMSW__
 	// GetNextItem is O(n) if nothing is selected, GetSelectedItemCount() is O(1)
@@ -38,12 +42,12 @@ void CQueueViewFailed::OnContextMenu(wxContextMenuEvent&)
 	const bool has_selection = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED) != -1;
 #endif
 
-	pMenu->Enable(XRCID("ID_REMOVE"), has_selection);
-	pMenu->Enable(XRCID("ID_REQUEUE"), has_selection);
-	pMenu->Enable(XRCID("ID_REQUEUEALL"), !m_serverList.empty());
+	menu.Enable(XRCID("ID_REMOVE"), has_selection);
+	menu.Enable(XRCID("ID_REQUEUE"), has_selection);
+	menu.Enable(XRCID("ID_REQUEUEALL"), !m_serverList.empty());
+	menu.Enable(XRCID("ID_EXPORT"), GetItemCount() != 0);
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CQueueViewFailed::OnRemoveAll(wxCommandEvent&)
@@ -55,16 +59,19 @@ void CQueueViewFailed::OnRemoveAll(wxCommandEvent&)
 	{
 		// First, clear all selections
 		int item;
-		while ((item = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1)
+		while ((item = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1) {
 			SetItemState(item, 0, wxLIST_STATE_SELECTED);
+		}
 	}
 
 	CEditHandler* pEditHandler = CEditHandler::Get();
-	if (pEditHandler)
+	if (pEditHandler) {
 		pEditHandler->RemoveAll(CEditHandler::upload_and_remove_failed);
+	}
 
-	for (auto iter = m_serverList.begin(); iter != m_serverList.end(); ++iter)
+	for (auto iter = m_serverList.begin(); iter != m_serverList.end(); ++iter) {
 		delete *iter;
+	}
 	m_serverList.clear();
 
 	m_itemCount = 0;
@@ -75,8 +82,9 @@ void CQueueViewFailed::OnRemoveAll(wxCommandEvent&)
 
 	RefreshListOnly();
 
-	if (!m_itemCount && m_pQueue->GetQueueView()->GetItemCount())
+	if (!m_itemCount && m_pQueue->GetQueueView()->GetItemCount()) {
 		m_pQueue->SetSelection(0);
+	}
 }
 
 void CQueueViewFailed::OnRemoveSelected(wxCommandEvent&)

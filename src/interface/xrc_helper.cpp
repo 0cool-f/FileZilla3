@@ -12,7 +12,6 @@
 #include <wx/xrc/xh_gauge.h>
 #include <wx/xrc/xh_listb.h>
 #include <wx/xrc/xh_listc.h>
-#include <wx/xrc/xh_menu.h>
 #include <wx/xrc/xh_notbk.h>
 #include <wx/xrc/xh_panel.h>
 #include <wx/xrc/xh_radbt.h>
@@ -32,7 +31,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxSizerXmlHandler);
 	res.AddHandler(new wxButtonXmlHandler);
 	res.AddHandler(new wxRadioButtonXmlHandler);
-	res.AddHandler(new wxMenuXmlHandler);
 	res.AddHandler(new wxTextCtrlXmlHandlerEx);
 	res.AddHandler(new wxCheckBoxXmlHandler);
 	res.AddHandler(new wxStaticBoxXmlHandler);

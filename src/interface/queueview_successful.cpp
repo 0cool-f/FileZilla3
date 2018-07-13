@@ -19,21 +19,27 @@ CQueueViewSuccessful::CQueueViewSuccessful(CQueue* parent, int index)
 
 void CQueueViewSuccessful::OnContextMenu(wxContextMenuEvent&)
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_QUEUE_SUCCESSFUL"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	menu.Append(XRCID("ID_REMOVEALL"), _("Remove &all"));
+	menu.Append(XRCID("ID_REQUEUEALL"), _("Reset and requeue &all"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_REMOVE"), _("Remove &selected"));
+	menu.Append(XRCID("ID_REQUEUE"), _("R&eset and requeue selected files"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_AUTOCLEAR"), _("A&utomatically remove successful transfers"), wxString(), wxITEM_CHECK);
+	menu.Append(XRCID("ID_EXPORT"), _("E&xport..."));
 
 	bool has_selection = HasSelection();
 
-	pMenu->Enable(XRCID("ID_REMOVE"), has_selection);
-	pMenu->Enable(XRCID("ID_REQUEUE"), has_selection);
-	pMenu->Enable(XRCID("ID_REQUEUEALL"), !m_serverList.empty());
-	pMenu->Check(XRCID("ID_AUTOCLEAR"), m_autoClear);
+	menu.Enable(XRCID("ID_REMOVE"), has_selection);
+	menu.Enable(XRCID("ID_REQUEUE"), has_selection);
+	menu.Enable(XRCID("ID_REQUEUEALL"), !m_serverList.empty());
+	menu.Check(XRCID("ID_AUTOCLEAR"), m_autoClear);
+	menu.Enable(XRCID("ID_EXPORT"), GetItemCount() != 0);
 
-	PopupMenu(pMenu);
-
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CQueueViewSuccessful::OnMenuAutoClear(wxCommandEvent&)

@@ -440,22 +440,24 @@ void CContextControl::OnTabBgDoubleclick(wxAuiNotebookEvent&)
 
 void CContextControl::OnTabRightclick(wxAuiNotebookEvent& event)
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_TABCONTEXT"));
-	if (!pMenu) {
-		wxBell();
-		return;
-	}
+	wxMenu menu;
+	menu.Append(XRCID("ID_TABCONTEXT_NEW"), _("&Create new tab"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_TABCONTEXT_CLOSE"), _("Cl&ose tab"));
+	menu.Append(XRCID("ID_TABCONTEXT_CLOSEOTHERS"), _("Close &all other tabs"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_TABCONTEXT_REFRESH"), _("&Refresh"));
 
 	if (!m_tabs || m_tabs->GetPageCount() < 2) {
-		pMenu->Enable(XRCID("ID_TABCONTEXT_CLOSE"), false);
-		pMenu->Enable(XRCID("ID_TABCONTEXT_CLOSEOTHERS"), false);
+		menu.Enable(XRCID("ID_TABCONTEXT_CLOSE"), false);
+		menu.Enable(XRCID("ID_TABCONTEXT_CLOSEOTHERS"), false);
 	}
 
 	m_right_clicked_tab = event.GetSelection();
 
-	PopupMenu(pMenu);
-
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CContextControl::OnTabContextClose(wxCommandEvent&)

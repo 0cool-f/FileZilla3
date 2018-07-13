@@ -1748,15 +1748,12 @@ void CSiteManagerDialog::RememberLastSelected()
 
 void CSiteManagerDialog::OnContextMenu(wxTreeEvent& event)
 {
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_SITEMANAGER"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	menu.Append(XRCID("ID_EXPORT"), _("&Export..."));
 
 	m_contextMenuItem = event.GetItem();
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CSiteManagerDialog::OnExportSelected(wxCommandEvent&)

@@ -14,7 +14,6 @@ dist_xrc_DATA = \
 	xrc/certificate.xrc \
 	xrc/dialogs.xrc \
 	xrc/inputdialog.xrc \
-	xrc/menus.xrc \
 	xrc/netconfwizard.xrc \
 	xrc/settings.xrc \
 	xrc/sitemanager.xrc \

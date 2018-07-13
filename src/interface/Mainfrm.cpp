@@ -2401,10 +2401,15 @@ void CMainFrame::OnToolbarComparisonDropdown(wxCommandEvent& event)
 		return;
 	}
 
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_TOOLBAR_COMPARISON_DROPDOWN"));
-	if (!pMenu) {
-		return;
-	}
+	auto menu = new wxMenu;
+    menu->Append(XRCID("ID_TOOLBAR_COMPARISON"), _("&Enable"), wxString(), wxITEM_CHECK);
+
+    menu->AppendSeparator();
+	menu->Append(XRCID("ID_COMPARE_SIZE"), _("Compare file&size"), wxString(), wxITEM_RADIO);
+	menu->Append(XRCID("ID_COMPARE_DATE"), _("Compare &modification time"), wxString(), wxITEM_RADIO);
+
+    menu->AppendSeparator();
+    menu->Append(XRCID("ID_COMPARE_HIDEIDENTICAL"), _("&Hide identical files"), wxString(), wxITEM_CHECK);
 
 	CState* pState = CContextManager::Get()->GetCurrentContext();
 	if (!pState) {
@@ -2412,19 +2417,19 @@ void CMainFrame::OnToolbarComparisonDropdown(wxCommandEvent& event)
 	}
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
-	pMenu->FindItem(XRCID("ID_TOOLBAR_COMPARISON"))->Check(pComparisonManager->IsComparing());
+	menu->FindItem(XRCID("ID_TOOLBAR_COMPARISON"))->Check(pComparisonManager->IsComparing());
 
 	const int mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
 	if (mode == 0) {
-		pMenu->FindItem(XRCID("ID_COMPARE_SIZE"))->Check();
+		menu->FindItem(XRCID("ID_COMPARE_SIZE"))->Check();
 	}
 	else {
-		pMenu->FindItem(XRCID("ID_COMPARE_DATE"))->Check();
+		menu->FindItem(XRCID("ID_COMPARE_DATE"))->Check();
 	}
 
-	pMenu->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+	menu->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0);
 
-	ShowDropdownMenu(pMenu, m_pToolBar, event);
+	ShowDropdownMenu(menu, m_pToolBar, event);
 }
 
 void CMainFrame::ShowDropdownMenu(wxMenu* pMenu, wxToolBar* pToolBar, wxCommandEvent& event)

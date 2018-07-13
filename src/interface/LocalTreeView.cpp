@@ -1060,10 +1060,24 @@ void CLocalTreeView::OnContextMenu(wxTreeEvent& event)
 		return;
 	}
 
-	wxMenu* pMenu = wxXmlResource::Get()->LoadMenu(_T("ID_MENU_LOCALTREE"));
-	if (!pMenu) {
-		return;
-	}
+	wxMenu menu;
+	auto item = new wxMenuItem(&menu, XRCID("ID_UPLOAD"), _("&Upload"), _("Upload selected directory"));
+	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_UPLOAD"), wxART_MENU));
+	menu.Append(item);
+	item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add to queue"), _("Add selected directory to the transfer queue"));
+	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_UPLOADADD"), wxART_MENU));
+	menu.Append(item);
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_OPEN"), _("&Open"), _("Open directory in system's file manager"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
+	menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
+
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_DELETE"), _("&Delete"), _("Delete selected directory"));
+	menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected directory"));
 
 	CLocalPath const path(GetDirFromItem(m_contextMenuItem).ToStdWstring());
 
@@ -1074,14 +1088,13 @@ void CLocalTreeView::OnContextMenu(wxTreeEvent& event)
 
 	bool const idle = m_state.GetLocalRecursiveOperation() && !m_state.GetLocalRecursiveOperation()->IsActive();
 
-	pMenu->Enable(XRCID("ID_UPLOAD"), hasParent && remoteConnected && idle);
-	pMenu->Enable(XRCID("ID_ADDTOQUEUE"), hasParent && remoteConnected && idle);
-	pMenu->Enable(XRCID("ID_MKDIR"), writeable);
-	pMenu->Enable(XRCID("ID_DELETE"), writeable && hasParent);
-	pMenu->Enable(XRCID("ID_RENAME"), writeable && hasParent);
+	menu.Enable(XRCID("ID_UPLOAD"), hasParent && remoteConnected && idle);
+	menu.Enable(XRCID("ID_ADDTOQUEUE"), hasParent && remoteConnected && idle);
+	menu.Enable(XRCID("ID_MKDIR"), writeable);
+	menu.Enable(XRCID("ID_DELETE"), writeable && hasParent);
+	menu.Enable(XRCID("ID_RENAME"), writeable && hasParent);
 
-	PopupMenu(pMenu);
-	delete pMenu;
+	PopupMenu(&menu);
 }
 
 void CLocalTreeView::OnMenuUpload(wxCommandEvent& event)
