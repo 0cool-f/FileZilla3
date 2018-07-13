@@ -41,7 +41,7 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 #ifndef __WXMAC__
 	sizer->Add(new wxStaticLine(this, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), wxSizerFlags().Expand());
 #endif
-	auto mainSizer = new wxFlexGridSizer(1, 0, 0, 5);
+	auto mainSizer = new wxFlexGridSizer(1, 0, 0, wxDLG_UNIT(this, wxPoint(0, 3)).y);
 	sizer->Add(mainSizer, wxSizerFlags().Border(wxALL, ConvertDialogToPixels(wxPoint(2, 0)).x));
 
 	mainSizer->Add(new wxStaticText(this, -1, _("&Host:")), wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));

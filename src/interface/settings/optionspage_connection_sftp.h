@@ -11,9 +11,9 @@ class COptionsPageConnectionSFTP final : public COptionsPage
 public:
 	COptionsPageConnectionSFTP();
 	virtual ~COptionsPageConnectionSFTP();
-	virtual wxString GetResourceName() { return _T("ID_SETTINGS_CONNECTION_SFTP"); }
-	virtual bool LoadPage();
-	virtual bool SavePage();
+	virtual wxString GetResourceName() const override { return _T("ID_SETTINGS_CONNECTION_SFTP"); }
+	virtual bool LoadPage() override;
+	virtual bool SavePage() override;
 
 protected:
 	std::unique_ptr<CFZPuttyGenInterface> m_pFzpg;

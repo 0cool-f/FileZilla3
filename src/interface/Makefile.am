@@ -93,6 +93,7 @@ filezilla_SOURCES = aboutdialog.cpp \
 		settings/optionspage_interface.cpp \
 		settings/optionspage_language.cpp \
 		settings/optionspage_logging.cpp \
+		settings/optionspage_passwords.cpp \
 		settings/optionspage_proxy.cpp \
 		settings/optionspage_sizeformatting.cpp \
 		settings/optionspage_themes.cpp \
@@ -221,6 +222,7 @@ noinst_HEADERS = aboutdialog.h \
 		 settings/optionspage_interface.h \
 		 settings/optionspage_language.h \
 		 settings/optionspage_logging.h \
+		 settings/optionspage_passwords.h \
 		 settings/optionspage_proxy.h \
 		 settings/optionspage_sizeformatting.h \
 		 settings/optionspage_themes.h \

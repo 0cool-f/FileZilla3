@@ -4,10 +4,10 @@
 class COptionsPageFileExists final : public COptionsPage
 {
 public:
-	virtual wxString GetResourceName() { return _T("ID_SETTINGS_FILEEXISTS"); }
-	virtual bool LoadPage();
-	virtual bool SavePage();
-	virtual bool Validate();
+	virtual wxString GetResourceName() const override { return _T("ID_SETTINGS_FILEEXISTS"); }
+	virtual bool LoadPage() override;
+	virtual bool SavePage() override;
+	virtual bool Validate() override;
 };
 
 #endif

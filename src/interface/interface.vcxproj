@@ -209,6 +209,7 @@
     <ClCompile Include="settings\optionspage_interface.cpp" />
     <ClCompile Include="settings\optionspage_language.cpp" />
     <ClCompile Include="settings\optionspage_logging.cpp" />
+    <ClCompile Include="settings\optionspage_passwords.cpp" />
     <ClCompile Include="settings\optionspage_proxy.cpp" />
     <ClCompile Include="settings\optionspage_sizeformatting.cpp" />
     <ClCompile Include="settings\optionspage_themes.cpp" />
@@ -332,6 +333,7 @@
     <ClInclude Include="settings\optionspage_interface.h" />
     <ClInclude Include="settings\optionspage_language.h" />
     <ClInclude Include="settings\optionspage_logging.h" />
+    <ClInclude Include="settings\optionspage_passwords.h" />
     <ClInclude Include="settings\optionspage_proxy.h" />
     <ClInclude Include="settings\optionspage_sizeformatting.h" />
     <ClInclude Include="settings\optionspage_themes.h" />

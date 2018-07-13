@@ -21,6 +21,7 @@
 #include "optionspage_sizeformatting.h"
 #include "optionspage_edit.h"
 #include "optionspage_edit_associations.h"
+#include "optionspage_passwords.h"
 #include "optionspage_proxy.h"
 #include "optionspage_filelists.h"
 #include "../filezillaapp.h"
@@ -49,11 +50,13 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
 	SetParent(pMainFrame);
-	if (!Load(GetParent(), _T("ID_SETTINGS")))
+	if (!Load(GetParent(), _T("ID_SETTINGS"))) {
 		return false;
+	}
 
-	if (!LoadPages())
+	if (!LoadPages()) {
 		return false;
+	}
 
 	return true;
 }
@@ -62,15 +65,15 @@ void CSettingsDialog::AddPage(wxString const& name, COptionsPage* page, int nest
 {
 	wxTreeCtrl* treeCtrl = XRCCTRL(*this, "ID_TREE", wxTreeCtrl);
 	wxTreeItemId parent = treeCtrl->GetRootItem();
-	while( nest-- ) {
+	while (nest--) {
 		parent = treeCtrl->GetLastChild(parent);
-		wxCHECK_RET( parent != wxTreeItemId(), "Nesting level too deep" );
+		wxCHECK_RET(parent != wxTreeItemId(), "Nesting level too deep");
 	}
 
 	t_page p;
 	p.page = page;
 	p.id = treeCtrl->AppendItem(parent, name);
-	if( parent != treeCtrl->GetRootItem() ) {
+	if (parent != treeCtrl->GetRootItem()) {
 		treeCtrl->Expand(parent);
 	}
 
@@ -83,8 +86,9 @@ bool CSettingsDialog::LoadPages()
 
 	wxTreeCtrl* treeCtrl = XRCCTRL(*this, "ID_TREE", wxTreeCtrl);
 	wxASSERT(treeCtrl);
-	if (!treeCtrl)
+	if (!treeCtrl) {
 		return false;
+	}
 
 	treeCtrl->AddRoot(wxString());
 
@@ -100,6 +104,7 @@ bool CSettingsDialog::LoadPages()
 	AddPage(_("FTP: File Types"), new COptionsPageFiletype, 1);
 	AddPage(_("File exists action"), new COptionsPageFileExists, 1);
 	AddPage(_("Interface"), new COptionsPageInterface, 0);
+	AddPage(_("Passwords"), new COptionsPagePasswords, 1);
 	AddPage(_("Themes"), new COptionsPageThemes, 1);
 	AddPage(_("Date/time format"), new COptionsPageDateFormatting, 1);
 	AddPage(_("Filesize format"), new COptionsPageSizeFormatting, 1);
@@ -131,15 +136,17 @@ bool CSettingsDialog::LoadPages()
 	// dialog.
 	wxPanel* parentPanel = XRCCTRL(*this, "ID_PAGEPANEL", wxPanel);
 	wxASSERT(parentPanel);
-	if (!parentPanel)
+	if (!parentPanel) {
 		return false;
+	}
 
 	// Keep track of maximum page size
 	size = wxSize();
 
 	for (auto const& page : m_pages) {
-		if (!page.page->CreatePage(m_pOptions, this, parentPanel, size))
+		if (!page.page->CreatePage(m_pOptions, this, parentPanel, size)) {
 			return false;
+		}
 	}
 
 	if (!LoadSettings()) {
@@ -205,8 +212,9 @@ bool CSettingsDialog::LoadPages()
 bool CSettingsDialog::LoadSettings()
 {
 	for (auto const& page : m_pages) {
-		if (!page.page->LoadPage())
+		if (!page.page->LoadPage()) {
 			return false;
+		}
 	}
 
 	return true;
@@ -214,12 +222,13 @@ bool CSettingsDialog::LoadSettings()
 
 void CSettingsDialog::OnPageChanged(wxTreeEvent& event)
 {
-	if (m_activePanel)
+	if (m_activePanel) {
 		m_activePanel->Hide();
+	}
 
 	wxTreeItemId item = event.GetItem();
 
-	for( auto const& page : m_pages ) {
+	for (auto const& page : m_pages) {
 		if (page.id == item) {
 			m_activePanel = page.page;
 			m_activePanel->Display();
@@ -230,7 +239,7 @@ void CSettingsDialog::OnPageChanged(wxTreeEvent& event)
 
 void CSettingsDialog::OnOK(wxCommandEvent&)
 {
-	for( auto const& page : m_pages ) {
+	for (auto const& page : m_pages) {
 		if (!page.page->Validate()) {
 			if (m_activePanel != page.page) {
 				wxTreeCtrl* treeCtrl = XRCCTRL(*this, "ID_TREE", wxTreeCtrl);
@@ -240,7 +249,7 @@ void CSettingsDialog::OnOK(wxCommandEvent&)
 		}
 	}
 
-	for( auto const& page : m_pages ) {
+	for (auto const& page : m_pages) {
 		page.page->SavePage();
 	}
 
@@ -258,11 +267,13 @@ void CSettingsDialog::OnCancel(wxCommandEvent&)
 
 void CSettingsDialog::OnPageChanging(wxTreeEvent& event)
 {
-	if (!m_activePanel)
+	if (!m_activePanel) {
 		return;
+	}
 
-	if (!m_activePanel->Validate())
+	if (!m_activePanel->Validate()) {
 		event.Veto();
+	}
 }
 
 void CSettingsDialog::RememberOldValue(int option)
