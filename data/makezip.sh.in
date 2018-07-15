@@ -59,6 +59,9 @@ copy_libtool "src/storj" "fzstorj.exe" "" 1
 copy_libtool "src/fzshellext/32" "libfzshellext-0.dll" "fzshellext.dll"
 copy_libtool "src/fzshellext/64" "libfzshellext-0.dll" "fzshellext_64.dll"
 
+echo Copying DLLs
+cp dlls/*.dll "$targetdir/"
+
 echo Copying locales
 
 mkdir -p $targetdir/locales || exit 1
