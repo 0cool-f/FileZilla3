@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.35.0-rc1 (2018-07-16)
+
++ Add option to settings dialog to have FileZilla restore tabs and connections after a restart
+- Fix initial size of Site Manager being too small on some systems
+
 3.34.0 (2018-06-15)
 
 + After deleting files, the focus rectangle now stays near the previously deleted file
