@@ -9,7 +9,7 @@ if [ ! -d "$bundle" ]; then
   exit 1
 fi
 
-frameworks="${bundle}/Contents/Frameworks" 
+frameworks="${bundle}/Contents/Frameworks"
 
 mkdir -p "$frameworks"
 rm -f ${frameworks}/*.processed
@@ -17,9 +17,9 @@ rm -f ${frameworks}/*.processed
 
 process_dylib()
 {
-  file="$1"
-  dylib="$2"
-  name=${dylib##*/}
+  local file="$1"
+  local dylib="$2"
+  local name="${dylib##*/}"
 
   if [ ! -f "${frameworks}/$name" ] && [ ! -f "${frameworks}/$name.processed" ]; then
     touch "${frameworks}/$name.processed"
@@ -30,6 +30,8 @@ process_dylib()
       echo "Dependency $name not found"
       exit 1
     fi
+
+    install_name_tool -id "$name" "${frameworks}/$name"
   fi
 
   install_name_tool -change "$dylib" "@executable_path/../Frameworks/$name" "$file"
@@ -37,15 +39,21 @@ process_dylib()
 
 process_dylibs()
 {
-  file="$1"
+  local file="$1"
   while [ ! -z "$2" ]; do
     process_dylib "$file" "$2"
     shift
   done
 }
 
+process_file()
+{
+  local file="$1"
+  process_dylibs "$file" `otool -L "$file" | grep 'dylib' | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep -v '^/usr/\|^/System/' | grep -v ':$'`
+}
+
 for file in "${bundle}/Contents/MacOS/"*; do
-  process_dylibs $file `otool -L "$file" | grep 'dylib' | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep -v '^/usr/\|^/System/'`
+  process_file "$file"
 done
 
 rm -f ${frameworks}/*.processed
