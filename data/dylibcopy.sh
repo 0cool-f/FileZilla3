@@ -32,6 +32,9 @@ process_dylib()
     fi
 
     install_name_tool -id "$name" "${frameworks}/$name"
+
+    # dylibs themselves have dependencies. Process them too
+    process_file "${frameworks}/$name"
   fi
 
   install_name_tool -change "$dylib" "@executable_path/../Frameworks/$name" "$file"
