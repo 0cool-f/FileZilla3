@@ -1,6 +1,7 @@
 #include <filezilla.h>
 #include "led.h"
 #include "filezillaapp.h"
+#include "themeprovider.h"
 
 #include <wx/dcclient.h>
 
@@ -22,18 +23,17 @@ CLed::CLed(wxWindow *parent, unsigned int index)
 	SetBackgroundStyle(wxBG_STYLE_TRANSPARENT);
 #endif
 
-	Create(parent, -1, wxDefaultPosition, wxSize(11, 11));
+	wxSize const& size = CThemeProvider::GetIconSize(iconSizeTiny);
+	Create(parent, -1, wxDefaultPosition, size);
 
 	m_ledState = LED_OFF;
 
 	m_timer.SetOwner(this);
 
-	wxImage image;
-	if (!image.LoadFile(wxGetApp().GetResourceDir().GetPath() + _T("leds.png"), wxBITMAP_TYPE_PNG))
-		return;
+	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap(L"ART_LEDS", wxART_OTHER, size * 2);
 
-	m_leds[0] = wxBitmap(image.GetSubImage(wxRect(0, index * 11, 11, 11)));
-	m_leds[1] = wxBitmap(image.GetSubImage(wxRect(11, index * 11, 11, 11)));
+	m_leds[0] = bmp.GetSubBitmap(wxRect(0, index * size.y, size.x, size.y));
+	m_leds[1] = bmp.GetSubBitmap(wxRect(size.x, index * size.y, size.x, size.y));
 
 	m_loaded = true;
 }
@@ -42,8 +42,9 @@ void CLed::OnPaint(wxPaintEvent&)
 {
 	wxPaintDC dc(this);
 
-	if (!m_loaded)
+	if (!m_loaded) {
 		return;
+	}
 
 	dc.DrawBitmap(m_leds[m_ledState], 0, 0, true);
 }
@@ -66,8 +67,9 @@ void CLed::Unset()
 
 void CLed::OnTimer(wxTimerEvent& event)
 {
-	if (!m_timer.IsRunning())
+	if (!m_timer.IsRunning()) {
 		return;
+	}
 
 	if (event.GetId() != m_timer.GetId()) {
 		return;
@@ -88,11 +90,13 @@ void CLed::OnEnterWindow(wxMouseEvent&)
 
 void CLed::Ping()
 {
-	if (!m_loaded)
+	if (!m_loaded) {
 		return;
+	}
 
-	if (m_timer.IsRunning())
+	if (m_timer.IsRunning()) {
 		return;
+	}
 
 	Set();
 	m_timer.Start(100);

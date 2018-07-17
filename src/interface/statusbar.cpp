@@ -12,7 +12,7 @@
 #include <algorithm>
 
 static const int statbarWidths[3] = {
-	-3, 0, 25
+	-1, 0, 0
 };
 #define FIELD_QUEUESIZE 1
 
@@ -86,6 +86,10 @@ void wxStatusBarEx::SetStatusWidths(int n, const int *widths)
 	for (int i = 0; i < n; ++i) {
 		m_columnWidths[i] = widths[i];
 	}
+	m_columnWidths[n - 1] += CThemeProvider::GetIconSize(iconSizeSmall).GetWidth();
+#ifdef __WXMSW__
+	m_columnWidths[n - 1] -= 18; // Internal magic constant of wx, it doesn't UI scale :(
+#endif
 
 	FixupFieldWidth(n - 1);
 
@@ -142,10 +146,10 @@ void wxStatusBarEx::OnSize(wxSizeEvent&)
 			m_parentWasMaximized = isMaximized;
 
 			if (isMaximized) {
-				m_columnWidths[count - 1] -= 16;
+				m_columnWidths[count - 1] -= CThemeProvider::GetIconSize(iconSizeSmall).GetWidth();
 			}
 			else {
-				m_columnWidths[count - 1] += 16;
+				m_columnWidths[count - 1] += CThemeProvider::GetIconSize(iconSizeSmall).GetWidth();
 			}
 
 			wxStatusBar::SetStatusWidths(count, m_columnWidths);
@@ -156,7 +160,7 @@ void wxStatusBarEx::OnSize(wxSizeEvent&)
 }
 
 #ifdef __WXGTK__
-void wxStatusBarEx::SetStatusText(const wxString& text, int number /*=0*/)
+void wxStatusBarEx::SetStatusText(const wxString& text, int number)
 {
 	wxString oldText = GetStatusText(number);
 	if (oldText != text) {
@@ -219,6 +223,10 @@ bool CWidgetsStatusBar::AddField(int field, int idx, wxWindow* pChild)
 
 	m_children[idx] = data;
 
+	if (statbarWidths[field] >= 0) {
+		SetFieldWidth(field, GetStatusWidth(field) + pChild->GetSize().GetWidth() + 3);
+	}
+
 	PositionChildren(field);
 
 	return true;
@@ -238,8 +246,7 @@ void CWidgetsStatusBar::PositionChildren(int field)
 {
 	wxRect rect;
 	GetFieldRect(field, rect);
-
-	int offset = 2;
+	int offset = 3;
 
 #ifndef __WXMSW__
 	if (field + 1 == GetFieldsCount()) {

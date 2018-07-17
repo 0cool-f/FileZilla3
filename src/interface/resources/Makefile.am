@@ -6,8 +6,7 @@ resourcesdir = $(pkgdatadir)/resources
 dist_resources_DATA = \
 	defaultfilters.xml \
 	dropdown.png \
-	finished.wav \
-	leds.png
+	finished.wav
 
 xrcdir = $(pkgdatadir)/resources/xrc
 dist_xrc_DATA = \

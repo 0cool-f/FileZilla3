@@ -23,6 +23,7 @@ dist_resources480_DATA = \
 		480x480/folderclosed.png \
 		480x480/folderup.png \
 		480x480/help.png \
+		480x480/leds.png \
 		480x480/localtreeview.png \
 		480x480/lock.png \
 		480x480/logview.png \
