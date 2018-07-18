@@ -1085,7 +1085,6 @@ Section "FileZilla Client" SecMain
   SetDetailsPrint none
 
   SetOutPath "$INSTDIR\resources"
-  File "${top_srcdir}/src\interface\resources\*.png"
   File "${top_srcdir}/src\interface\resources\defaultfilters.xml"
   File "${top_srcdir}/src\interface\resources\finished.wav"
 
@@ -1575,7 +1574,6 @@ Section "Uninstall"
   SetDetailsPrint none
 
   Delete "$INSTDIR\resources\xrc\*.xrc"
-  Delete "$INSTDIR\resources\*.png"
   Delete "$INSTDIR\resources\defaultfilters.xml"
   Delete "$INSTDIR\resources\finished.wav"
   Delete "$INSTDIR\resources\16x16\*.png"
