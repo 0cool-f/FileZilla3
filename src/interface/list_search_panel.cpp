@@ -56,7 +56,7 @@ CListSearchPanel::CListSearchPanel(wxWindow* parent, wxWindow* pListView, CState
 	sizer->Add(m_optionsButton, 0, wxTOP | wxBOTTOM | wxRIGHT, 5);
 
 	// close button
-	wxBitmap closeBmp = CThemeProvider::Get()->GetBitmap(L"ART_CLOSE", wxART_OTHER, CThemeProvider::GetIconSize(iconSizeTiny));
+	wxBitmap closeBmp = CThemeProvider::Get()->CreateBitmap(L"ART_CLOSE", wxART_OTHER, CThemeProvider::GetIconSize(iconSizeTiny));
 	auto closeButton = new wxBitmapButton(this, ID_CLOSE_BUTTON, closeBmp, wxDefaultPosition, bs);
 	closeButton->SetToolTip(_("Close"));
 	sizer->Add(closeButton, 0, wxTOP | wxBOTTOM | wxRIGHT, 5);
