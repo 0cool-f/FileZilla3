@@ -8,6 +8,7 @@
 #include "Mainfrm.h"
 #include "asksavepassworddialog.h"
 #include "filezillaapp.h"
+#include "themeprovider.h"
 
 #include <wx/bmpbuttn.h>
 #include <wx/statline.h>
@@ -69,7 +70,7 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 	connect->SetDefault();
 	connectSizer->Add(connect, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
 
-	wxBitmap bmp(wxGetApp().GetResourceDir().GetPath() + _T("dropdown.png"), wxBITMAP_TYPE_PNG);
+	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap(L"ART_DROPDOWN", wxART_OTHER, CThemeProvider::GetIconSize(iconSizeTiny));
 	auto flags = wxSizerFlags().Expand();
 #if defined(__WXMSW__)
 	wxSize dropdownSize = ConvertDialogToPixels(wxSize(12, -1));

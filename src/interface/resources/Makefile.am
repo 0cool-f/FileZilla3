@@ -5,7 +5,6 @@ CLEANFILES = filezilla.o
 resourcesdir = $(pkgdatadir)/resources
 dist_resources_DATA = \
 	defaultfilters.xml \
-	dropdown.png \
 	finished.wav
 
 xrcdir = $(pkgdatadir)/resources/xrc

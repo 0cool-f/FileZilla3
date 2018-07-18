@@ -49,7 +49,7 @@ CListSearchPanel::CListSearchPanel(wxWindow* parent, wxWindow* pListView, CState
 	int const editHeight = m_textCtrl->GetSize().GetHeight();
 
 	// options button
-	wxBitmap dropdownBmp(wxGetApp().GetResourceDir().GetPath() + _T("dropdown.png"), wxBITMAP_TYPE_PNG);
+	wxBitmap dropdownBmp = CThemeProvider::Get()->CreateBitmap(L"ART_DROPDOWN", wxART_OTHER, CThemeProvider::GetIconSize(iconSizeTiny));
 	wxSize bs(editHeight, editHeight);
 	m_optionsButton = new wxBitmapButton(this, ID_OPTIONS_MENU_BUTTON, dropdownBmp, wxDefaultPosition, bs);
 	m_optionsButton->SetToolTip(_("Options"));

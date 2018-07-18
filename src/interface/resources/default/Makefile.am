@@ -15,6 +15,7 @@ dist_resources480_DATA = \
 		480x480/disconnect.png \
 		480x480/download.png \
 		480x480/downloadadd.png \
+		480x480/dropdown.png \
 		480x480/file.png \
 		480x480/filter.png \
 		480x480/find.png \
