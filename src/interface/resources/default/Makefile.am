@@ -36,6 +36,10 @@ dist_resources480_DATA = \
 		480x480/server.png \
 		480x480/showhidden.png \
 		480x480/sitemanager.png \
+		480x480/sort_down_dark.png \
+		480x480/sort_down_light.png \
+		480x480/sort_up_dark.png \
+		480x480/sort_up_light.png \
 		480x480/speedlimits.png \
 		480x480/symlink.png \
 		480x480/synchronize.png \

@@ -21,10 +21,6 @@ dist_xrc_DATA = \
 resources16dir = $(pkgdatadir)/resources/16x16
 dist_resources16_DATA = \
 	16x16/filezilla.png \
-	16x16/sort_down_dark.png \
-	16x16/sort_down_light.png \
-	16x16/sort_up_dark.png \
-	16x16/sort_up_light.png \
 	16x16/throbber.gif \
 	16x16/unknown.png
 

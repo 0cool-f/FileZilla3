@@ -867,9 +867,9 @@ void wxListCtrlEx::InitHeaderSortImageList()
 	if (imageList) {
 		wxBitmap bmp;
 
-		bmp = wxArtProvider::GetBitmap(_T("ART_SORT_UP_") + lightness, wxART_OTHER, CThemeProvider::GetIconSize(iconSizeSmall));
+		bmp = CThemeProvider::Get()->CreateBitmap(_T("ART_SORT_UP_") + lightness, wxART_OTHER, CThemeProvider::GetIconSize(iconSizeSmall));
 		m_header_icon_index.up = imageList->Add(bmp);
-		bmp = wxArtProvider::GetBitmap(_T("ART_SORT_DOWN_") + lightness, wxART_OTHER, CThemeProvider::GetIconSize(iconSizeSmall));
+		bmp = CThemeProvider::Get()->CreateBitmap(_T("ART_SORT_DOWN_") + lightness, wxART_OTHER, CThemeProvider::GetIconSize(iconSizeSmall));
 		m_header_icon_index.down = imageList->Add(bmp);
 	}
 #endif
