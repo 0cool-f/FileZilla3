@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FileZilla\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2018-07-16 11:12+0200\n"
-"PO-Revision-Date: 2018-06-24 15:26+0000\n"
+"POT-Creation-Date: 2018-07-20 14:07+0200\n"
+"PO-Revision-Date: 2018-07-19 10:36+0000\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/zeron/filezilla/"
 "language/pl_PL/)\n"
@@ -303,7 +303,7 @@ msgstr "&Pytaj system operacyjny o zewnętrzny adres IP"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1055
 #: ../../locales/../src/interface/menu_bar.cpp:118
-#: ../../locales/../src/interface/statusbar.cpp:554
+#: ../../locales/../src/interface/statusbar.cpp:561
 msgid "&Auto"
 msgstr "&Automatyczny"
 
@@ -317,7 +317,7 @@ msgstr "Kolor &tła:"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1070
 #: ../../locales/../src/interface/menu_bar.cpp:120
-#: ../../locales/../src/interface/statusbar.cpp:556
+#: ../../locales/../src/interface/statusbar.cpp:563
 msgid "&Binary"
 msgstr "&Binarny"
 
@@ -370,7 +370,7 @@ msgstr "&Zamknij FileZilla"
 msgid "&Close FileZilla once"
 msgstr "&Zamknij FileZillę jednorazowo"
 
-#: ../../locales/../src/interface/statusbar.cpp:545
+#: ../../locales/../src/interface/statusbar.cpp:552
 msgid "&Configure speed limits..."
 msgstr "&Konfiguruj limity prędkości..."
 
@@ -515,7 +515,7 @@ msgstr "&Edytuj reguły filtrów..."
 #: ../../locales/../src/interface/Mainfrm.cpp:2405
 #: ../../locales/../src/interface/menu_bar.cpp:89
 #: ../../locales/../src/interface/menu_bar.cpp:128
-#: ../../locales/../src/interface/statusbar.cpp:544
+#: ../../locales/../src/interface/statusbar.cpp:551
 msgid "&Enable"
 msgstr "&Włącz"
 
@@ -652,7 +652,7 @@ msgstr "Naj&wyższy dostępny port:"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2637
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:156
-#: ../../locales/../src/interface/quickconnectbar.cpp:47
+#: ../../locales/../src/interface/quickconnectbar.cpp:48
 #: ../../locales/../src/interface/sitemanager_site.cpp:268
 msgid "&Host:"
 msgstr "&Serwer:"
@@ -833,11 +833,11 @@ msgstr "&Hasło:"
 
 #: ../../locales/../src/interface/QueueView.cpp:1826
 msgid "&Play sound"
-msgstr "O&degraj dzwięk"
+msgstr "O&dtwórz dźwięk"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2650
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:169
-#: ../../locales/../src/interface/quickconnectbar.cpp:60
+#: ../../locales/../src/interface/quickconnectbar.cpp:61
 msgid "&Port:"
 msgstr "&Port:"
 
@@ -849,7 +849,7 @@ msgstr "&Zachowaj daty przesyłanych plików"
 msgid "&Queue"
 msgstr "&Kolejka"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:68
+#: ../../locales/../src/interface/quickconnectbar.cpp:69
 msgid "&Quickconnect"
 msgstr "S&zybkie łączenie"
 
@@ -1144,7 +1144,7 @@ msgstr "&Użyj separatora tysięcy"
 msgid "&User:"
 msgstr "&Użytkownik:"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:52
+#: ../../locales/../src/interface/quickconnectbar.cpp:53
 msgid "&Username:"
 msgstr "&Nazwa użytkownika:"
 
@@ -1410,8 +1410,15 @@ msgstr ""
 "plików.\n"
 "Ostrzeżenia nie będą ponownie wyświetlane podczas tej sesji."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4079
 #: ../../locales/../src/interface/settings/optionspage_passwords.cpp:167
+msgid ""
+"A lost master password cannot be recovered! Please thoroughly memorize your "
+"password."
+msgstr ""
+"Utraconego hasła głównego nie będzie może odzyskać! Zapamiętaj dokładnie "
+"swoje hasło."
+
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4079
 msgid ""
 "A lost master password cannot be recovered! Please thorougly memorize your "
 "password."
@@ -1428,8 +1435,8 @@ msgid ""
 "A proper server always shows all files, but some broken servers hide files "
 "from the user. Use this option to force the server to show all files."
 msgstr ""
-"Sprawny serwer zawsze pokazuje wszytkie pliki, jednak niektóre, źle "
-"skonfigurowane serwery mogą je ukrywać. Uzyj tej opcji, aby wymusić "
+"Sprawny serwer zawsze pokazuje wszystkie pliki, jednak niektóre, źle "
+"skonfigurowane serwery mogą je ukrywać. Użyj tej opcji, aby wymusić "
 "pokazywanie wszystkich plików przez serwer."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:246
@@ -1451,7 +1458,7 @@ msgstr ""
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1063
 #: ../../locales/../src/interface/menu_bar.cpp:119
-#: ../../locales/../src/interface/statusbar.cpp:555
+#: ../../locales/../src/interface/statusbar.cpp:562
 msgid "A&SCII"
 msgstr "A&SCII"
 
@@ -1655,7 +1662,7 @@ msgid ""
 "Alternatively you can use the Pageant tool from PuTTY to manage your keys, "
 "FileZilla does recognize Pageant."
 msgstr ""
-"Do zarządzania kluczami można również użyć narzędzia Pageant z PuTTY."
+"Do zarządzania kluczami można również użyć narzędzia Pageant z PuTTY. "
 "FileZilla rozpoznaje program Pageant."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:666
@@ -1699,8 +1706,8 @@ msgid ""
 "An item with the same name as the dragged item already exists at the target "
 "location."
 msgstr ""
-"W lokalizacji docelowej istnieje już obiekt o takej samej nazwie, jak obiekt "
-"przeciągany."
+"W lokalizacji docelowej istnieje już obiekt o takiej samej nazwie, jak "
+"obiekt przeciągany."
 
 #: ../../locales/../src/engine/server.cpp:697
 #: ../../locales/../src/interface/manual_transfer.cpp:147
@@ -1750,7 +1757,7 @@ msgstr "Archiwum"
 
 #: ../../locales/../src/engine/socket.cpp:1107
 msgid "Argument buffer overflow"
-msgstr "Przepełnienie buforu paremetru"
+msgstr "Przepełnienie bufora parametru"
 
 #: ../../locales/../src/interface/settings/optionspage_interface.cpp:128
 msgid "As tab in the transfer queue pane"
@@ -1899,7 +1906,7 @@ msgid ""
 "mode. If you want to limit FileZilla to use only a small range of ports, "
 "please enter the port range below."
 msgstr ""
-"Domyślnie do ustanowenia połączenia w trybie aktywnym używany jest "
+"Domyślnie do ustanowienia połączenia w trybie aktywnym używany jest "
 "jakikolwiek wolny port lokalny. Jeśli chcesz ograniczyć liczbę portów "
 "używanych przez FileZilla, wprowadź zakres portów poniżej."
 
@@ -2077,7 +2084,9 @@ msgstr "Nie można zmienić nazwy pliku"
 
 #: ../../locales/../src/engine/proxy.cpp:136
 msgid "Cannot resolve hostname to IPv4 address for use with SOCKS4 proxy."
-msgstr "Nie można ustalić nazwy hosta dla adresu IPv4 do użytku z proxy SOCKS4"
+msgstr ""
+"Nie można rozwiązać nazwy hosta dla adresu IPv4 do użytku z serwerem proxy "
+"SOCKS4."
 
 #: ../../locales/../src/interface/filter.cpp:245
 #: ../../locales/../src/interface/filter.cpp:315
@@ -2126,7 +2135,7 @@ msgstr "Z wielkością liter (domyślnie)"
 msgid "Categories to clear"
 msgstr "Kategorie do wyczyszczenia"
 
-#: ../../locales/../src/interface/statusbar.cpp:517
+#: ../../locales/../src/interface/statusbar.cpp:524
 msgid "Certificate and session data are not available yet."
 msgstr "Certyfikat oraz dane sesji nie są jeszcze dostępne."
 
@@ -2260,7 +2269,7 @@ msgstr "Wy&czyść pamięć podręczną układu okien"
 msgid "Clear auto&update data"
 msgstr "Wyczyść dane &automatycznej aktualizacji"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:197
+#: ../../locales/../src/interface/quickconnectbar.cpp:198
 msgid "Clear history"
 msgstr "Wyczyść historię"
 
@@ -2273,7 +2282,7 @@ msgstr "Wyczyść historię"
 msgid "Clear private data"
 msgstr "Wyczyść prywatne dane"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:196
+#: ../../locales/../src/interface/quickconnectbar.cpp:197
 msgid "Clear quickconnect bar"
 msgstr "Wyczyść pasek szybkiego łączenia"
 
@@ -2446,7 +2455,7 @@ msgstr "Wymagane potwierdzenie"
 msgid "Congratulations, your configuration seems to be working."
 msgstr "Gratulacje, wygląda na to, że Twoja konfiguracja działa."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:194
+#: ../../locales/../src/interface/quickconnectbar.cpp:195
 msgid "Connect bypassing proxy settings"
 msgstr "Połącz z pominięciem ustawień serwera proxy"
 
@@ -2725,9 +2734,9 @@ msgid ""
 "Either the shell extension is not installed properly or you didn't drop the "
 "files into an Explorer window."
 msgstr ""
-"Nie można określić lokalizacji dolecowej operacji 'przeciągnij i upuść'.\n"
+"Nie można określić celu operacji 'przeciągnij i upuść'.\n"
 "Rozszerzenie powłoki nie jest poprawnie zainstalowane lub pliki nie zostały "
-"przeciągnięte do okna Explorera."
+"przeciągnięte do okna Eksploratora."
 
 #: ../../locales/../src/engine/ftp/rawtransfer.cpp:236
 msgid "Could not establish connection to server"
@@ -2886,7 +2895,7 @@ msgstr "Nie można otworzyć pliku dziennika: %s"
 msgid "Could not parse remote path."
 msgstr "Nie można zanalizować zdalnej ścieżki."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:114
+#: ../../locales/../src/interface/quickconnectbar.cpp:115
 msgid "Could not parse server address:"
 msgstr "Nie można zanalizować adresu serwera:"
 
@@ -3115,15 +3124,15 @@ msgstr ""
 "synchronizacji (%s).\n"
 "Synchronizowane przeglądanie zostało wyłączone."
 
-#: ../../locales/../src/interface/statusbar.cpp:402
+#: ../../locales/../src/interface/statusbar.cpp:409
 msgid "Current transfer type is set to ASCII."
 msgstr "Bieżący tryb transferu jest ustawiony na ASCII."
 
-#: ../../locales/../src/interface/statusbar.cpp:410
+#: ../../locales/../src/interface/statusbar.cpp:417
 msgid "Current transfer type is set to automatic detection."
 msgstr "Bieżący tryb transferu jest ustawiony na wykrywanie automatyczne."
 
-#: ../../locales/../src/interface/statusbar.cpp:406
+#: ../../locales/../src/interface/statusbar.cpp:413
 msgid "Current transfer type is set to binary."
 msgstr "Bieżący tryb transferu jest ustawiony na binarny."
 
@@ -3173,7 +3182,7 @@ msgstr "Poró&wnywanie katalogów"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1302
 msgid "D&isable all"
-msgstr "Deaktywuj wszystkie"
+msgstr "W&yłącz wszystkie"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4035
 #: ../../locales/../src/interface/settings/optionspage_passwords.cpp:155
@@ -3419,7 +3428,7 @@ msgstr "Listowanie katalogów zakończone pomyślnie"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1337
 msgid "Disa&ble all"
-msgstr "Deaktywuj wszystkie"
+msgstr "W&yłącz wszystkie"
 
 #: ../../locales/../src/interface/state.cpp:1101
 msgid ""
@@ -3534,12 +3543,12 @@ msgstr "Pobieranie"
 msgid "Download &limit:"
 msgstr "Limit pobierania:"
 
-#: ../../locales/../src/interface/statusbar.cpp:601
+#: ../../locales/../src/interface/statusbar.cpp:608
 #, c-format
 msgid "Download limit: %s/s"
 msgstr "Limit pobierania: %s/s"
 
-#: ../../locales/../src/interface/statusbar.cpp:604
+#: ../../locales/../src/interface/statusbar.cpp:611
 msgid "Download limit: none"
 msgstr "Limit pobierania: brak"
 
@@ -3785,7 +3794,7 @@ msgstr "Wprowadź hasło"
 msgid "Enter selected directory"
 msgstr "Wejdź do zaznaczonego katalog"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:49
+#: ../../locales/../src/interface/quickconnectbar.cpp:50
 msgid ""
 "Enter the address of the server. To specify the server protocol, prepend the "
 "host with the protocol identifier. If no protocol is specified, the default "
@@ -3820,7 +3829,7 @@ msgstr ""
 "Wprowadź hasło do pliku '%s'.\n"
 "Przekształcony plik nie będzie chroniony hasłem."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:62
+#: ../../locales/../src/interface/quickconnectbar.cpp:63
 msgid ""
 "Enter the port on which the server listens. The default for FTP is 21, the "
 "default for SFTP is 22."
@@ -3967,7 +3976,7 @@ msgstr "FTP - protokół transferu plików z możliwością szyfrowania"
 msgid "FTP - Insecure File Transfer Protocol"
 msgstr "FTP - niezabezpieczony protokół transferu plików"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:99
+#: ../../locales/../src/interface/quickconnectbar.cpp:100
 msgid "FTP Engine not initialized, can't connect"
 msgstr "Nie zainicjowano silnika FTP, nie można się połączyć"
 
@@ -4075,7 +4084,7 @@ msgstr "Nie udało się zainicjować silnika FTP"
 #: ../../locales/../src/engine/ftp/logon.cpp:259
 #: ../../locales/../src/engine/http/httpcontrolsocket.cpp:208
 msgid "Failed to initialize TLS."
-msgstr "Nie udało się zainicjalizować TLS."
+msgstr "Nie udało się zainicjować TLS."
 
 #: ../../locales/../src/interface/FileZilla.cpp:98
 msgid "Failed to initialize networking"
@@ -4088,7 +4097,7 @@ msgstr "Nie udało się załadować paneli, nieprawidłowy pliki z zasobami?"
 #: ../../locales/../src/interface/fzputtygen_interface.cpp:110
 #, c-format
 msgid "Failed to load private key: %s"
-msgstr "Nie powiodło sie załadowanie prywatnego klucza: %s"
+msgstr "Nie udało się załadować klucza prywatnego: %s"
 
 #: ../../locales/../src/engine/ftp/filetransfer.cpp:81
 #, c-format
@@ -4308,7 +4317,7 @@ msgid "File would transfer with binary data type."
 msgstr "Plik byłby przesyłany w trybie binarnym."
 
 #: ../../locales/../src/interface/FileZilla.cpp:453
-#: ../../locales/../src/interface/quickconnectbar.cpp:99
+#: ../../locales/../src/interface/quickconnectbar.cpp:100
 msgid "FileZilla Error"
 msgstr "Błąd FileZilla"
 
@@ -5076,7 +5085,7 @@ msgstr "Nieprawidłowa ścieżka"
 msgid "Invalid port given. The port has to be a value from 1 to 65535."
 msgstr "Nieprawidłowy port. Numer portu musi zawierać się między 1 a 65535."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:160
+#: ../../locales/../src/interface/quickconnectbar.cpp:161
 #: ../../locales/../src/interface/serverdata.cpp:40
 msgid ""
 "Invalid protocol specified. Valid protocols are:\n"
@@ -5481,9 +5490,8 @@ msgid "Message log"
 msgstr "Dziennik wiadomości"
 
 #: ../../locales/../src/interface/settings/optionspage_interface.cpp:130
-#, fuzzy
 msgid "Message log positio&n:"
-msgstr "Pozycja dziennika wiadomości"
+msgstr "Pozycja dzie&nnika wiadomości:"
 
 #: ../../locales/../src/engine/socket.cpp:1084
 msgid "Message too large"
@@ -5565,7 +5573,7 @@ msgstr "Należy wybrać kodowanie znaków"
 
 #: ../../locales/../src/engine/socket.cpp:1105
 msgid "Neither nodename nor servname provided, or not known"
-msgstr "Nie dostarczarczo ani nazwy hosta ani nazwy serwera, lub jest nieznana"
+msgstr "Nie podano ani nazwy hosta ani nazwy serwera, lub jest nieznana"
 
 #: ../../locales/../src/engine/socket.cpp:1092
 msgid ""
@@ -5768,7 +5776,7 @@ msgstr "Nie połączono."
 
 #: ../../locales/../src/engine/socket.cpp:1120
 msgid "Not initialized, need to call WSAStartup"
-msgstr "Nie zainicjalizowane, trzeba wywołać WSAStartup"
+msgstr "Nie zainicjowano, należy wywołać WSAStartup"
 
 #: ../../locales/../src/interface/Mainfrm.cpp:722
 msgid "Note that this feature is only supported using the FTP protocol."
@@ -5843,9 +5851,8 @@ msgid "OS version:"
 msgstr "Wersja OS:"
 
 #: ../../locales/../src/interface/settings/optionspage_interface.cpp:148
-#, fuzzy
 msgid "On startup of FileZilla:"
-msgstr "Otwarcie okna ustawień FileZilla"
+msgstr "Przy uruchamianiu FileZilla:"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:103
 msgid ""
@@ -6073,7 +6080,7 @@ msgstr "Parsowanie %d bajtów z informacji o wersji.\n"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2714
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:286
-#: ../../locales/../src/interface/quickconnectbar.cpp:56
+#: ../../locales/../src/interface/quickconnectbar.cpp:57
 #: ../../locales/../src/interface/sitemanager_site.cpp:272
 msgid "Pass&word:"
 msgstr "&Hasło:"
@@ -6335,9 +6342,9 @@ msgid ""
 "wizard. In case you have a dynamic address or don't know your external "
 "address, use the external resolver option."
 msgstr ""
-"Podaj swój zewnętrzny adres IP na karcie trybu aktywnego w tym kreatorze. "
-"Jeśli masz adres dynamiczny lub nie znasz zewnętrznego adresu, użyj opcji "
-"zewnętrznego rozwiązywatora problemów."
+"Podaj swój zewnętrzny adres IP na karcie trybu aktywnego tego kreatora. "
+"Jeśli masz adres dynamiczny lub nie znasz swojego adresu zewnętrznego, "
+"skorzystaj z opcji zewnętrznego resolwera."
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:402
 msgid ""
@@ -6358,7 +6365,7 @@ msgid ""
 "make sure you typed the address of the address resolver correctly."
 msgstr ""
 "Upewnij się, że FileZila została uprawniona do nawiązywania połączeń "
-"wychodzących, oraz że adres rozwiązywatora problemów został podany poprawnie."
+"wychodzących, oraz że wpisałeś poprawnie adres resolwera adresów."
 
 #: ../../locales/../src/interface/FileZilla.cpp:150
 msgid "Please make sure the requested locale is installed on your system."
@@ -6509,7 +6516,7 @@ msgstr "Wydrukuj informacje wersji do stdout i wyjdź"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1591
 msgid "Prioritize directories (default)"
-msgstr "Nadaj piorytet katalogom (domyślne)"
+msgstr "Priorytetowe katalogów (domyślnie)"
 
 #: ../../locales/../src/interface/queue.cpp:1280
 msgid "Priority"
@@ -6557,7 +6564,7 @@ msgstr "Przetwarzanie przepełnienia tabeli pliku"
 #: ../../locales/../src/interface/recursive_operation_status.cpp:122
 #, c-format
 msgid "Processed %s in %s."
-msgstr "Przetwarzanie %s w %s."
+msgstr "Przetworzono %s w %s."
 
 #. @translator: Keep short
 #: ../../locales/../src/interface/sitemanager_site.cpp:296
@@ -6638,18 +6645,18 @@ msgstr "Publiczne prawa dostępu"
 msgid "Queue has been fully processed"
 msgstr "Kolejka została całkowicie przetworzona"
 
-#: ../../locales/../src/interface/statusbar.cpp:439
+#: ../../locales/../src/interface/statusbar.cpp:446
 #, c-format
 msgid "Queue: %s MiB"
 msgstr "Kolejka: %s MiB"
 
-#: ../../locales/../src/interface/statusbar.cpp:374
+#: ../../locales/../src/interface/statusbar.cpp:381
 #, c-format
 msgid "Queue: %s%s"
 msgstr "Kolejka: %s%s"
 
-#: ../../locales/../src/interface/statusbar.cpp:370
-#: ../../locales/../src/interface/statusbar.cpp:430
+#: ../../locales/../src/interface/statusbar.cpp:377
+#: ../../locales/../src/interface/statusbar.cpp:437
 msgid "Queue: empty"
 msgstr "Kolejka: pusta"
 
@@ -6669,7 +6676,7 @@ msgstr "Szybkie wyszukiwanie:"
 #: ../../locales/../src/interface/view.cpp:110
 msgid "Quick search cannot be opened if comparing directories."
 msgstr ""
-"Nie można otworzyc Szybkiego wyszukiwania w trakcie porównywania katalogów."
+"Nie można otworzyć Szybkiego wyszukiwania w trakcie porównywania katalogów."
 
 #: ../../locales/../src/interface/QueueView.cpp:1829
 msgid "R&eboot system once"
@@ -6822,7 +6829,7 @@ msgid ""
 msgstr ""
 "Informacje o ponownym połączeniu nie mogą zostać wyczyszczone podczas "
 "połączenia do serwera.\n"
-"Jeśli będziesz kontynuować, połączenie zostanie przewane."
+"Jeśli będziesz kontynuować, połączenie zostanie przerwane."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:185
 msgid "Reconnection settings"
@@ -6957,7 +6964,7 @@ msgstr "Zmień nazwę pliku"
 #: ../../locales/../src/interface/LocalTreeView.cpp:1080
 #: ../../locales/../src/interface/RemoteTreeView.cpp:909
 msgid "Rename selected directory"
-msgstr "Zmień nazwę zaznazconego katalogu"
+msgstr "Zmień nazwę zaznaczonego katalogu"
 
 #: ../../locales/../src/interface/LocalListView.cpp:807
 #: ../../locales/../src/interface/RemoteListView.cpp:1117
@@ -7008,7 +7015,7 @@ msgstr "Zresetuj &wszystkie pliki i ponownie dodaj do kolejki"
 
 #: ../../locales/../src/engine/socket.cpp:1110
 msgid "Resolved protocol is unknown"
-msgstr "Ustalony protokół jest nieznany"
+msgstr "Rozwiązany protokół jest nieznany"
 
 #: ../../locales/../src/engine/ControlSocket.cpp:1088
 #, c-format
@@ -7028,7 +7035,7 @@ msgstr "Odpowiedź"
 
 #: ../../locales/../src/interface/settings/optionspage_interface.cpp:151
 msgid "Restore ta&bs and reconnect"
-msgstr ""
+msgstr "Przywróć &karty i połącz się ponownie"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3362
 msgid "Results:"
@@ -7082,7 +7089,7 @@ msgstr "W&yłącz system jednorazowo"
 
 #: ../../locales/../src/interface/settings/optionspage_interface.cpp:149
 msgid "S&tart normally"
-msgstr ""
+msgstr "U&ruchom normalnie"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3286
 msgid "S&top"
@@ -7177,7 +7184,7 @@ msgstr "Rodzaj wyszukiwania:"
 msgid "Secret Access &Key:"
 msgstr "Tajny &klucz dostępu:"
 
-#: ../../locales/../src/interface/statusbar.cpp:517
+#: ../../locales/../src/interface/statusbar.cpp:524
 msgid "Security information"
 msgstr "Informacje o zabezpieczeniach"
 
@@ -7490,8 +7497,8 @@ msgstr "Serwer wysłał dane przed wysłaniem nagłówków żądania"
 #: ../../locales/../src/engine/ftp/rawtransfer.cpp:347
 msgid "Server sent passive reply with unroutable address. Passive mode failed."
 msgstr ""
-"Serwer wysłał pasywną odpowiedź z nieroutowalnym adresem. Uzycie trybu "
-"pasywnego nie powiodło się"
+"Serwer wysłał pasywną odpowiedź z nieroutowalnym adresem. Tryb pasywny nie "
+"powiódł się."
 
 #: ../../locales/../src/engine/ftp/rawtransfer.cpp:342
 msgid ""
@@ -7808,11 +7815,11 @@ msgstr "Limity prędkości"
 msgid "Speed limits"
 msgstr "Limity prędkości"
 
-#: ../../locales/../src/interface/statusbar.cpp:595
+#: ../../locales/../src/interface/statusbar.cpp:602
 msgid "Speed limits are disabled, click to change."
 msgstr "Limity prędkości są wyłączone, kliknij aby zmienić."
 
-#: ../../locales/../src/interface/statusbar.cpp:598
+#: ../../locales/../src/interface/statusbar.cpp:605
 msgid "Speed limits are enabled, click to change."
 msgstr "Limity prędkości są włączone, kliknij aby zmienić."
 
@@ -7839,7 +7846,7 @@ msgstr "Otwórz Menedżera Stron przy starcie"
 #: ../../locales/../src/interface/updater.cpp:255
 #, c-format
 msgid "Started update check on %s\n"
-msgstr "Rozpoczęgo sprawdzanie aktualizacji na %s\n"
+msgstr "Rozpoczęto sprawdzanie aktualizacji na %s\n"
 
 #: ../../locales/../src/engine/ftp/filetransfer.cpp:36
 #: ../../locales/../src/engine/sftp/filetransfer.cpp:35
@@ -7948,8 +7955,8 @@ msgstr "Synchronizowane przeglądanie zostało wyłączone."
 msgid "Synchronizing directories."
 msgstr "Synchronizowanie katalogów."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:117
-#: ../../locales/../src/interface/quickconnectbar.cpp:161
+#: ../../locales/../src/interface/quickconnectbar.cpp:118
+#: ../../locales/../src/interface/quickconnectbar.cpp:162
 msgid "Syntax error"
 msgstr "Błąd składni"
 
@@ -8088,7 +8095,7 @@ msgstr ""
 "Certyfikat wymaga, aby serwer uwzględnił status OCSP w swojej odpowiedzi, "
 "ale brakuje statusu OCSP."
 
-#: ../../locales/../src/interface/statusbar.cpp:476
+#: ../../locales/../src/interface/statusbar.cpp:483
 msgid "The connection is encrypted. Click icon for details."
 msgstr "Połączenie jest szyfrowane. Kliknij ikonę, aby zobaczyć szczegóły."
 
@@ -8241,7 +8248,7 @@ msgid ""
 "Continue with the import?"
 msgstr ""
 "Wybrany plik zawiera dane Menedżera Stron poprzedniej wersji FileZilla.\n"
-"Z powodu różnic w formacie zapisu, zostaną zainmortowane jedynie: host, "
+"Z powodu różnic w formacie zapisu, zostaną zaimportowane jedynie: host, "
 "port, nazwa użytkownika oraz hasło.\n"
 "Kontynuować importowanie?"
 
@@ -8358,7 +8365,7 @@ msgstr "Wybrane kategorie zostały zaimportowane."
 msgid ""
 "The selected file contains importable data for the following categories:"
 msgstr ""
-"Zaznaczony plik zawiera dane, które można zaimportować do nastepujących "
+"Zaznaczony plik zawiera dane, które można zaimportować do następujących "
 "kategorii:"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1998
@@ -8833,12 +8840,12 @@ msgstr "Wyślij"
 msgid "Upload failed"
 msgstr "Wysyłanie nie powiodło się"
 
-#: ../../locales/../src/interface/statusbar.cpp:608
+#: ../../locales/../src/interface/statusbar.cpp:615
 #, c-format
 msgid "Upload limit: %s/s"
 msgstr "Limit wysyłania: %s/s"
 
-#: ../../locales/../src/interface/statusbar.cpp:611
+#: ../../locales/../src/interface/statusbar.cpp:618
 msgid "Upload limit: none"
 msgstr "Limit wysyłania: brak"
 
@@ -8913,7 +8920,7 @@ msgstr "Użyj domyślnej akcji"
 
 #: ../../locales/../src/interface/sitemanager_site.cpp:155
 msgid "Use explicit FTP over TLS if available"
-msgstr "Jeżeli dostepne, używaj bezpośredniego FTP przez TLS"
+msgstr "Jeżeli dostępne, używaj bezpośredniego FTP przez TLS"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2574
 msgid "Use server currently connected to"
@@ -9524,6 +9531,3 @@ msgstr "zapis - wszyscy"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:890
 msgid "wxWidgets:"
 msgstr "wxWidgets:"
-
-#~ msgid "Positio&n of the message log:"
-#~ msgstr "&Pozycja dziennika wiadomości:"

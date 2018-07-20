@@ -9,10 +9,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: FileZilla 3.34.0\n"
+"Project-Id-Version: FileZilla 3.35.0\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2018-06-15 13:38+0200\n"
-"PO-Revision-Date: 2018-06-13 00:00+0900\n"
+"POT-Creation-Date: 2018-07-20 14:07+0200\n"
+"PO-Revision-Date: 2018-07-16 21:21+0900\n"
 "Last-Translator: Rukoto Luther <rukotolucies@hotmail.com>\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -49,17 +49,17 @@ msgid "%d directory"
 msgid_plural "%d directories"
 msgstr[0] "%d 個のディレクトリ"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1452
+#: ../../locales/../src/interface/RemoteListView.cpp:1470
 #: ../../locales/../src/interface/search.cpp:876
 #: ../../locales/../src/interface/search.cpp:1263
 #, c-format
 msgid "%d directory with its contents"
 msgid_plural "%d directories with their contents"
-msgstr[0] "%d 個の空ではないディレクトリ。"
+msgstr[0] "%d 個の空ではないディレクトリ"
 
 #: ../../locales/../src/interface/filelist_statusbar.cpp:50
 #: ../../locales/../src/interface/filelist_statusbar.cpp:75
-#: ../../locales/../src/interface/RemoteListView.cpp:1451
+#: ../../locales/../src/interface/RemoteListView.cpp:1469
 #: ../../locales/../src/interface/search.cpp:875
 #: ../../locales/../src/interface/search.cpp:1262
 #, c-format
@@ -176,8 +176,8 @@ msgstr ""
 "せん。\n"
 "\n"
 "解決法の候補:\n"
-"- %s が環境変数 PATH に含まれるディレクトリにあるか確認する。\n"
-"- 環境変数 %s に %s へのフルパスを設定する。"
+"- %s が環境変数 PATH に含まれるディレクトリにあるか確認する\n"
+"- 環境変数 %s に %s へのフルパスを設定する"
 
 #: ../../locales/../src/interface/verifycertdialog.cpp:249
 #, c-format
@@ -207,7 +207,7 @@ msgid "&About..."
 msgstr "バージョン情報(&A)..."
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:275
+#: ../../locales/../src/interface/sitemanager_site.cpp:276
 msgid "&Access key ID:"
 msgstr "アクセス キー ID(&A)"
 
@@ -230,8 +230,8 @@ msgstr "ブックマークの追加(&A)..."
 msgid "&Add directory..."
 msgstr "ディレクトリの追加(&A)..."
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:10
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:56
+#: ../../locales/../src/interface/LocalListView.cpp:791
+#: ../../locales/../src/interface/RemoteListView.cpp:1103
 msgid "&Add files to queue"
 msgstr "キューにファイルを追加(&A)"
 
@@ -239,8 +239,8 @@ msgstr "キューにファイルを追加(&A)"
 msgid "&Add key file..."
 msgstr "鍵ファイルの追加(&A)..."
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:266
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:329
+#: ../../locales/../src/interface/LocalTreeView.cpp:1067
+#: ../../locales/../src/interface/RemoteTreeView.cpp:899
 msgid "&Add to queue"
 msgstr "キューに追加(&A)"
 
@@ -256,7 +256,7 @@ msgstr "今後もこの証明書を常に信用する(&A)"
 msgid "&Always trust this host, add this key to the cache"
 msgstr "常にこのホストを信用し、この鍵をキャッシュに追加(&A)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2038
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1816
 msgid "&Always use default editor"
 msgstr "常にデフォルトのエディターを使用(&A)"
 
@@ -272,9 +272,9 @@ msgstr "常にこのアクションを使用する(&A)"
 msgid "&Ask your operating system for the external IP address"
 msgstr "オペレーティング システムに外部 IP アドレスを尋ねる(&A)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:364
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1055
 #: ../../locales/../src/interface/menu_bar.cpp:118
+#: ../../locales/../src/interface/statusbar.cpp:561
 msgid "&Auto"
 msgstr "自動(&A)"
 
@@ -286,13 +286,13 @@ msgstr "自動検出(&A)"
 msgid "&Background color:"
 msgstr "背景色(&B):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:372
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1070
 #: ../../locales/../src/interface/menu_bar.cpp:120
+#: ../../locales/../src/interface/statusbar.cpp:563
 msgid "&Binary"
 msgstr "バイナリ(&B)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1701
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1479
 msgid "&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"
 msgstr "SI 接頭辞 (2進数) (例: 1 KB = 1024 バイト)(&B)"
 
@@ -305,8 +305,8 @@ msgstr "ブックマーク(&B)"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2998
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3193
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3406
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2010
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2225
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1788
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2003
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:506
 msgid "&Browse..."
 msgstr "参照(&B)..."
@@ -333,15 +333,15 @@ msgstr "個人データのクリア(&C)..."
 msgid "&Close"
 msgstr "閉じる(&C)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:158
+#: ../../locales/../src/interface/QueueView.cpp:1824
 msgid "&Close FileZilla"
 msgstr "FileZilla を閉じる(&C)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:170
+#: ../../locales/../src/interface/QueueView.cpp:1827
 msgid "&Close FileZilla once"
 msgstr "一度だけ FileZilla を閉じる(&C)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:424
+#: ../../locales/../src/interface/statusbar.cpp:552
 msgid "&Configure speed limits..."
 msgstr "速度制限の設定(&C)..."
 
@@ -358,35 +358,35 @@ msgid "&Copy current connection to Site Manager..."
 msgstr "現在の接続をサイト マネージャーにコピー(&C)..."
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:985
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:200
+#: ../../locales/../src/interface/StatusView.cpp:420
 msgid "&Copy to clipboard"
 msgstr "クリップボードにコピー(&C)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:29
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:69
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:272
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:340
+#: ../../locales/../src/interface/LocalListView.cpp:801
+#: ../../locales/../src/interface/LocalTreeView.cpp:1075
+#: ../../locales/../src/interface/RemoteListView.cpp:1110
+#: ../../locales/../src/interface/RemoteTreeView.cpp:904
 msgid "&Create directory"
 msgstr "ディレクトリの作成(&C)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:404
+#: ../../locales/../src/interface/context_control.cpp:444
 msgid "&Create new tab"
 msgstr "新規タブの作成(&C)"
 
-#: ../../locales/../src/interface/menu_bar.cpp:182
+#: ../../locales/../src/interface/menu_bar.cpp:184
 msgid "&Debug"
 msgstr "デバッグ(&D)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2314
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2092
 msgid "&Debug information in message log:"
 msgstr "メッセージ ログのデバッグ情報(&D):"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1980
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1758
 msgid "&Default editor:"
 msgstr "デフォルトのエディター(&D):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:118
 #: ../../locales/../src/interface/menu_bar.cpp:113
+#: ../../locales/../src/interface/QueueView.cpp:1809
 msgid "&Default file exists action..."
 msgstr "ファイル存在時のデフォルトのアクション(&D)..."
 
@@ -397,9 +397,9 @@ msgstr "ログイン失敗時の待機時間(&D):"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1271
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1440
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3078
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:41
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:349
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:59
+#: ../../locales/../src/interface/LocalListView.cpp:806
+#: ../../locales/../src/interface/LocalTreeView.cpp:1079
 msgid "&Delete"
 msgstr "削除(&D)"
 
@@ -415,12 +415,12 @@ msgstr "ディレクトリのパーミッション(&D)..."
 msgid "&Directory comparison"
 msgstr "ディレクトリの比較(&D)"
 
-#: ../../locales/../src/interface/state.cpp:1030
+#: ../../locales/../src/interface/state.cpp:1031
 msgid ""
 "&Disable synchronized browsing and continue changing the local directory"
 msgstr "同期ブラウジングを無効にしてローカル ディレクトリの移動を継続(&D)"
 
-#: ../../locales/../src/interface/state.cpp:1108
+#: ../../locales/../src/interface/state.cpp:1109
 msgid ""
 "&Disable synchronized browsing and continue changing the remote directory"
 msgstr "同期ブラウジングを無効にしてリモート ディレクトリの移動を継続(&D)"
@@ -433,11 +433,11 @@ msgstr "ローカル ファイルを破棄して新たにファイルをダウ�
 msgid "&Disconnect"
 msgstr "切断(&D)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1473
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:163
 msgid "&Display momentary transfer speed instead of average speed"
 msgstr "平均速度の代わりに瞬間的な転送速度を表示する(&D)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1688
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1466
 msgid "&Display size in bytes"
 msgstr "サイズをバイトで表示(&D)"
 
@@ -449,12 +449,12 @@ msgstr "このダイアログを今後表示しない(&D)"
 msgid "&Don't use external IP address on local connections."
 msgstr "ローカル接続に外部 IP アドレスを使用しない(&D)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1895
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1673
 msgid "&Double-click action on files:"
 msgstr "ファイルをダブルクリックしたときのアクション(&D):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:51
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:261
+#: ../../locales/../src/interface/RemoteListView.cpp:1100
+#: ../../locales/../src/interface/RemoteTreeView.cpp:896
 msgid "&Download"
 msgstr "ダウンロード(&D)"
 
@@ -462,7 +462,7 @@ msgstr "ダウンロード(&D)"
 msgid "&Download to:"
 msgstr "ダウンロード先(&D):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:378
+#: ../../locales/../src/interface/search.cpp:835
 msgid "&Download..."
 msgstr "ダウンロード(&D)..."
 
@@ -471,7 +471,7 @@ msgstr "ダウンロード(&D)..."
 msgid "&Downloads:"
 msgstr "ダウンロード(&D):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:24
+#: ../../locales/../src/interface/LocalListView.cpp:798
 #: ../../locales/../src/interface/menu_bar.cpp:68
 msgid "&Edit"
 msgstr "編集(&E)"
@@ -480,10 +480,10 @@ msgstr "編集(&E)"
 msgid "&Edit filter rules..."
 msgstr "フィルター ルールの編集(&E)..."
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:304
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:420
+#: ../../locales/../src/interface/Mainfrm.cpp:2405
 #: ../../locales/../src/interface/menu_bar.cpp:89
 #: ../../locales/../src/interface/menu_bar.cpp:128
+#: ../../locales/../src/interface/statusbar.cpp:551
 msgid "&Enable"
 msgstr "有効(&E)"
 
@@ -504,7 +504,7 @@ msgstr "文字コード(&E):"
 msgid "&Encryption:"
 msgstr "暗号化(&E)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:192
+#: ../../locales/../src/interface/StatusView.cpp:416
 msgid "&Enter custom command..."
 msgstr "カスタム コマンドの入力(&E)..."
 
@@ -520,24 +520,24 @@ msgstr "実行(&E)"
 msgid "&Export Site Manager entries"
 msgstr "サイト マネージャー エントリをエクスポート(&E)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:359
 #: ../../locales/../src/interface/menu_bar.cpp:57
+#: ../../locales/../src/interface/sitemanager_dialog.cpp:1752
 msgid "&Export..."
 msgstr "エクスポート(&E)..."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:427
 msgid "&Fall back to active mode"
-msgstr "アクティブ モードに戻る(&F)"
+msgstr "アクティブ モードに戻す(&F)"
 
 #: ../../locales/../src/interface/menu_bar.cpp:44
 msgid "&File"
 msgstr "ファイル(&F)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:297
+#: ../../locales/../src/interface/RemoteTreeView.cpp:912
 msgid "&File Attributes..."
 msgstr "パーミッションの変更(&F)..."
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:101
+#: ../../locales/../src/interface/RemoteListView.cpp:1120
 msgid "&File permissions..."
 msgstr "パーミッションの変更(&F)..."
 
@@ -605,12 +605,12 @@ msgstr "CONNECT メソッドを使用する &HTTP/1.1"
 msgid "&Help"
 msgstr "ヘルプ(&H)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:318
+#: ../../locales/../src/interface/Mainfrm.cpp:2412
 #: ../../locales/../src/interface/menu_bar.cpp:94
 msgid "&Hide identical files"
 msgstr "同一ファイルを非表示(&H)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:123
+#: ../../locales/../src/interface/QueueView.cpp:1813
 msgid "&Highest"
 msgstr "最高(&H)"
 
@@ -620,16 +620,16 @@ msgstr "利用可能なポートの最大値(&H):"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2637
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:156
-#: ../../locales/../src/interface/quickconnectbar.cpp:47
-#: ../../locales/../src/interface/sitemanager_site.cpp:267
+#: ../../locales/../src/interface/quickconnectbar.cpp:48
+#: ../../locales/../src/interface/sitemanager_site.cpp:268
 msgid "&Host:"
 msgstr "ホスト(&H):"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1696
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1474
 msgid "&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)"
 msgstr "&IEC 2進接頭辞 (例: 1 KiB = 1024 バイト)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1582
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1360
 msgid "&ISO 8601 (example: 2007-09-15)"
 msgstr "&ISO 8601 (例: 2007-09-15)"
 
@@ -637,7 +637,7 @@ msgstr "&ISO 8601 (例: 2007-09-15)"
 msgid "&Import..."
 msgstr "インポート(&I)..."
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2071
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1849
 msgid "&Inherit system's filetype associations"
 msgstr "システムのファイルの関連付けを継承する(&I)"
 
@@ -657,7 +657,7 @@ msgstr "リモート パス構造を検索のルートに対して相対的に�
 msgid "&Key file:"
 msgstr "鍵ファイル(&K):"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1352
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:124
 msgid "&Layout of file and directory panes:"
 msgstr "ファイルとディレクトリ ペインのレイアウト(&L):"
 
@@ -682,7 +682,7 @@ msgstr "ローカル ディレクトリ(&L):"
 msgid "&Local search"
 msgstr "ローカル検索(&L)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2202
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1980
 msgid "&Log to file"
 msgstr "ファイルにログを記録する(&L)"
 
@@ -694,7 +694,7 @@ msgstr "ログオン タイプ(&L):"
 msgid "&Logontype:"
 msgstr "ログオン タイプ(&L):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:135
+#: ../../locales/../src/interface/QueueView.cpp:1816
 msgid "&Low"
 msgstr "低(&L)"
 
@@ -718,13 +718,13 @@ msgstr "最大再試行回数(&M):"
 msgid "&Message log"
 msgstr "メッセージ ログ(&M)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1425
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:145
 msgid "&Minimize to tray"
 msgstr "トレイに最小化する(&M)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1822
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1600
 msgid "&Name sorting mode:"
-msgstr "並べ替えモード(&N):"
+msgstr "名前による並べ替え(&N):"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2869
 msgid "&Name:"
@@ -742,7 +742,7 @@ msgstr "新規(&N)"
 msgid "&New Site"
 msgstr "新しいサイト(&N)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1763
+#: ../../locales/../src/interface/Mainfrm.cpp:1794
 msgid "&New version available!"
 msgstr "新バージョンを利用できます!(&N)"
 
@@ -755,13 +755,13 @@ msgstr "次へ(&N) >"
 msgid "&No"
 msgstr "いいえ(&N)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:146
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:459
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:720
+#: ../../locales/../src/interface/QueueView.cpp:1821
 msgid "&None"
 msgstr "何もしない(&N)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:131
+#: ../../locales/../src/interface/QueueView.cpp:1815
 msgid "&Normal"
 msgstr "通常(&N)"
 
@@ -780,8 +780,8 @@ msgstr "&OK"
 msgid "&OPEN"
 msgstr "&OPEN"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:20
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:335
+#: ../../locales/../src/interface/LocalListView.cpp:797
+#: ../../locales/../src/interface/LocalTreeView.cpp:1072
 msgid "&Open"
 msgstr "開く(&O)"
 
@@ -797,13 +797,13 @@ msgstr "パッシブ(&P)"
 msgid "&Password:"
 msgstr "パスワード(&P):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:166
+#: ../../locales/../src/interface/QueueView.cpp:1826
 msgid "&Play sound"
 msgstr "音を鳴らす(&P)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2650
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:169
-#: ../../locales/../src/interface/quickconnectbar.cpp:60
+#: ../../locales/../src/interface/quickconnectbar.cpp:61
 msgid "&Port:"
 msgstr "ポート(&P):"
 
@@ -815,7 +815,7 @@ msgstr "転送したファイルのタイムスタンプを維持(&P)"
 msgid "&Queue"
 msgstr "キュー(&Q)"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:68
+#: ../../locales/../src/interface/quickconnectbar.cpp:69
 msgid "&Quickconnect"
 msgstr "クイック接続(&Q)"
 
@@ -839,7 +839,7 @@ msgstr "再接続(&R)"
 msgid "&Reconnect information"
 msgstr "再接続の情報(&R)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:415
+#: ../../locales/../src/interface/context_control.cpp:451
 #: ../../locales/../src/interface/menu_bar.cpp:80
 msgid "&Refresh"
 msgstr "最新の情報に更新(&R)"
@@ -874,17 +874,17 @@ msgid "&Remove key"
 msgstr "鍵を削除(&R)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4212
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:115
+#: ../../locales/../src/interface/QueueView.cpp:1808
 msgid "&Remove selected"
 msgstr "選択したアイテムを削除(&R)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1446
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3072
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:45
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:89
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:285
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:353
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:53
+#: ../../locales/../src/interface/LocalListView.cpp:807
+#: ../../locales/../src/interface/LocalTreeView.cpp:1080
+#: ../../locales/../src/interface/RemoteListView.cpp:1117
+#: ../../locales/../src/interface/RemoteTreeView.cpp:909
 msgid "&Rename"
 msgstr "名前の変更(&R)"
 
@@ -904,11 +904,11 @@ msgstr "不正な文字を置換(&R):"
 msgid "&Report a bug..."
 msgstr "バグの報告(&R)..."
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:154
+#: ../../locales/../src/interface/QueueView.cpp:1823
 msgid "&Request attention"
 msgstr "ユーザーに注意を促す(&R)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:223
+#: ../../locales/../src/interface/queueview_failed.cpp:31
 msgid "&Reset and requeue all"
 msgstr "すべてリセットして再びキューに入れる(&R)"
 
@@ -920,7 +920,7 @@ msgstr "ウィザードを再実行(&R)"
 msgid "&Resume"
 msgstr "再開(&R)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:162
+#: ../../locales/../src/interface/QueueView.cpp:1825
 msgid "&Run command..."
 msgstr "コマンドを実行(&R)..."
 
@@ -928,7 +928,7 @@ msgstr "コマンドを実行(&R)..."
 msgid "&Run configuration wizard now..."
 msgstr "今すぐ設定ウィザードを実行(&R)..."
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2164
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1942
 msgid "&Run update check now..."
 msgstr "今すぐアップデートを確認(&R)..."
 
@@ -956,7 +956,7 @@ msgstr "リモート ファイルの検索(&S)..."
 msgid "&Select Entry:"
 msgstr "エントリを選択(&S):"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1947
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1725
 msgid "&Select language:"
 msgstr "言語を選択(&S):"
 
@@ -977,15 +977,15 @@ msgstr "設定(&S)"
 msgid "&Settings..."
 msgstr "設定(&S)..."
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2303
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2081
 msgid "&Show debug menu"
-msgstr "デバッグ メニューを表示する(&S)"
+msgstr "[デバッグ] メニューを表示する(&S)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:196
+#: ../../locales/../src/interface/StatusView.cpp:419
 msgid "&Show detailed log"
 msgstr "詳細なログを表示(&S)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2197
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1975
 msgid "&Show timestamps in message log"
 msgstr "メッセージ ログのタイムスタンプを表示する(&S)"
 
@@ -1014,11 +1014,11 @@ msgstr "速度制限(&S)"
 msgid "&Start transfer immediately"
 msgstr "今すぐ転送を開始(&S)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1373
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:137
 msgid "&Swap local and remote panes"
 msgstr "ローカル ペインとリモート ペインを入れ替える(&S)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:211
+#: ../../locales/../src/interface/menu_bar.cpp:182
 msgid "&TLS Ciphers"
 msgstr "暗号化方式(&T):"
 
@@ -1026,7 +1026,7 @@ msgstr "暗号化方式(&T):"
 msgid "&Test"
 msgstr "テスト(&T)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1500
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1278
 msgid "&Theme:"
 msgstr "テーマ(&T):"
 
@@ -1059,8 +1059,8 @@ msgstr "編集中を解除(&U)"
 msgid "&Update cached key for this host"
 msgstr "このホストのキャッシュされた鍵を更新(&U)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:5
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:324
+#: ../../locales/../src/interface/LocalListView.cpp:788
+#: ../../locales/../src/interface/LocalTreeView.cpp:1064
 msgid "&Upload"
 msgstr "アップロード(&U)"
 
@@ -1068,7 +1068,7 @@ msgstr "アップロード(&U)"
 msgid "&Upload to:"
 msgstr "アップロード先(&U):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:381
+#: ../../locales/../src/interface/search.cpp:828
 msgid "&Upload..."
 msgstr "アップロード(&U)..."
 
@@ -1085,7 +1085,7 @@ msgstr "カスタム プログラムを使用(&U)"
 msgid "&Use synchronized browsing"
 msgstr "同期ブラウジングを使用する(&U)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1991
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1769
 msgid "&Use system's default editor for text files"
 msgstr "テキスト ファイルの編集にシステムのデフォルトのエディターを使用(&U)"
 
@@ -1097,23 +1097,23 @@ msgstr "以下の IP アドレスを使用(&U):"
 msgid "&Use the server's external IP address instead"
 msgstr "代わりにサーバーの外部 IP アドレスを使用(&U)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1711
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1489
 msgid "&Use thousands separator"
 msgstr "桁区切りを使用する(&U)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:323
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2704
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:260
-#: ../../locales/../src/interface/sitemanager_site.cpp:270
-#: ../../locales/../src/interface/sitemanager_site.cpp:347
+#: ../../locales/../src/interface/sitemanager_site.cpp:271
+#: ../../locales/../src/interface/sitemanager_site.cpp:348
 msgid "&User:"
 msgstr "ユーザー(&U):"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:52
+#: ../../locales/../src/interface/quickconnectbar.cpp:53
 msgid "&Username:"
 msgstr "ユーザー名(&U):"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1757
+#: ../../locales/../src/interface/Mainfrm.cpp:1788
 #, c-format
 msgid "&Version %s"
 msgstr "バージョン %s(&V)"
@@ -1122,16 +1122,16 @@ msgstr "バージョン %s(&V)"
 msgid "&View"
 msgstr "表示(&V)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:65
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:384
+#: ../../locales/../src/interface/RemoteListView.cpp:1107
+#: ../../locales/../src/interface/search.cpp:836
 msgid "&View/Edit"
 msgstr "表示/編集(&V)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2048
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1826
 msgid "&Watch locally edited files and prompt to upload modifications"
 msgstr "ローカルで編集したファイルを監視して変更のアップロードを促す(&W)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2140
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1918
 msgid "&When checking for updates, check for:"
 msgstr "アップデートの確認対象(&W):"
 
@@ -1163,7 +1163,7 @@ msgid "'%s' is not a supported protocol."
 msgstr "'%s' はサポートされているプロトコルではありません。"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:419
-#: ../../locales/../src/interface/sitemanager_site.cpp:489
+#: ../../locales/../src/interface/sitemanager_site.cpp:490
 msgid "'Account' logontype not supported by selected protocol"
 msgstr ""
 "ログオン タイプ「アカウント」は選択したプロトコルでサポートされていません"
@@ -1176,7 +1176,7 @@ msgstr ""
 "ログオン タイプ「標準」と「アカウント」は利用できません。代わりに「パスワード"
 "を尋ねる」を使用してください。"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:506
+#: ../../locales/../src/interface/sitemanager_site.cpp:507
 msgid ""
 "'Normal' and 'Account' logontypes are not available. Your entry has been "
 "changed to 'Ask for password'."
@@ -1184,7 +1184,7 @@ msgstr ""
 "ログオン タイプ「標準」と「アカウント」は利用できません。あなたのエントリは、"
 "「パスワードを尋ねる」に変更されました。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:640
+#: ../../locales/../src/interface/Mainfrm.cpp:647
 msgid ""
 "'quote' is usually a local command used by commandline clients to send the "
 "arguments following 'quote' to the server. You might want to enter the raw "
@@ -1192,7 +1192,7 @@ msgid ""
 msgstr ""
 "'quote' は通常引数を伴った 'quote' をサーバーに送信するためにコマンドライン "
 "クライアントによって使われるローカル コマンドです。あなたは先頭に 'quote' を"
-"付けずにそのままのコマンドを入力することもできます。"
+"付けずに生のコマンドを入力することもできます。"
 
 #: ../../locales/../src/interface/filelist_statusbar.cpp:87
 #: ../../locales/../src/interface/filelist_statusbar.cpp:94
@@ -1225,7 +1225,7 @@ msgstr "(1～10)"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:110
 msgid "(10-9999, 0 to disable)"
-msgstr "(10～9999、0 は無効)"
+msgstr "(10～9999, 0 は無効)"
 
 #: ../../locales/../src/interface/aboutdialog.cpp:94
 #: ../../locales/../src/interface/aboutdialog.cpp:194
@@ -1233,11 +1233,11 @@ msgstr "(10～9999、0 は無効)"
 msgid "(app-compat is set to %d.%d)"
 msgstr "(app-compat は %d.%d に設定されています)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1649
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1427
 msgid "(example: %H:%M)"
 msgstr "(例: %H:%M)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1600
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1378
 msgid "(example: %Y-%m-%d)"
 msgstr "(例: %Y-%m-%d)"
 
@@ -1273,19 +1273,19 @@ msgstr "-s と -c は同時に使用できません。"
 msgid "-s cannot be used together with an FTP URL."
 msgstr "-s は FTP URL と同時には使用できません。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2324
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2102
 msgid "0 - None"
 msgstr "0 - なし"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2325
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2103
 msgid "1 - Warning"
 msgstr "1 - 警告"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2326
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2104
 msgid "2 - Info"
 msgstr "2 - 情報"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2327
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2105
 msgid "3 - Verbose"
 msgstr "3 - 詳細"
 
@@ -1293,7 +1293,7 @@ msgstr "3 - 詳細"
 msgid "32-bit system"
 msgstr "32 ビット システム"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2328
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2106
 msgid "4 - Debug"
 msgstr "4 - デバッグ"
 
@@ -1313,7 +1313,8 @@ msgstr "?"
 msgid ""
 "A bookmark with the entered name already exists. Please enter an unused name."
 msgstr ""
-"入力した名前のブックマークは既に存在します。未使用の名前を入力してください。"
+"入力した名前のブックマークはすでに存在します。未使用の名前を入力してくださ"
+"い。"
 
 #: ../../locales/../src/engine/tlssocket_impl.cpp:1283
 msgid "A certificate in the chain was signed using an insecure algorithm"
@@ -1325,7 +1326,7 @@ msgstr "デフォルトのエディターを設定する必要があります。
 
 #: ../../locales/../src/interface/RemoteListView.cpp:166
 #: ../../locales/../src/interface/RemoteTreeView.cpp:123
-#: ../../locales/../src/interface/state.cpp:852
+#: ../../locales/../src/interface/state.cpp:853
 msgid "A directory cannot be dragged into one of its subdirectories."
 msgstr "ディレクトリを自身のサブディレクトリにドラッグすることはできません。"
 
@@ -1345,7 +1346,7 @@ msgstr "以前開かれたファイルは変更されています。"
 
 #: ../../locales/../src/interface/edithandler.cpp:1696
 msgid "A file with that name is already being transferred."
-msgstr "その名前のファイルは既に転送されています。"
+msgstr "その名前のファイルはすでに転送されています。"
 
 #: ../../locales/../src/interface/edithandler.cpp:1700
 msgid ""
@@ -1367,8 +1368,16 @@ msgstr ""
 "す。\n"
 "以降このセッションでは警告を表示しません。"
 
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:167
+#, fuzzy
+msgid ""
+"A lost master password cannot be recovered! Please thoroughly memorize your "
+"password."
+msgstr ""
+"紛失したマスター パスワードは回復できません! パスワードを覚えておいてくださ"
+"い。"
+
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4079
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1330
 msgid ""
 "A lost master password cannot be recovered! Please thorougly memorize your "
 "password."
@@ -1380,7 +1389,7 @@ msgstr ""
 msgid "A new version of FileZilla is available:"
 msgstr "新しいバージョンの FileZilla を利用できます:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:711
+#: ../../locales/../src/interface/Mainfrm.cpp:723
 msgid ""
 "A proper server always shows all files, but some broken servers hide files "
 "from the user. Use this option to force the server to show all files."
@@ -1396,7 +1405,7 @@ msgstr ""
 "これは適切なサーバーでは不要です。これが必要な場合はサーバー管理者に連絡して"
 "ください。"
 
-#: ../../locales/../src/interface/state.cpp:284
+#: ../../locales/../src/interface/state.cpp:289
 msgid ""
 "A remote operation is in progress and synchronized browsing is enabled.\n"
 "Disable synchronized browsing and continue changing the local directory?"
@@ -1404,9 +1413,9 @@ msgstr ""
 "リモート操作が進行中で同期ブラウジングが有効です。\n"
 "同期ブラウジングを無効にしてローカル ディレクトリの変更を継続しますか?"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:368
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1063
 #: ../../locales/../src/interface/menu_bar.cpp:119
+#: ../../locales/../src/interface/statusbar.cpp:562
 msgid "A&SCII"
 msgstr "A&SCII"
 
@@ -1430,7 +1439,7 @@ msgstr "アップロードにのみ適用する(&P)"
 msgid "A&pply to all files and directories"
 msgstr "すべてのファイルとディレクトリに適用する(&P)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:252
+#: ../../locales/../src/interface/queueview_successful.cpp:31
 msgid "A&utomatically remove successful transfers"
 msgstr "成功した転送を自動的に削除(&U)"
 
@@ -1442,11 +1451,11 @@ msgstr "ASCII"
 msgid "About FileZilla"
 msgstr "FileZilla のバージョン情報"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1400
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:126
 msgid "Above the file lists"
 msgstr "ファイル リストの上"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:283
+#: ../../locales/../src/interface/sitemanager_site.cpp:284
 msgid "Access &Key:"
 msgstr "アクセス キー(&K)"
 
@@ -1464,7 +1473,7 @@ msgstr "一部のローカル ディレクトリへのアクセスを復元で�
 msgid "Account"
 msgstr "アカウント"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:144
+#: ../../locales/../src/interface/QueueView.cpp:1820
 msgid "Action after queue &completion"
 msgstr "キュー完了後のアクション(&C)"
 
@@ -1480,7 +1489,7 @@ msgstr "実行するアクション:"
 msgid "Action:"
 msgstr "アクション:"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:94
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:98
 msgid "Active mode"
 msgstr "アクティブ モード"
 
@@ -1519,18 +1528,18 @@ msgstr "アクティブ モード IP"
 msgid "Add files to &queue only"
 msgstr "キューにのみファイルを追加(&Q)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:268
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:331
+#: ../../locales/../src/interface/LocalTreeView.cpp:1067
+#: ../../locales/../src/interface/RemoteTreeView.cpp:899
 msgid "Add selected directory to the transfer queue"
 msgstr "選択したディレクトリを転送キューへ追加"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:12
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:58
+#: ../../locales/../src/interface/LocalListView.cpp:791
+#: ../../locales/../src/interface/RemoteListView.cpp:1103
 msgid "Add selected files and folders to the transfer queue"
 msgstr "選択したファイルとフォルダーを転送キューへ追加"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1903
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1923
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1681
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1701
 msgid "Add to queue"
 msgstr "キューに追加"
 
@@ -1542,7 +1551,7 @@ msgstr "サポートされていないアドレス タイプ"
 msgid "Advanced"
 msgstr "詳細"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2155
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1933
 msgid ""
 "Advice: Unless you want to test new features, please keep using stable "
 "versions only. Beta versions and nightly builds are development versions "
@@ -1564,7 +1573,7 @@ msgstr "常にこのアクションを実行する(&W)"
 msgid "Algorithm:"
 msgstr "アルゴリズム:"
 
-#: ../../locales/../src/interface/QueueView.cpp:2663
+#: ../../locales/../src/interface/QueueView.cpp:2693
 msgid "All files have been successfully transferred"
 msgstr "すべてのファイルを正しく転送しました"
 
@@ -1572,7 +1581,7 @@ msgstr "すべてのファイルを正しく転送しました"
 msgid "All ports in the given range have to be between 1024 and 65535."
 msgstr "指定するすべてのポートは 1024 から 65535 の範囲である必要があります。"
 
-#: ../../locales/../src/interface/QueueView.cpp:2659
+#: ../../locales/../src/interface/QueueView.cpp:2689
 #, c-format
 msgid "All transfers have finished. %d file could not be transferred."
 msgid_plural "All transfers have finished. %d files could not be transferred."
@@ -1588,7 +1597,7 @@ msgstr "失敗時に他の転送モードへのフォールバックを許可す
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3839
 msgid "Already connected"
-msgstr "既に接続されています"
+msgstr "すでに接続されています"
 
 #: ../../locales/../src/interface/verifycertdialog.cpp:270
 msgid "Alternative name:"
@@ -1643,21 +1652,23 @@ msgstr "証明書チェーンの発行者は認証局ではありません"
 msgid ""
 "An item with the same name as the dragged item already exists at the target "
 "location."
-msgstr "目的の場所には既にドラッグしたアイテムと同じ名前のアイテムがあります。"
+msgstr ""
+"目的の場所にはすでにドラッグしたアイテムと同じ名前のアイテムがあります。"
 
 #: ../../locales/../src/engine/server.cpp:697
 #: ../../locales/../src/interface/manual_transfer.cpp:147
 #: ../../locales/../src/interface/manual_transfer.cpp:188
 #: ../../locales/../src/interface/manual_transfer.cpp:203
 #: ../../locales/../src/interface/manual_transfer.cpp:534
-#: ../../locales/../src/interface/sitemanager_site.cpp:795
+#: ../../locales/../src/interface/sitemanager_site.cpp:796
 msgid "Anonymous"
 msgstr "匿名"
 
-#: ../../locales/../src/interface/state.cpp:1084
+#: ../../locales/../src/interface/state.cpp:1085
 msgid ""
 "Another remote operation is already in progress, cannot change directory now."
-msgstr "他のリモート操作が既に進行中のため現在はディレクトリを変更できません。"
+msgstr ""
+"他のリモート操作がすでに進行中のため現在はディレクトリを変更できません。"
 
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:735
 msgid "Any changes made in the Site Manager could not be saved."
@@ -1695,7 +1706,7 @@ msgstr "アーカイブ属性"
 msgid "Argument buffer overflow"
 msgstr "引数のバッファー オーバーフロー"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1402
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:128
 msgid "As tab in the transfer queue pane"
 msgstr "転送キュー ペイン内のタブ"
 
@@ -1703,7 +1714,7 @@ msgstr "転送キュー ペイン内のタブ"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1633
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1187
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1208
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1450
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:155
 msgid "Ask for action"
 msgstr "アクションを尋ねる"
 
@@ -1745,7 +1756,7 @@ msgstr "属性"
 msgid "Authentication failed."
 msgstr "認証に失敗しました。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1509
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1287
 msgid "Author:"
 msgstr "著者:"
 
@@ -1774,7 +1785,7 @@ msgstr "不正なファイル記述子"
 msgid "Basic usage instructions"
 msgstr "基本的な使用手順"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1419
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:139
 msgid "Behaviour"
 msgstr "挙動"
 
@@ -1791,7 +1802,7 @@ msgstr "注意! 証明書は失効しています"
 msgid "Binary"
 msgstr "バイナリ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1362
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:135
 msgid "Blackboard"
 msgstr "黒板"
 
@@ -1800,7 +1811,7 @@ msgid "Blue"
 msgstr "Blue"
 
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:271
-#: ../../locales/../src/interface/menu_bar.cpp:436
+#: ../../locales/../src/interface/menu_bar.cpp:439
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:334
 msgid "Bookmark"
 msgstr "ブックマーク"
@@ -1850,27 +1861,27 @@ msgstr ""
 msgid "C&ancel current operation"
 msgstr "現在の操作をキャンセル(&A)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:203
+#: ../../locales/../src/interface/StatusView.cpp:421
 msgid "C&lear all"
 msgstr "すべてクリア(&L)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:93
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:289
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:390
+#: ../../locales/../src/interface/RemoteListView.cpp:1118
+#: ../../locales/../src/interface/RemoteTreeView.cpp:910
+#: ../../locales/../src/interface/search.cpp:843
 msgid "C&opy URL(s) to clipboard"
 msgstr "URL をクリップボードにコピー(&O)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:97
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:293
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:393
+#: ../../locales/../src/interface/RemoteListView.cpp:1119
+#: ../../locales/../src/interface/RemoteTreeView.cpp:911
+#: ../../locales/../src/interface/search.cpp:840
 msgid "C&opy URL(s) with password to clipboard"
 msgstr "パスワード付き URL をクリップボードにコピー(&O)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1587
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1365
 msgid "C&ustom"
 msgstr "カスタム(&U)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2076
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1854
 msgid "C&ustom filetype associations:"
 msgstr "ファイルの関連付けをカスタマイズ(&U):"
 
@@ -1938,7 +1949,7 @@ msgstr ""
 "'%s' にアクセスできません、メディアが挿入されていないかドライブの準備ができて"
 "いません。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:611
+#: ../../locales/../src/interface/Mainfrm.cpp:618
 msgid "Cannot add server to Site Manager"
 msgstr "サイト マネージャーにサーバーを追加できません"
 
@@ -1946,13 +1957,13 @@ msgstr "サイト マネージャーにサーバーを追加できません"
 msgid "Cannot assign requested address"
 msgstr "要求されたアドレスを割り当てることができません"
 
-#: ../../locales/../src/interface/state.cpp:263
+#: ../../locales/../src/interface/state.cpp:268
 msgid ""
 "Cannot change directory, there already is a synchronized browsing operation "
 "in progress."
 msgstr "ディレクトリを変更できません。すでに進行中のブラウズ操作があります。"
 
-#: ../../locales/../src/interface/context_control.cpp:360
+#: ../../locales/../src/interface/context_control.cpp:374
 msgid ""
 "Cannot close tab while busy.\n"
 "Cancel current operation and close tab?"
@@ -1974,17 +1985,17 @@ msgstr "新しいフィルターを作成できません"
 
 #: ../../locales/../src/interface/edithandler.cpp:1626
 #: ../../locales/../src/interface/edithandler.cpp:1674
-#: ../../locales/../src/interface/LocalListView.cpp:1857
+#: ../../locales/../src/interface/LocalListView.cpp:1874
 #: ../../locales/../src/interface/search.cpp:1210
 #: ../../locales/../src/interface/search.cpp:1528
 msgid "Cannot edit file"
 msgstr "ファイルを編集できません"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1733
+#: ../../locales/../src/interface/LocalListView.cpp:1750
 msgid "Cannot edit file, not connected to any server."
 msgstr "ファイルを編集できません、どのサーバーにも接続されていません。"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1742
+#: ../../locales/../src/interface/LocalListView.cpp:1759
 msgid "Cannot edit file, remote path unknown."
 msgstr "ファイルを編集できません、リモート パスが不明です。"
 
@@ -2000,7 +2011,7 @@ msgstr ""
 msgid "Cannot load key file"
 msgstr "鍵ファイルを読み込めません"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1077
+#: ../../locales/../src/interface/Mainfrm.cpp:1098
 msgid "Cannot load toolbar from resource file"
 msgstr "リソース ファイルからツールバーを読み込みできません"
 
@@ -2013,7 +2024,7 @@ msgstr "パスワードを保存しない"
 msgid "Cannot rename entry"
 msgstr "エントリの名前を変更できません"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1654
+#: ../../locales/../src/interface/RemoteListView.cpp:1672
 msgid "Cannot rename file"
 msgstr "ファイル名を変更できません"
 
@@ -2048,19 +2059,19 @@ msgstr "選択したファイルは表示/編集できません"
 msgid "Case Insensitive"
 msgstr "大文字と小文字を区別しない"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1831
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1609
 msgid "Case insensitive"
 msgstr "大文字と小文字を区別しない"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1830
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1608
 msgid "Case insensitive (default)"
 msgstr "大文字と小文字を区別しない (デフォルト)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1832
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1610
 msgid "Case sensitive"
 msgstr "大文字と小文字を区別する"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1833
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1611
 msgid "Case sensitive (default)"
 msgstr "大文字と小文字を区別する (デフォルト)"
 
@@ -2068,7 +2079,7 @@ msgstr "大文字と小文字を区別する (デフォルト)"
 msgid "Categories to clear"
 msgstr "クリアするカテゴリ"
 
-#: ../../locales/../src/interface/statusbar.cpp:516
+#: ../../locales/../src/interface/statusbar.cpp:524
 msgid "Certificate and session data are not available yet."
 msgstr "証明書とセッション データがまだ利用できません。"
 
@@ -2092,12 +2103,12 @@ msgstr "チャレンジ:"
 msgid "Change file attributes"
 msgstr "パーミッションの変更"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:102
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:298
+#: ../../locales/../src/interface/RemoteListView.cpp:1120
+#: ../../locales/../src/interface/RemoteTreeView.cpp:912
 msgid "Change the file permissions."
 msgstr "パーミッションを変更します。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2275
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2053
 msgid "Changing logfile settings requires restart of FileZilla."
 msgstr "ログ ファイルの設定の変更には FileZilla の再起動が必要です。"
 
@@ -2113,7 +2124,7 @@ msgstr "文字コード"
 msgid "Check for &updates..."
 msgstr "アップデートの確認(&U)..."
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2122
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1900
 msgid "Check for FileZilla &updates automatically:"
 msgstr "アップデートの自動確認(&U):"
 
@@ -2153,27 +2164,27 @@ msgstr "正しい外部 IP アドレスをチェック中"
 msgid "Checking for updates..."
 msgstr "アップデートの確認中..."
 
-#: ../../locales/../src/interface/updater.cpp:782
+#: ../../locales/../src/interface/updater.cpp:783
 #, c-format
 msgid "Checksum match on file %s\n"
 msgstr "ファイル %s のチェックサムが一致しました。\n"
 
-#: ../../locales/../src/interface/updater.cpp:778
+#: ../../locales/../src/interface/updater.cpp:779
 #, c-format
 msgid "Checksum mismatch on file %s\n"
 msgstr "ファイル %s のチェックサムが一致しません。\n"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:1033
+#: ../../locales/../src/interface/sitemanager_site.cpp:1034
 msgid "Choose a key file"
 msgstr "鍵ファイルの選択"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:1024
+#: ../../locales/../src/interface/sitemanager_site.cpp:1025
 msgid "Choose the default local directory"
 msgstr "デフォルトのローカル ディレクトリを選択"
 
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:134
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:386
-#: ../../locales/../src/interface/sitemanager_dialog.cpp:1807
+#: ../../locales/../src/interface/sitemanager_dialog.cpp:1804
 msgid "Choose the local directory"
 msgstr "ローカル ディレクトリを選択"
 
@@ -2185,37 +2196,37 @@ msgstr "チャンク データが不正に終了しました"
 msgid "Cipher:"
 msgstr "暗号化方式:"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:408
+#: ../../locales/../src/interface/context_control.cpp:447
 #: ../../locales/../src/interface/menu_bar.cpp:55
 msgid "Cl&ose tab"
 msgstr "タブを閉じる(&O)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1359
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:132
 msgid "Classic"
 msgstr "クラシック"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:208
+#: ../../locales/../src/interface/menu_bar.cpp:181
 msgid "Clear &layout cache"
 msgstr "レイアウト キャッシュをクリア(&L)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:215
+#: ../../locales/../src/interface/menu_bar.cpp:183
 msgid "Clear auto&update data"
 msgstr "自動アップデートのデータをクリア(&U)"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:197
+#: ../../locales/../src/interface/quickconnectbar.cpp:198
 msgid "Clear history"
 msgstr "履歴をクリア"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1690
-#: ../../locales/../src/interface/clearprivatedata.cpp:35
-#: ../../locales/../src/interface/clearprivatedata.cpp:41
-#: ../../locales/../src/interface/clearprivatedata.cpp:47
-#: ../../locales/../src/interface/clearprivatedata.cpp:74
+#: ../../locales/../src/interface/clearprivatedata.cpp:36
+#: ../../locales/../src/interface/clearprivatedata.cpp:42
+#: ../../locales/../src/interface/clearprivatedata.cpp:48
+#: ../../locales/../src/interface/clearprivatedata.cpp:72
 #: ../../locales/../src/interface/clearprivatedata.cpp:98
 msgid "Clear private data"
 msgstr "個人データのクリア"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:196
+#: ../../locales/../src/interface/quickconnectbar.cpp:197
 msgid "Clear quickconnect bar"
 msgstr "クイック接続バーをクリア"
 
@@ -2235,12 +2246,12 @@ msgstr "クライアント -> サーバー 暗号化方式:"
 msgid "Close"
 msgstr "閉じる"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:411
+#: ../../locales/../src/interface/context_control.cpp:448
 msgid "Close &all other tabs"
 msgstr "他のタブをすべて閉じる(&A)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1230
-#: ../../locales/../src/interface/Mainfrm.cpp:1251
+#: ../../locales/../src/interface/Mainfrm.cpp:1254
+#: ../../locales/../src/interface/Mainfrm.cpp:1276
 #: ../../locales/../src/interface/menu_bar.cpp:64
 msgid "Close FileZilla"
 msgstr "FileZilla を閉じる"
@@ -2249,7 +2260,7 @@ msgstr "FileZilla を閉じる"
 msgid "Close all running instances of FileZilla"
 msgstr "すべての実行中の FileZilla インスタンスを終了"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2308
+#: ../../locales/../src/interface/Mainfrm.cpp:2358
 msgid "Close quick search and continue comparing?"
 msgstr "クイック検索を閉じて比較を続けますか?"
 
@@ -2269,7 +2280,7 @@ msgstr "列のプロパティ"
 msgid "Column setup"
 msgstr "列の設定"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2020
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1798
 msgid "Command and its arguments should be properly quoted."
 msgstr "コマンドと引数は引用符で適切に囲む必要があります。"
 
@@ -2307,17 +2318,17 @@ msgstr "共有名:"
 msgid "Communication tainted by router or firewall"
 msgstr "ルーターまたはファイアウォールによって通信を失いました"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:313
+#: ../../locales/../src/interface/Mainfrm.cpp:2409
 #: ../../locales/../src/interface/menu_bar.cpp:92
 msgid "Compare &modification time"
 msgstr "更新日時で比較(&M)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:309
+#: ../../locales/../src/interface/Mainfrm.cpp:2408
 #: ../../locales/../src/interface/menu_bar.cpp:91
 msgid "Compare file&size"
 msgstr "ファイルサイズで比較(&S)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1864
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1642
 msgid "Comparison &threshold (in minutes):"
 msgstr "比較の閾値 (分)(&T):"
 
@@ -2376,9 +2387,9 @@ msgstr "削除の確認"
 
 #: ../../locales/../src/interface/edithandler.cpp:1638
 #: ../../locales/../src/interface/file_utils.h:45
-#: ../../locales/../src/interface/LocalListView.cpp:1819
-#: ../../locales/../src/interface/RemoteListView.cpp:1456
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1085
+#: ../../locales/../src/interface/LocalListView.cpp:1836
+#: ../../locales/../src/interface/RemoteListView.cpp:1474
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1100
 #: ../../locales/../src/interface/search.cpp:1222
 #: ../../locales/../src/interface/search.cpp:1488
 msgid "Confirmation needed"
@@ -2388,7 +2399,7 @@ msgstr "必要な確認"
 msgid "Congratulations, your configuration seems to be working."
 msgstr "おめでとうございます。設定は正しく機能しているようです。"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:194
+#: ../../locales/../src/interface/quickconnectbar.cpp:195
 msgid "Connect bypassing proxy settings"
 msgstr "プロキシ設定を無視して接続"
 
@@ -2397,11 +2408,11 @@ msgstr "プロキシ設定を無視して接続"
 msgid "Connect failed: %s"
 msgstr "接続に失敗しました: %s"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1452
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:157
 msgid "Connect in current tab"
 msgstr "現在のタブで接続"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1451
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:156
 msgid "Connect in new tab"
 msgstr "新規タブで接続"
 
@@ -2419,13 +2430,13 @@ msgstr "接続中"
 msgid "Connecting to %s"
 msgstr "%s に接続中"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1064
+#: ../../locales/../src/engine/ControlSocket.cpp:1065
 #: ../../locales/../src/engine/ftp/logon.cpp:96
 #, c-format
 msgid "Connecting to %s through %s proxy"
 msgstr "%s にプロキシ %s を使用して接続中"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:996
+#: ../../locales/../src/engine/ControlSocket.cpp:997
 #: ../../locales/../src/engine/proxy.cpp:236
 #: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:43
 #: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:42
@@ -2433,7 +2444,7 @@ msgstr "%s にプロキシ %s を使用して接続中"
 msgid "Connecting to %s..."
 msgstr "%s に接続中..."
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:92
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:96
 msgid "Connection"
 msgstr "接続"
 
@@ -2445,13 +2456,13 @@ msgstr "接続が閉じられました"
 msgid "Connection attempt failed"
 msgstr "接続の試行が失敗しました"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:958
+#: ../../locales/../src/engine/ControlSocket.cpp:959
 #: ../../locales/../src/engine/proxy.cpp:208
 #, c-format
 msgid "Connection attempt failed with \"%s\", trying next address."
 msgstr "\"%s\" への接続の試行が失敗しました。次のアドレスを試しています。"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:964
+#: ../../locales/../src/engine/ControlSocket.cpp:965
 #, c-format
 msgid "Connection attempt failed with \"%s\"."
 msgstr "\"%s\" への接続の試行が失敗しました。"
@@ -2469,7 +2480,7 @@ msgstr "接続タイムアウト"
 msgid "Connection closed"
 msgstr "接続が閉じられました"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1042
+#: ../../locales/../src/engine/ControlSocket.cpp:1043
 #: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:75
 #: ../../locales/../src/engine/http/request.cpp:305
 #: ../../locales/../src/engine/http/request.cpp:318
@@ -2519,7 +2530,7 @@ msgstr "ネットワークによって接続がリセットされました"
 msgid "Connection reset by peer"
 msgstr "相手によって接続がリセットされました"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:516
+#: ../../locales/../src/engine/ControlSocket.cpp:517
 #, c-format
 msgid "Connection timed out after %d second of inactivity"
 msgid_plural "Connection timed out after %d seconds of inactivity"
@@ -2561,14 +2572,14 @@ msgstr "%2$s - コピー (%1$d)"
 msgid "Copy of %s"
 msgstr "%s - コピー"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:98
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:294
+#: ../../locales/../src/interface/RemoteListView.cpp:1119
+#: ../../locales/../src/interface/RemoteTreeView.cpp:911
 msgid "Copy the URLs of the selected items to clipboard, including password."
 msgstr ""
 "選択したアイテムのパスワードを含む URL をクリップボードにコピーします。"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:94
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:290
+#: ../../locales/../src/interface/RemoteListView.cpp:1118
+#: ../../locales/../src/interface/RemoteTreeView.cpp:910
 msgid "Copy the URLs of the selected items to clipboard."
 msgstr "選択したアイテムの URL をクリップボードにコピーします。"
 
@@ -2591,7 +2602,7 @@ msgstr "一時的な信頼リストに証明書を追加できませんでした
 msgid "Could not add connection to Site Manager"
 msgstr "サイト マネージャーに接続を追加できませんでした"
 
-#: ../../locales/../src/interface/state.cpp:868
+#: ../../locales/../src/interface/state.cpp:869
 msgid "Could not complete operation"
 msgstr "操作を完了できませんでした"
 
@@ -2599,7 +2610,7 @@ msgstr "操作を完了できませんでした"
 msgid "Could not connect to server"
 msgstr "サーバーに接続できませんでした"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1097
+#: ../../locales/../src/engine/ControlSocket.cpp:1098
 #, c-format
 msgid "Could not connect to server: %s"
 msgstr "サーバーに接続できませんでした: %s"
@@ -2607,7 +2618,7 @@ msgstr "サーバーに接続できませんでした: %s"
 #: ../../locales/../src/engine/sftp/filetransfer.cpp:76
 #: ../../locales/../src/engine/sftp/filetransfer.cpp:97
 #: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:342
-#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:261
+#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:260
 msgid "Could not convert command to server encoding"
 msgstr "コマンドをサーバーの文字コードに変換できません"
 
@@ -2616,8 +2627,8 @@ msgstr "コマンドをサーバーの文字コードに変換できません"
 msgid "Could not convert private key"
 msgstr "秘密鍵を変換できません"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2672
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1427
+#: ../../locales/../src/interface/RemoteListView.cpp:2690
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1442
 #: ../../locales/../src/interface/search.cpp:1419
 msgid "Could not copy URLs"
 msgstr "URL をコピーできませんでした"
@@ -2640,7 +2651,7 @@ msgstr "パス %s から CFURL を作成できませんでした"
 msgid "Could not create URI for this transfer."
 msgstr "この転送の URI を作成できませんでした。"
 
-#: ../../locales/../src/interface/updater.cpp:513
+#: ../../locales/../src/interface/updater.cpp:514
 #, c-format
 msgid "Could not create local file %s\n"
 msgstr "ローカル ファイル %s に書き込めませんでした\n"
@@ -2655,7 +2666,7 @@ msgstr "ロギング ミューテックスを作成できませんでした: %s"
 msgid "Could not create security-scoped bookmark from URL:"
 msgstr "URL からセキュリティ スコープ付きブックマークを作成できませんでした:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2315
+#: ../../locales/../src/interface/RemoteListView.cpp:2333
 #: ../../locales/../src/interface/RemoteTreeView.cpp:881
 msgid ""
 "Could not determine the target of the Drag&Drop operation.\n"
@@ -2670,7 +2681,7 @@ msgstr ""
 msgid "Could not establish connection to server"
 msgstr "サーバーとの接続を確立できませんでした"
 
-#: ../../locales/../src/interface/FileZilla.cpp:451
+#: ../../locales/../src/interface/FileZilla.cpp:452
 msgid ""
 "Could not find the resource files for FileZilla, closing FileZilla.\n"
 "You can set the data directory of FileZilla using the '--datadir "
@@ -2687,7 +2698,7 @@ msgid "Could not generate custom login sequence."
 msgstr "カスタム ログイン シーケンスを生成できませんでした。"
 
 #: ../../locales/../src/interface/asksavepassworddialog.cpp:53
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:121
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:83
 msgid "Could not generate key"
 msgstr "鍵を生成できません"
 
@@ -2705,7 +2716,7 @@ msgid ""
 msgstr ""
 "証明書のサブジェクトの識別名を取得できず、gnutls_x509_get_dn に失敗しました"
 
-#: ../../locales/../src/interface/state.cpp:1069
+#: ../../locales/../src/interface/state.cpp:1070
 msgid "Could not get full remote path."
 msgstr "完全なリモート パスを取得できませんでした。"
 
@@ -2728,7 +2739,7 @@ msgstr "fzputtygen からの結果を取得できません。"
 msgid "Could not get temporary directory to download file into."
 msgstr "ファイルをダウンロードする一時ディレクトリを取得できませんでした。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:96
+#: ../../locales/../src/interface/FileZilla.cpp:97
 #, c-format
 msgid "Could not initialize Winsock (%d): %s"
 msgstr "Winsock を初期化できませんでした (%d): %s"
@@ -2759,7 +2770,7 @@ msgstr "鍵ファイルを読み込めません"
 msgid "Could not load private key"
 msgstr "秘密鍵を読み込めません"
 
-#: ../../locales/../src/interface/state.cpp:1092
+#: ../../locales/../src/interface/state.cpp:1093
 #, c-format
 msgid ""
 "Could not obtain corresponding local directory for the remote directory "
@@ -2770,7 +2781,7 @@ msgstr ""
 "した。\n"
 "同期ブラウジングを無効にしてリモート ディレクトリの変更を継続しますか?"
 
-#: ../../locales/../src/interface/state.cpp:401
+#: ../../locales/../src/interface/state.cpp:404
 #, c-format
 msgid ""
 "Could not obtain corresponding local directory for the remote directory "
@@ -2781,7 +2792,7 @@ msgstr ""
 "した。\n"
 "同期ブラウジングを無効にしました。"
 
-#: ../../locales/../src/interface/state.cpp:294
+#: ../../locales/../src/interface/state.cpp:299
 #, c-format
 msgid ""
 "Could not obtain corresponding remote directory for the local directory "
@@ -2792,19 +2803,19 @@ msgstr ""
 "した。\n"
 "同期ブラウジングを無効にしました。"
 
-#: ../../locales/../src/interface/updater.cpp:743
+#: ../../locales/../src/interface/updater.cpp:744
 #, c-format
 msgid "Could not obtain size of '%s'"
 msgstr "'%s' のサイズを取得できませんでした"
 
-#: ../../locales/../src/interface/updater.cpp:757
+#: ../../locales/../src/interface/updater.cpp:758
 #, c-format
 msgid "Could not open '%s'"
 msgstr "'%s' を開くことができませんでした"
 
 #: ../../locales/../src/interface/aboutdialog.cpp:220
-#: ../../locales/../src/interface/RemoteListView.cpp:2672
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1427
+#: ../../locales/../src/interface/RemoteListView.cpp:2690
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1442
 #: ../../locales/../src/interface/search.cpp:1419
 msgid "Could not open clipboard"
 msgstr "クリップボードを開くことができませんでした"
@@ -2822,11 +2833,11 @@ msgstr "ログ ファイルを開けませんでした: %s"
 msgid "Could not parse remote path."
 msgstr "リモート パスを構文解析できませんでした。"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:114
+#: ../../locales/../src/interface/quickconnectbar.cpp:115
 msgid "Could not parse server address:"
 msgstr "サーバーのアドレスを構文解析できません:"
 
-#: ../../locales/../src/interface/updater.cpp:766
+#: ../../locales/../src/interface/updater.cpp:767
 #, c-format
 msgid "Could not read from '%s'"
 msgstr "'%s' から読み取れませんでした"
@@ -2860,14 +2871,14 @@ msgstr "ディレクトリ アクセスを復元できませんでした"
 msgid "Could not seek to offset %d within file"
 msgstr "ファイル内のオフセット %d を探し出せませんでした"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:115
-#: ../../locales/../src/engine/http/filetransfer.cpp:174
+#: ../../locales/../src/engine/http/filetransfer.cpp:120
+#: ../../locales/../src/engine/http/filetransfer.cpp:179
 #: ../../locales/../src/engine/http/httpcontrolsocket.cpp:71
 msgid "Could not seek to the beginning of the file"
 msgstr "ファイルの先頭にシークすることができません"
 
 #: ../../locales/../src/engine/ftp/filetransfer.cpp:90
-#: ../../locales/../src/engine/http/filetransfer.cpp:98
+#: ../../locales/../src/engine/http/filetransfer.cpp:103
 msgid "Could not seek to the end of the file"
 msgstr "ファイルの終わりを見つけられませんでした"
 
@@ -2887,7 +2898,7 @@ msgstr "ピア証明書を並べ替えできません"
 msgid "Could not spawn IO thread"
 msgstr "IO スレッドを作成できません"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1078
+#: ../../locales/../src/engine/ControlSocket.cpp:1079
 #, c-format
 msgid "Could not start proxy handshake: %s"
 msgstr "プロキシ ハンドシェイクを開始できませんでした: %s"
@@ -2929,7 +2940,7 @@ msgstr ""
 
 #: ../../locales/../src/interface/sitemanager.cpp:758
 #: ../../locales/../src/interface/sitemanager.cpp:815
-#: ../../locales/../src/interface/sitemanager_dialog.cpp:1785
+#: ../../locales/../src/interface/sitemanager_dialog.cpp:1782
 #, c-format
 msgid "Could not write \"%s\", the selected sites could not be exported: %s"
 msgstr ""
@@ -2956,8 +2967,8 @@ msgstr "ローカル ファイルに書き込めませんでした"
 msgid "Could not write to log file: %s"
 msgstr "ログ ファイルに書き込めませんでした: %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:919
-#: ../../locales/../src/engine/ControlSocket.cpp:1014
+#: ../../locales/../src/engine/ControlSocket.cpp:920
+#: ../../locales/../src/engine/ControlSocket.cpp:1015
 #: ../../locales/../src/engine/http/request.cpp:237
 #, c-format
 msgid "Could not write to socket: %s"
@@ -2967,51 +2978,51 @@ msgstr "ソケットに書き込めませんでした: %s"
 msgid "Country:"
 msgstr "国:"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:77
+#: ../../locales/../src/interface/RemoteListView.cpp:1112
 msgid "Crea&te new file"
 msgstr "新しいファイルの作成(&T)"
 
-#: ../../locales/../src/interface/state.cpp:1107
+#: ../../locales/../src/interface/state.cpp:1108
 msgid "Create &missing local directory and enter it"
 msgstr "ディレクトリを作成して移動(&M)"
 
-#: ../../locales/../src/interface/state.cpp:1029
+#: ../../locales/../src/interface/state.cpp:1030
 msgid "Create &missing remote directory and enter it"
 msgstr "ディレクトリを作成して移動(&M)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:30
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:70
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:273
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:341
+#: ../../locales/../src/interface/LocalListView.cpp:801
+#: ../../locales/../src/interface/LocalTreeView.cpp:1075
+#: ../../locales/../src/interface/RemoteListView.cpp:1110
+#: ../../locales/../src/interface/RemoteTreeView.cpp:904
 msgid "Create a new subdirectory in the current directory"
 msgstr "現在のディレクトリに新しいサブディレクトリを作成"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:34
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:74
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:277
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:345
+#: ../../locales/../src/interface/LocalListView.cpp:802
+#: ../../locales/../src/interface/LocalTreeView.cpp:1076
+#: ../../locales/../src/interface/RemoteListView.cpp:1111
+#: ../../locales/../src/interface/RemoteTreeView.cpp:905
 msgid "Create a new subdirectory in the current directory and change into it"
 msgstr "現在のディレクトリに新しいサブディレクトリを作成して移動"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:78
+#: ../../locales/../src/interface/RemoteListView.cpp:1112
 msgid "Create a new, empty file in the current directory"
 msgstr "現在のディレクトリに空のファイルを作成"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:33
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:73
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:276
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:344
+#: ../../locales/../src/interface/LocalListView.cpp:802
+#: ../../locales/../src/interface/LocalTreeView.cpp:1076
+#: ../../locales/../src/interface/RemoteListView.cpp:1111
+#: ../../locales/../src/interface/RemoteTreeView.cpp:905
 msgid "Create director&y and enter it"
 msgstr "ディレクトリを作成して移動(&Y)"
 
-#: ../../locales/../src/interface/LocalListView.cpp:955
-#: ../../locales/../src/interface/LocalTreeView.cpp:1181
-#: ../../locales/../src/interface/RemoteListView.cpp:1354
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1267
+#: ../../locales/../src/interface/LocalListView.cpp:972
+#: ../../locales/../src/interface/LocalTreeView.cpp:1194
+#: ../../locales/../src/interface/RemoteListView.cpp:1372
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1282
 msgid "Create directory"
 msgstr "ディレクトリを作成"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2761
+#: ../../locales/../src/interface/RemoteListView.cpp:2779
 msgid "Create empty file"
 msgstr "空のファイルを作成"
 
@@ -3019,9 +3030,9 @@ msgstr "空のファイルを作成"
 msgid "Creating directory"
 msgstr "ディレクトリを作成しています"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:600
-#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:561
-#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:106
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:599
+#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:560
+#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:105
 #, c-format
 msgid "Creating directory '%s'..."
 msgstr "ディレクトリ '%s' を作成中..."
@@ -3036,32 +3047,32 @@ msgstr "致命的なエラー:"
 
 #: ../../locales/../src/engine/ControlSocket.cpp:112
 msgid "Critical file transfer error"
-msgstr "ファイル転送での致命的なエラー"
+msgstr "致命的なファイル転送エラー"
 
 #: ../../locales/../src/engine/ControlSocket.cpp:92
 #, c-format
 msgid "Critical file transfer error after transferring %s in %s"
-msgstr "%s (%s) の転送後にファイル転送の致命的なエラーが発生しました"
+msgstr "%s (%s) の転送後に致命的なファイル転送エラーが発生しました"
 
-#: ../../locales/../src/interface/state.cpp:392
+#: ../../locales/../src/interface/state.cpp:395
 #, c-format
 msgid ""
 "Current remote directory (%s) is not below the synchronization root (%s).\n"
 "Synchronized browsing has been disabled."
 msgstr ""
 "現在のリモート ディレクトリ (%s) は同期されるルート (%s) の配下ではありませ"
-"ん.\n"
+"ん。\n"
 "同期ブラウジングを無効にしました。"
 
-#: ../../locales/../src/interface/statusbar.cpp:402
+#: ../../locales/../src/interface/statusbar.cpp:409
 msgid "Current transfer type is set to ASCII."
 msgstr "現在の転送モードは ASCII に設定されています。"
 
-#: ../../locales/../src/interface/statusbar.cpp:410
+#: ../../locales/../src/interface/statusbar.cpp:417
 msgid "Current transfer type is set to automatic detection."
 msgstr "現在の転送モードは自動検出に設定されています。"
 
-#: ../../locales/../src/interface/statusbar.cpp:406
+#: ../../locales/../src/interface/statusbar.cpp:413
 msgid "Current transfer type is set to binary."
 msgstr "現在の転送モードはバイナリに設定されています。"
 
@@ -3070,7 +3081,7 @@ msgid "Curve:"
 msgstr "曲線:"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:479
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1636
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1414
 msgid "Cus&tom"
 msgstr "カスタム(&T)"
 
@@ -3091,7 +3102,7 @@ msgstr "Cyan"
 msgid "D&ata type"
 msgstr "データ形式(&A)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1706
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1484
 msgid "D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"
 msgstr "SI 接頭辞 (10進数) (例: 1 KB = 1000 バイト)(&E)"
 
@@ -3099,9 +3110,9 @@ msgstr "SI 接頭辞 (10進数) (例: 1 KB = 1000 バイト)(&E)"
 msgid "D&efault"
 msgstr "デフォルト(&E)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:85
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:281
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:387
+#: ../../locales/../src/interface/RemoteListView.cpp:1116
+#: ../../locales/../src/interface/RemoteTreeView.cpp:908
+#: ../../locales/../src/interface/search.cpp:837
 msgid "D&elete"
 msgstr "削除(&E)"
 
@@ -3114,11 +3125,11 @@ msgid "D&isable all"
 msgstr "すべて無効(&I)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4035
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1286
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:155
 msgid "D&o not save passwords"
 msgstr "パスワードを保存しない(&O)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1912
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1690
 msgid "D&ouble-click action on directories:"
 msgstr "ディレクトリをダブルクリックしたときのアクション(&O):"
 
@@ -3148,11 +3159,11 @@ msgstr "データ ソケットは早々に閉じられました。"
 msgid "Date"
 msgstr "日付"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1570
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1348
 msgid "Date formatting"
 msgstr "日付の書式"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:104
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:109
 msgid "Date/time format"
 msgstr "日付/時刻の書式"
 
@@ -3160,11 +3171,11 @@ msgstr "日付/時刻の書式"
 msgid "Date/time unknown"
 msgstr "日付/時刻が不明"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:116
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:121
 msgid "Debug"
 msgstr "デバッグ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2296
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2074
 msgid "Debugging settings"
 msgstr "デバッグの設定"
 
@@ -3190,7 +3201,7 @@ msgstr "ファイル存在時のデフォルトのアクション"
 msgid "Default r&emote directory:"
 msgstr "デフォルトのリモート ディレクトリ(&E):"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:636
+#: ../../locales/../src/interface/sitemanager_site.cpp:637
 msgid ""
 "Default remote path cannot be parsed. Make sure it is a valid absolute path "
 "for the selected server type."
@@ -3234,13 +3245,13 @@ msgstr[0] "前回の接続失敗から %d 秒間再接続を遅延させてい�
 msgid "Delete Site Manager entry"
 msgstr "サイト マネージャー エントリの削除"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:282
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:350
+#: ../../locales/../src/interface/LocalTreeView.cpp:1079
+#: ../../locales/../src/interface/RemoteTreeView.cpp:908
 msgid "Delete selected directory"
 msgstr "選択したディレクトリを削除"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:42
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:86
+#: ../../locales/../src/interface/LocalListView.cpp:806
+#: ../../locales/../src/interface/RemoteListView.cpp:1116
 msgid "Delete selected files and directories"
 msgstr "選択したファイルとフォルダーを削除"
 
@@ -3297,12 +3308,11 @@ msgid "Directory access permissions"
 msgstr "ディレクトリのアクセス許可"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3025
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:302
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1850
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1628
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:534
 #: ../../locales/../src/interface/filelistctrl.cpp:477
-#: ../../locales/../src/interface/Mainfrm.cpp:2306
-#: ../../locales/../src/interface/Mainfrm.cpp:2323
+#: ../../locales/../src/interface/Mainfrm.cpp:2356
+#: ../../locales/../src/interface/Mainfrm.cpp:2376
 #: ../../locales/../src/interface/toolbar.cpp:51
 #: ../../locales/../src/interface/view.cpp:109
 msgid "Directory comparison"
@@ -3324,7 +3334,7 @@ msgstr "ディレクトリ リストのフィルタリング(&F)..."
 msgid "Directory listing aborted by user"
 msgstr "ディレクトリ リストの表示はユーザーにより中断されました"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2144
+#: ../../locales/../src/interface/RemoteListView.cpp:2162
 msgid "Directory listing failed"
 msgstr "ディレクトリ リスト取得に失敗しました"
 
@@ -3345,12 +3355,12 @@ msgstr "ディレクトリ リストの表示成功"
 msgid "Disa&ble all"
 msgstr "すべて無効(&B)"
 
-#: ../../locales/../src/interface/state.cpp:1100
+#: ../../locales/../src/interface/state.cpp:1101
 msgid ""
 "Disable synchronized browsing and continue changing the remote directory?"
 msgstr "同期ブラウジングを無効にしてリモート ディレクトリの変更を継続しますか?"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:713
+#: ../../locales/../src/interface/Mainfrm.cpp:725
 msgid ""
 "Disable this option again if you will not be able to see the correct "
 "directory contents anymore."
@@ -3362,15 +3372,15 @@ msgid "Disconnect from server"
 msgstr "サーバーから切断"
 
 #: ../../locales/../src/engine/ControlSocket.cpp:52
-#: ../../locales/../src/engine/ControlSocket.cpp:920
-#: ../../locales/../src/engine/ControlSocket.cpp:1016
+#: ../../locales/../src/engine/ControlSocket.cpp:921
+#: ../../locales/../src/engine/ControlSocket.cpp:1017
 #: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:66
 #: ../../locales/../src/engine/http/request.cpp:238
 #: ../../locales/../src/interface/queue.cpp:352
 msgid "Disconnected from server"
 msgstr "サーバーから切断されました"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1045
+#: ../../locales/../src/engine/ControlSocket.cpp:1046
 #: ../../locales/../src/engine/http/httpcontrolsocket.cpp:299
 #, c-format
 msgid "Disconnected from server: %s"
@@ -3389,26 +3399,26 @@ msgstr "現在表示されているサーバーから切断"
 msgid "Display about dialog"
 msgstr "ダイアログについて表示"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1985
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1763
 msgid "Do &not use default editor"
 msgstr "デフォルトのエディターを使用しない(&N)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2032
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2087
 msgid "Do the same with &all selected files already being edited"
-msgstr "既に編集中のすべての選択したファイルで同じ操作を行う(&A)"
+msgstr "すでに編集中のすべての選択したファイルで同じ操作を行う(&A)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1233
-#: ../../locales/../src/interface/Mainfrm.cpp:1255
+#: ../../locales/../src/interface/Mainfrm.cpp:1257
+#: ../../locales/../src/interface/Mainfrm.cpp:1280
 msgid "Do you really want to close FileZilla?"
 msgstr "FileZilla を本当に終了しますか?"
 
-#: ../../locales/../src/interface/clearprivatedata.cpp:35
+#: ../../locales/../src/interface/clearprivatedata.cpp:36
 msgid ""
 "Do you really want to delete all Site Manager entries and the transfer queue?"
 msgstr "サイト マネージャー エントリと転送キューを本当に削除しますか?"
 
-#: ../../locales/../src/interface/clearprivatedata.cpp:47
+#: ../../locales/../src/interface/clearprivatedata.cpp:48
 msgid "Do you really want to delete all Site Manager entries?"
 msgstr "すべてのサイト マネージャー エントリを本当に削除しますか?"
 
@@ -3416,11 +3426,11 @@ msgstr "すべてのサイト マネージャー エントリを本当に削除�
 msgid "Do you really want to delete selected entry?"
 msgstr "選択したエントリを本当に削除しますか?"
 
-#: ../../locales/../src/interface/clearprivatedata.cpp:41
+#: ../../locales/../src/interface/clearprivatedata.cpp:42
 msgid "Do you really want to delete the transfer queue?"
 msgstr "転送キューを本当に削除しますか?"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:641
+#: ../../locales/../src/interface/Mainfrm.cpp:648
 #, c-format
 msgid "Do you really want to send '%s' to the server?"
 msgstr "'%s' をサーバーに本当に送信しますか?"
@@ -3442,7 +3452,7 @@ msgid "Dotfiles are filenames starting with a dot, e.g. .htaccess"
 msgstr ""
 "ドットファイルとはファイル名がドットで始まるファイルです。 例: .htaccess"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1888
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1666
 msgid "Double-click action"
 msgstr "ダブルクリックしたときのアクション"
 
@@ -3455,12 +3465,12 @@ msgstr "ダウンロード"
 msgid "Download &limit:"
 msgstr "ダウンロード制限(&L):"
 
-#: ../../locales/../src/interface/statusbar.cpp:599
+#: ../../locales/../src/interface/statusbar.cpp:608
 #, c-format
 msgid "Download limit: %s/s"
 msgstr "ダウンロード制限: %s/s"
 
-#: ../../locales/../src/interface/statusbar.cpp:602
+#: ../../locales/../src/interface/statusbar.cpp:611
 msgid "Download limit: none"
 msgstr "ダウンロード制限: なし"
 
@@ -3470,15 +3480,15 @@ msgstr "ダウンロード制限: なし"
 msgid "Download search results"
 msgstr "検索結果をダウンロード"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:263
+#: ../../locales/../src/interface/RemoteTreeView.cpp:896
 msgid "Download selected directory"
 msgstr "選択したディレクトリをダウンロード"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:53
+#: ../../locales/../src/interface/RemoteListView.cpp:1100
 msgid "Download selected files and directories"
 msgstr "選択したファイルとディレクトリをダウンロード"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1049
+#: ../../locales/../src/interface/Mainfrm.cpp:1070
 #, c-format
 msgid ""
 "Download speed: %s/s\n"
@@ -3526,8 +3536,8 @@ msgstr "複製(&I)"
 msgid "E&nable all"
 msgstr "すべて有効(&N)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:15
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:61
+#: ../../locales/../src/interface/LocalListView.cpp:794
+#: ../../locales/../src/interface/RemoteListView.cpp:1106
 msgid "E&nter directory"
 msgstr "ディレクトリを開く(&N)"
 
@@ -3539,13 +3549,13 @@ msgstr "実行(&X)"
 msgid "E&xit"
 msgstr "終了(&X)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:187
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:233
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:256
+#: ../../locales/../src/interface/QueueView.cpp:1834
+#: ../../locales/../src/interface/queueview_failed.cpp:36
+#: ../../locales/../src/interface/queueview_successful.cpp:32
 msgid "E&xport..."
 msgstr "エクスポート(&X)..."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:340
+#: ../../locales/../src/interface/sitemanager_site.cpp:341
 msgid "E-&mail account:"
 msgstr "メール アカウント(&M):"
 
@@ -3561,7 +3571,7 @@ msgstr "各フィルターは少なくとも 1 つの条件を必要とします
 msgid "Edit filters"
 msgstr "フィルター編集"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:25
+#: ../../locales/../src/interface/LocalListView.cpp:798
 msgid ""
 "Edit the file with the configured editor and upload changes to the server."
 msgstr ""
@@ -3571,8 +3581,8 @@ msgstr ""
 msgid "Editing directories is not supported"
 msgstr "複数ディレクトリの編集はサポートされていません"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1733
-#: ../../locales/../src/interface/LocalListView.cpp:1742
+#: ../../locales/../src/interface/LocalListView.cpp:1750
+#: ../../locales/../src/interface/LocalListView.cpp:1759
 msgid "Editing failed"
 msgstr "編集に失敗"
 
@@ -3580,11 +3590,11 @@ msgstr "編集に失敗"
 msgid "Editing search results"
 msgstr "検索結果を編集中"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1520
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1298
 msgid "Email:"
 msgstr "メール:"
 
-#: ../../locales/../src/interface/QueueView.cpp:1884
+#: ../../locales/../src/interface/QueueView.cpp:1914
 msgid "Empty command"
 msgstr "空コマンド"
 
@@ -3592,7 +3602,7 @@ msgstr "空コマンド"
 msgid "Empty command."
 msgstr "コマンドが空です。"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2146
+#: ../../locales/../src/interface/RemoteListView.cpp:2164
 msgid "Empty directory listing"
 msgstr "空のディレクトリ リスト"
 
@@ -3662,15 +3672,15 @@ msgstr "カスタム コマンドの入力(&C)..."
 msgid "Enter 0 for unlimited speed."
 msgstr "速度を無制限にするには 0 を入力してください。"
 
-#: ../../locales/../src/interface/QueueView.cpp:1878
+#: ../../locales/../src/interface/QueueView.cpp:1908
 msgid "Enter command"
 msgstr "コマンドを入力"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:623
+#: ../../locales/../src/interface/Mainfrm.cpp:630
 msgid "Enter custom command"
 msgstr "カスタム コマンドの入力"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1921
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1699
 msgid "Enter directory"
 msgstr "ディレクトリに移動"
 
@@ -3697,12 +3707,12 @@ msgstr "フィルターセットの新しい名前を入力"
 msgid "Enter password"
 msgstr "パスワードを入力"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:16
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:62
+#: ../../locales/../src/interface/LocalListView.cpp:794
+#: ../../locales/../src/interface/RemoteListView.cpp:1106
 msgid "Enter selected directory"
 msgstr "選択したディレクトリに移動"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:49
+#: ../../locales/../src/interface/quickconnectbar.cpp:50
 msgid ""
 "Enter the address of the server. To specify the server protocol, prepend the "
 "host with the protocol identifier. If no protocol is specified, the default "
@@ -3738,7 +3748,7 @@ msgstr ""
 "ファイル '%s' のパスワードを入力してください。\n"
 "変換後のファイルは同じパスワードで保護されます。"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:62
+#: ../../locales/../src/interface/quickconnectbar.cpp:63
 msgid ""
 "Enter the port on which the server listens. The default for FTP is 21, the "
 "default for SFTP is 22."
@@ -3755,7 +3765,7 @@ msgid "Enter username and password"
 msgstr "ユーザー名とパスワードを入力"
 
 #: ../../locales/../src/interface/asksavepassworddialog.cpp:53
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:121
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:83
 msgid "Error"
 msgstr "エラー"
 
@@ -3781,7 +3791,7 @@ msgstr "キューの読み込みエラー"
 #: ../../locales/../src/interface/filter.cpp:1005
 #: ../../locales/../src/interface/import.cpp:118
 #: ../../locales/../src/interface/import.cpp:309
-#: ../../locales/../src/interface/Options.cpp:255
+#: ../../locales/../src/interface/Options.cpp:253
 #: ../../locales/../src/interface/osx_sandbox_userdirs.cpp:65
 #: ../../locales/../src/interface/osx_sandbox_userdirs.cpp:136
 #: ../../locales/../src/interface/QueueView.cpp:1571
@@ -3795,7 +3805,7 @@ msgstr "キューの読み込みエラー"
 #: ../../locales/../src/interface/sitemanager.cpp:884
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:673
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:736
-#: ../../locales/../src/interface/wrapengine.cpp:935
+#: ../../locales/../src/interface/wrapengine.cpp:936
 msgid "Error loading xml file"
 msgstr "xml ファイルの読み込みエラー"
 
@@ -3817,7 +3827,7 @@ msgstr "プログラムの開始エラー"
 #: ../../locales/../src/interface/sitemanager.cpp:759
 #: ../../locales/../src/interface/sitemanager.cpp:816
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:757
-#: ../../locales/../src/interface/sitemanager_dialog.cpp:1786
+#: ../../locales/../src/interface/sitemanager_dialog.cpp:1783
 #: ../../locales/../src/interface/xmlfunctions.cpp:152
 msgid "Error writing xml file"
 msgstr "xml ファイルの書き込みエラー"
@@ -3828,11 +3838,11 @@ msgstr "xml ファイルの書き込みエラー"
 msgid "Error:"
 msgstr "エラー:"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2093
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1871
 msgid "Example: png \"c:\\program files\\viewer\\viewer.exe\" -open"
 msgstr "例: png \"c:\\program files\\viewer\\viewer.exe\" -open"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1743
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1521
 msgid "Examples"
 msgstr "例"
 
@@ -3845,7 +3855,7 @@ msgid "Executable contains no version info, cannot check for updates."
 msgstr ""
 "実行ファイルがバージョン情報を含んでいないためアップデートを確認できません。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1360
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:133
 msgid "Explorer"
 msgstr "エクスプローラー"
 
@@ -3869,11 +3879,11 @@ msgstr "エクスポートの設定"
 msgid "F&ilter name:"
 msgstr "フィルター名(&I):"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:93
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:97
 msgid "FTP"
 msgstr "FTP"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:129
+#: ../../locales/../src/interface/sitemanager_site.cpp:130
 msgid "FTP - File Transfer Protocol"
 msgstr "FTP - ファイル転送プロトコル"
 
@@ -3885,7 +3895,7 @@ msgstr "FTP - ファイル転送プロトコル (任意の暗号化付き)"
 msgid "FTP - Insecure File Transfer Protocol"
 msgstr "FTP - セキュアではないファイル転送プロトコル"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:99
+#: ../../locales/../src/interface/quickconnectbar.cpp:100
 msgid "FTP Engine not initialized, can't connect"
 msgstr "FTP エンジンが初期化されていないため接続できません"
 
@@ -3894,7 +3904,7 @@ msgid "FTP Keep-alive"
 msgstr "FTP キープアライブ"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:446
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:96
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:100
 msgid "FTP Proxy"
 msgstr "FTP プロキシ"
 
@@ -3910,7 +3920,7 @@ msgstr ""
 "FTP はデータ転送に二次的な接続を使用します。これらの付加的な接続は 2 通りの方"
 "法で確立できます。"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:100
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:104
 msgid "FTP: File Types"
 msgstr "FTP: ファイルの種類"
 
@@ -3924,17 +3934,17 @@ msgstr "FTPS - FTP over TLS (暗黙的)"
 
 #: ../../locales/../src/interface/LocalListView.cpp:546
 #: ../../locales/../src/interface/LocalListView.cpp:619
-#: ../../locales/../src/interface/LocalListView.cpp:942
-#: ../../locales/../src/interface/LocalListView.cpp:1941
+#: ../../locales/../src/interface/LocalListView.cpp:959
+#: ../../locales/../src/interface/LocalListView.cpp:1958
 #: ../../locales/../src/interface/LocalTreeView.cpp:871
-#: ../../locales/../src/interface/LocalTreeView.cpp:1154
+#: ../../locales/../src/interface/LocalTreeView.cpp:1167
 #: ../../locales/../src/interface/viewheader.cpp:499
 msgid "Failed to change directory"
 msgstr "ディレクトリ変更に失敗しました"
 
-#: ../../locales/../src/interface/FileZilla.cpp:150
-#: ../../locales/../src/interface/FileZilla.cpp:165
-#: ../../locales/../src/interface/FileZilla.cpp:168
+#: ../../locales/../src/interface/FileZilla.cpp:151
+#: ../../locales/../src/interface/FileZilla.cpp:166
+#: ../../locales/../src/interface/FileZilla.cpp:169
 msgid "Failed to change language"
 msgstr "言語変更に失敗しました"
 
@@ -3981,7 +3991,7 @@ msgstr ""
 msgid "Failed to get peer address of data connection, connection closed."
 msgstr "データ接続のピア アドレスの取得に失敗しましたので、接続を閉じました。"
 
-#: ../../locales/../src/interface/context_control.cpp:87
+#: ../../locales/../src/interface/context_control.cpp:105
 msgid "Failed to initialize FTP engine"
 msgstr "FTP エンジンの初期化に失敗しました"
 
@@ -3991,11 +4001,11 @@ msgstr "FTP エンジンの初期化に失敗しました"
 msgid "Failed to initialize TLS."
 msgstr "TLS の初期化に失敗しました。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:97
+#: ../../locales/../src/interface/FileZilla.cpp:98
 msgid "Failed to initialize networking"
 msgstr "ネットワークの初期化に失敗しました"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:146
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:153
 msgid "Failed to load panels, invalid resource files?"
 msgstr ""
 "パネルの読み込みに失敗しました。リソース ファイルが不正である可能性がありま"
@@ -4017,7 +4027,7 @@ msgid "Failed to open \"%s\" for reading"
 msgstr "読み取り用に \"%s\" を開くのに失敗しました"
 
 #: ../../locales/../src/engine/ftp/filetransfer.cpp:107
-#: ../../locales/../src/engine/http/filetransfer.cpp:91
+#: ../../locales/../src/engine/http/filetransfer.cpp:96
 #, c-format
 msgid "Failed to open \"%s\" for writing"
 msgstr "書き込み用に \"%s\" を開くのに失敗しました"
@@ -4038,7 +4048,7 @@ msgstr "ディレクトリ リスト表示の取り出しに失敗しました"
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "外部 IP アドレスの取得に失敗したので、中止しています。"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:671
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:670
 msgid "Failed to retrieve external IP address, using local address"
 msgstr ""
 "外部 IP アドレスの取得に失敗したので、ローカル アドレスを使用しています。"
@@ -4047,7 +4057,7 @@ msgstr ""
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "ローカル IP アドレスの取得に失敗したので、中止しています。"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:689
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:688
 msgid "Failed to retrieve local IP address."
 msgstr "ローカル IP アドレスの取得に失敗しました。"
 
@@ -4059,13 +4069,13 @@ msgstr "外部 IP アドレスの取得に失敗しました。"
 msgid "Failed to send command."
 msgstr "コマンドの送信に失敗しました。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:165
+#: ../../locales/../src/interface/FileZilla.cpp:166
 #, c-format
 msgid "Failed to set language to %s (%s), using default system language"
 msgstr ""
 "%s (%s) への言語の設定に失敗したので、デフォルトのシステム言語を使用します"
 
-#: ../../locales/../src/interface/FileZilla.cpp:142
+#: ../../locales/../src/interface/FileZilla.cpp:143
 #, c-format
 msgid ""
 "Failed to set language to %s (%s), using default system language (%s, %s)."
@@ -4073,31 +4083,31 @@ msgstr ""
 "%s (%s) への言語の設定に失敗しました、デフォルトのシステム言語 (%s, %s) を使"
 "用します。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:129
+#: ../../locales/../src/interface/FileZilla.cpp:130
 #, c-format
 msgid "Failed to set language to %s (%s), using default system language."
 msgstr ""
 "%s (%s) への言語の設定に失敗しました、デフォルトのシステム言語を利用します。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:168
+#: ../../locales/../src/interface/FileZilla.cpp:169
 #, c-format
 msgid "Failed to set language to %s, using default system language"
 msgstr "%s への言語の設定に失敗しました、デフォルトのシステム言語を使用します"
 
-#: ../../locales/../src/interface/FileZilla.cpp:137
+#: ../../locales/../src/interface/FileZilla.cpp:138
 #, c-format
 msgid "Failed to set language to %s, using default system language (%s, %s)."
 msgstr ""
 "%s への言語の設定に失敗しました、デフォルトのシステム言語を使用します (%s, "
 "%s)"
 
-#: ../../locales/../src/interface/FileZilla.cpp:125
+#: ../../locales/../src/interface/FileZilla.cpp:126
 #, c-format
 msgid "Failed to set language to %s, using default system language."
 msgstr ""
 "%s への言語の設定に失敗しました、デフォルトのシステム言語を使用します。"
 
-#: ../../locales/../src/interface/settings/optionspage.cpp:212
+#: ../../locales/../src/interface/settings/optionspage.cpp:225
 msgid "Failed to validate settings"
 msgstr "設定を有効にするのに失敗しました"
 
@@ -4105,7 +4115,7 @@ msgstr "設定を有効にするのに失敗しました"
 msgid "Failed to verify peer certificate"
 msgstr "ピア証明書の検証に失敗しました"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:211
+#: ../../locales/../src/engine/http/filetransfer.cpp:216
 #, c-format
 msgid "Failed to write to file %s"
 msgstr "ファイル %s への書き込みに失敗しました"
@@ -4120,7 +4130,7 @@ msgstr "失敗した転送"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:159
 msgid "Fall back to active mode"
-msgstr "アクティブ モードに戻る"
+msgstr "アクティブ モードに戻す"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2538
 msgid "Fil&e:"
@@ -4140,17 +4150,17 @@ msgstr "ファイル記述子はソケットではありません"
 
 #: ../../locales/../src/interface/import.cpp:107
 msgid "File does not contain any importable data."
-msgstr "ファイルはインポートできるデータを含んでいません。"
+msgstr "ファイルにはインポート可能なデータが含まれていません。"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:108
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:113
 msgid "File editing"
 msgstr "ファイルの編集"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1666
+#: ../../locales/../src/interface/RemoteListView.cpp:1684
 msgid "File exists"
 msgstr "ファイルが存在します"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:101
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:105
 msgid "File exists action"
 msgstr "ファイル存在時のアクション"
 
@@ -4158,7 +4168,7 @@ msgstr "ファイル存在時のアクション"
 msgid "File has changed"
 msgstr "ファイルは変更されています"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:106
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:111
 msgid "File lists"
 msgstr "ファイル リスト"
 
@@ -4209,7 +4219,7 @@ msgstr "ファイル転送が成功しました"
 msgid "File transfer successful, transferred %s in %s"
 msgstr "%s (%s) のファイル転送に成功しました"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1232
+#: ../../locales/../src/interface/Mainfrm.cpp:1256
 msgid "File transfers still in progress."
 msgstr "ファイル転送はまだ進行中です。"
 
@@ -4221,8 +4231,8 @@ msgstr "ファイルは ASCII データ形式で転送されます。"
 msgid "File would transfer with binary data type."
 msgstr "ファイルはバイナリ データ形式で転送されます。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:452
-#: ../../locales/../src/interface/quickconnectbar.cpp:99
+#: ../../locales/../src/interface/FileZilla.cpp:453
+#: ../../locales/../src/interface/quickconnectbar.cpp:100
 msgid "FileZilla Error"
 msgstr "Filezilla エラー"
 
@@ -4234,19 +4244,19 @@ msgstr "FileZilla ではすべての設定が適切か確認するために設�
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3857
 msgid "FileZilla is already connected to a server."
-msgstr "FileZilla は既にサーバーに接続されています。"
+msgstr "FileZilla はすでにサーバーに接続されています。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1539
+#: ../../locales/../src/interface/Mainfrm.cpp:1564
 msgid "FileZilla needs to be restarted for the language change to take effect."
 msgstr "言語設定を有効にするには、FileZilla を再起動する必要があります。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2181
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1959
 msgid "FileZilla updates"
 msgstr "Filezilla のアップデート"
 
 #: ../../locales/../src/interface/menu_bar.cpp:98
 msgid "Filelist status &bars"
-msgstr "ファイル リストのステータス バー(&B)"
+msgstr "ファイル リストのステータスバー(&B)"
 
 #: ../../locales/../src/interface/edithandler.cpp:1136
 #: ../../locales/../src/interface/filter_conditions_dialog.cpp:101
@@ -4263,7 +4273,7 @@ msgstr "名前"
 msgid "Filename cannot be constructed for directory %s and filename %s"
 msgstr "ファイル名にはディレクトリ %s とファイル名 %s を含めることはできません"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1654
+#: ../../locales/../src/interface/RemoteListView.cpp:1672
 msgid "Filename invalid"
 msgstr "ファイル名が不正です"
 
@@ -4272,15 +4282,15 @@ msgid "Filename unchanged"
 msgstr "ファイル名は変更されませんでした"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1902
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2213
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1991
 msgid "Filename:"
 msgstr "ファイル名:"
 
-#: ../../locales/../src/interface/file_utils.cpp:315
+#: ../../locales/../src/interface/file_utils.cpp:326
 msgid "Filenames may not contain any of the following characters: / * ? < > |"
 msgstr "ファイル名には次の文字は使用できません: / * ? < > |"
 
-#: ../../locales/../src/interface/file_utils.cpp:290
+#: ../../locales/../src/interface/file_utils.cpp:291
 msgid ""
 "Filenames may not contain any of the following characters: / \\ : * ? \" < > "
 "|"
@@ -4306,7 +4316,7 @@ msgstr "ファイルが見つかりません"
 msgid "Filesize"
 msgstr "サイズ"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:105
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:110
 msgid "Filesize format"
 msgstr "ファイルサイズの書式"
 
@@ -4316,8 +4326,8 @@ msgstr "ファイルサイズの書式"
 msgid "Filetype"
 msgstr "種類"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2105
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:109
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1883
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:114
 msgid "Filetype associations"
 msgstr "ファイルの関連付け"
 
@@ -4334,7 +4344,7 @@ msgstr "ファイル名の不正な文字をフィルタリング"
 #: ../../locales/../src/interface/filteredit.cpp:255
 #: ../../locales/../src/interface/filteredit.cpp:353
 msgid "Filter name already exists"
-msgstr "フィルター名は既に存在しています"
+msgstr "フィルター名はすでに存在しています"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1494
 msgid "Filter out items matching all of the following"
@@ -4355,7 +4365,7 @@ msgstr "以下のいずれかに一致しないアイテムを非表示"
 #: ../../locales/../src/interface/filter.cpp:261
 #: ../../locales/../src/interface/filter.cpp:321
 msgid "Filter set already exists"
-msgstr "フィルターセットは既に存在しています"
+msgstr "フィルターセットはすでに存在しています"
 
 #: ../../locales/../src/interface/toolbar.cpp:50
 msgid "Filter the directory listings"
@@ -4405,7 +4415,7 @@ msgstr ""
 msgid "For reliability you should specify a range of at least 10 ports."
 msgstr "信頼性確保のために、少なくとも 10 ポートの範囲指定が必要です。"
 
-#: ../../locales/../src/interface/Options.cpp:254
+#: ../../locales/../src/interface/Options.cpp:252
 msgid ""
 "For this session the default settings will be used. Any changes to the "
 "settings will not be saved."
@@ -4420,7 +4430,7 @@ msgstr "&UTF-8 を強制"
 msgid "Force showing &hidden files"
 msgstr "強制的に隠しファイルを表示(&H)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:708
+#: ../../locales/../src/interface/Mainfrm.cpp:720
 msgid "Force showing hidden files"
 msgstr "強制的に隠しファイルを表示"
 
@@ -4428,12 +4438,12 @@ msgstr "強制的に隠しファイルを表示"
 msgid "Format specifications:"
 msgstr "書式の仕様:"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2088
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1866
 msgid "Format: Extension followed by properly quoted command and arguments."
-msgstr "書式: 拡張子の後に適切に引用符で囲まれたコマンドと引数が続きます。"
+msgstr "書式: 拡張子の後に引用符で適切に囲まれたコマンドと引数を続けて記述"
 
 #. @translator: Two examples: Found new nightly 2014-04-03\n, Found new release 3.9.0.1\n
-#: ../../locales/../src/interface/updater.cpp:711
+#: ../../locales/../src/interface/updater.cpp:712
 #, c-format
 msgid "Found new %s %s\n"
 msgstr "新しい %s %s が見つかりました\n"
@@ -4460,7 +4470,7 @@ msgid "Generate..."
 msgstr "自動生成..."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:707
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:98
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:102
 msgid "Generic proxy"
 msgstr "汎用プロキシ"
 
@@ -4476,7 +4486,8 @@ msgstr "ヘルプを取得"
 #: ../../locales/../src/interface/filter.cpp:321
 msgid "Given filterset name already exists, overwrite filter set?"
 msgstr ""
-"入力したフィルターセット名は既に存在します。フィルターセットを上書きしますか?"
+"入力したフィルターセット名はすでに存在します。フィルターセットを上書きします"
+"か?"
 
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:258
 msgid "Global bookmarks"
@@ -4514,7 +4525,7 @@ msgstr "Green"
 msgid "Group permissions"
 msgstr "グループのパーミッション"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:127
+#: ../../locales/../src/interface/QueueView.cpp:1814
 msgid "H&igh"
 msgstr "高(&I)"
 
@@ -4566,7 +4577,7 @@ msgid "Host key mismatch"
 msgstr "ホスト鍵が一致しません"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:292
+#: ../../locales/../src/interface/sitemanager_site.cpp:293
 msgid "Host name of identity service"
 msgstr "アイデンティティ サービスのホスト名"
 
@@ -4602,7 +4613,7 @@ msgstr ""
 "マスター パスワードを忘れてしまいました。この鍵で保存されているすべてのパス"
 "ワードを削除します。(&F)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1631
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1409
 msgid "I&SO 8601 (example: 15:47)"
 msgstr "I&SO 8601 (例: 15:47)"
 
@@ -4611,12 +4622,12 @@ msgid "IPv6 addresses are not supported with SOCKS4 proxy"
 msgstr "IPv6 アドレスは SOCKS4 プロキシでサポートされていません"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:290
+#: ../../locales/../src/interface/sitemanager_site.cpp:291
 msgid "Identity &host:"
 msgstr "アイデンティティ ホスト(&H):"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:344
+#: ../../locales/../src/interface/sitemanager_site.cpp:345
 msgid "Identity service path:"
 msgstr "アイデンティティ サービスのパス:"
 
@@ -4629,7 +4640,7 @@ msgstr ""
 "操作中に指定された時間を超えてもデータが送受信されない場合には、接続は閉じら"
 "れ、FileZilla は必要なときに自動で再接続を試みます。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2345
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2123
 msgid "If reporting bugs, please provide logs with \"Verbose\" logging level."
 msgstr ""
 "バグを報告していただく場合は、ログ レベル \"詳細\" でのログの提供をお願いしま"
@@ -4678,7 +4689,7 @@ msgstr ""
 "問題が続く場合は、ルーター/ファイアウォールが接続を中断している可能性がありま"
 "す。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2268
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2046
 msgid ""
 "If the size of the logfile reaches the limit, it gets renamed by adding "
 "\".1\" to the end of the filename (possibly overwriting older logfiles) and "
@@ -4719,7 +4730,7 @@ msgstr ""
 "している必要があります。時刻が異なっている場合 (例: 異なるタイムゾーン) は、"
 "サイト マネージャーでタイムゾーンのオフセットを指定してください。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1857
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1635
 msgid ""
 "If using timestamp based comparison, consider two files equal if their "
 "timestamp difference does not exceed this threshold."
@@ -4727,7 +4738,7 @@ msgstr ""
 "タイムスタンプに基づいた比較を行う場合は、タイムスタンプの差が以下の閾値を超"
 "えない場合に 2 つのファイルを同一と見なします。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1962
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1740
 msgid "If you change the language, you need to restart FileZilla."
 msgstr "言語の変更には FileZilla の再起動が必要です。"
 
@@ -4739,7 +4750,7 @@ msgstr ""
 "テストをクリックすると、FileZilla は probe.filezilla-project.org に接続して簡"
 "単なテストを行います。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1254
+#: ../../locales/../src/interface/Mainfrm.cpp:1279
 msgid "If you close FileZilla, your changes will be lost."
 msgstr "FileZilla を終了すると、変更内容は破棄されます。"
 
@@ -4822,7 +4833,7 @@ msgstr "インポート成功"
 #: ../../locales/../src/interface/settings/optionspage_edit_associations.cpp:49
 #: ../../locales/../src/interface/settings/optionspage_edit_associations.cpp:56
 msgid "Improperly quoted association."
-msgstr "引用符で不適切に囲まれた関連付け。"
+msgstr "引用符で不適切に囲まれた関連付けです。"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:266
 msgid ""
@@ -4846,8 +4857,8 @@ msgid ""
 "In order to use active mode, FileZilla needs to know your external IP "
 "address."
 msgstr ""
-"パッシブ モードを使用するために FileZilla は外部 IP アドレスを知る必要があり"
-"ます。"
+"パッシブ モードを使用するには、FileZilla が外部 IP アドレスを認識している必要"
+"があります。"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:52
 msgid ""
@@ -4889,7 +4900,7 @@ msgstr "FTP over TLS がサポートされていないセキュアではない�
 msgid "Interactive"
 msgstr "インタラクティブ"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:102
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:106
 msgid "Interface"
 msgstr "インターフェイス"
 
@@ -4915,7 +4926,7 @@ msgstr "不正な HTTP レスポンス"
 msgid "Invalid argument passed"
 msgstr "不正な引数が渡されました"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:459
+#: ../../locales/../src/engine/ControlSocket.cpp:460
 msgid ""
 "Invalid character sequence received, disabling UTF-8. Select UTF-8 option in "
 "site manager to force UTF-8."
@@ -4939,12 +4950,12 @@ msgstr "不正なデータを受信しました"
 msgid "Invalid date"
 msgstr "不正な日付"
 
-#: ../../locales/../src/interface/file_utils.cpp:290
-#: ../../locales/../src/interface/file_utils.cpp:315
+#: ../../locales/../src/interface/file_utils.cpp:291
+#: ../../locales/../src/interface/file_utils.cpp:326
 msgid "Invalid filename"
 msgstr "不正なファイル名"
 
-#: ../../locales/../src/interface/updater.cpp:706
+#: ../../locales/../src/interface/updater.cpp:707
 #, c-format
 msgid "Invalid hash: %s\n"
 msgstr "不正なハッシュ: %s\n"
@@ -4953,7 +4964,7 @@ msgstr "不正なハッシュ: %s\n"
 msgid "Invalid host, after closing bracket only colon and port may follow."
 msgstr "不正なホストです、ホスト名の後はコロンとポートだけが続きます。"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:160
+#: ../../locales/../src/engine/http/filetransfer.cpp:165
 #, c-format
 msgid "Invalid hostname: %s"
 msgstr "不正なホスト名: %s"
@@ -4984,7 +4995,7 @@ msgstr ""
 "不正なポートが入力されました。ポートは 1 から 65535 の範囲である必要がありま"
 "す。"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:160
+#: ../../locales/../src/interface/quickconnectbar.cpp:161
 #: ../../locales/../src/interface/serverdata.cpp:40
 msgid ""
 "Invalid protocol specified. Valid protocols are:\n"
@@ -5061,11 +5072,11 @@ msgstr "管轄する地方:"
 msgid "Jurisdiction state or province:"
 msgstr "管轄する都道府県:"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1814
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1592
 msgid "Keep directories on top"
 msgstr "ディレクトリを常に先頭に"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:712
+#: ../../locales/../src/interface/Mainfrm.cpp:724
 msgid ""
 "Keep in mind that not all servers support this feature and may return "
 "incorrect listings if this option is enabled. Although FileZilla performs "
@@ -5094,16 +5105,16 @@ msgstr "鍵ファイル"
 msgid "Key identifier:"
 msgstr "鍵識別子:"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:139
+#: ../../locales/../src/interface/QueueView.cpp:1817
 msgid "L&owest"
 msgstr "最低(&O)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1943
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:107
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1721
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:112
 msgid "Language"
 msgstr "言語"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1539
+#: ../../locales/../src/interface/Mainfrm.cpp:1564
 msgid "Language changed"
 msgstr "言語が変更されました"
 
@@ -5113,17 +5124,17 @@ msgstr "言語が変更されました"
 msgid "Last modified"
 msgstr "更新日時"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1344
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:116
 msgid "Layout"
 msgstr "レイアウト"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:874
+#: ../../locales/../src/interface/sitemanager_site.cpp:875
 msgid "Leave empty to keep existing data."
 msgstr "既存のデータを保持するには、空のままにします。"
 
 #. @translator: Keep this string as short as possible
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:67
-#: ../../locales/../src/interface/sitemanager_site.cpp:872
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:44
+#: ../../locales/../src/interface/sitemanager_site.cpp:873
 msgid "Leave empty to keep existing password."
 msgstr "既存のパスワードを保持するには、空のままにします。"
 
@@ -5139,11 +5150,11 @@ msgstr "同時アップロード数の上限(&U):"
 msgid "Limit local ports"
 msgstr "ローカル ポートの制限"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2237
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2015
 msgid "Limit size of logfile"
 msgstr "ログ ファイルのサイズを制限する"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2245
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2023
 msgid "Limit:"
 msgstr "制限:"
 
@@ -5191,8 +5202,8 @@ msgstr "ローカル ファイル"
 msgid "Local file does not exist."
 msgstr "ローカル ファイルが存在しません。"
 
-#: ../../locales/../src/interface/updater.cpp:424
-#: ../../locales/../src/interface/updater.cpp:517
+#: ../../locales/../src/interface/updater.cpp:425
+#: ../../locales/../src/interface/updater.cpp:518
 #, c-format
 msgid "Local file is %s\n"
 msgstr "ローカル ファイル %s\n"
@@ -5222,7 +5233,7 @@ msgstr "ローカル パスの処理:"
 msgid "Local site:"
 msgstr "ローカル サイト:"
 
-#: ../../locales/../src/interface/updater.cpp:747
+#: ../../locales/../src/interface/updater.cpp:748
 #, c-format
 msgid "Local size of '%s' does not match expected size: %d != %d"
 msgstr "'%s' のローカル サイズが予想サイズと一致しません: %d != %d"
@@ -5239,8 +5250,8 @@ msgstr "ログ ファイル"
 msgid "Logged in"
 msgstr "ログインしました"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2191
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:115
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1969
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:120
 msgid "Logging"
 msgstr "ログ"
 
@@ -5358,7 +5369,7 @@ msgid "Master &Password:"
 msgstr "マスター パスワード(&P):"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4051
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1302
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:160
 msgid "Master password:"
 msgstr "マスター パスワード:"
 
@@ -5386,20 +5397,20 @@ msgstr "最大同時転送数(&T):"
 msgid "Memory allocation failure"
 msgstr "メモリ割り当てエラー"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:435
-#: ../../locales/../src/interface/Mainfrm.cpp:1854
+#: ../../locales/../src/interface/Mainfrm.cpp:437
+#: ../../locales/../src/interface/Mainfrm.cpp:1889
 msgid "Message log"
 msgstr "メッセージ ログ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1411
-msgid "Message log position"
-msgstr "メッセージ ログの位置"
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:130
+msgid "Message log positio&n:"
+msgstr "メッセージ ログの位置(&N):"
 
 #: ../../locales/../src/engine/socket.cpp:1084
 msgid "Message too large"
 msgstr "メッセージが長過ぎます"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2257
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2035
 msgid "MiB"
 msgstr "MiB"
 
@@ -5441,19 +5452,19 @@ msgstr "名前"
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:732
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:979
 msgid "Name already exists"
-msgstr "名前は既に存在しています"
+msgstr "名前はすでに存在しています"
 
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:853
 #: ../../locales/../src/interface/sitemanager.cpp:725
 msgid "Name of bookmark already exists."
-msgstr "ブックマーク名は既に存在しています。"
+msgstr "ブックマーク名はすでに存在しています。"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:276
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:412
 msgid "Name:"
 msgstr "名前:"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1834
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1612
 msgid "Natural sort"
 msgstr "自然な並べ替え"
 
@@ -5469,7 +5480,7 @@ msgstr "有効なローカル パスを入力する必要があります"
 msgid "Need to enter valid remote path"
 msgstr "有効なリモート パスを入力する必要があります"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:540
+#: ../../locales/../src/interface/sitemanager_site.cpp:541
 msgid "Need to specify a character encoding"
 msgstr "文字コードを指定する必要があります"
 
@@ -5490,7 +5501,7 @@ msgstr ""
 msgid "Network unreachable"
 msgstr "ネットワークに到達できません"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2128
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1906
 msgid "Never"
 msgstr "しない"
 
@@ -5526,9 +5537,9 @@ msgstr "新規ブックマーク(&M)"
 msgid "New bookmark"
 msgstr "新規ブックマーク"
 
-#: ../../locales/../src/interface/LocalTreeView.cpp:1185
-#: ../../locales/../src/interface/RemoteListView.cpp:1367
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1280
+#: ../../locales/../src/interface/LocalTreeView.cpp:1198
+#: ../../locales/../src/interface/RemoteListView.cpp:1385
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1295
 msgid "New directory"
 msgstr "新規ディレクトリ"
 
@@ -5551,7 +5562,7 @@ msgstr "新規フォルダー"
 msgid "New site"
 msgstr "新規サイト"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1401
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:127
 msgid "Next to the transfer queue"
 msgstr "転送キューの隣"
 
@@ -5567,11 +5578,11 @@ msgstr "ノード名に関連付けられたアドレスがありません"
 msgid "No category to export selected"
 msgstr "選択したアイテムにはエクスポートするカテゴリがありません"
 
-#: ../../locales/../src/interface/QueueView.cpp:1884
+#: ../../locales/../src/interface/QueueView.cpp:1914
 msgid "No command given, aborting."
 msgstr "コマンドが入力されていないため、中止しています。"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:644
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:643
 msgid "No external IP address set, trying default."
 msgstr "外部 IP アドレスが設定されていないため、デフォルトを試しています。"
 
@@ -5627,8 +5638,8 @@ msgstr "サポートされた SOCKS5 認証メソッドがありません"
 msgid "No username given."
 msgstr "ユーザー名が入力されていません。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1905
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1924
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1683
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1702
 #: ../../locales/../src/interface/sitemanager.cpp:17
 #: ../../locales/../src/interface/verifycertdialog.cpp:246
 msgid "None"
@@ -5653,21 +5664,21 @@ msgstr "名前解決で回復不能の障害"
 msgid "Normal"
 msgstr "通常"
 
-#: ../../locales/../src/interface/queueview_failed.cpp:309
-#: ../../locales/../src/interface/queueview_failed.cpp:334
+#: ../../locales/../src/interface/queueview_failed.cpp:317
+#: ../../locales/../src/interface/queueview_failed.cpp:342
 msgid "Not all items could be requeued for transfer."
 msgstr "転送キューに再び入れられないアイテムがありました。"
 
-#: ../../locales/../src/interface/state.cpp:211
-#: ../../locales/../src/interface/state.cpp:1311
+#: ../../locales/../src/interface/state.cpp:216
+#: ../../locales/../src/interface/state.cpp:1312
 msgid "Not connected"
 msgstr "未接続"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2142
+#: ../../locales/../src/interface/RemoteListView.cpp:2160
 msgid "Not connected to any server"
 msgstr "どのサーバーにも接続されていません"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:611
+#: ../../locales/../src/interface/Mainfrm.cpp:618
 msgid "Not connected to any server."
 msgstr "どのサーバーにも接続されていません。"
 
@@ -5679,29 +5690,28 @@ msgstr "未接続です"
 msgid "Not initialized, need to call WSAStartup"
 msgstr "初期化されていないため、WSAStartup を呼び出す必要があります"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:710
+#: ../../locales/../src/interface/Mainfrm.cpp:722
 msgid "Note that this feature is only supported using the FTP protocol."
 msgstr "この機能は FTP プロトコルでのみサポートされることにご注意ください。"
 
 #: ../../locales/../src/interface/resources/xrc/storj.xrc:27
 msgid "Note: A lost key cannot be recovered."
-msgstr "注意: 紛失した鍵は復元できません。"
+msgstr "注意: 紛失した鍵は復元できません"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:596
 msgid "Note: This only works with plain, unencrypted FTP connections."
-msgstr "注意: これは暗号化されていない平文での FTP 接続でのみ機能します。"
+msgstr "注意: これは暗号化されていない平文での FTP 接続でのみ機能します"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:795
 msgid "Note: Using a generic proxy forces passive mode on FTP connections."
-msgstr ""
-"注意: 汎用プロキシを使用すると FTP 接続でパッシブ モードが強制されます。"
+msgstr "注意: 汎用プロキシを使用すると FTP 接続でパッシブ モードが強制されます"
 
 #: ../../locales/../src/engine/http/request.cpp:465
 #: ../../locales/../src/engine/http/request.cpp:652
 msgid "Null character in line"
 msgstr "行内に NULL 文字が存在します"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1718
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1496
 msgid "Number of decimal places:"
 msgstr "小数点以下の桁数:"
 
@@ -5709,7 +5719,7 @@ msgstr "小数点以下の桁数:"
 msgid "Number of retries has to be between 0 and 99."
 msgstr "再試行回数は 0 から 99 の間でなければなりません。"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:396
+#: ../../locales/../src/interface/search.cpp:829
 msgid "O&pen"
 msgstr "開く(&P)"
 
@@ -5750,6 +5760,10 @@ msgstr "OK"
 msgid "OS version:"
 msgstr "OS バージョン:"
 
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:148
+msgid "On startup of FileZilla:"
+msgstr "FileZilla 起動時:"
+
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:103
 msgid ""
 "On the following pages, the selected transfer mode will be configured, as "
@@ -5762,15 +5776,15 @@ msgstr ""
 msgid "Once"
 msgstr "1 度だけ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2129
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1907
 msgid "Once a day"
 msgstr "1 日に 1 回"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2130
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1908
 msgid "Once a week"
 msgstr "1 週間に 1 回"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:157
+#: ../../locales/../src/interface/sitemanager_site.cpp:158
 msgid "Only use plain FTP (insecure)"
 msgstr "平文の FTP のみを使用する (安全ではない)"
 
@@ -5778,7 +5792,7 @@ msgstr "平文の FTP のみを使用する (安全ではない)"
 msgid "Op&en file"
 msgstr "ファイルを開く(&E)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:336
+#: ../../locales/../src/interface/LocalTreeView.cpp:1072
 msgid "Open directory in system's file manager"
 msgstr "システムのファイル マネージャーのディレクトリを開く"
 
@@ -5800,10 +5814,10 @@ msgid ""
 "Open the directory access permissions dialog to configure the local "
 "directories FileZilla has access to."
 msgstr ""
-"ディレクトリ アクセス許可ダイアログを開き、FileZilla がアクセスできるローカ"
+"ディレクトリのアクセス許可ダイアログを開き、FileZilla がアクセスできるローカ"
 "ル ディレクトリを設定します。"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:21
+#: ../../locales/../src/interface/LocalListView.cpp:797
 msgid "Open the file."
 msgstr "ファイルを開きます。"
 
@@ -5817,8 +5831,8 @@ msgstr "開かれています:"
 
 #: ../../locales/../src/interface/edithandler.cpp:1668
 #: ../../locales/../src/interface/edithandler.cpp:1785
-#: ../../locales/../src/interface/LocalListView.cpp:1852
-#: ../../locales/../src/interface/LocalListView.cpp:1865
+#: ../../locales/../src/interface/LocalListView.cpp:1869
+#: ../../locales/../src/interface/LocalListView.cpp:1882
 #: ../../locales/../src/interface/search.cpp:1523
 #: ../../locales/../src/interface/search.cpp:1536
 msgid "Opening failed"
@@ -5942,7 +5956,7 @@ msgstr "所有者のパーミッション"
 msgid "Owner/Group"
 msgstr "所有者/グループ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1430
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:146
 msgid ""
 "P&revent system from entering idle sleep during transfers and other "
 "operations"
@@ -5961,19 +5975,19 @@ msgstr "ルーターまたはファイアウォールによって PORT コマン
 msgid "Pa&ssive (recommended)"
 msgstr "パッシブ (推奨)(&S)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2484
+#: ../../locales/../src/interface/Mainfrm.cpp:2544
 msgid "Parameter not a valid URL"
 msgstr "パラメーターは有効な URL ではありません"
 
-#: ../../locales/../src/interface/updater.cpp:597
+#: ../../locales/../src/interface/updater.cpp:598
 #, c-format
 msgid "Parsing %d bytes of version information.\n"
 msgstr "%d バイトのバージョン情報を解析します。\n"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2714
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:286
-#: ../../locales/../src/interface/quickconnectbar.cpp:56
-#: ../../locales/../src/interface/sitemanager_site.cpp:271
+#: ../../locales/../src/interface/quickconnectbar.cpp:57
+#: ../../locales/../src/interface/sitemanager_site.cpp:272
 msgid "Pass&word:"
 msgstr "パスワード(&W):"
 
@@ -5982,7 +5996,7 @@ msgid "Passive (recommended)"
 msgstr "パッシブ (推奨)"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:410
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:95
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:99
 msgid "Passive mode"
 msgstr "パッシブ モード"
 
@@ -6001,7 +6015,8 @@ msgstr "パスワードまたは暗号化鍵が設定されていません"
 msgid "Password required"
 msgstr "パスワードが必要"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1271
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:148
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:107
 msgid "Passwords"
 msgstr "パスワード"
 
@@ -6017,7 +6032,7 @@ msgstr "パス"
 msgid "Path cannot be constructed for directory %s and subdir %s"
 msgstr "パスにはディレクトリ %s とサブディレクトリ %s を含めることはできません"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2439
+#: ../../locales/../src/interface/Mainfrm.cpp:2502
 msgid "Path not found:"
 msgstr "パスが見つかりません:"
 
@@ -6063,8 +6078,8 @@ msgid ""
 "Please check on https://filezilla-project.org/probe.php that the server is "
 "running and carefully check your settings again."
 msgstr ""
-"https://filezilla-project.org/probe.php 上でサーバーの挙動をチェックして再度"
-"注意深く設定をチェックしてください。"
+"https://filezilla-project.org/probe.php でサーバーの挙動をチェックして再度注"
+"意深く設定をチェックしてください。"
 
 #: ../../locales/../src/interface/osx_sandbox_userdirs.cpp:121
 msgid ""
@@ -6181,7 +6196,7 @@ msgstr "外部アドレスを取得するための URL を入力してくださ�
 msgid "Please enter an upload speed limit greater or equal to 0 %s/s."
 msgstr "アップロード速度制限 (0 %s/s 以上) を入力してください。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:623
+#: ../../locales/../src/interface/Mainfrm.cpp:630
 msgid ""
 "Please enter raw FTP command.\n"
 "Using raw ftp commands will clear the directory cache."
@@ -6189,7 +6204,7 @@ msgstr ""
 "生の FTP コマンドを入力してください。\n"
 "生の FTP コマンドを使用するとディレクトリのキャッシュをクリアされます。"
 
-#: ../../locales/../src/interface/QueueView.cpp:1878
+#: ../../locales/../src/interface/QueueView.cpp:1908
 msgid ""
 "Please enter the complete path of a program and its arguments. This command "
 "will be executed when the queue has finished processing.\n"
@@ -6197,18 +6212,19 @@ msgid ""
 "You need to properly quote commands and their arguments if they contain "
 "spaces."
 msgstr ""
-"実行するパスと実行ファイル名を入力してください。\n"
-"例えば MS Windows では c:\\somePath\\file.exe、UNIX では /somePath/file。\n"
-"また、プログラム引数を指定することもできます。"
+"プログラムのフルパスと引数を入力してください。このコマンドは、キューの処理が"
+"完了したときに実行されます。\n"
+"例: (MS Windows) c:\\somePath\\file.exe, (UNIX) /somePath/file\n"
+"スペースを含む場合はコマンドと引数を引用符で適切に囲む必要があります。"
 
-#: ../../locales/../src/interface/LocalListView.cpp:955
-#: ../../locales/../src/interface/LocalTreeView.cpp:1181
-#: ../../locales/../src/interface/RemoteListView.cpp:1354
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1267
+#: ../../locales/../src/interface/LocalListView.cpp:972
+#: ../../locales/../src/interface/LocalTreeView.cpp:1194
+#: ../../locales/../src/interface/RemoteListView.cpp:1372
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1282
 msgid "Please enter the name of the directory which should be created:"
 msgstr "作成するディレクトリ名を入力:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2761
+#: ../../locales/../src/interface/RemoteListView.cpp:2779
 msgid "Please enter the name of the file which should be created:"
 msgstr "作成するファイル名を入力:"
 
@@ -6249,7 +6265,8 @@ msgid ""
 "Please follow the instructions carefully, as wrong configuration will "
 "prevent successful FTP connections."
 msgstr ""
-"誤った設定を防ぎ FTP 接続を成功させるために、注意深く指示に従ってください。"
+"誤った設定を防ぎ FTP 接続を成功させるために、注意深く指示にしたがってくださ"
+"い。"
 
 #: ../../locales/../src/interface/netconfwizard.cpp:639
 msgid ""
@@ -6259,7 +6276,7 @@ msgstr ""
 "FileZilla が外部に接続確立するのを許可されていることと、アドレス リゾルバーの"
 "アドレスが正しく入力されていることを確認してください。"
 
-#: ../../locales/../src/interface/FileZilla.cpp:149
+#: ../../locales/../src/interface/FileZilla.cpp:150
 msgid "Please make sure the requested locale is installed on your system."
 msgstr ""
 "要求されたロケールがシステムにインストールされていることを確認してください。"
@@ -6271,7 +6288,7 @@ msgid ""
 "manual port forwarding. Don't run your router in the so called 'DMZ mode' or "
 "'game mode'."
 msgstr ""
-"ルーターの利用できる最新のファームウェアを確認してください。その上で、ルー"
+"ルーターの利用できる最新のファームウェアを確認してください。そのうえで、ルー"
 "ターを適切に設定すべきです。手動ポート転送を利用すべきでしょう。'DMZ モード' "
 "や 'ゲーム モード' と呼ばれるもののルーターでの起動はできません。"
 
@@ -6287,7 +6304,7 @@ msgstr ""
 "バーは選ぶ可能性があります。これにより、誤った警告が発生する可能性がありま"
 "す。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:750
+#: ../../locales/../src/interface/Mainfrm.cpp:763
 msgid ""
 "Please note that preserving timestamps on uploads on FTP, FTPS and FTPES "
 "servers only works if they support the MFMT command."
@@ -6365,14 +6382,10 @@ msgid ""
 "protocol specific 'fixups' have to be disabled"
 msgstr ""
 "ファイアウォールを更新してあなたのルーターが最新の利用できるファームウェアを"
-"使用しているか確認してください。その上でルーターが適切に設定されている必要が"
-"あります。あなたは手動でポート転送を使用する必要があります。'DMZ モード' また"
-"は 'ゲーム モード' でルーターを運用しないでください。プロトコル検知またはプロ"
-"トコルの特殊な 'fixups' は無効にする必要があります。"
-
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1392
-msgid "Positio&n of the message log:"
-msgstr "メッセージ ログの位置(&N):"
+"使用しているか確認してください。そのうえでルーターが適切に設定されている必要"
+"があります。あなたは手動でポート転送を使用する必要があります。'DMZ モード' ま"
+"たは 'ゲーム モード' でルーターを運用しないでください。プロトコル検知またはプ"
+"ロトコルの特殊な 'fixups' は無効にする必要があります。"
 
 #: ../../locales/../src/interface/verifycertdialog.cpp:439
 #: ../../locales/../src/interface/verifycertdialog.cpp:440
@@ -6392,11 +6405,11 @@ msgstr "事前確保"
 msgid "Predefined Sites"
 msgstr "所定のサイト"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:749
+#: ../../locales/../src/interface/Mainfrm.cpp:762
 msgid "Preserving file timestamps"
 msgstr "ファイルのタイムスタンプを保持"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1551
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1329
 msgid "Preview"
 msgstr "プレビュー"
 
@@ -6412,7 +6425,7 @@ msgstr "FileZilla の起動に関連する診断情報を表示"
 msgid "Print version information to stdout and exit"
 msgstr "バージョン情報を標準出力に表示して終了"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1813
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1591
 msgid "Prioritize directories (default)"
 msgstr "ディレクトリを先頭に (デフォルト)"
 
@@ -6420,23 +6433,23 @@ msgstr "ディレクトリを先頭に (デフォルト)"
 msgid "Priority"
 msgstr "優先度"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2169
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1947
 msgid ""
 "Privacy policy: Only your version of FileZilla, your used operating system "
 "and your CPU architecture will be submitted to the server."
 msgstr ""
 "プライバシー ポリシー: FileZilla のバージョン、OS、CPU アーキテクチャのみが"
-"サーバーに送信されます。"
+"サーバーに送信されます"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:630
 msgid "Private &keys:"
 msgstr "秘密鍵(&K):"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:286
+#: ../../locales/../src/interface/sitemanager_site.cpp:287
 msgid "Pro&ject ID:"
 msgstr "プロジェクト ID(&J):"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:293
+#: ../../locales/../src/interface/sitemanager_site.cpp:294
 msgid "Pro&ject:"
 msgstr "プロジェクト(&J):"
 
@@ -6449,8 +6462,8 @@ msgstr "プロトコル(&T):"
 msgid "Pro&xy password:"
 msgstr "プロキシ パスワード(&X):"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:107
 #: ../../locales/../src/interface/menu_bar.cpp:111
+#: ../../locales/../src/interface/QueueView.cpp:1804
 msgid "Process &Queue"
 msgstr "キューを処理(&Q)"
 
@@ -6465,7 +6478,7 @@ msgid "Processed %s in %s."
 msgstr "%s で %s を処理しました。"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:295
+#: ../../locales/../src/interface/sitemanager_site.cpp:296
 msgid "Project (or tenant) name or ID"
 msgstr "プロジェクト (またはテナント) の名前/ID(&J)"
 
@@ -6541,24 +6554,24 @@ msgstr "公開鍵アルゴリズム:"
 msgid "Public permissions"
 msgstr "その他のパーミッション"
 
-#: ../../locales/../src/interface/QueueView.cpp:2784
+#: ../../locales/../src/interface/QueueView.cpp:2815
 msgid "Queue has been fully processed"
 msgstr "キューの処理が完了しました"
 
-#: ../../locales/../src/interface/statusbar.cpp:439
+#: ../../locales/../src/interface/statusbar.cpp:446
 #, c-format
 msgid "Queue: %s MiB"
 msgstr "キュー: %s MiB"
 
-#: ../../locales/../src/interface/statusbar.cpp:374
+#: ../../locales/../src/interface/statusbar.cpp:381
 #, c-format
 msgid "Queue: %s%s"
 msgstr "キュー: %s%s"
 
-#: ../../locales/../src/interface/statusbar.cpp:370
-#: ../../locales/../src/interface/statusbar.cpp:430
+#: ../../locales/../src/interface/statusbar.cpp:377
+#: ../../locales/../src/interface/statusbar.cpp:437
 msgid "Queue: empty"
-msgstr "キュー: ありません"
+msgstr "キュー: なし"
 
 #: ../../locales/../src/interface/QueueView.cpp:207
 msgid "Queued files"
@@ -6567,7 +6580,7 @@ msgstr "キュー ファイル"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3434
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3529
 msgid "Queueing:"
-msgstr "待機中:"
+msgstr "キュー:"
 
 #: ../../locales/../src/interface/list_search_panel.cpp:42
 msgid "Quick Search:"
@@ -6577,7 +6590,7 @@ msgstr "クイック検索:"
 msgid "Quick search cannot be opened if comparing directories."
 msgstr "ディレクトリを比較中はクイック検索を開くことができません。"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:174
+#: ../../locales/../src/interface/QueueView.cpp:1829
 msgid "R&eboot system once"
 msgstr "システムの再起動(&E)"
 
@@ -6585,12 +6598,12 @@ msgstr "システムの再起動(&E)"
 msgid "R&emote directory tree"
 msgstr "リモート ディレクトリ ツリー(&E)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:230
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:248
+#: ../../locales/../src/interface/queueview_failed.cpp:35
+#: ../../locales/../src/interface/queueview_successful.cpp:28
 msgid "R&eset and requeue selected files"
 msgstr "リセットして選択したファイルを再度キューに入れる(&E)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:638
+#: ../../locales/../src/interface/Mainfrm.cpp:645
 msgid "Raw FTP command"
 msgstr "生の FTP コマンド"
 
@@ -6598,8 +6611,8 @@ msgstr "生の FTP コマンド"
 msgid "Re&ad"
 msgstr "読み取り(&A)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:37
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:81
+#: ../../locales/../src/interface/LocalListView.cpp:803
+#: ../../locales/../src/interface/RemoteListView.cpp:1113
 msgid "Re&fresh"
 msgstr "最新の情報に更新(&F)"
 
@@ -6627,11 +6640,11 @@ msgstr "読み取り専用"
 msgid "Reading from local file failed"
 msgstr "ローカル ファイルの読み込みに失敗しました。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1114
+#: ../../locales/../src/interface/Mainfrm.cpp:1138
 msgid "Really cancel current operation?"
 msgstr "現在の操作を本当に中止しますか?"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1448
+#: ../../locales/../src/interface/RemoteListView.cpp:1466
 #: ../../locales/../src/interface/search.cpp:1259
 #, c-format
 msgid "Really delete %d directory with its contents from the server?"
@@ -6639,20 +6652,20 @@ msgid_plural ""
 "Really delete %d directories with their contents from the server?"
 msgstr[0] "サーバーから %d 個のディレクトリとその中身を本当に削除しますか?"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1445
+#: ../../locales/../src/interface/RemoteListView.cpp:1463
 #: ../../locales/../src/interface/search.cpp:1256
 #, c-format
 msgid "Really delete %d file from the server?"
 msgid_plural "Really delete %d files from the server?"
 msgstr[0] "サーバーから %d 個のファイルを本当に削除しますか?"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1453
+#: ../../locales/../src/interface/RemoteListView.cpp:1471
 #: ../../locales/../src/interface/search.cpp:1264
 #, c-format
 msgid "Really delete %s and %s from the server?"
 msgstr "サーバーから %sと %s を本当に削除しますか?"
 
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1085
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1100
 msgid "Really delete all selected files and/or directories from the server?"
 msgstr "選択したすべてのファイル/ディレクトリをサーバーから削除しますか?"
 
@@ -6664,7 +6677,7 @@ msgstr "選択したすべてのファイル/ディレクトリをコンピュ�
 msgid "Reason"
 msgstr "理由"
 
-#: ../../locales/../src/interface/QueueView.cpp:2777
+#: ../../locales/../src/interface/QueueView.cpp:2808
 msgid "Reboot now"
 msgstr "今すぐ再起動"
 
@@ -6700,7 +6713,7 @@ msgstr ""
 msgid "Received data tainted"
 msgstr "受信したデータは失われました"
 
-#: ../../locales/../src/interface/updater.cpp:576
+#: ../../locales/../src/interface/updater.cpp:577
 msgid "Received invalid character in version information"
 msgstr "受信したバージョン情報に不正な文字が含まれています"
 
@@ -6709,11 +6722,11 @@ msgstr "受信したバージョン情報に不正な文字が含まれていま
 msgid "Received unknown TLS alert %d from the server"
 msgstr "サーバーから未知の TLS アラート %d を受信しました"
 
-#: ../../locales/../src/interface/updater.cpp:569
+#: ../../locales/../src/interface/updater.cpp:570
 msgid "Received version information is too large"
 msgstr "受信したバージョン情報が大きすぎます"
 
-#: ../../locales/../src/interface/clearprivatedata.cpp:74
+#: ../../locales/../src/interface/clearprivatedata.cpp:72
 msgid ""
 "Reconnect information cannot be cleared while connected to a server.\n"
 "If you continue, your connection will be disconnected."
@@ -6745,12 +6758,12 @@ msgstr "ファイルとディレクトリを再帰的に削除します。"
 msgid "Red"
 msgstr "Red"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:147
+#: ../../locales/../src/engine/http/filetransfer.cpp:152
 #, c-format
 msgid "Redirection to invalid or unsupported URI: %s"
 msgstr "不正またはサポートされていない URI へのリダイレクト: %s"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:153
+#: ../../locales/../src/engine/http/filetransfer.cpp:158
 #, c-format
 msgid "Redirection to invalid or unsupported address: %s"
 msgstr "不正またはサポートされていないアドレスへのリダイレクト: %s"
@@ -6829,13 +6842,13 @@ msgstr "リモート パス:"
 msgid "Remote site:"
 msgstr "リモート サイト:"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:220
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:238
+#: ../../locales/../src/interface/queueview_failed.cpp:30
+#: ../../locales/../src/interface/queueview_successful.cpp:23
 msgid "Remove &all"
 msgstr "すべて削除(&A)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:227
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:245
+#: ../../locales/../src/interface/queueview_failed.cpp:34
+#: ../../locales/../src/interface/queueview_successful.cpp:27
 msgid "Remove &selected"
 msgstr "選択されているアイテムを削除(&S)"
 
@@ -6847,24 +6860,24 @@ msgstr "選択されているアイテムを削除(&S)"
 msgid "Rename file"
 msgstr "ファイル名を変更"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:286
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:354
+#: ../../locales/../src/interface/LocalTreeView.cpp:1080
+#: ../../locales/../src/interface/RemoteTreeView.cpp:909
 msgid "Rename selected directory"
 msgstr "選択したディレクトリの名前の変更"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:46
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:90
+#: ../../locales/../src/interface/LocalListView.cpp:807
+#: ../../locales/../src/interface/RemoteListView.cpp:1117
 msgid "Rename selected files and directories"
 msgstr "選択したファイルとディレクトリの名前の変更"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:611
-#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:605
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:610
+#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:604
 #, c-format
 msgid "Renaming '%s' to '%s'"
 msgstr "名前を '%s' から '%s' に変更中"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4063
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1314
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:163
 msgid "Repeat password:"
 msgstr "パスワードの再入力:"
 
@@ -6889,15 +6902,15 @@ msgstr ""
 msgid "Request rejected or failed"
 msgstr "要求の拒否または失敗"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:155
+#: ../../locales/../src/interface/sitemanager_site.cpp:156
 msgid "Require explicit FTP over TLS"
 msgstr "明示的な FTP over TLS が必要"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:156
+#: ../../locales/../src/interface/sitemanager_site.cpp:157
 msgid "Require implicit FTP over TLS"
 msgstr "暗黙的な FTP over TLS が必要"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:241
+#: ../../locales/../src/interface/queueview_successful.cpp:24
 msgid "Reset and requeue &all"
 msgstr "すべてリセットして再度キューに入れる(&A)"
 
@@ -6905,7 +6918,7 @@ msgstr "すべてリセットして再度キューに入れる(&A)"
 msgid "Resolved protocol is unknown"
 msgstr "解決されたプロトコルは不明です"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1087
+#: ../../locales/../src/engine/ControlSocket.cpp:1088
 #, c-format
 msgid "Resolving address of %s"
 msgstr "%s のアドレスを解決中"
@@ -6920,6 +6933,10 @@ msgstr "リソースが一時的に使用できません"
 #: ../../locales/../src/interface/StatusView.cpp:358
 msgid "Response:"
 msgstr "レスポンス:"
+
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:151
+msgid "Restore ta&bs and reconnect"
+msgstr "タブを復元して再接続(&B)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3362
 msgid "Results:"
@@ -6953,7 +6970,7 @@ msgstr "\"%s\" のディレクトリ リストを取得中..."
 msgid "Retrieving directory listing..."
 msgstr "ディレクトリ リストを取得中..."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:659
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:658
 #: ../../locales/../src/interface/netconfwizard.cpp:725
 #, c-format
 msgid "Retrieving external IP address from %s"
@@ -6963,19 +6980,23 @@ msgstr "%s から外部 IP アドレスを取得中"
 msgid "S&how files currently being edited..."
 msgstr "現在編集中のファイルを表示(&H)..."
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1435
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:150
 msgid "S&how the Site Manager on startup"
-msgstr "開始時にサイト マネージャーを表示する(&H)"
+msgstr "サイト マネージャーを表示(&H)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:178
+#: ../../locales/../src/interface/QueueView.cpp:1830
 msgid "S&hutdown system once"
 msgstr "システムのシャットダウン(&H)"
+
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:149
+msgid "S&tart normally"
+msgstr "通常の起動(&T)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3286
 msgid "S&top"
 msgstr "停止(&T)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:182
+#: ../../locales/../src/interface/QueueView.cpp:1831
 msgid "S&uspend system once"
 msgstr "システムのサスペンド(&U)"
 
@@ -6983,7 +7004,7 @@ msgstr "システムのサスペンド(&U)"
 msgid "S&ynchronized browsing"
 msgstr "同期ブラウジング(&Y)"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:97
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:101
 msgid "SFTP"
 msgstr "SFTP"
 
@@ -7011,12 +7032,12 @@ msgid "SQLite:"
 msgstr "SQLite:"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4040
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1291
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:156
 msgid "Sa&ve passwords protected by a master password"
 msgstr "マスター パスワードで保護されたパスワードを保存する(&V)"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4030
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1281
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:154
 msgid "Sav&e passwords"
 msgstr "パスワードを保存する(&E)"
 
@@ -7025,16 +7046,16 @@ msgid "Save settings?"
 msgstr "設定を保存しますか?"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:429
-#: ../../locales/../src/interface/sitemanager_site.cpp:500
+#: ../../locales/../src/interface/sitemanager_site.cpp:501
 msgid "Saving of password has been disabled by your system administrator."
 msgstr "システム管理者によりパスワードの保存が無効にされています。"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:432
-#: ../../locales/../src/interface/sitemanager_site.cpp:503
+#: ../../locales/../src/interface/sitemanager_site.cpp:504
 msgid "Saving of passwords has been disabled by you."
 msgstr "あなたによってパスワードの保存は無効にされています。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1531
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1309
 msgid "Scale factor:"
 msgstr "表示倍率:"
 
@@ -7059,11 +7080,11 @@ msgid "Search type:"
 msgstr "検索タイプ:"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:277
+#: ../../locales/../src/interface/sitemanager_site.cpp:278
 msgid "Secret Access &Key:"
 msgstr "シークレット アクセス キー(&K):"
 
-#: ../../locales/../src/interface/statusbar.cpp:516
+#: ../../locales/../src/interface/statusbar.cpp:524
 msgid "Security information"
 msgstr "セキュリティ情報"
 
@@ -7080,7 +7101,7 @@ msgstr "サーバーを選択(&C)"
 msgid "Select &page:"
 msgstr "ページを選択(&P):"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1493
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1271
 msgid "Select Theme"
 msgstr "テーマの選択"
 
@@ -7088,8 +7109,8 @@ msgstr "テーマの選択"
 msgid ""
 "Select default action to perform if target file of a transfer already exists."
 msgstr ""
-"転送するターゲット ファイルが既に存在しているときのデフォルトのアクションを選"
-"択してください。"
+"転送するターゲット ファイルがすでに存在しているときのデフォルトのアクションを"
+"選択してください。"
 
 #: ../../locales/../src/interface/edithandler.cpp:1583
 #: ../../locales/../src/interface/settings/optionspage_edit.cpp:104
@@ -7101,8 +7122,8 @@ msgid ""
 "Select default file exists action if the target file already exists. This "
 "selection is valid only for the current session."
 msgstr ""
-"ターゲット ファイルが既に存在しているときのデフォルトのアクションを選択してく"
-"ださい。この選択は現在のセッションのみで有効です。"
+"ターゲット ファイルがすでに存在しているときのデフォルトのアクションを選択して"
+"ください。この選択は現在のセッションのみで有効です。"
 
 #: ../../locales/../src/interface/defaultfileexistsdlg.cpp:13
 msgid ""
@@ -7134,7 +7155,7 @@ msgid "Select file for exported settings"
 msgstr "設定をエクスポートするファイルを選択"
 
 #: ../../locales/../src/interface/export.cpp:36
-#: ../../locales/../src/interface/sitemanager_dialog.cpp:1769
+#: ../../locales/../src/interface/sitemanager_dialog.cpp:1766
 msgid "Select file for exported sites"
 msgstr "サイトをエクスポートするファイルを選択"
 
@@ -7224,15 +7245,15 @@ msgstr "選択したエディターは存在しません。"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1991
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2058
 msgid "Selected file already being edited"
-msgstr "選択したファイルは既に編集中です"
+msgstr "選択したファイルはすでに編集中です"
 
 #: ../../locales/../src/interface/settings/optionspage_connection_sftp.cpp:126
 msgid "Selected file is already loaded"
-msgstr "選択したファイルは既に読み込まれています"
+msgstr "選択したファイルはすでに読み込まれています"
 
 #: ../../locales/../src/interface/edithandler.cpp:1700
 msgid "Selected file is already opened"
-msgstr "選択したファイルは既に開かれています"
+msgstr "選択したファイルはすでに開かれています"
 
 #: ../../locales/../src/interface/edithandler.cpp:1772
 msgid "Selected file is still being edited"
@@ -7242,7 +7263,7 @@ msgstr "選択したファイルはまだ編集中です"
 msgid "Selected filter only works for local files."
 msgstr "選択したフィルターはローカル ファイルにのみ適用されます。"
 
-#: ../../locales/../src/interface/menu_bar.cpp:436
+#: ../../locales/../src/interface/menu_bar.cpp:439
 msgid ""
 "Selected global bookmark and current server use a different server type.\n"
 "Use site-specific bookmarks for this server."
@@ -7263,7 +7284,7 @@ msgstr "FTP キープアライブ コマンドを送信する(&K)"
 msgid "Send custom command to the server otherwise not available"
 msgstr "不可能でなければサーバーにカスタム コマンドを送信"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:781
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:780
 msgid "Sending keep-alive command"
 msgstr "キープアライブ コマンドを送信中"
 
@@ -7422,12 +7443,12 @@ msgstr "サーバー:"
 msgid "Session details"
 msgstr "セッション詳細"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:121
+#: ../../locales/../src/interface/QueueView.cpp:1812
 msgid "Set &Priority"
 msgstr "優先度の設定(&P)"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:618
-#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:599
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:617
+#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:598
 #, c-format
 msgid "Setting permissions of '%s' to '%s'"
 msgstr "'%s' のパーミッションを '%s' に設定"
@@ -7440,19 +7461,19 @@ msgstr "設定"
 msgid "Settings directory:"
 msgstr "ディレクトリ設定:"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:150
+#: ../../locales/../src/interface/QueueView.cpp:1822
 msgid "Sh&ow notification bubble"
 msgstr "通知バルーンを表示(&O)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2353
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2131
 msgid "Show &raw directory listing"
-msgstr "そのままのディレクトリ リストを表示する(&R)"
+msgstr "生のディレクトリ リストを表示する(&R)"
 
 #: ../../locales/../src/interface/menu_bar.cpp:171
 msgid "Show &welcome dialog..."
 msgstr "ウェルカム ダイアログの表示(&W)..."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2326
+#: ../../locales/../src/interface/Mainfrm.cpp:2379
 msgid "Show both directory trees and continue comparing?"
 msgstr "両方のディレクトリ ツリーを表示して、比較を継続しますか?"
 
@@ -7461,15 +7482,15 @@ msgstr "両方のディレクトリ ツリーを表示して、比較を継続�
 msgid "Show details"
 msgstr "詳細の表示"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1668
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1446
 msgid "Show details about custom date and time formats"
 msgstr "日付と時刻の書式を表示"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:399
+#: ../../locales/../src/interface/search.cpp:830
 msgid "Show in file &manager"
 msgstr "ファイル マネージャーに表示(&M)"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:212
+#: ../../locales/../src/interface/menu_bar.cpp:182
 msgid "Shows available TLS ciphers"
 msgstr "TLS で使用できる暗号方式の表示"
 
@@ -7477,7 +7498,7 @@ msgstr "TLS で使用できる暗号方式の表示"
 msgid "Shows this help dialog"
 msgstr "このヘルプ ダイアログを表示"
 
-#: ../../locales/../src/interface/QueueView.cpp:2773
+#: ../../locales/../src/interface/QueueView.cpp:2804
 msgid "Shutdown now"
 msgstr "今すぐシャットダウン"
 
@@ -7497,7 +7518,7 @@ msgstr "サイト マネージャー エントリ(&M)"
 msgid "Site Manager"
 msgstr "サイト マネージャー"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:510
+#: ../../locales/../src/interface/sitemanager_site.cpp:511
 msgid "Site Manager - Cannot remember password"
 msgstr "サイト マネージャー - パスワードを保存しない"
 
@@ -7508,25 +7529,25 @@ msgstr "サイト マネージャー - 自動生成された鍵"
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:897
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:906
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:913
-#: ../../locales/../src/interface/sitemanager_site.cpp:476
-#: ../../locales/../src/interface/sitemanager_site.cpp:489
-#: ../../locales/../src/interface/sitemanager_site.cpp:523
-#: ../../locales/../src/interface/sitemanager_site.cpp:540
-#: ../../locales/../src/interface/sitemanager_site.cpp:553
-#: ../../locales/../src/interface/sitemanager_site.cpp:568
-#: ../../locales/../src/interface/sitemanager_site.cpp:578
-#: ../../locales/../src/interface/sitemanager_site.cpp:586
-#: ../../locales/../src/interface/sitemanager_site.cpp:611
-#: ../../locales/../src/interface/sitemanager_site.cpp:620
-#: ../../locales/../src/interface/sitemanager_site.cpp:636
-#: ../../locales/../src/interface/sitemanager_site.cpp:645
-#: ../../locales/../src/interface/sitemanager_site.cpp:661
+#: ../../locales/../src/interface/sitemanager_site.cpp:477
+#: ../../locales/../src/interface/sitemanager_site.cpp:490
+#: ../../locales/../src/interface/sitemanager_site.cpp:524
+#: ../../locales/../src/interface/sitemanager_site.cpp:541
+#: ../../locales/../src/interface/sitemanager_site.cpp:554
+#: ../../locales/../src/interface/sitemanager_site.cpp:569
+#: ../../locales/../src/interface/sitemanager_site.cpp:579
+#: ../../locales/../src/interface/sitemanager_site.cpp:587
+#: ../../locales/../src/interface/sitemanager_site.cpp:612
+#: ../../locales/../src/interface/sitemanager_site.cpp:621
+#: ../../locales/../src/interface/sitemanager_site.cpp:637
+#: ../../locales/../src/interface/sitemanager_site.cpp:646
+#: ../../locales/../src/interface/sitemanager_site.cpp:662
 msgid "Site Manager - Invalid data"
 msgstr "サイト マネージャー - 不正なデータ"
 
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:280
 msgid "Site Manager already open"
-msgstr "サイト マネージャーは既に開かれています"
+msgstr "サイト マネージャーはすでに開かれています"
 
 #: ../../locales/../src/interface/sitemanager.cpp:489
 #: ../../locales/../src/interface/sitemanager.cpp:517
@@ -7566,7 +7587,7 @@ msgstr ""
 msgid "Size"
 msgstr "サイズ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1682
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1460
 msgid "Size formatting"
 msgstr "サイズの書式"
 
@@ -7581,10 +7602,10 @@ msgstr "サイズ不明"
 msgid "Skip file"
 msgstr "ファイルをスキップ"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1157
-#: ../../locales/../src/engine/ControlSocket.cpp:1174
-#: ../../locales/../src/engine/ControlSocket.cpp:1200
-#: ../../locales/../src/engine/ControlSocket.cpp:1278
+#: ../../locales/../src/engine/ControlSocket.cpp:1158
+#: ../../locales/../src/engine/ControlSocket.cpp:1175
+#: ../../locales/../src/engine/ControlSocket.cpp:1201
+#: ../../locales/../src/engine/ControlSocket.cpp:1279
 #, c-format
 msgid "Skipping download of %s"
 msgstr "%s のダウンロードをスキップしています"
@@ -7594,10 +7615,10 @@ msgstr "%s のダウンロードをスキップしています"
 msgid "Skipping non-existing key file \"%s\""
 msgstr "存在しない鍵ファイル \"%s\" をスキップします。"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1160
-#: ../../locales/../src/engine/ControlSocket.cpp:1177
-#: ../../locales/../src/engine/ControlSocket.cpp:1203
-#: ../../locales/../src/engine/ControlSocket.cpp:1281
+#: ../../locales/../src/engine/ControlSocket.cpp:1161
+#: ../../locales/../src/engine/ControlSocket.cpp:1178
+#: ../../locales/../src/engine/ControlSocket.cpp:1204
+#: ../../locales/../src/engine/ControlSocket.cpp:1282
 #, c-format
 msgid "Skipping upload of %s"
 msgstr "%s のアップロードをスキップしています"
@@ -7608,7 +7629,7 @@ msgstr "アドレス空間外のソケット アドレス"
 
 #: ../../locales/../src/engine/socket.cpp:1075
 msgid "Socket already connected"
-msgstr "ソケットは既に接続されています"
+msgstr "ソケットはすでに接続されています"
 
 #: ../../locales/../src/engine/socket.cpp:1083
 msgid "Socket has been shut down"
@@ -7622,7 +7643,7 @@ msgstr "ソケットは接続されていません"
 msgid "Socket type not supported for address family"
 msgstr "ソケット タイプはアドレス ファミリではサポートされていません"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1253
+#: ../../locales/../src/interface/Mainfrm.cpp:1278
 msgid "Some files are still being edited or need to be uploaded."
 msgstr "編集中またはアップロードの必要があるファイルがあります。"
 
@@ -7632,10 +7653,10 @@ msgid ""
 "Some misconfigured remote servers which are behind a router, may reply with "
 "their local IP address."
 msgstr ""
-"ルーターの背後にある誤った構成のリモート サーバーは、ローカル IP アドレスを返"
+"ルーターの配下にある誤った構成のリモート サーバーは、ローカル IP アドレスを返"
 "信することがあります。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1815
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1593
 msgid "Sort directories inline"
 msgstr "ディレクトリをインラインで並べ替え"
 
@@ -7643,11 +7664,11 @@ msgstr "ディレクトリをインラインで並べ替え"
 msgid "Sort order cannot be changed if comparing directories."
 msgstr "ディレクトリ比較中は並べ替え順を変更できません。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1799
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1577
 msgid "Sorting"
 msgstr "並べ替え"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1806
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1584
 msgid "Sorting &mode:"
 msgstr "並べ替えモード(&M):"
 
@@ -7677,23 +7698,23 @@ msgstr "速度制限"
 msgid "Speed limits"
 msgstr "速度制限"
 
-#: ../../locales/../src/interface/statusbar.cpp:593
+#: ../../locales/../src/interface/statusbar.cpp:602
 msgid "Speed limits are disabled, click to change."
 msgstr "速度制限は無効です。変更するにはクリックしてください。"
 
-#: ../../locales/../src/interface/statusbar.cpp:596
+#: ../../locales/../src/interface/statusbar.cpp:605
 msgid "Speed limits are enabled, click to change."
 msgstr "速度制限は有効です。変更するにはクリックしてください。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2147
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1925
 msgid "Stable and beta versions"
 msgstr "安定版とベータ版"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2146
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1924
 msgid "Stable versions only"
 msgstr "安定版のみ"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2148
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1926
 msgid "Stable, beta and nightly versions"
 msgstr "安定版、ベータ版、およびナイトリー ビルド"
 
@@ -7743,7 +7764,7 @@ msgstr "状態"
 msgid "Status:"
 msgstr "状態:"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:111
+#: ../../locales/../src/interface/QueueView.cpp:1805
 msgid "Stop and remove &all"
 msgstr "停止してすべて削除(&A)"
 
@@ -7752,7 +7773,7 @@ msgid "Stop recursive operation"
 msgstr "再帰処理を停止"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:282
+#: ../../locales/../src/interface/sitemanager_site.cpp:283
 msgid "Storage &account:"
 msgstr "ストレージ アカウント(&A):"
 
@@ -7780,7 +7801,7 @@ msgstr "成功した転送"
 msgid "Summary of test results:"
 msgstr "テスト結果の概要:"
 
-#: ../../locales/../src/interface/QueueView.cpp:2781
+#: ../../locales/../src/interface/QueueView.cpp:2812
 msgid "Suspend now"
 msgstr "今すぐサスペンド"
 
@@ -7793,23 +7814,23 @@ msgstr ""
 "リックリンクは常に削除されます。"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4115
-#: ../../locales/../src/interface/state.cpp:263
-#: ../../locales/../src/interface/state.cpp:278
-#: ../../locales/../src/interface/state.cpp:285
-#: ../../locales/../src/interface/state.cpp:296
-#: ../../locales/../src/interface/state.cpp:395
-#: ../../locales/../src/interface/state.cpp:403
-#: ../../locales/../src/interface/state.cpp:411
-#: ../../locales/../src/interface/state.cpp:1070
-#: ../../locales/../src/interface/state.cpp:1078
-#: ../../locales/../src/interface/state.cpp:1085
-#: ../../locales/../src/interface/state.cpp:1094
-#: ../../locales/../src/interface/state.cpp:1121
+#: ../../locales/../src/interface/state.cpp:268
+#: ../../locales/../src/interface/state.cpp:283
+#: ../../locales/../src/interface/state.cpp:290
+#: ../../locales/../src/interface/state.cpp:301
+#: ../../locales/../src/interface/state.cpp:398
+#: ../../locales/../src/interface/state.cpp:406
+#: ../../locales/../src/interface/state.cpp:414
+#: ../../locales/../src/interface/state.cpp:1071
+#: ../../locales/../src/interface/state.cpp:1079
+#: ../../locales/../src/interface/state.cpp:1086
+#: ../../locales/../src/interface/state.cpp:1095
+#: ../../locales/../src/interface/state.cpp:1122
 #: ../../locales/../src/interface/toolbar.cpp:52
 msgid "Synchronized browsing"
 msgstr "同期ブラウジング"
 
-#: ../../locales/../src/interface/state.cpp:410
+#: ../../locales/../src/interface/state.cpp:413
 msgid "Synchronized browsing has been disabled."
 msgstr "同期ブラウジングを無効にしました。"
 
@@ -7817,8 +7838,8 @@ msgstr "同期ブラウジングを無効にしました。"
 msgid "Synchronizing directories."
 msgstr "ディレクトリを同期中。"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:117
-#: ../../locales/../src/interface/quickconnectbar.cpp:161
+#: ../../locales/../src/interface/quickconnectbar.cpp:118
+#: ../../locales/../src/interface/quickconnectbar.cpp:162
 msgid "Syntax error"
 msgstr "構文エラー"
 
@@ -7827,8 +7848,8 @@ msgstr "構文エラー"
 #: ../../locales/../src/interface/cmdline.cpp:88
 #: ../../locales/../src/interface/cmdline.cpp:97
 #: ../../locales/../src/interface/cmdline.cpp:103
-#: ../../locales/../src/interface/Mainfrm.cpp:2441
-#: ../../locales/../src/interface/Mainfrm.cpp:2486
+#: ../../locales/../src/interface/Mainfrm.cpp:2504
+#: ../../locales/../src/interface/Mainfrm.cpp:2546
 msgid "Syntax error in command line"
 msgstr "コマンドラインでの構文エラー"
 
@@ -7870,19 +7891,19 @@ msgstr "TTL の期限が切れました"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:6
 msgid "Target file already exists"
-msgstr "ターゲット ファイルは既に存在しています"
+msgstr "ターゲット ファイルはすでに存在しています"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:65
 msgid "Target file:"
 msgstr "ターゲット ファイル:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2779
+#: ../../locales/../src/interface/RemoteListView.cpp:2797
 msgid "Target filename already exists!"
-msgstr "ターゲットのファイル名は既に存在しています!"
+msgstr "ターゲットのファイル名はすでに存在しています!"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1666
+#: ../../locales/../src/interface/RemoteListView.cpp:1684
 msgid "Target filename already exists, really continue?"
-msgstr "ターゲットのファイル名は既に存在しています。本当に続けますか?"
+msgstr "ターゲットのファイル名はすでに存在しています。本当に続けますか?"
 
 #: ../../locales/../src/engine/socket.cpp:1094
 msgid "Temporary failure in name resolution"
@@ -7955,7 +7976,7 @@ msgstr ""
 "証明書はサーバーの応答に OCSP ステータスを含める必要がありますが、OCSP ステー"
 "タスが見つかりません。"
 
-#: ../../locales/../src/interface/statusbar.cpp:476
+#: ../../locales/../src/interface/statusbar.cpp:483
 msgid "The connection is encrypted. Click icon for details."
 msgstr "接続は暗号化されています。詳細はアイコンをクリックしてください。"
 
@@ -7996,17 +8017,18 @@ msgstr "テキスト ファイルを編集するデフォルトのエディタ�
 #: ../../locales/../src/interface/filteredit.cpp:216
 #: ../../locales/../src/interface/filteredit.cpp:255
 msgid "The entered filter name already exists, please choose a different name."
-msgstr "入力したフィルター名は既に存在しています。他の名前を選択してください。"
+msgstr ""
+"入力したフィルター名はすでに存在しています。他の名前を選択してください。"
 
 #: ../../locales/../src/interface/asksavepassworddialog.cpp:41
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:205
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:130
 msgid "The entered passwords are not the same."
 msgstr "入力したパスワードは同じではありません。"
 
 #: ../../locales/../src/interface/settings/optionspage_filetype.cpp:153
 #, c-format
 msgid "The extension '%s' does already exist in the list"
-msgstr "拡張子 '%s' は既にリストに存在しません"
+msgstr "拡張子 '%s' はすでにリストに存在しません"
 
 #: ../../locales/../src/interface/asyncrequestqueue.cpp:315
 #: ../../locales/../src/interface/asyncrequestqueue.cpp:323
@@ -8015,11 +8037,11 @@ msgid ""
 "The file %s already exists.\n"
 "Please enter a new name:"
 msgstr ""
-"ファイル %s は既に存在しています。\n"
+"ファイル %s はすでに存在しています。\n"
 "新しい名前を入力:"
 
 #: ../../locales/../src/interface/edithandler.cpp:1673
-#: ../../locales/../src/interface/LocalListView.cpp:1856
+#: ../../locales/../src/interface/LocalListView.cpp:1873
 #: ../../locales/../src/interface/search.cpp:1527
 #, c-format
 msgid ""
@@ -8051,7 +8073,7 @@ msgid "The file '%s' could not be loaded."
 msgstr "ファイル '%s' を読み込めませんでした。"
 
 #: ../../locales/../src/interface/edithandler.cpp:1668
-#: ../../locales/../src/interface/LocalListView.cpp:1852
+#: ../../locales/../src/interface/LocalListView.cpp:1869
 #: ../../locales/../src/interface/search.cpp:1523
 #, c-format
 msgid ""
@@ -8062,7 +8084,7 @@ msgstr ""
 "あなたのシステムではこのファイルの種類にプログラムが関連付けられていません。"
 
 #: ../../locales/../src/interface/edithandler.cpp:1785
-#: ../../locales/../src/interface/LocalListView.cpp:1865
+#: ../../locales/../src/interface/LocalListView.cpp:1882
 #: ../../locales/../src/interface/search.cpp:1536
 #, c-format
 msgid ""
@@ -8123,12 +8145,12 @@ msgstr "ファイル名の列は非表示にできません。"
 #: ../../locales/../src/interface/settings/optionspage_transfer.cpp:69
 #, c-format
 msgid "The following character will be replaced: %s"
-msgstr "以下の文字は置換されます: %s"
+msgstr "次の文字は置換されます: %s"
 
 #: ../../locales/../src/interface/settings/optionspage_transfer.cpp:66
 #, c-format
 msgid "The following characters will be replaced: %s"
-msgstr "以下の文字は置換されます: %s"
+msgstr "次の文字は置換されます: %s"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3665
 msgid "The free open source FTP solution"
@@ -8142,7 +8164,7 @@ msgstr "生成された暗号化鍵は次のとおりです:"
 msgid "The global bookmarks could not be saved."
 msgstr "グローバル ブックマークを保存できませんでした。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2340
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:2118
 msgid ""
 "The higher the debug level, the more information will be displayed in the "
 "message log. Displaying debug information has a negative impact on "
@@ -8155,17 +8177,17 @@ msgstr ""
 msgid "The limit needs to be between 1 and 2000 MiB"
 msgstr "制限は 1 から 2000 MiB にしてください"
 
-#: ../../locales/../src/interface/state.cpp:1121
+#: ../../locales/../src/interface/state.cpp:1122
 #, c-format
 msgid "The local directory '%s' could not be created."
 msgstr "ローカル ディレクトリに '%s' を作成できませんでした。"
 
-#: ../../locales/../src/interface/state.cpp:1106
+#: ../../locales/../src/interface/state.cpp:1107
 #, c-format
 msgid "The local directory '%s' does not exist."
 msgstr "ローカル ディレクトリに '%s' は見つかりませんでした。"
 
-#: ../../locales/../src/interface/state.cpp:275
+#: ../../locales/../src/interface/state.cpp:280
 #, c-format
 msgid ""
 "The local directory '%s' is not below the synchronization root (%s).\n"
@@ -8181,7 +8203,7 @@ msgid ""
 msgstr "利用可能なポートの最小値は最大値以下である必要があります。"
 
 #: ../../locales/../src/interface/asksavepassworddialog.cpp:46
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:214
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:139
 msgid "The master password needs to be at least 8 characters long."
 msgstr "マスター パスワードは少なくとも 8 文字以上必要です。"
 
@@ -8198,12 +8220,12 @@ msgstr "ダウンロード ディレクトリに新しいバージョンを保�
 msgid "The queue will not be saved."
 msgstr "キューは保存されません。"
 
-#: ../../locales/../src/interface/state.cpp:1028
+#: ../../locales/../src/interface/state.cpp:1029
 #, c-format
 msgid "The remote directory '%s' does not exist."
 msgstr "リモート ディレクトリに '%s' は見つかりませんでした。"
 
-#: ../../locales/../src/interface/state.cpp:1075
+#: ../../locales/../src/interface/state.cpp:1076
 #, c-format
 msgid ""
 "The remote directory '%s' is not below the synchronization root (%s).\n"
@@ -8225,7 +8247,7 @@ msgstr ""
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1998
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2065
 msgid "The selected file is already being edited:"
-msgstr "選択したファイルは既に編集中です:"
+msgstr "選択したファイルはすでに編集中です:"
 
 #: ../../locales/../src/interface/edithandler.cpp:1772
 msgid ""
@@ -8304,11 +8326,11 @@ msgstr "指定のアドレス ファミリーをサポートしていません"
 msgid "The specified network name is no longer available"
 msgstr "指定のネットワーク名は使用できません"
 
-#: ../../locales/../src/interface/QueueView.cpp:2776
+#: ../../locales/../src/interface/QueueView.cpp:2807
 msgid "The system will soon reboot unless you click Cancel."
 msgstr "キャンセルをクリックしない場合は、システムはまもなく再起動されます。"
 
-#: ../../locales/../src/interface/QueueView.cpp:2772
+#: ../../locales/../src/interface/QueueView.cpp:2803
 msgid "The system will soon shut down unless you click Cancel."
 msgstr ""
 "キャンセルをクリックしない場合は、システムはまもなくシャットダウンされます。"
@@ -8318,7 +8340,7 @@ msgid ""
 "The target file already exists.\n"
 "Please choose an action."
 msgstr ""
-"ターゲット ファイルは既に存在しています。\n"
+"ターゲット ファイルはすでに存在しています。\n"
 "アクションを選択してください。"
 
 #: ../../locales/../src/interface/netconfwizard.cpp:867
@@ -8330,7 +8352,7 @@ msgstr "テストは成功しませんでした。設定を本当に保存しま
 msgid "The valid backup file %s could not be restored"
 msgstr "有効なバックアップ ファイル '%s' を復元できませんでした"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:103
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:108
 msgid "Themes"
 msgstr "テーマ"
 
@@ -8355,8 +8377,8 @@ msgid ""
 "This only works if you are not behind a router, else your system would just "
 "return your internal address."
 msgstr ""
-"これはルーターの下ではない場合のみ動作し、そうではない場合はシステムは内部ア"
-"ドレスを返します。"
+"これはルーターの配下ではない場合のみ動作し、そうではない場合はシステムは内部"
+"アドレスを返します。"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:8
 msgid ""
@@ -8370,7 +8392,7 @@ msgstr ""
 msgid "Time"
 msgstr "日時"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1619
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1397
 msgid "Time formatting"
 msgstr "時刻の書式"
 
@@ -8387,17 +8409,17 @@ msgstr "タイムアウト"
 msgid "Title:"
 msgstr "タイトル:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2307
+#: ../../locales/../src/interface/Mainfrm.cpp:2357
 msgid "To compare directories quick search must be closed."
 msgstr "ディレクトリを比較するには、クイック検索を終了する必要があります。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2324
+#: ../../locales/../src/interface/Mainfrm.cpp:2377
 msgid "To compare directories, both file lists have to be aligned."
 msgstr ""
 "ディレクトリを比較するには、両方のファイル リストの位置合わせをする必要があり"
 "ます。"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2325
+#: ../../locales/../src/interface/Mainfrm.cpp:2378
 msgid "To do this, the directory trees need to be both shown or both hidden."
 msgstr ""
 "これを行うには、両方のディレクトリ ツリーはともに表示または非表示である必要が"
@@ -8461,7 +8483,7 @@ msgstr "転送キューの表示を切り替える"
 msgid "Too long header line"
 msgstr "あまりにも長いヘッダー行"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:132
+#: ../../locales/../src/engine/http/filetransfer.cpp:137
 msgid "Too many redirects"
 msgstr "リダイレクトが多すぎます"
 
@@ -8471,8 +8493,8 @@ msgstr "リダイレクトが多すぎます"
 msgid "Trace:"
 msgstr "トレース:"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1902
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1922
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1680
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1700
 msgid "Transfer"
 msgstr "転送"
 
@@ -8488,7 +8510,7 @@ msgstr "転送形式(&T)"
 msgid "Transfer Mode"
 msgstr "転送モード"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1480
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:160
 msgid "Transfer Queue"
 msgstr "転送キュー"
 
@@ -8511,11 +8533,11 @@ msgstr "転送したデータは失われました。"
 msgid "Transferring"
 msgstr "転送中"
 
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:99
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:103
 msgid "Transfers"
 msgstr "転送"
 
-#: ../../locales/../src/interface/QueueView.cpp:2655
+#: ../../locales/../src/interface/QueueView.cpp:2685
 msgid "Transfers finished"
 msgstr "転送完了"
 
@@ -8574,13 +8596,13 @@ msgstr "アップロード(&P)"
 msgid "U&pload limit:"
 msgstr "アップロード制限(&P):"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:2032
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1810
 msgid "U&se filetype associations if available"
 msgstr "可能ならファイルの関連付けを使用(&S)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1625
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1403
 msgid "U&se system defaults for current language"
-msgstr "既定のシステム言語を使用(&S)"
+msgstr "システムのデフォルト言語を使用(&S)"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:464
 msgid "USER@&HOST"
@@ -8676,7 +8698,7 @@ msgstr ""
 msgid "Unsupported certificate type"
 msgstr "サポートされていない証明書タイプ"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:137
+#: ../../locales/../src/engine/http/filetransfer.cpp:142
 msgid "Unsupported redirect"
 msgstr "サポートされていないリダイレクト"
 
@@ -8685,7 +8707,7 @@ msgid "Up&load and unedit"
 msgstr "アップロードして編集中を解除(&L)"
 
 #: ../../locales/../src/interface/settings/optionspage_updatecheck.cpp:45
-#: ../../locales/../src/interface/settings/settingsdialog.cpp:112
+#: ../../locales/../src/interface/settings/settingsdialog.cpp:117
 msgid "Updates"
 msgstr "アップデート"
 
@@ -8697,12 +8719,12 @@ msgstr "アップロード"
 msgid "Upload failed"
 msgstr "アップロード失敗"
 
-#: ../../locales/../src/interface/statusbar.cpp:606
+#: ../../locales/../src/interface/statusbar.cpp:615
 #, c-format
 msgid "Upload limit: %s/s"
 msgstr "アップロード制限: %s/s"
 
-#: ../../locales/../src/interface/statusbar.cpp:609
+#: ../../locales/../src/interface/statusbar.cpp:618
 msgid "Upload limit: none"
 msgstr "アップロード制限: なし"
 
@@ -8711,11 +8733,11 @@ msgstr "アップロード制限: なし"
 msgid "Upload search results"
 msgstr "検索結果をアップロード"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:326
+#: ../../locales/../src/interface/LocalTreeView.cpp:1064
 msgid "Upload selected directory"
 msgstr "選択したディレクトリをアップロード"
 
-#: ../../locales/../src/interface/resources/xrc/menus.xrc:7
+#: ../../locales/../src/interface/LocalListView.cpp:788
 msgid "Upload selected files and directories"
 msgstr "選択したファイルとディレクトリをアップロード"
 
@@ -8747,7 +8769,7 @@ msgstr "アップロード/編集解除中"
 msgid "Use &custom charset"
 msgstr "カスタム文字コードを使用(&C)"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1996
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1774
 msgid "Use &custom editor:"
 msgstr "カスタム エディターを使用(&C):"
 
@@ -8775,7 +8797,7 @@ msgstr ""
 msgid "Use default action"
 msgstr "デフォルトのアクションを使用"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:154
+#: ../../locales/../src/interface/sitemanager_site.cpp:155
 msgid "Use explicit FTP over TLS if available"
 msgstr "使用可能なら明示的な FTP over TLS を使用"
 
@@ -8787,9 +8809,9 @@ msgstr "現在接続しているサーバーを使用"
 msgid "Use server from site manager"
 msgstr "サイト マネージャーからサーバーを選択"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1576
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1354
 msgid "Use system &defaults for current language"
-msgstr "既定のシステム言語を使用(&D)"
+msgstr "システムのデフォルト言語を使用(&D)"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:194
 msgid "Use the following IP address:"
@@ -8807,7 +8829,8 @@ msgstr "代わりにサーバーの外部 IP アドレスを使用"
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:359
 msgid ""
 "Use this if you're behind a router and have a static external IP address."
-msgstr "ルーターの下にいて静的な外部 IP アドレスを持つ場合はこれを使用します。"
+msgstr ""
+"ルーターの配下にありながら静的外部 IP アドレスを持っている場合に使用します。"
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:240
 msgid ""
@@ -8826,7 +8849,7 @@ msgid "User:"
 msgstr "ユーザー:"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:491
-#: ../../locales/../src/interface/sitemanager_site.cpp:568
+#: ../../locales/../src/interface/sitemanager_site.cpp:569
 msgid "Username cannot be a series of spaces"
 msgstr "ユーザー名は空白の連続であってはなりません"
 
@@ -8862,7 +8885,7 @@ msgstr ""
 "隠しオプションセットを表示しようとしましたが、サーバーにサポートされていませ"
 "ん"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1904
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1682
 msgid "View/Edit"
 msgstr "表示/編集"
 
@@ -8941,11 +8964,11 @@ msgstr ""
 "有効にすると、ファイルをダウンロードするときにファイル名に含まれるローカル オ"
 "ペレーティング システムでサポートされていない文字を置換します。"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1444
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:153
 msgid "When st&arting a new connection while already connected:"
 msgstr "接続済みの状態で新しく接続する場合:"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1361
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:134
 msgid "Widescreen"
 msgstr "ワイドスクリーン"
 
@@ -9002,7 +9025,7 @@ msgstr "最新版の FileZilla を使用しています。"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3806
 msgid "You can always open this dialog again through the help menu."
-msgstr "このダイアログはいつでもヘルプ メニューから開くことができます。"
+msgstr "このダイアログはいつでも [ヘルプ] メニューから開くことができます。"
 
 #: ../../locales/../src/interface/resources/xrc/update.xrc:166
 #: ../../locales/../src/interface/resources/xrc/update.xrc:246
@@ -9019,7 +9042,7 @@ msgid ""
 "have."
 msgstr "任意の位置で x を使用することで、元のパーミッションを維持できます。"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:611
+#: ../../locales/../src/interface/sitemanager_site.cpp:612
 msgid ""
 "You cannot change password and encryption key individually if using a master "
 "password."
@@ -9059,7 +9082,7 @@ msgid ""
 "continue?"
 msgstr "10 個以上のファイルを選択していますが、本当に編集しますか?"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1820
+#: ../../locales/../src/interface/LocalListView.cpp:1837
 #: ../../locales/../src/interface/search.cpp:1489
 msgid ""
 "You have selected more than 10 files or directories to open, do you really "
@@ -9067,11 +9090,11 @@ msgid ""
 msgstr "10 個以上のファイル/ディレクトリを選択していますが、本当に開きますか?"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:407
-#: ../../locales/../src/interface/sitemanager_site.cpp:476
+#: ../../locales/../src/interface/sitemanager_site.cpp:477
 msgid "You have to enter a hostname."
 msgstr "ホスト名を入力する必要があります。"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:586
+#: ../../locales/../src/interface/sitemanager_site.cpp:587
 msgid "You have to enter a key file path"
 msgstr "鍵ファイルのパスを入力する必要があります。"
 
@@ -9088,7 +9111,7 @@ msgstr "リモート ディレクトリを入力する必要があります。"
 msgid "You have to enter a valid IPv4 address."
 msgstr "有効な IPv4 アドレスを入力する必要があります。"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:620
+#: ../../locales/../src/interface/sitemanager_site.cpp:621
 msgid "You have to enter a valid encryption key"
 msgstr "有効な暗号鍵を入力する必要があります。"
 
@@ -9097,12 +9120,12 @@ msgid "You have to enter a writable local directory."
 msgstr "書き込み可能なローカル ディレクトリを入力する必要があります。"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:502
-#: ../../locales/../src/interface/sitemanager_site.cpp:578
+#: ../../locales/../src/interface/sitemanager_site.cpp:579
 msgid "You have to enter an account name"
 msgstr "アカウント名を入力する必要があります。"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:476
-#: ../../locales/../src/interface/sitemanager_site.cpp:553
+#: ../../locales/../src/interface/sitemanager_site.cpp:554
 msgid "You have to specify a user name"
 msgstr "ユーザー名を明確にする必要があります。"
 
@@ -9113,7 +9136,7 @@ msgid ""
 msgstr ""
 "転送されたデータを誤って変更したルーター/ファイアウォールがあるようです。"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:210
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:135
 msgid "You need to enter a master password."
 msgstr "マスター パスワードを入力する必要があります。"
 
@@ -9127,7 +9150,7 @@ msgstr "ログ ファイルの名前を入力する必要があります。"
 
 #: ../../locales/../src/interface/edithandler.cpp:1524
 msgid "You need to enter a properly quoted command."
-msgstr "適切に引用符で囲まれたコマンドを入力する必要があります。"
+msgstr "引用符で適切に囲まれたコマンドを入力する必要があります。"
 
 #: ../../locales/../src/interface/settings/optionspage_ftpproxy.cpp:82
 #: ../../locales/../src/interface/settings/optionspage_proxy.cpp:79
@@ -9138,7 +9161,7 @@ msgstr "プロキシのホストを入力する必要があります。"
 msgid "You need to enter a proxy port in the range from 1 to 65535"
 msgstr "プロキシ ポートを 1 から 65535 の範囲で入力する必要があります"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:661
+#: ../../locales/../src/interface/sitemanager_site.cpp:662
 msgid "You need to enter a value."
 msgstr "値を入力する必要があります。"
 
@@ -9160,7 +9183,7 @@ msgstr ""
 "このブックマークで同期ブラウジングを有効にするにはローカル パスとリモート パ"
 "スの両方を入力する必要があります。"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:645
+#: ../../locales/../src/interface/sitemanager_site.cpp:646
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
 "browsing for this site."
@@ -9200,7 +9223,7 @@ msgstr ""
 "他のサーバーへの接続に問題がないようでしたら、ファイル転送は適切に動作してい"
 "ます。"
 
-#: ../../locales/../src/interface/QueueView.cpp:2780
+#: ../../locales/../src/interface/QueueView.cpp:2811
 msgid "Your computer will suspend unless you click Cancel."
 msgstr "キャンセルをクリックしない場合はサスペンドします。"
 
@@ -9281,7 +9304,7 @@ msgstr "fzsftp を起動できませんでした"
 msgid "fzstorj belongs to a different version of FileZilla"
 msgstr "fzstorj は異なるバージョンの FileZilla に属しています"
 
-#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:337
+#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:336
 msgid "fzstorj could not be started"
 msgstr "fzstorj を起動できませんでした"
 
@@ -9320,7 +9343,7 @@ msgstr "グループは読み取り可能"
 msgid "group writeable"
 msgstr "グループは書き込み可能"
 
-#: ../../locales/../src/interface/resources/xrc/settings.xrc:1670
+#: ../../locales/../src/interface/resources/xrc/settings.xrc:1448
 msgid "https://wiki.filezilla-project.org/Date_and_Time_formatting"
 msgstr "https://wiki.filezilla-project.org/Date_and_Time_formatting"
 
