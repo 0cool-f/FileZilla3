@@ -28,7 +28,7 @@ int CStorjDeleteOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case delete_delete:
 		if (files_.empty()) {
-			return FZ_REPLY_OK;
+			return deleteFailed_ ? FZ_REPLY_ERROR : FZ_REPLY_OK;
 		}
 
 		std::wstring const& file = files_.front();
