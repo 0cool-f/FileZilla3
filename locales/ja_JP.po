@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: FileZilla 3.35.0\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
 "POT-Creation-Date: 2018-07-20 14:07+0200\n"
-"PO-Revision-Date: 2018-07-16 21:21+0900\n"
+"PO-Revision-Date: 2018-07-21 12:30+0900\n"
 "Last-Translator: Rukoto Luther <rukotolucies@hotmail.com>\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -1369,7 +1369,6 @@ msgstr ""
 "以降このセッションでは警告を表示しません。"
 
 #: ../../locales/../src/interface/settings/optionspage_passwords.cpp:167
-#, fuzzy
 msgid ""
 "A lost master password cannot be recovered! Please thoroughly memorize your "
 "password."

@@ -1396,7 +1396,6 @@ msgstr ""
 "Aucun avertissement ne sera affiché durant cette session."
 
 #: ../../locales/../src/interface/settings/optionspage_passwords.cpp:167
-#, fuzzy
 msgid ""
 "A lost master password cannot be recovered! Please thoroughly memorize your "
 "password."
@@ -5532,7 +5531,7 @@ msgstr "Journal des événements"
 
 #: ../../locales/../src/interface/settings/optionspage_interface.cpp:130
 msgid "Message log positio&n:"
-msgstr "Emplacement du journal des évé&nements :"
+msgstr "Emplacement du journal des événeme&nts :"
 
 #: ../../locales/../src/engine/socket.cpp:1084
 msgid "Message too large"
