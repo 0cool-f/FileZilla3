@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.35.0 (2018-07-23)
+
++ Improved appearance of activity indicators, sort direction indicators, and quick search panel buttons on high-DPI displays
+
 3.35.0-rc2 (2018-07-17)
 
 - OS X: Fix dependency problem in build system
