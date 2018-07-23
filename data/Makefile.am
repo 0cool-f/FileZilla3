@@ -1,5 +1,6 @@
 dist_noinst_DATA = install.nsi.in \
 		dllcopy.sh \
+		dylibcopy.sh \
 		makezip.sh.in \
 		nsis_appid.dll \
 		nsis_appid.txt \
