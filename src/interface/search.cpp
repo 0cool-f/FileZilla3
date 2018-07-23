@@ -821,7 +821,7 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 
 	bool const localSearch = m_results->mode_ == search_mode::local;
 
-	bool const connected = !m_state.IsRemoteIdle() || !m_state.IsRemoteConnected();
+	bool const connected = m_state.IsRemoteIdle() && m_state.IsRemoteConnected();
 
 	wxMenu menu;
 	if (localSearch) {
