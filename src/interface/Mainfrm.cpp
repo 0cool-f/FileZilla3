@@ -2496,7 +2496,7 @@ void CMainFrame::ProcessCommandLine()
 	}
 
 	std::wstring local;
-	if ((local = !pCommandLine->GetOption(CCommandLine::local)).empty()) {
+	if (!(local = pCommandLine->GetOption(CCommandLine::local)).empty()) {
 
 		if (!wxDir::Exists(local)) {
 			wxString str = _("Path not found:");
@@ -2517,7 +2517,7 @@ void CMainFrame::ProcessCommandLine()
 			OpenSiteManager();
 		}
 	}
-	else if ((site = !pCommandLine->GetOption(CCommandLine::site)).empty()) {
+	else if (!(site = pCommandLine->GetOption(CCommandLine::site)).empty()) {
 		auto const data = CSiteManager::GetSiteByPath(site);
 
 		if (data.first) {
