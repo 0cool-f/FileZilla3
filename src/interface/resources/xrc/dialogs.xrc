@@ -3882,7 +3882,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>A lost master password cannot be recovered! Please thorougly memorize your password.</label>
+              <label>A lost master password cannot be recovered! Please thoroughly memorize your password.</label>
             </object>
             <border>10d</border>
             <flag>wxLEFT</flag>
