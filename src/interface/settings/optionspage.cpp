@@ -3,10 +3,6 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 
-wxSizerFlags const COptionsPage::grow(wxSizerFlags().Expand());
-wxSizerFlags const COptionsPage::valign(wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
-wxSizerFlags const COptionsPage::valigng(wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Expand());
-
 bool COptionsPage::CreatePage(COptions* pOptions, CSettingsDialog* pOwner, wxWindow* parent, wxSize& maxSize)
 {
 	m_pOwner = pOwner;

@@ -8,6 +8,8 @@
 #include "osx_sandbox_userdirs.h"
 #endif
 #include <wx/hyperlink.h>
+#include <wx/statbmp.h>
+#include <wx/statline.h>
 
 BEGIN_EVENT_TABLE(CWelcomeDialog, wxDialogEx)
 EVT_TIMER(wxID_ANY, CWelcomeDialog::OnTimer)
@@ -47,33 +49,79 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 		}
 	}
 
-	if (!Load(parent, _T("ID_WELCOME"))) {
-		return false;
-	}
 
-	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::GetIconSize(iconSizeLarge));
-	xrc_call(*this, "ID_FILEZILLA_LOGO", &wxStaticBitmap::SetBitmap, bmp);
+	Create(parent, -1, _("Welcome to FileZilla"));
 
-	InitFooter(force ? wxString() : resources);
+	auto const& lay = layout();
+	auto outer = new wxBoxSizer(wxVERTICAL);
+	SetSizer(outer);
 
-	xrc_call(*this, "ID_FZVERSION", &wxStaticText::SetLabel, _T("FileZilla ") + CBuildInfo::GetVersion());
+	auto main = lay.createFlex(1);
+	outer->Add(main, 0, wxALL, lay.border);
 
+
+	auto header = new wxBoxSizer(wxHORIZONTAL);
+	main->Add(header, lay.grow);
+
+	auto headerLeft = lay.createFlex(1);
+	header->Add(headerLeft, lay.valign)->SetProportion(1);
+
+	auto heading = new wxStaticText(this, -1, _T("FileZilla ") + CBuildInfo::GetVersion());
+	heading->SetFont(heading->GetFont().Bold());
+	headerLeft->Add(heading);
+	headerLeft->Add(new wxStaticText(this, -1, _("The free open source FTP solution")));
+
+	header->AddSpacer(wxDLG_UNIT(this, wxSize(10, -1)).x);
+
+	header->Add(new wxStaticBitmap(this, -1, CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::GetIconSize(iconSizeLarge))), lay.valign);
+
+	main->Add(new wxStaticLine(this), lay.grow);
+
+	int const leftIndent = wxDLG_UNIT(this, wxPoint(10, 0)).x;
 	wxString const url = _T("https://welcome.filezilla-project.org/welcome?type=client&category=%s&version=") + ownVersion;
 
+	main->Add(new wxPanel(this, XRCID("ID_HEADERMESSAGE_PANEL")), lay.halign)->Show(false);
+
 	if (!greetingVersion.empty()) {
-		xrc_call(*this, "ID_LINK_NEWS", &wxHyperlinkCtrl::SetURL, wxString::Format(url, _T("news")) + _T("&oldversion=") + greetingVersion);
-		xrc_call(*this, "ID_LINK_NEWS", &wxHyperlinkCtrl::SetLabel, wxString::Format(_("New features and improvements in %s"), CBuildInfo::GetVersion()));
-	}
-	else {
-		xrc_call(*this, "ID_LINK_NEWS", &wxHyperlinkCtrl::Hide);
-		xrc_call(*this, "ID_HEADING_NEWS", &wxStaticText::Hide);
+		auto news = new wxStaticText(this, -1, _("What's new"));
+		news->SetFont(news->GetFont().Bold());
+		main->Add(news);
+		main->Add(new wxHyperlinkCtrl(this, -1, wxString::Format(_("New features and improvements in %s"), CBuildInfo::GetVersion()), wxString::Format(url, _T("news")) + _T("&oldversion=") + greetingVersion), 0, wxLEFT, leftIndent);
 	}
 
-	xrc_call(*this, "ID_DOCUMENTATION_BASIC", &wxHyperlinkCtrl::SetURL, wxString::Format(url, _T("documentation_basic")));
-	xrc_call(*this, "ID_DOCUMENTATION_NETWORK", &wxHyperlinkCtrl::SetURL, wxString::Format(url, _T("documentation_network")));
-	xrc_call(*this, "ID_DOCUMENTATION_MORE", &wxHyperlinkCtrl::SetURL, wxString::Format(url, _T("documentation_more")));
-	xrc_call(*this, "ID_SUPPORT_FORUM", &wxHyperlinkCtrl::SetURL, wxString::Format(url, _T("support_forum")));
-	xrc_call(*this, "ID_SUPPORT_MORE", &wxHyperlinkCtrl::SetURL, wxString::Format(url, _T("support_more")));
+	main->AddSpacer(0);
+
+	auto helpHeading = new wxStaticText(this, -1, _("Getting help"));
+	helpHeading->SetFont(helpHeading->GetFont().Bold());
+	main->Add(helpHeading);
+	
+	main->Add(new wxHyperlinkCtrl(this, -1, _("Asking questions in the FileZilla Forums"), wxString::Format(url, _T("support_forum"))), 0, wxLEFT, leftIndent);
+	main->Add(new wxHyperlinkCtrl(this, -1, _("Reporting bugs and feature requests"), wxString::Format(url, _T("support_more"))), 0, wxLEFT, leftIndent);
+
+	main->AddSpacer(0);
+
+	auto documentationHeading = new wxStaticText(this, -1, _("Documentation"));
+	documentationHeading->SetFont(helpHeading->GetFont().Bold());
+	main->Add(documentationHeading);
+
+	main->Add(new wxHyperlinkCtrl(this, -1, _("Basic usage instructions"), wxString::Format(url, _T("documentation_basic"))), 0, wxLEFT, leftIndent);
+	main->Add(new wxHyperlinkCtrl(this, -1, _("Configuring FileZilla and your network"), wxString::Format(url, _T("documentation_network"))), 0, wxLEFT, leftIndent);
+	main->Add(new wxHyperlinkCtrl(this, -1, _("Further documentation"), wxString::Format(url, _T("documentation_more"))), 0, wxLEFT, leftIndent);
+
+	main->Add(new wxStaticText(this, -1, _("You can always open this dialog again through the help menu.")));
+
+	main->Add(new wxPanel(this, XRCID("ID_FOOTERMESSAGE_PANEL")), lay.halign)->Show(false);
+
+	auto buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, XRCID("wxID_OK"), _("OK"));
+	ok->SetFocus();
+	buttons->AddButton(ok);
+	ok->SetDefault();
+
+	buttons->Realize();
+
+	InitFooter(force ? wxString() : resources);
 
 	Layout();
 

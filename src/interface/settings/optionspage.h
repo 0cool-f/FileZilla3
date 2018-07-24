@@ -57,10 +57,6 @@ protected:
 	CSettingsDialog* m_pOwner{};
 
 	bool m_was_selected{};
-
-	static wxSizerFlags const grow;
-	static wxSizerFlags const valign;
-	static wxSizerFlags const valigng;
 };
 
 #endif

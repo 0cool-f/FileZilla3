@@ -3,6 +3,26 @@
 
 #include "wrapengine.h"
 
+struct DialogLayout final
+{
+public:
+	int gap{};
+	int border{};
+
+	static wxSizerFlags const grow;
+	static wxSizerFlags const halign;
+	static wxSizerFlags const valign;
+	static wxSizerFlags const valigng;
+
+	wxFlexGridSizer* createFlex(int cols, int rows = 0) const;
+	wxStdDialogButtonSizer* createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const;
+
+	DialogLayout(wxTopLevelWindow * parent);
+
+protected:
+	wxTopLevelWindow * parent_;
+};
+
 class wxDialogEx : public wxDialog, public CWrapEngine
 {
 public:
@@ -17,6 +37,9 @@ public:
 	bool ReplaceControl(wxWindow* old, wxWindow* wnd);
 
 	static bool CanShowPopupDialog();
+
+	DialogLayout const& layout();
+
 protected:
 	virtual void InitDialog();
 
@@ -29,6 +52,8 @@ protected:
 #endif
 
 	static int m_shown_dialogs;
+
+	std::unique_ptr<DialogLayout> layout_;
 };
 
 #endif

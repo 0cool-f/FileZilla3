@@ -2,6 +2,8 @@
 #include "dialogex.h"
 #include "msgbox.h"
 
+#include <wx/statline.h>
+
 #ifdef __WXMAC__
 #include "filezillaapp.h"
 #endif
@@ -179,4 +181,43 @@ void wxDialogEx::InitDialog()
 #endif
 
 	wxDialog::InitDialog();
+}
+
+
+DialogLayout const& wxDialogEx::layout()
+{
+	if (!layout_) {
+		layout_ = std::make_unique<DialogLayout>(this);
+	}
+
+	return *layout_;
+}
+
+wxSizerFlags const DialogLayout::grow(wxSizerFlags().Expand());
+wxSizerFlags const DialogLayout::valign(wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
+wxSizerFlags const DialogLayout::halign(wxSizerFlags().Align(wxALIGN_CENTER_HORIZONTAL));
+wxSizerFlags const DialogLayout::valigng(wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Expand());
+
+DialogLayout::DialogLayout(wxTopLevelWindow * parent)
+	: parent_(parent)
+{
+	gap = wxDLG_UNIT(parent_, wxPoint(0, 3)).y;
+	border = wxDLG_UNIT(parent_, wxPoint(0, 3)).y;
+}
+
+wxFlexGridSizer* DialogLayout::createFlex(int cols, int rows) const
+{
+	int const g = gap;
+	return new wxFlexGridSizer(rows, cols, g, g);
+}
+
+wxStdDialogButtonSizer * DialogLayout::createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const
+{
+	if (hline) {
+		sizer->Add(new wxStaticLine(parent), grow);
+	}
+	auto btns = new wxStdDialogButtonSizer();
+	sizer->Add(btns, grow);
+
+	return btns;
 }

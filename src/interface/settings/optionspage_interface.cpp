@@ -110,38 +110,40 @@ void COptionsPageInterface::OnLayoutChange(wxCommandEvent&)
 
 bool COptionsPageInterface::CreateControls(wxWindow* parent)
 {
+	auto const& layout = m_pOwner->layout();
+
 	Create(parent);
 	auto outer = new wxBoxSizer(wxVERTICAL);
 
 	auto boxSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Layout"));
-	outer->Add(boxSizer, grow);
+	outer->Add(boxSizer, layout.grow);
 	auto box = boxSizer->GetStaticBox();
 
-	auto layout = new wxFlexGridSizer(1, wxDLG_UNIT(this, wxSize(3, 3)));
-	boxSizer->Add(layout, 0, wxALL, wxDLG_UNIT(this, wxSize(3, 3)).y);
-	auto innerLayout = new wxFlexGridSizer(2, wxDLG_UNIT(this, wxSize(3, 3)));
-	layout->Add(innerLayout);
-	innerLayout->Add(new wxStaticText(box, -1, _("&Layout of file and directory panes:")), valign);
+	auto layoutSizer = layout.createFlex(1);
+	boxSizer->Add(layoutSizer, 0, wxALL, layout.border);
+	auto innerlayoutSizer = layout.createFlex(2);
+	layoutSizer->Add(innerlayoutSizer);
+	innerlayoutSizer->Add(new wxStaticText(box, -1, _("&Layout of file and directory panes:")), layout.valign);
 	auto choice = new wxChoice(box, XRCID("ID_MESSAGELOGPOS"));
 	choice->Append(_("Above the file lists"));
 	choice->Append(_("Next to the transfer queue"));
 	choice->Append(_("As tab in the transfer queue pane"));
-	innerLayout->Add(choice, valign);
-	innerLayout->Add(new wxStaticText(box, -1, _("Message log positio&n:")), valign);
+	innerlayoutSizer->Add(choice, layout.valign);
+	innerlayoutSizer->Add(new wxStaticText(box, -1, _("Message log positio&n:")), layout.valign);
 	choice = new wxChoice(box, XRCID("ID_FILEPANELAYOUT"));
 	choice->Append(_("Classic"));
 	choice->Append(_("Explorer"));
 	choice->Append(_("Widescreen"));
 	choice->Append(_("Blackboard"));
-	innerLayout->Add(choice, valign);
-	layout->Add(new wxCheckBox(box, XRCID("ID_FILEPANESWAP"), _("&Swap local and remote panes")));
+	innerlayoutSizer->Add(choice, layout.valign);
+	layoutSizer->Add(new wxCheckBox(box, XRCID("ID_FILEPANESWAP"), _("&Swap local and remote panes")));
 
 	boxSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Behaviour"));
-	outer->Add(boxSizer, grow);
+	outer->Add(boxSizer, layout.grow);
 	box = boxSizer->GetStaticBox();
 
-	auto behaviour = new wxFlexGridSizer(1, wxDLG_UNIT(this, wxSize(3, 3)));
-	boxSizer->Add(behaviour, 0, wxALL, wxDLG_UNIT(this, wxSize(3, 3)).y);
+	auto behaviour = layout.createFlex(1);
+	boxSizer->Add(behaviour, 0, wxALL, layout.border);
 	behaviour->Add(new wxCheckBox(box, XRCID("ID_MINIMIZE_TRAY"), _("&Minimize to tray")));
 	behaviour->Add(new wxCheckBox(box, XRCID("ID_PREVENT_IDLESLEEP"), _("P&revent system from entering idle sleep during transfers and other operations")));
 	behaviour->AddSpacer(0);
@@ -158,9 +160,9 @@ bool COptionsPageInterface::CreateControls(wxWindow* parent)
 	behaviour->Add(choice);
 
 	boxSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Transfer Queue"));
-	outer->Add(boxSizer, grow);
+	outer->Add(boxSizer, layout.grow);
 	box = boxSizer->GetStaticBox();
-	boxSizer->Add(new wxCheckBox(box, XRCID("ID_SPEED_DISPLAY"), _("&Display momentary transfer speed instead of average speed")), 0, wxALL, wxDLG_UNIT(this, wxSize(0, 3)).y);
+	boxSizer->Add(new wxCheckBox(box, XRCID("ID_SPEED_DISPLAY"), _("&Display momentary transfer speed instead of average speed")), 0, wxALL, layout.border);
 
 	SetSizer(outer);
 

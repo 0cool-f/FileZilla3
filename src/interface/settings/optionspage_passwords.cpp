@@ -144,30 +144,32 @@ bool COptionsPagePasswords::Validate()
 
 bool COptionsPagePasswords::CreateControls(wxWindow* parent)
 {
+	auto const& layout = m_pOwner->layout();
+
 	Create(parent);
 	auto boxSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Passwords"));
 	auto box = boxSizer->GetStaticBox();
-	auto sizer = new wxFlexGridSizer(1, wxDLG_UNIT(this, wxSize(0, 3)));
+	auto sizer = layout.createFlex(1);
 	sizer->AddGrowableCol(0);
-	boxSizer->Add(sizer, 0, wxGROW|wxALL, wxDLG_UNIT(this, wxSize(0, 3)).y);
+	boxSizer->Add(sizer, 0, wxGROW|wxALL, layout.border);
 
 	sizer->Add(new wxRadioButton(box, XRCID("ID_PASSWORDS_SAVE"), _("Sav&e passwords"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
 	sizer->Add(new wxRadioButton(box, XRCID("ID_PASSWORDS_NOSAVE"), _("D&o not save passwords")));
 	sizer->Add(new wxRadioButton(box, XRCID("ID_PASSWORDS_USEMASTERPASSWORD"), _("Sa&ve passwords protected by a master password")));
 
-	auto changeSizer = new wxFlexGridSizer(2, wxDLG_UNIT(this, wxSize(3, 3)));
+	auto changeSizer = layout.createFlex(2);
 	changeSizer->AddGrowableCol(1);
-	changeSizer->Add(new wxStaticText(box, -1, _("Master password:")), valign);
+	changeSizer->Add(new wxStaticText(box, -1, _("Master password:")), layout.valign);
 	auto pw = new wxTextCtrl(box, XRCID("ID_MASTERPASSWORD"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	changeSizer->Add(pw, valigng);
-	changeSizer->Add(new wxStaticText(box, -1, _("Repeat password:")), valign);
-	changeSizer->Add(new wxTextCtrl(box, XRCID("ID_MASTERPASSWORD_REPEAT"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), valigng);
+	changeSizer->Add(pw, layout.valigng);
+	changeSizer->Add(new wxStaticText(box, -1, _("Repeat password:")), layout.valign);
+	changeSizer->Add(new wxTextCtrl(box, XRCID("ID_MASTERPASSWORD_REPEAT"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), layout.valigng);
 
 	sizer->Add(changeSizer, 0, wxGROW|wxLEFT, wxDLG_UNIT(this, wxSize(0, 10)).y);
 	sizer->Add(new wxStaticText(box, -1, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, wxDLG_UNIT(this, wxSize(0, 10)).y);
 
 	auto outer = new wxBoxSizer(wxVERTICAL);
-	outer->Add(boxSizer, grow);
+	outer->Add(boxSizer, layout.grow);
 	SetSizer(outer);
 
 	return true;

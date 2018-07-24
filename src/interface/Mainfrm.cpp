@@ -263,7 +263,7 @@ void ShowStorjOverlay(wxWindow* parent, wxWindow* anchor, wxPoint const& offset)
 	auto p = new OverlayWindow(parent);
 
 	auto box = new wxBoxSizer(wxVERTICAL);
-	auto sizer = new wxFlexGridSizer(1, wxSize(5, 5));
+	auto sizer = layout::createFlex(1);
 	box->Add(sizer, 0, wxALL, 7);
 
 	p->SetSizer(box);

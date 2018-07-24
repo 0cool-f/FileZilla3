@@ -1,5 +1,6 @@
 #include <filezilla.h>
 #include "conditionaldialog.h"
+#include "dialogex.h"
 #include "filezillaapp.h"
 #include "wrapengine.h"
 #include "Options.h"
@@ -11,6 +12,8 @@ END_EVENT_TABLE()
 CConditionalDialog::CConditionalDialog(wxWindow* parent, DialogType type, Modes mode, bool checked)
 	: wxDialog(parent, wxID_ANY, wxString(), wxDefaultPosition), m_type(type)
 {
+	DialogLayout layout(this);
+
 	wxSizer* pVertSizer = new wxBoxSizer(wxVERTICAL);
 
 	wxSizer* pMainSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -19,7 +22,7 @@ CConditionalDialog::CConditionalDialog(wxWindow* parent, DialogType type, Modes 
 	pMainSizer->AddSpacer(5);
 	wxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
 	pMainSizer->Add(pSizer, 0, wxALL, 5);
-	m_pTextSizer = new wxFlexGridSizer(1, 5, 6);
+	m_pTextSizer = layout.createFlex(1);
 	pSizer->Add(m_pTextSizer, 0, wxTOP, 5);
 
 	wxCheckBox *pCheckBox = new wxCheckBox(this, wxID_HIGHEST + 1, _("&Don't show this dialog again."));
