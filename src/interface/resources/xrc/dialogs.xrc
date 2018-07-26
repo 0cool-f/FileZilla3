@@ -3826,7 +3826,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>When allowing FileZilla to remember passwords, you can reconnnect without having to re-enter a password after restarting FileZilla.</label>
+              <label>When allowing FileZilla to remember passwords, you can reconnect without having to re-enter a password after restarting FileZilla.</label>
             </object>
           </object>
           <object class="spacer"/>
