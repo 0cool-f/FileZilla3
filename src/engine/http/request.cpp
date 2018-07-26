@@ -251,7 +251,7 @@ int CHttpRequestOpData::Send()
 
 				req.flags_ |= HttpRequest::flag_sent_body;
 
-				MessageType::Debug_Verbose;
+				sendLogLevel_ = MessageType::Debug_Verbose;
 
 				opState &= ~request_send;
 				++send_pos_;
