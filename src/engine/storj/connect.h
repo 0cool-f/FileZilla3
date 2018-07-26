@@ -18,7 +18,7 @@ class CStorjConnectOpData final : public COpData, public CStorjOpData
 {
 public:
 	CStorjConnectOpData(CStorjControlSocket & controlSocket, Credentials const& credentials)
-		: COpData(Command::connect)
+		: COpData(Command::connect, L"CStorjConnectOpData")
 		, CStorjOpData(controlSocket)
 		, credentials_(credentials)
 	{}

@@ -7,7 +7,7 @@ class CStorjFileTransferOpData final : public CFileTransferOpData, public CStorj
 {
 public:
 	CStorjFileTransferOpData(CStorjControlSocket & controlSocket, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
-		: CFileTransferOpData(is_download, local_file, remote_file, remote_path, settings)
+		: CFileTransferOpData(L"CStorjFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
 		, CStorjOpData(controlSocket)
 	{
 	}

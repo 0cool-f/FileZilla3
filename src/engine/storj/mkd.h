@@ -7,7 +7,8 @@ class CStorjMkdirOpData final : public CMkdirOpData, public CStorjOpData
 {
 public:
 	CStorjMkdirOpData(CStorjControlSocket & controlSocket)
-		: CStorjOpData(controlSocket)
+		: CMkdirOpData(L"CStorjMkdirOpData")
+		, CStorjOpData(controlSocket)
 	{}
 
 	virtual int Send() override;

@@ -7,7 +7,7 @@ class CStorjResolveOpData final : public COpData, public CStorjOpData
 {
 public:
 	CStorjResolveOpData(CStorjControlSocket & controlSocket, CServerPath const& path, std::wstring const& file, std::wstring & bucket, std::wstring * fileId, bool ignore_missing_file)
-		: COpData(PrivCommand::resolve)
+		: COpData(PrivCommand::resolve, L"CStorjResolveOpData")
 		, CStorjOpData(controlSocket)
 		, path_(path)
 		, file_(file)
@@ -18,7 +18,7 @@ public:
 	}
 
 	virtual int Send() override;
-	virtual int ParseResponse() override;
+	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
 	virtual int SubcommandResult(int prevResult, COpData const& previousOperation) override;
 
 private:
@@ -34,7 +34,7 @@ class CStorjResolveManyOpData final : public COpData, public CStorjOpData
 {
 public:
 	CStorjResolveManyOpData(CStorjControlSocket & controlSocket, CServerPath const& path, std::deque<std::wstring> const& files, std::wstring & bucket, std::deque<std::wstring> & fileIds)
-		: COpData(PrivCommand::resolve)
+		: COpData(PrivCommand::resolve, L"CStorjResolveManyOpData")
 		, CStorjOpData(controlSocket)
 		, path_(path)
 		, files_(files)
@@ -44,7 +44,7 @@ public:
 	}
 
 	virtual int Send() override;
-	virtual int ParseResponse() override;
+	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
 	virtual int SubcommandResult(int prevResult, COpData const& previousOperation) override;
 
 private:

@@ -6,8 +6,6 @@
 
 int CFtpRawCommandOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRawCommandOpData::Send() in state %d", opState);
-
 	engine_.GetDirectoryCache().InvalidateServer(currentServer_);
 	engine_.GetPathCache().InvalidateServer(currentServer_);
 	currentPath_.clear();
@@ -19,8 +17,6 @@ int CFtpRawCommandOpData::Send()
 
 int CFtpRawCommandOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRawCommandOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	if (code == 2 || code == 3) {
 		return FZ_REPLY_OK;

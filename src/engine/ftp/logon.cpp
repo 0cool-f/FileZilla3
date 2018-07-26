@@ -6,7 +6,7 @@
 #include "../tlssocket.h"
 
 CFtpLogonOpData::CFtpLogonOpData(CFtpControlSocket& controlSocket, Credentials const& credentials)
-    : COpData(Command::connect)
+    : COpData(Command::connect, L"CFtpLogonOpData")
 	, CFtpOpData(controlSocket)
 	, credentials_(credentials)
 {
@@ -38,8 +38,6 @@ CFtpLogonOpData::CFtpLogonOpData(CFtpControlSocket& controlSocket, Credentials c
 
 int CFtpLogonOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpLogonOpData::Send() in state %d", opState);
-
 	switch (opState)
 	{
 	case LOGON_CONNECT:
@@ -214,8 +212,6 @@ int CFtpLogonOpData::Send()
 
 int CFtpLogonOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpLogonOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	std::wstring const& response = controlSocket_.m_Response;
 

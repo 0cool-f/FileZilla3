@@ -16,8 +16,6 @@ enum FileTransferStates
 
 int CStorjFileTransferOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjFileTransferOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case filetransfer_init:
 		if (localFile_.empty()) {
@@ -107,20 +105,16 @@ int CStorjFileTransferOpData::Send()
 
 int CStorjFileTransferOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjFileTransferOpData::ParseResponse() in state %d", opState);
-
 	if (opState == filetransfer_transfer) {
 		return controlSocket_.result_;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"FileTransferParseResponse called at improper time: %d", opState);
+	LogMessage(MessageType::Debug_Warning, L"CStorjFileTransferOpData::ParseResponse called at improper time: %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
 int CStorjFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjFileTransferOpData::SubcommandResult() in state %d", opState);
-
 	switch (opState) {
 	case filetransfer_resolve:
 

@@ -12,8 +12,6 @@ enum rmdStates
 
 int CFtpDeleteOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpDeleteOpData::Send() in state %d", opState);
-
 	if (opState == del_init) {
 		controlSocket_.ChangeDir(path_);
 		opState = del_waitcwd;
@@ -43,8 +41,6 @@ int CFtpDeleteOpData::Send()
 
 int CFtpDeleteOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpDeleteOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	if (code != 2 && code != 3) {
 		deleteFailed_ = true;
@@ -76,8 +72,6 @@ int CFtpDeleteOpData::ParseResponse()
 
 int CFtpDeleteOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpDeleteOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == del_waitcwd) {
 		opState = del_del;
 
@@ -95,8 +89,6 @@ int CFtpDeleteOpData::SubcommandResult(int prevResult, COpData const&)
 
 int CFtpDeleteOpData::Reset(int result)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpDeleteOpData::Reset(%d) in state %d", result, opState);
-
 	if (needSendListing_ && !(result & FZ_REPLY_DISCONNECTED)) {
 		controlSocket_.SendDirectoryListingNotification(path_, false, false);
 	}

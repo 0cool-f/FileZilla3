@@ -17,8 +17,6 @@ enum filetransferStates
 
 int CSftpFileTransferOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpFileTransferOpData::Send() in state %d", opState);
-	
 	if (opState == filetransfer_init) {
 
 		if (localFile_.empty()) {
@@ -134,8 +132,6 @@ int CSftpFileTransferOpData::Send()
 
 int CSftpFileTransferOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpFileTransferOpData::ParseResponse() in state %d", opState);
-
 	if (opState == filetransfer_transfer) {
 		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS)) {
 			if (download_) {
@@ -198,8 +194,6 @@ int CSftpFileTransferOpData::ParseResponse()
 
 int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpFileTransferOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == filetransfer_waitcwd) {
 		if (prevResult == FZ_REPLY_OK) {
 			CDirentry entry;

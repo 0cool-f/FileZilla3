@@ -14,8 +14,6 @@ enum mkdStates
 
 int CSftpMkdirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpMkdirOpData::Send() in state %d", opState);
-	
 	if (!holdsLock_) {
 		if (!controlSocket_.TryLock(locking_reason::mkdir, path_)) {
 			return FZ_REPLY_WOULDBLOCK;
@@ -71,8 +69,6 @@ int CSftpMkdirOpData::Send()
 
 int CSftpMkdirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpMkdirOpData::ParseResponse() in state %d", opState);
-	
 	bool successful = controlSocket_.result_ == FZ_REPLY_OK;
 	switch (opState)
 	{

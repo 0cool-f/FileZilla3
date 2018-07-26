@@ -15,8 +15,6 @@ enum cwdStates
 
 int CFtpChangeDirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpChangeDirOpData::Send() in state %d", opState);
-
 	std::wstring cmd;
 	switch (opState)
 	{
@@ -110,8 +108,6 @@ int CFtpChangeDirOpData::Send()
 
 int CFtpChangeDirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpChangeDirOpData::ParseResponse() in state %d", opState);
-
 	std::wstring const& response = controlSocket_.m_Response;
 	int code = controlSocket_.GetReplyCode();
 

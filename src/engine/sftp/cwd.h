@@ -7,7 +7,8 @@ class CSftpChangeDirOpData final : public CChangeDirOpData, public CSftpOpData
 {
 public:
 	CSftpChangeDirOpData(CSftpControlSocket & controlSocket)
-		: CSftpOpData(controlSocket)
+		: CChangeDirOpData(L"CSftpChangeDirOpData")
+		, CSftpOpData(controlSocket)
 	{}
 
 	virtual int Send() override;
@@ -15,7 +16,6 @@ public:
 	
 	virtual int SubcommandResult(int, COpData const&) override
 	{
-		LogMessage(MessageType::Debug_Verbose, L"CSftpChangeDirOpData::SubcommandResult()");
 		return FZ_REPLY_CONTINUE;
 	}
 };

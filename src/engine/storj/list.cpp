@@ -13,8 +13,6 @@ enum listStates
 
 int CStorjListOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjListOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case list_init:
 		if (!subDir_.empty()) {
@@ -85,8 +83,6 @@ int CStorjListOpData::Send()
 
 int CStorjListOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjListOpData::ParseResponse() in state %d", opState);
-
 	if (opState == list_list) {
 		if (controlSocket_.result_ != FZ_REPLY_OK) {
 			return controlSocket_.result_;
@@ -103,14 +99,12 @@ int CStorjListOpData::ParseResponse()
 		return FZ_REPLY_OK;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"ListParseResponse called at improper time: %d", opState);
+	LogMessage(MessageType::Debug_Warning, L"CStorjListOpData::ParseResponse called at improper time: %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
 int CStorjListOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjListOpData::SubcommandResult() in state %d", opState);
-
 	if (prevResult != FZ_REPLY_OK) {
 		return prevResult;
 	}
@@ -134,7 +128,7 @@ int CStorjListOpData::SubcommandResult(int prevResult, COpData const&)
 int CStorjListOpData::ParseEntry(std::wstring && name, std::wstring const& size, std::wstring && id, std::wstring const& created)
 {
 	if (opState != list_list) {
-		LogMessage(MessageType::Debug_Warning, L"ListParseResponse called at improper time: %d", opState);
+		LogMessage(MessageType::Debug_Warning, L"CStorjListOpData::ParseEntry called at improper time: %d", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 

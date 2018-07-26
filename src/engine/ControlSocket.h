@@ -9,8 +9,9 @@
 class COpData
 {
 public:
-	explicit COpData(Command op_Id)
+	explicit COpData(Command op_Id, wchar_t const* name)
 		: opId(op_Id)
+		, name_(name)
 	{}
 
 	virtual ~COpData() = default;
@@ -37,6 +38,10 @@ public:
 
 	bool waitForAsyncRequest{};
 	bool holdsLock_{};
+
+	wchar_t const* const name_;
+
+	MessageType sendLogLevel_{MessageType::Debug_Verbose};
 };
 
 template<typename T>
@@ -68,36 +73,17 @@ class CNotSupportedOpData : public COpData
 {
 public:
 	CNotSupportedOpData()
-		: COpData(Command::none)
+		: COpData(Command::none, L"CNotSupportedOpData")
 	{}
 
 	virtual int Send() { return FZ_REPLY_NOTSUPPORTED; }
 	virtual int ParseResponse() { return FZ_REPLY_INTERNALERROR; }
 };
 
-class CConnectOpData : public COpData
-{
-public:
-	CConnectOpData(CServer const& server)
-		: COpData(Command::connect)
-		, server_(server)
-	{
-	}
-
-	// What to connect the socket to,
-	// can be different from server_ if using
-	// a proxy
-	std::wstring host_;
-	unsigned int port_{};
-
-	// Target server
-	CServer server_;
-};
-
 class CFileTransferOpData : public COpData
 {
 public:
-	CFileTransferOpData(bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings);
+	CFileTransferOpData(wchar_t const* name, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings);
 
 	// Transfer data
 	std::wstring localFile_, remoteFile_;
@@ -121,8 +107,8 @@ public:
 class CMkdirOpData : public COpData
 {
 public:
-	CMkdirOpData()
-		: COpData(Command::mkdir)
+	CMkdirOpData(wchar_t const* name)
+		: COpData(Command::mkdir, name)
 	{
 	}
 
@@ -135,8 +121,8 @@ public:
 class CChangeDirOpData : public COpData
 {
 public:
-	CChangeDirOpData()
-		: COpData(Command::cwd)
+	CChangeDirOpData(wchar_t const* name)
+		: COpData(Command::cwd, name)
 	{
 	}
 

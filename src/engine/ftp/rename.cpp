@@ -14,8 +14,6 @@ enum renameStates
 
 int CFtpRenameOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRenameOpData::Send() in state %d", opState);
-
 	switch (opState)
 	{
 	case rename_init:
@@ -51,8 +49,6 @@ int CFtpRenameOpData::Send()
 
 int CFtpRenameOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRenameOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	if (code != 2 && code != 3) {
 		return FZ_REPLY_ERROR;
@@ -79,8 +75,6 @@ int CFtpRenameOpData::ParseResponse()
 
 int CFtpRenameOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRenameOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == rename_waitcwd) {
 		if (prevResult != FZ_REPLY_OK) {
 			useAbsolute_ = true;

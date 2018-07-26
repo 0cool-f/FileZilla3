@@ -7,7 +7,7 @@ class CStorjRemoveDirOpData final : public COpData, public CStorjOpData
 {
 public:
 	CStorjRemoveDirOpData(CStorjControlSocket & controlSocket)
-		: COpData(Command::removedir)
+		: COpData(Command::removedir, L"CStorjRemoveDirOpData")
 		, CStorjOpData(controlSocket)
 	{}
 

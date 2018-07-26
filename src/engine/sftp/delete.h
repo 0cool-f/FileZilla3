@@ -7,7 +7,7 @@ class CSftpDeleteOpData final : public COpData, public CSftpOpData
 {
 public:
 	CSftpDeleteOpData(CSftpControlSocket & controlSocket)
-		: COpData(Command::del)
+		: COpData(Command::del, L"CSftpDeleteOpData")
 		, CSftpOpData(controlSocket)
 	{}
 

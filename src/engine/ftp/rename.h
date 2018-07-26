@@ -7,7 +7,7 @@ class CFtpRenameOpData final : public COpData, public CFtpOpData
 {
 public:
 	CFtpRenameOpData(CFtpControlSocket & controlSocket, CRenameCommand const& command)
-	    : COpData(Command::rename)
+	    : COpData(Command::rename, L"CFtpRenameOpData")
 		, CFtpOpData(controlSocket)
 		, command_(command)
 	{}

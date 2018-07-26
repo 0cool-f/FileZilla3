@@ -9,15 +9,13 @@
 #include <libfilezilla/local_filesys.hpp>
 
 CFtpFileTransferOpData::CFtpFileTransferOpData(CFtpControlSocket& controlSocket, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
-	: CFileTransferOpData(is_download, local_file, remote_file, remote_path, settings)
+	: CFileTransferOpData(L"CFtpFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
 	, CFtpOpData(controlSocket)
 {
 }
 
 int CFtpFileTransferOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpFileTransferOpData::Send() in state %d", opState);
-
 	std::wstring cmd;
 	switch (opState)
 	{
@@ -301,8 +299,6 @@ int CFtpFileTransferOpData::TestResumeCapability()
 
 int CFtpFileTransferOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpFileTransferOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	auto const& response = controlSocket_.m_Response;
 
@@ -380,8 +376,6 @@ int CFtpFileTransferOpData::ParseResponse()
 
 int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpFileTransferOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == filetransfer_waitcwd) {
 		if (prevResult == FZ_REPLY_OK) {
 			CDirentry entry;

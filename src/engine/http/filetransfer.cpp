@@ -16,8 +16,6 @@ enum filetransferStates
 
 int CHttpFileTransferOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpFileTransferOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case filetransfer_init:
 		if (!download_) {
@@ -68,12 +66,6 @@ int CHttpFileTransferOpData::Send()
 		break;
 	}
 
-	return FZ_REPLY_INTERNALERROR;
-}
-
-int CHttpFileTransferOpData::ParseResponse()
-{
-	LogMessage(MessageType::Debug_Verbose, L"CHttpFileTransferOpData::ParseResponse() in state %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -225,8 +217,6 @@ int CHttpFileTransferOpData::OnData(unsigned char const* data, unsigned int len)
 
 int CHttpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpFileTransferOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == filetransfer_transfer) {
 		return FZ_REPLY_CONTINUE;
 	}

@@ -138,6 +138,7 @@ int CControlSocket::ResetOperation(int nErrorCode)
 		oldOperation = std::move(operations_.back());
 		operations_.pop_back();
 
+		LogMessage(MessageType::Debug_Verbose, L"%s::Reset(%d) in state %d", oldOperation->name_, nErrorCode, oldOperation->opState);
 		nErrorCode = oldOperation->Reset(nErrorCode);
 	}
 	if (!operations_.empty()) {
@@ -434,8 +435,8 @@ int CControlSocket::CheckOverwriteFile()
 	return FZ_REPLY_WOULDBLOCK;
 }
 
-CFileTransferOpData::CFileTransferOpData(bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
-	: COpData(Command::transfer)
+CFileTransferOpData::CFileTransferOpData(wchar_t const* name, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
+	: COpData(Command::transfer, name)
 	, localFile_(local_file), remoteFile_(remote_file), remotePath_(remote_path)
 	, download_(is_download)
 	, transferSettings_(settings)
@@ -575,6 +576,7 @@ int CControlSocket::SendNextCommand()
 			return FZ_REPLY_WOULDBLOCK;
 		}
 
+		LogMessage(data.sendLogLevel_, L"%s::Send() in state %d", data.name_, data.opState);
 		int res = data.Send();
 		if (res != FZ_REPLY_CONTINUE) {
 			if (res == FZ_REPLY_OK) {
@@ -601,14 +603,14 @@ int CControlSocket::SendNextCommand()
 
 int CControlSocket::ParseSubcommandResult(int prevResult, COpData const& opData)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CControlSocket::ParseSubcommandResult(%d)", prevResult);
 	if (operations_.empty()) {
-		LogMessage(MessageType::Debug_Warning, L"ParseSubcommandResult called without active operation");
+		LogMessage(MessageType::Debug_Warning, L"CControlSocket::ParseSubcommandResult(%d) called without active operation", prevResult);
 		ResetOperation(FZ_REPLY_ERROR);
 		return FZ_REPLY_ERROR;
 	}
 
 	auto & data = *operations_.back();
+	LogMessage(MessageType::Debug_Verbose, L"%s::SubcommandResult(%d) in state %d", data.name_, prevResult, data.opState);
 	int res = data.SubcommandResult(prevResult, opData);
 	if (res == FZ_REPLY_WOULDBLOCK) {
 		return FZ_REPLY_WOULDBLOCK;

@@ -32,7 +32,7 @@ bool IsMisleadingListResponse(std::wstring const& response)
 }
 
 CFtpListOpData::CFtpListOpData(CFtpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags, bool topLevel)
-    : COpData(Command::list)
+    : COpData(Command::list, L"CFtpListOpData")
     , CFtpOpData(controlSocket)
     , path_(path)
     , subDir_(subDir)
@@ -48,8 +48,6 @@ CFtpListOpData::CFtpListOpData(CFtpControlSocket & controlSocket, CServerPath co
 
 int CFtpListOpData::Send()
 {
-	controlSocket_.LogMessage(MessageType::Debug_Verbose, L"CFtpListOpData::ListSend() in state %d", opState);
-
 	if (opState == list_init) {
 		controlSocket_.ChangeDir(path_, subDir_, (flags_ & LIST_FLAG_LINK));
 		opState = list_waitcwd;
@@ -132,8 +130,6 @@ int CFtpListOpData::Send()
 
 int CFtpListOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpListOpData::ParseResponse() in state %d", opState);
-
 	if (opState != list_mdtm) {
 		LogMessage(MessageType::Debug_Warning, "CFtpListOpData::ParseResponse should never be called if opState != list_mdtm");
 		return FZ_REPLY_INTERNALERROR;
@@ -192,8 +188,6 @@ int CFtpListOpData::ParseResponse()
 
 int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpListOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == list_waitcwd) {
 		if (prevResult != FZ_REPLY_OK) {
 			if ((prevResult & FZ_REPLY_LINKNOTDIR) == FZ_REPLY_LINKNOTDIR) {

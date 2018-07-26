@@ -12,8 +12,6 @@ enum DeleteStates
 
 int CStorjDeleteOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjDeleteOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case delete_init:
 		if (files_.empty()) {
@@ -54,8 +52,6 @@ int CStorjDeleteOpData::Send()
 
 int CStorjDeleteOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjDeleteOpData::ParseResponse() in state %d", opState);
-
 	if (controlSocket_.result_ != FZ_REPLY_OK) {
 		deleteFailed_ = true;
 	}
@@ -87,8 +83,6 @@ int CStorjDeleteOpData::ParseResponse()
 
 int CStorjDeleteOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjDeleteOpData::SubcommandResult() in state %d", opState);
-
 	if (prevResult != FZ_REPLY_OK) {
 		return prevResult;
 	}

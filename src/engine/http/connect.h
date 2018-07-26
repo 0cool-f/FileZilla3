@@ -10,7 +10,7 @@ class CHttpConnectOpData final : public COpData, public CHttpOpData
 {
 public:
 	CHttpConnectOpData(CHttpControlSocket & controlSocket)
-		: COpData(Command::connect)
+		: COpData(Command::connect, L"CHttpConnectOpData")
 		, CHttpOpData(controlSocket)
 	{}
 

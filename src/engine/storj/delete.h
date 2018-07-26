@@ -7,7 +7,7 @@ class CStorjDeleteOpData final : public COpData, public CStorjOpData
 {
 public:
 	CStorjDeleteOpData(CStorjControlSocket & controlSocket, CServerPath const& path, std::deque<std::wstring> && files)
-		: COpData(Command::del)
+		: COpData(Command::del, L"CStorjDeleteOpData")
 		, CStorjOpData(controlSocket)
 		, path_(path)
 		, files_(files)

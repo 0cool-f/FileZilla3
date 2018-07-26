@@ -7,7 +7,8 @@ class CSftpMkdirOpData final : public CMkdirOpData, public CSftpOpData
 {
 public:
 	CSftpMkdirOpData(CSftpControlSocket & controlSocket)
-		: CSftpOpData(controlSocket)
+		: CMkdirOpData(L"CSftpMkdirOpData")
+		, CSftpOpData(controlSocket)
 	{}
 
 	virtual int Send() override;

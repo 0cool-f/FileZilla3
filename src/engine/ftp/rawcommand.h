@@ -7,7 +7,7 @@ class CFtpRawCommandOpData final : public COpData, public CFtpOpData
 {
 public:
 	CFtpRawCommandOpData(CFtpControlSocket & controlSocket, std::wstring const& command)
-	    : COpData(Command::raw)
+	    : COpData(Command::raw, L"CFtpRawCommandOpData")
 		, CFtpOpData(controlSocket)
 		, command_(command)
 	{}

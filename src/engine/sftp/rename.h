@@ -7,7 +7,7 @@ class CSftpRenameOpData final : public COpData, public CSftpOpData
 {
 public:
 	CSftpRenameOpData(CSftpControlSocket & controlSocket, CRenameCommand const& command)
-		: COpData(Command::rename)
+		: COpData(Command::rename, L"CSftpRenameOpData")
 		, CSftpOpData(controlSocket)
 		, command_(command)
 	{}

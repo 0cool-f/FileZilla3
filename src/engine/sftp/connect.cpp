@@ -9,8 +9,6 @@
 
 int CSftpConnectOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpConnectOpData::Send() in state %d", opState);
-	
 	switch (opState)
 	{
 	case connect_init:
@@ -91,8 +89,6 @@ int CSftpConnectOpData::Send()
 
 int CSftpConnectOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpConnectOpData::ParseResponse() in state %d", opState);
-
 	if (controlSocket_.result_ != FZ_REPLY_OK) {
 		return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 	}
@@ -140,8 +136,6 @@ int CSftpConnectOpData::ParseResponse()
 
 int CSftpConnectOpData::Reset(int result)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpConnectOpData::Reset(%d) in state %d", result, opState);
-
 	if (opState == connect_init && (result & FZ_REPLY_CANCELED) != FZ_REPLY_CANCELED) {
 		LogMessage(MessageType::Error, _("fzsftp could not be started"));
 	}

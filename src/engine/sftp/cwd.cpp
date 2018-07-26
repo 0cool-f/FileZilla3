@@ -13,8 +13,6 @@ enum cwdStates
 
 int CSftpChangeDirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpChangeDirOpData::Send() in state %d", opState);
-	
 	std::wstring cmd;
 	switch (opState)
 	{
@@ -102,8 +100,6 @@ int CSftpChangeDirOpData::Send()
 
 int CSftpChangeDirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpChangeDirOpData::ParseResponse() in state %d", opState);
-	
 	bool const successful = controlSocket_.result_ == FZ_REPLY_OK;
 	switch (opState)
 	{

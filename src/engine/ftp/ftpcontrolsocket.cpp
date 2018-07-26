@@ -259,7 +259,9 @@ void CFtpControlSocket::ParseResponse()
 		return;
 	}
 
-	int res = operations_.back()->ParseResponse();
+	auto & data = *operations_.back();
+	LogMessage(MessageType::Debug_Verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
+	int res = data.ParseResponse();
 	if (res == FZ_REPLY_OK) {
 		ResetOperation(FZ_REPLY_OK);
 	}

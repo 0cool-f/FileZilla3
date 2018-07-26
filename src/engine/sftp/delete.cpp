@@ -5,8 +5,6 @@
 
 int CSftpDeleteOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpDeleteOpData::Send() in state %d", opState);
-	
 	std::wstring const& file = files_.front();
 	if (file.empty()) {
 		LogMessage(MessageType::Debug_Info, L"Empty filename");
@@ -30,8 +28,6 @@ int CSftpDeleteOpData::Send()
 
 int CSftpDeleteOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpDeleteOpData::ParseResponse() in state %d", opState);
-
 	if (controlSocket_.result_ != FZ_REPLY_OK) {
 		deleteFailed_ = true;
 	}
@@ -62,14 +58,11 @@ int CSftpDeleteOpData::ParseResponse()
 
 int CSftpDeleteOpData::SubcommandResult(int, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpDeleteOpData::SubcommandResult() in state %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
 int CSftpDeleteOpData::Reset(int result)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpDeleteOpData::Reset(%d) in state %d", result, opState);
-
 	if (needSendListing_ && !(result & FZ_REPLY_DISCONNECTED)) {
 		controlSocket_.SendDirectoryListingNotification(path_, false, false);
 	}

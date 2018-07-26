@@ -10,7 +10,7 @@
 
 
 CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::shared_ptr<HttpRequestResponseInterface> const& request)
-	: COpData(PrivCommand::http_request)
+	: COpData(PrivCommand::http_request, L"CHttpRequestOpData")
 	, CHttpOpData(controlSocket)
 {
 	opState = request_init | request_reading;
@@ -22,7 +22,7 @@ CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::
 }
 
 CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::deque<std::shared_ptr<HttpRequestResponseInterface>> && requests)
-	: COpData(PrivCommand::http_request)
+	: COpData(PrivCommand::http_request, L"CHttpRequestOpData")
 	, CHttpOpData(controlSocket)
 	, requests_(requests)
 {
@@ -62,8 +62,6 @@ void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface
 
 int CHttpRequestOpData::Send()
 {
-	LogMessage(MessageType::Debug_Debug, L"CHttpRequestOpData::Send() in state %d", opState);
-
 	if (opState & request_init) {
 		if (send_pos_ >= requests_.size()) {
 			opState &= ~request_init;
@@ -198,7 +196,8 @@ int CHttpRequestOpData::Send()
 					}
 				}
 				else {
-					LogMessage(MessageType::Debug_Info, "Finish sending request header.");
+					LogMessage(MessageType::Debug_Info, "Finished sending request header.");
+					sendLogLevel_ = MessageType::Debug_Debug;
 				}
 
 				auto result = controlSocket_.Send(command.c_str(), command.size());
@@ -252,6 +251,8 @@ int CHttpRequestOpData::Send()
 
 				req.flags_ |= HttpRequest::flag_sent_body;
 
+				MessageType::Debug_Verbose;
+
 				opState &= ~request_send;
 				++send_pos_;
 
@@ -276,16 +277,8 @@ int CHttpRequestOpData::Send()
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CHttpRequestOpData::ParseResponse()
-{
-	LogMessage(MessageType::Debug_Verbose, L"CHttpRequestOpData::ParseResponse() in state %d", opState);
-	return FZ_REPLY_INTERNALERROR;
-}
-
 int CHttpRequestOpData::SubcommandResult(int, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpRequestOpData::SubcommandResult() in state %d", opState);
-
 	if (opState & request_wait_connect) {
 		opState &= ~request_wait_connect;
 		opState |= request_send;
@@ -788,6 +781,7 @@ int CHttpRequestOpData::OnClose()
 			send_pos_ = 0;
 			opState = request_init | request_reading;
 			controlSocket_.ResetSocket();
+			sendLogLevel_ = MessageType::Debug_Verbose;
 			return FZ_REPLY_CONTINUE;
 		}
 	}
@@ -797,8 +791,6 @@ int CHttpRequestOpData::OnClose()
 
 int CHttpRequestOpData::Reset(int result)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpRequestOpData::Reset(%d) in state %d", result, opState);
-
 	if (result != FZ_REPLY_OK) {
 		controlSocket_.ResetSocket();
 	}

@@ -7,7 +7,7 @@ class CFtpChmodOpData final : public COpData, public CFtpOpData
 {
 public:
 	CFtpChmodOpData(CFtpControlSocket & controlSocket, CChmodCommand const& command)
-	    : COpData(Command::chmod)
+	    : COpData(Command::chmod, L"CFtpChmodOpData")
 		, CFtpOpData(controlSocket)
 		, command_(command)
 	{}

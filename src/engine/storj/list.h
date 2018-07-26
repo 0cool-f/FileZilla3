@@ -7,7 +7,7 @@ class CStorjListOpData final : public COpData, public CStorjOpData
 {
 public:
 	CStorjListOpData(CStorjControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int, bool topLevel)
-		: COpData(Command::list)
+		: COpData(Command::list, L"CStorjListOpData")
 		, CStorjOpData(controlSocket)
 		, path_(path)
 		, subDir_(subDir)

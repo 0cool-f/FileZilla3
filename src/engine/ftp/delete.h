@@ -9,7 +9,7 @@ class CFtpDeleteOpData final : public COpData, public CFtpOpData
 {
 public:
 	CFtpDeleteOpData(CFtpControlSocket & controlSocket)
-	    : COpData(Command::del)
+	    : COpData(Command::del, L"CFtpDeleteOpData")
 		, CFtpOpData(controlSocket)
 	{}
 

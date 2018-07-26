@@ -7,7 +7,8 @@ class CFtpChangeDirOpData final : public CChangeDirOpData, public CFtpOpData
 {
 public:
 	CFtpChangeDirOpData(CFtpControlSocket & controlSocket)
-	    : CFtpOpData(controlSocket)
+	    : CChangeDirOpData(L"CFtpChangeDirOpData")
+		, CFtpOpData(controlSocket)
 	{}
 
 	virtual int Send() override;
@@ -15,7 +16,6 @@ public:
 
 	virtual int SubcommandResult(int, COpData const&) override
 	{
-		LogMessage(MessageType::Debug_Verbose, L"CFtpChangeDirOpData::SubcommandResult()");
 		return FZ_REPLY_CONTINUE;
 	}
 

@@ -12,8 +12,6 @@ enum chmodStates
 
 int CFtpChmodOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpChmodOpData::Send() in state %d", opState);
-
 	if (opState == chmod_init) {
 		controlSocket_.ChangeDir(command_.GetPath());
 		opState = chmod_waitcwd;
@@ -28,8 +26,6 @@ int CFtpChmodOpData::Send()
 
 int CFtpChmodOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpChmodOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	if (code != 2 && code != 3) {
 		return FZ_REPLY_ERROR;
@@ -42,8 +38,6 @@ int CFtpChmodOpData::ParseResponse()
 
 int CFtpChmodOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpChmodOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == chmod_waitcwd) {
 		if (prevResult != FZ_REPLY_OK) {
 			useAbsolute_ = true;

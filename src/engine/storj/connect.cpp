@@ -10,8 +10,6 @@
 
 int CStorjConnectOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjConnectOpData::Send() in state %d", opState);
-
 	switch (opState)
 	{
 	case connect_init:
@@ -106,8 +104,6 @@ int CStorjConnectOpData::Send()
 
 int CStorjConnectOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjConnectOpData::ParseResponse() in state %d", opState);
-
 	if (controlSocket_.result_ != FZ_REPLY_OK) {
 		return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 	}

@@ -7,7 +7,7 @@ class CSftpRemoveDirOpData final : public COpData, public CSftpOpData
 {
 public:
 	CSftpRemoveDirOpData(CSftpControlSocket & controlSocket)
-		: COpData(Command::removedir)
+		: COpData(Command::removedir, L"CSftpRemoveDirOpData")
 		, CSftpOpData(controlSocket)
 	{}
 

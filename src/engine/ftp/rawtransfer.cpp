@@ -8,8 +8,6 @@
 
 int CFtpRawTransferOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRawTransferOpData::ParseResponse() in state %d", opState);
-
 	if (opState == rawtransfer_init) {
 		return FZ_REPLY_ERROR;
 	}
@@ -168,8 +166,6 @@ int CFtpRawTransferOpData::ParseResponse()
 
 int CFtpRawTransferOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRawTransferOpData::Send() in state %d", opState);
-
 	if (!controlSocket_.m_pTransferSocket) {
 		LogMessage(MessageType::Debug_Info, L"Empty m_pTransferSocket");
 		return FZ_REPLY_INTERNALERROR;

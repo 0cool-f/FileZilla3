@@ -8,7 +8,7 @@ class CFtpRemoveDirOpData final : public COpData, public CFtpOpData
 {
 public:
 	CFtpRemoveDirOpData(CFtpControlSocket & controlSocket)
-	    : COpData(Command::removedir)
+	    : COpData(Command::removedir, L"CFtpRemoveDirOpData")
 		, CFtpOpData(controlSocket)
 	{}
 

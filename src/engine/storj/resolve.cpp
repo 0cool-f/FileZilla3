@@ -32,8 +32,6 @@ std::wstring ExtractId(std::wstring const& metaData)
 
 int CStorjResolveOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjResolveOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case resolve_init:
 		bucket_.clear();
@@ -125,16 +123,8 @@ int CStorjResolveOpData::Send()
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CStorjResolveOpData::ParseResponse()
-{
-	LogMessage(MessageType::Debug_Verbose, L"CStorjResolveOpData::ParseResponse() in state %d", opState);
-	return FZ_REPLY_INTERNALERROR;
-}
-
 int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjResolveOpData::SubcommandResult() in state %d", opState);
-
 	switch (opState) {
 	case resolve_waitlistbuckets:
 		if (prevResult != FZ_REPLY_OK) {
@@ -195,8 +185,6 @@ int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 
 int CStorjResolveManyOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjResolveManyOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case resolve_init:
 		bucket_.clear();
@@ -265,16 +253,8 @@ int CStorjResolveManyOpData::Send()
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CStorjResolveManyOpData::ParseResponse()
-{
-	LogMessage(MessageType::Debug_Verbose, L"CStorjResolveManyOpData::ParseResponse() in state %d", opState);
-	return FZ_REPLY_INTERNALERROR;
-}
-
 int CStorjResolveManyOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjResolveManyOpData::SubcommandResult() in state %d", opState);
-
 	if (prevResult != FZ_REPLY_OK) {
 		return prevResult;
 	}

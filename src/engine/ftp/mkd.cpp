@@ -14,8 +14,6 @@ enum mkdStates
 
 int CFtpMkdirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpMkdirOpData::Send() in state %d", opState);
-
 	if (!holdsLock_) {
 		if (!controlSocket_.TryLock(locking_reason::mkdir, path_)) {
 			return FZ_REPLY_WOULDBLOCK;
@@ -72,8 +70,6 @@ int CFtpMkdirOpData::Send()
 
 int CFtpMkdirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpMkdirOpData::ParseResonse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	switch (opState) {
 	case mkd_findparent:

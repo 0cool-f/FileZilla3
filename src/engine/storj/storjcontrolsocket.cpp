@@ -306,6 +306,7 @@ void CStorjControlSocket::ProcessReply(int result, std::wstring const& reply)
 	}
 
 	auto & data = *operations_.back();
+	LogMessage(MessageType::Debug_Verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
 	int res = data.ParseResponse();
 	if (res == FZ_REPLY_OK) {
 		ResetOperation(FZ_REPLY_OK);
@@ -328,8 +329,6 @@ void CStorjControlSocket::ProcessReply(int result, std::wstring const& reply)
 
 int CStorjControlSocket::ResetOperation(int nErrorCode)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjControlSocket::ResetOperation(%d)", nErrorCode);
-
 	if (!operations_.empty() && operations_.back()->opId == Command::connect) {
 		auto &data = static_cast<CStorjConnectOpData &>(*operations_.back());
 		if (data.opState == connect_init && nErrorCode & FZ_REPLY_ERROR && (nErrorCode & FZ_REPLY_CANCELED) != FZ_REPLY_CANCELED) {

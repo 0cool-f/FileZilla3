@@ -13,8 +13,6 @@ enum rmdStates
 
 int CFtpRemoveDirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRemoveDirOpData::Send() in state %d", opState);
-
 	if (opState == rmd_init) {
 		controlSocket_.ChangeDir(path_);
 		opState = rmd_waitcwd;
@@ -55,8 +53,6 @@ int CFtpRemoveDirOpData::Send()
 
 int CFtpRemoveDirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRemoveDirOpData::ParseResponse() in state %d", opState);
-
 	int code = controlSocket_.GetReplyCode();
 	if (code != 2 && code != 3) {
 		return FZ_REPLY_ERROR;
@@ -70,8 +66,6 @@ int CFtpRemoveDirOpData::ParseResponse()
 
 int CFtpRemoveDirOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpRemoveDirOpData::SubcommandResult() in state %d", opState);
-
 	if (opState == rmd_waitcwd) {
 		if (prevResult != FZ_REPLY_OK) {
 			omitPath_ = false;

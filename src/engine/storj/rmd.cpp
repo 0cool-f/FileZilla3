@@ -16,8 +16,6 @@ enum mkdStates
 
 int CStorjRemoveDirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjRemoveDirOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case rmd_init:
 		if (path_.SegmentCount() < 1) {
@@ -45,9 +43,6 @@ int CStorjRemoveDirOpData::Send()
 
 int CStorjRemoveDirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjRemoveDirOpData::ParseResponse() in state %d", opState);
-
-
 	switch (opState) {
 	case rmd_rmbucket:
 		if (controlSocket_.result_ == FZ_REPLY_OK) {
@@ -70,8 +65,6 @@ int CStorjRemoveDirOpData::ParseResponse()
 
 int CStorjRemoveDirOpData::SubcommandResult(int prevResult, COpData const& previousOperation)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjRemoveDirOpData::SubcommandResult() in state %d", opState);
-
 	switch (opState) {
 	case rmd_resolve:
 		if (prevResult != FZ_REPLY_OK) {

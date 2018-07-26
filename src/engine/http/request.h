@@ -27,7 +27,7 @@ public:
 	CHttpRequestOpData(CHttpControlSocket & controlSocket, std::deque<std::shared_ptr<HttpRequestResponseInterface>> && requests);
 
 	virtual int Send() override;
-	virtual int ParseResponse() override;
+	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
 	virtual int SubcommandResult(int prevResult, COpData const& previousOperation) override;
 	virtual int Reset(int result) override;
 

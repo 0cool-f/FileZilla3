@@ -7,7 +7,8 @@ class CFtpMkdirOpData final : public CMkdirOpData, public CFtpOpData
 {
 public:
 	CFtpMkdirOpData(CFtpControlSocket & controlSocket)
-		: CFtpOpData(controlSocket)
+		: CMkdirOpData(L"CFtpMkdirOpData")
+		, CFtpOpData(controlSocket)
 	{}
 
 	virtual int Send() override;

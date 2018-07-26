@@ -14,8 +14,6 @@ enum mkdStates
 
 int CStorjMkdirOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjMkdirOpData::Send() in state %d", opState);
-
 	switch (opState) {
 	case mkd_init:
 		if (path_.SegmentCount() < 1) {
@@ -46,8 +44,6 @@ int CStorjMkdirOpData::Send()
 
 int CStorjMkdirOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjMkdirOpData::ParseResponse() in state %d", opState);
-
 	switch (opState) {
 	case mkd_mkbucket:
 		if (controlSocket_.result_ == FZ_REPLY_OK) {
@@ -82,8 +78,6 @@ int CStorjMkdirOpData::ParseResponse()
 
 int CStorjMkdirOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjMkdirOpData::SubcommandResult() in state %d", opState);
-
 	if (prevResult != FZ_REPLY_OK) {
 		return prevResult;
 	}

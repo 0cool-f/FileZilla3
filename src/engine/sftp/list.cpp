@@ -13,8 +13,6 @@ enum listStates
 
 int CSftpListOpData::Send()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpListOpData::Send() in state %d", opState);
-
 	if (opState == list_init) {
 		if (!currentServer_) {
 			LogMessage(MessageType::Debug_Warning, L"currenServer_ is empty");
@@ -66,8 +64,6 @@ int CSftpListOpData::Send()
 
 int CSftpListOpData::ParseResponse()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpListOpData::ParseResponse() in state %d", opState);
-
 	if (opState == list_list) {
 		if (controlSocket_.result_ != FZ_REPLY_OK) {
 			return FZ_REPLY_ERROR;
@@ -91,8 +87,6 @@ int CSftpListOpData::ParseResponse()
 
 int CSftpListOpData::SubcommandResult(int prevResult, COpData const&)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpListOpData::SubcommandResult() in state %d", opState);
-
 	if (opState != list_waitcwd) {
 		return FZ_REPLY_INTERNALERROR;
 	}
@@ -121,7 +115,7 @@ int CSftpListOpData::ParseEntry(std::wstring && entry, uint64_t mtime, std::wstr
 {
 	if (opState != list_list) {
 		controlSocket_.LogMessageRaw(MessageType::RawList, entry);
-		LogMessage(MessageType::Debug_Warning, L"ListParseResponse called at improper time: %d", opState);
+		LogMessage(MessageType::Debug_Warning, L"CSftpListOpData::ParseEntry called at improper time: %d", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 

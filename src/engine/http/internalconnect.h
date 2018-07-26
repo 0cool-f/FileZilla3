@@ -10,7 +10,7 @@ class CHttpInternalConnectOpData final : public COpData, public CHttpOpData
 {
 public:
 	CHttpInternalConnectOpData(CHttpControlSocket & controlSocket, std::wstring const& host, unsigned short port, bool tls)
-		: COpData(PrivCommand::http_connect)
+		: COpData(PrivCommand::http_connect, L"CHttpInternalConnectOpData")
 		, CHttpOpData(controlSocket)
 		, host_(host)
 		, port_(port)

@@ -7,7 +7,7 @@ class CSftpChmodOpData final : public COpData, public CSftpOpData
 {
 public:
 	CSftpChmodOpData(CSftpControlSocket & controlSocket, CChmodCommand const& command)
-		: COpData(Command::chmod)
+		: COpData(Command::chmod, L"CSftpChmodOpData")
 		, CSftpOpData(controlSocket)
 		, command_(command)
 	{}

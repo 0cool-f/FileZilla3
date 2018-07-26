@@ -8,7 +8,7 @@ class CSftpListOpData final : public COpData, public CSftpOpData
 {
 public:
 	CSftpListOpData(CSftpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags, bool topLevel)
-		: COpData(Command::list)
+		: COpData(Command::list, L"CSftpListOpData")
 		, CSftpOpData(controlSocket)
 		, path_(path)
 		, subDir_(subDir)
