@@ -173,8 +173,9 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 	help->Append(XRCID("ID_MENU_HELP_BUGREPORT"), _("&Report a bug..."));
 
 #ifndef FZ_MAC
-	help->Append(XRCID("wxID_ABOUT"), _("&About..."), _("Display about dialog"));
+	help->AppendSeparator();
 #endif
+	help->Append(XRCID("wxID_ABOUT"), _("&About..."), _("Display about dialog"));
 
 	if (COptions::Get()->GetOptionVal(OPTION_DEBUG_MENU)) {
 		wxMenu * debug = new wxMenu;
