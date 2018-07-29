@@ -124,17 +124,17 @@ bool COptionsPageInterface::CreateControls(wxWindow* parent)
 	auto innerlayoutSizer = layout.createFlex(2);
 	layoutSizer->Add(innerlayoutSizer);
 	innerlayoutSizer->Add(new wxStaticText(box, -1, _("&Layout of file and directory panes:")), layout.valign);
-	auto choice = new wxChoice(box, XRCID("ID_MESSAGELOGPOS"));
-	choice->Append(_("Above the file lists"));
-	choice->Append(_("Next to the transfer queue"));
-	choice->Append(_("As tab in the transfer queue pane"));
-	innerlayoutSizer->Add(choice, layout.valign);
-	innerlayoutSizer->Add(new wxStaticText(box, -1, _("Message log positio&n:")), layout.valign);
-	choice = new wxChoice(box, XRCID("ID_FILEPANELAYOUT"));
+	auto choice = new wxChoice(box, XRCID("ID_FILEPANELAYOUT"));
 	choice->Append(_("Classic"));
 	choice->Append(_("Explorer"));
 	choice->Append(_("Widescreen"));
 	choice->Append(_("Blackboard"));
+	innerlayoutSizer->Add(choice, layout.valign);
+	innerlayoutSizer->Add(new wxStaticText(box, -1, _("Message log positio&n:")), layout.valign);
+	choice = new wxChoice(box, XRCID("ID_MESSAGELOGPOS"));
+	choice->Append(_("Above the file lists"));
+	choice->Append(_("Next to the transfer queue"));
+	choice->Append(_("As tab in the transfer queue pane"));
 	innerlayoutSizer->Add(choice, layout.valign);
 	layoutSizer->Add(new wxCheckBox(box, XRCID("ID_FILEPANESWAP"), _("&Swap local and remote panes")));
 
