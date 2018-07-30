@@ -307,7 +307,7 @@ bool RenameFile(wxWindow* parent, wxString dir, wxString from, wxString to)
 
 	wxWindow * focused = wxWindow::FindFocus();
 
-	bool res = SHFileOperation(&op);
+	bool res = SHFileOperation(&op) == 0;
 
 	if (focused) {
 		// Microsoft introduced a bug in Windows 10 1803: Calling SHFileOperation resets focus.
