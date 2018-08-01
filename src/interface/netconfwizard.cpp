@@ -922,7 +922,7 @@ int CNetConfWizard::CreateListenSocket()
 
 int CNetConfWizard::CreateListenSocket(unsigned int port)
 {
-	m_pSocketServer = new fz::socket(engine_context_.GetThreadPool(), this);
+	m_pSocketServer = new fz::listen_socket(engine_context_.GetThreadPool(), this);
 	int res = m_pSocketServer->listen(m_socket ? m_socket->address_family() : fz::address_type::unknown, port);
 
 	if (res < 0) {

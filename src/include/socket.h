@@ -79,6 +79,115 @@ void change_socket_event_handler(event_handler * old_handler, event_handler * ne
 /// \private
 class socket_thread;
 
+/// \private
+class socket_base : public socket_event_source
+{
+public:
+	enum
+	{
+		/// flag_nodelay disables Nagle's algorithm
+		flag_nodelay = 0x01,
+
+		/// flag_keepalive enables TCP keepalive.
+		flag_keepalive = 0x02
+	};
+
+	int flags() const { return flags_; }
+	void set_flags(int flags);
+
+	/**
+	 * \brief Sets socket buffer sizes.
+	 *
+	 * Internally this sets SO_RCVBUF and SO_SNDBUF on the socket.
+	 *
+	 * If called on listen socket, sizes will be inherited by accepted sockets.
+	 */
+	int set_buffer_sizes(int size_receive, int size_send);
+
+	/**
+	 * Sets the interval between TCP keepalive packets.
+	 *
+	 * Duration must not be smaller than 5 minutes. The default interval is 2 hours.
+	 */
+	void set_keepalive_interval(duration const& d);
+
+	/// If connected, either ipv4 or ipv6, unknown otherwise
+	address_type address_family() const;
+
+	/**
+	 * \brief Returns local address of a connected socket
+	 *
+	 * \return empty string on error
+	 */
+	std::string local_ip(bool strip_zone_index = false) const;
+
+	/**
+	* \brief Returns local port of a connected socket
+	*
+	* \return -1 on error
+	*/
+	int local_port(int& error);
+
+	static std::string address_to_string(sockaddr const* addr, int addr_len, bool with_port = true, bool strip_zone_index = false);
+	static std::string address_to_string(char const* buf, int buf_len);
+
+	int close();
+
+	void set_event_handler(event_handler* pEvtHandler);
+
+protected:
+	friend class socket_thread;
+
+	socket_base(thread_pool& pool, event_handler* evt_handler);
+
+	// Note: Unlocks the lock.
+	void detach_thread(scoped_lock & l);
+
+	thread_pool & thread_pool_;
+	event_handler* evt_handler_;
+
+	int fd_{-1};
+
+	socket_thread* socket_thread_{};
+
+	unsigned int port_{};
+
+	int family_;
+
+	int flags_{};
+	duration keepalive_interval_;
+
+	int buffer_sizes_[2];
+
+	int state_{};
+};
+
+class socket;
+
+class listen_socket final : public socket_base
+{
+	friend class socket_thread;
+public:
+	listen_socket(thread_pool& pool, event_handler* evt_handler);
+	virtual ~listen_socket();
+
+	listen_socket(listen_socket const&) = delete;
+	listen_socket& operator=(listen_socket const&) = delete;
+
+	int listen(address_type family, int port = 0);
+	socket* accept(int& error);
+
+	enum listen_socket_state
+	{
+		// How the socket is initially
+		none,
+
+		// Only in listening state you can get a connection event.
+		listening
+	};
+	listen_socket_state get_state();
+};
+
 /**
  * \brief IPv6 capable, non-blocking socket class
  *
@@ -87,7 +196,7 @@ class socket_thread;
  * Error codes are the same as used by the POSIX socket functions,
  * see 'man 2 socket', 'man 2 connect', ...
  */
-class socket final : public socket_event_source
+class socket final : public socket_base
 {
 	friend class socket_thread;
 public:
@@ -102,9 +211,8 @@ public:
 		// How the socket is initially
 		none,
 
-		// Only in listening and connecting states you can get a connection event.
+		// Only in connecting state you can get a connection event.
 		// After sending the event, socket is in connected state
-		listening,
 		connecting,
 
 		// Only in this state you can get send or receive events
@@ -131,15 +239,6 @@ public:
 	int peek(void *buffer, unsigned int size, int& error);
 	int write(const void *buffer, unsigned int size, int& error);
 
-	int close();
-
-	/**
-	 * \brief Returns local address of a connected socket
-	 *
-	 * \return empty string on error
-	 */
-	std::string local_ip(bool strip_zone_index = false) const;
-
 	/**
 	* \brief Returns remote address of a connected socket
 	*
@@ -151,57 +250,11 @@ public:
 	native_string peer_host() const;
 
 	/**
-	* \brief Returns local port of a connected socket
-	*
-	* \return -1 on error
-	*/
-	int local_port(int& error);
-
-	/**
 	* \brief Returns remote port of a connected socket
 	*
 	* \return -1 on error
 	*/
 	int remote_port(int& error);
-
-	/// If connected, either ipv4 or ipv6, unknown otherwise
-	address_type address_family() const;
-
-	void set_event_handler(event_handler* pEvtHandler);
-
-	static std::string address_to_string(sockaddr const* addr, int addr_len, bool with_port = true, bool strip_zone_index = false);
-	static std::string address_to_string(char const* buf, int buf_len);
-
-	int listen(address_type family, int port = 0);
-	socket* accept(int& error);
-
-	enum
-	{
-		/// flag_nodelay disables Nagle's algorithm
-		flag_nodelay = 0x01,
-
-		/// flag_keepalive enables TCP keepalive.
-		flag_keepalive = 0x02
-	};
-
-	int flags() const { return flags_; }
-	void set_flags(int flags);
-
-	/**
-	 * \brief Sets socket buffer sizes.
-	 *
-	 * Internally this sets SO_RCVBUF and SO_SNDBUF on the socket.
-	 * 
-	 * If called on listen socket, sizes will be inherited by accepted sockets.
-	 */
-	int set_buffer_sizes(int size_receive, int size_send);
-
-	/**
-	 * Sets the interval between TCP keepalive packets.
-	 *
-	 * Duration must not be smaller than 5 minutes. The default interval is 2 hours.
-	 */
-	void set_keepalive_interval(duration const& d);
 
 	/**
 	 * On a connected socket, gets the ideal send buffer size or
@@ -218,30 +271,8 @@ public:
 	void retrigger(socket_event_flag event);
 
 private:
-	static int do_set_flags(int fd, int flags, int flags_mask, duration const& keepalive_interval);
-	static int do_set_buffer_sizes(int fd, int size_read, int size_write);
-	static int set_nonblocking(int fd);
-
-	// Note: Unlocks the lock.
-	void detach_thread(scoped_lock & l);
-
-	thread_pool & thread_pool_;
-	event_handler* evt_handler_;
-
-	int fd_{-1};
-
-	socket_state state_{none};
-
-	socket_thread* socket_thread_{};
-
+	friend class listen_socket;
 	native_string host_;
-	unsigned int port_{};
-	int family_;
-
-	int flags_{};
-	duration keepalive_interval_;
-
-	int buffer_sizes_[2];
 };
 
 #ifdef FZ_WINDOWS

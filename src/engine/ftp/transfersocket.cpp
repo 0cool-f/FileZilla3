@@ -593,9 +593,9 @@ void CTransferSocket::TransferEnd(TransferEndReason reason)
 	controlSocket_.send_event<TransferEndEvent>();
 }
 
-std::unique_ptr<fz::socket> CTransferSocket::CreateSocketServer(int port)
+std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer(int port)
 {
-	auto socket = std::make_unique<fz::socket>(engine_.GetThreadPool(), this);
+	auto socket = std::make_unique<fz::listen_socket>(engine_.GetThreadPool(), this);
 	int res = socket->listen(controlSocket_.socket_->address_family(), port);
 	if (res) {
 		controlSocket_.LogMessage(MessageType::Debug_Verbose, L"Could not listen on port %d: %s", port, fz::socket_error_description(res));
@@ -608,7 +608,7 @@ std::unique_ptr<fz::socket> CTransferSocket::CreateSocketServer(int port)
 	return socket;
 }
 
-std::unique_ptr<fz::socket> CTransferSocket::CreateSocketServer()
+std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer()
 {
 	if (!engine_.GetOptions().GetOptionVal(OPTION_LIMITPORTS)) {
 		// Ask the systen for a port
@@ -638,7 +638,7 @@ std::unique_ptr<fz::socket> CTransferSocket::CreateSocketServer()
 		assert(start >= low && start <= high);
 	}
 
-	std::unique_ptr<fz::socket> server;
+	std::unique_ptr<fz::listen_socket> server;
 
 	int count = high - low + 1;
 	while (count--) {
@@ -827,7 +827,7 @@ bool CTransferSocket::InitBackend()
 	return true;
 }
 
-void CTransferSocket::SetSocketBufferSizes(fz::socket& socket)
+void CTransferSocket::SetSocketBufferSizes(fz::socket_base& socket)
 {
 	const int size_read = engine_.GetOptions().GetOptionVal(OPTION_SOCKET_BUFFERSIZE_RECV);
 #if FZ_WINDOWS

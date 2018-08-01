@@ -92,7 +92,7 @@ protected:
 	CExternalIPResolver* m_pIPResolver{};
 	wxString m_externalIP;
 
-	fz::socket* m_pSocketServer{};
+	fz::listen_socket* m_pSocketServer{};
 	fz::socket* m_pDataSocket{};
 	int m_listenPort{};
 	bool gotListReply{};
