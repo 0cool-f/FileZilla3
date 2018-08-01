@@ -4,10 +4,11 @@
 #include "ftp/ftpcontrolsocket.h"
 #include "iothread.h"
 #include "optionsbase.h"
-#include "tlssocket.h"
-#include "transfersocket.h"
 #include "proxy.h"
 #include "servercapabilities.h"
+#include "socket_errors.h"
+#include "tlssocket.h"
+#include "transfersocket.h"
 
 #include <libfilezilla/util.hpp>
 
@@ -67,7 +68,7 @@ std::wstring CTransferSocket::SetupActiveTransfer(std::string const& ip)
 	if (port == -1)	{
 		ResetSocket();
 
-		controlSocket_.LogMessage(MessageType::Debug_Warning, L"GetLocalPort failed: %s", fz::socket::error_description(error));
+		controlSocket_.LogMessage(MessageType::Debug_Warning, L"GetLocalPort failed: %s", fz::socket_error_description(error));
 		return std::wstring();
 	}
 
@@ -100,7 +101,7 @@ void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_f
 		case fz::socket_event_flag::connection:
 			{
 				if (error) {
-					controlSocket_.LogMessage(MessageType::Error, _("Proxy handshake failed: %s"), fz::socket::error_description(error));
+					controlSocket_.LogMessage(MessageType::Error, _("Proxy handshake failed: %s"), fz::socket_error_description(error));
 					TransferEnd(TransferEndReason::failure);
 				}
 				else {
@@ -112,7 +113,7 @@ void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_f
 			return;
 		case fz::socket_event_flag::close:
 			{
-				controlSocket_.LogMessage(MessageType::Error, _("Proxy handshake failed: %s"), fz::socket::error_description(error));
+				controlSocket_.LogMessage(MessageType::Error, _("Proxy handshake failed: %s"), fz::socket_error_description(error));
 				TransferEnd(TransferEndReason::failure);
 			}
 			return;
@@ -138,7 +139,7 @@ void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_f
 	case fz::socket_event_flag::connection:
 		if (error) {
 			if (m_transferEndReason == TransferEndReason::none) {
-				controlSocket_.LogMessage(MessageType::Error, _("The data connection could not be established: %s"), fz::socket::error_description(error));
+				controlSocket_.LogMessage(MessageType::Error, _("The data connection could not be established: %s"), fz::socket_error_description(error));
 				TransferEnd(TransferEndReason::transfer_failure);
 			}
 		}
@@ -176,7 +177,7 @@ void CTransferSocket::OnAccept(int error)
 			controlSocket_.LogMessage(MessageType::Debug_Verbose, L"No pending connection");
 		}
 		else {
-			controlSocket_.LogMessage(MessageType::Status, _("Could not accept connection: %s"), fz::socket::error_description(error));
+			controlSocket_.LogMessage(MessageType::Status, _("Could not accept connection: %s"), fz::socket_error_description(error));
 			TransferEnd(TransferEndReason::transfer_failure);
 		}
 		return;
@@ -239,7 +240,7 @@ void CTransferSocket::OnReceive()
 			if (numread < 0) {
 				delete [] pBuffer;
 				if (error != EAGAIN) {
-					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket::error_description(error));
+					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 					TransferEnd(TransferEndReason::transfer_failure);
 				}
 				else if (m_onCloseCalled && !m_pBackend->IsWaiting(CRateLimiter::inbound)) {
@@ -298,7 +299,7 @@ void CTransferSocket::OnReceive()
 
 		if (numread < 0) {
 			if (error != EAGAIN) {
-				controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket::error_description(error));
+				controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 				TransferEnd(TransferEndReason::transfer_failure);
 			}
 			else if (m_onCloseCalled && !m_pBackend->IsWaiting(CRateLimiter::inbound)) {
@@ -319,7 +320,7 @@ void CTransferSocket::OnReceive()
 			int numread = m_pBackend->Read(buffer, 2, error);
 			if (numread < 0) {
 				if (error != EAGAIN) {
-					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket::error_description(error));
+					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 					TransferEnd(TransferEndReason::transfer_failure);
 				}
 				else if (m_onCloseCalled && !m_pBackend->IsWaiting(CRateLimiter::inbound)) {
@@ -409,7 +410,7 @@ void CTransferSocket::OnSend()
 			}
 		}
 		else {
-			controlSocket_.LogMessage(MessageType::Error, L"Could not write to transfer socket: %s", fz::socket::error_description(error));
+			controlSocket_.LogMessage(MessageType::Error, L"Could not write to transfer socket: %s", fz::socket_error_description(error));
 			TransferEnd(TransferEndReason::transfer_failure);
 		}
 	}
@@ -450,7 +451,7 @@ void CTransferSocket::OnClose(int error)
 	}
 
 	if (error) {
-		controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket::error_description(error));
+		controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket_error_description(error));
 		TransferEnd(TransferEndReason::transfer_failure);
 		return;
 	}
@@ -472,7 +473,7 @@ void CTransferSocket::OnClose(int error)
 		return;
 	}
 	else if (numread < 0 && error != EAGAIN) {
-		controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket::error_description(error));
+		controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket_error_description(error));
 		TransferEnd(TransferEndReason::transfer_failure);
 		return;
 	}
@@ -597,7 +598,7 @@ std::unique_ptr<fz::socket> CTransferSocket::CreateSocketServer(int port)
 	auto socket = std::make_unique<fz::socket>(engine_.GetThreadPool(), this);
 	int res = socket->listen(controlSocket_.socket_->address_family(), port);
 	if (res) {
-		controlSocket_.LogMessage(MessageType::Debug_Verbose, L"Could not listen on port %d: %s", port, fz::socket::error_description(res));
+		controlSocket_.LogMessage(MessageType::Debug_Verbose, L"Could not listen on port %d: %s", port, fz::socket_error_description(res));
 		socket.reset();
 	}
 	else {

@@ -7,6 +7,7 @@
 #include "proxy.h"
 #include "servercapabilities.h"
 #include "sizeformatting_base.h"
+#include "socket_errors.h"
 
 #include <libfilezilla/event_loop.hpp>
 #include <libfilezilla/iputils.hpp>
@@ -919,7 +920,7 @@ int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 		int written = m_pBackend->Write(buffer, len, error);
 		if (written < 0) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket::error_description(error));
+				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
 				LogMessage(MessageType::Error, _("Disconnected from server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
@@ -958,13 +959,13 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 	{
 	case fz::socket_event_flag::connection_next:
 		if (error) {
-			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket::error_description(error));
+			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket_error_description(error));
 		}
 		SetAlive();
 		break;
 	case fz::socket_event_flag::connection:
 		if (error) {
-			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\"."), fz::socket::error_description(error));
+			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\"."), fz::socket_error_description(error));
 			OnClose(error);
 		}
 		else {
@@ -1014,7 +1015,7 @@ int CRealControlSocket::OnSend()
 		int written = m_pBackend->Write(sendBuffer_.get(), sendBuffer_.size(), error);
 		if (written < 0) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket::error_description(error));
+				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
 				if (GetCurrentCommandId() != Command::connect) {
 					LogMessage(MessageType::Error, _("Disconnected from server"));
 				}
@@ -1045,7 +1046,7 @@ void CRealControlSocket::OnClose(int error)
 			LogMessage(messageType, _("Connection closed by server"));
 		}
 		else {
-			LogMessage(messageType, _("Disconnected from server: %s"), fz::socket::error_description(error));
+			LogMessage(messageType, _("Disconnected from server: %s"), fz::socket_error_description(error));
 		}
 	}
 	DoClose();
@@ -1078,7 +1079,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 											engine_.GetOptions().GetOption(OPTION_PROXY_PASS));
 
 		if (res != EINPROGRESS) {
-			LogMessage(MessageType::Error, _("Could not start proxy handshake: %s"), fz::socket::error_description(res));
+			LogMessage(MessageType::Error, _("Could not start proxy handshake: %s"), fz::socket_error_description(res));
 			return FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR;
 		}
 	}
@@ -1097,7 +1098,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 
 	// Treat success same as EINPROGRESS, we wait for connect notification in any case
 	if (res && res != EINPROGRESS) {
-		LogMessage(MessageType::Error, _("Could not connect to server: %s"), fz::socket::error_description(res));
+		LogMessage(MessageType::Error, _("Could not connect to server: %s"), fz::socket_error_description(res));
 		return FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR; 
 	}
 

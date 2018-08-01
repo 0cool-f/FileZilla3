@@ -137,6 +137,9 @@
     <ClCompile Include="socket.cpp">
       <PrecompiledHeader />
     </ClCompile>
+    <ClCompile Include="socket_errors.cpp">
+      <PrecompiledHeader />
+    </ClCompile>
     <ClCompile Include="storj\connect.cpp" />
     <ClCompile Include="storj\delete.cpp" />
     <ClCompile Include="storj\file_transfer.cpp" />
@@ -200,6 +203,7 @@
     <ClInclude Include="..\include\serverpath.h" />
     <ClInclude Include="..\include\sizeformatting_base.h" />
     <ClInclude Include="..\include\socket.h" />
+    <ClInclude Include="..\include\socket_errors.h" />
     <ClInclude Include="sftp\chmod.h" />
     <ClInclude Include="sftp\connect.h" />
     <ClInclude Include="sftp\cwd.h" />

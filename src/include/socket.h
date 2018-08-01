@@ -167,21 +167,6 @@ public:
 	/// If connected, either ipv4 or ipv6, unknown otherwise
 	address_type address_family() const;
 
-	/**
-	 * \brief Gets a symbolic name for socket errors.
-	 *
-	 * \example error_string(EAGAIN) == "EAGAIN"
-	 *
-	 * \return name if the error code is known
-	 * \return number as string if the error code is not known
-	 */
-	static std::string error_string(int error);
-
-	/**
-	 * \brief Gets a human-readable, translated description of the error
-	 */
-	static native_string error_description(int error);
-
 	void set_event_handler(event_handler* pEvtHandler);
 
 	static std::string address_to_string(sockaddr const* addr, int addr_len, bool with_port = true, bool strip_zone_index = false);

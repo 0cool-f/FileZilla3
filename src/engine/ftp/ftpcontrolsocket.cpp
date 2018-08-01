@@ -20,6 +20,7 @@
 #include "rename.h"
 #include "rmd.h"
 #include "servercapabilities.h"
+#include "socket_errors.h"
 #include "tlssocket.h"
 #include "transfersocket.h"
 
@@ -61,7 +62,7 @@ void CFtpControlSocket::OnReceive()
 
 		if (read < 0) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket::error_description(error));
+				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket_error_description(error));
 				if (GetCurrentCommandId() != Command::connect) {
 					LogMessage(MessageType::Error, _("Disconnected from server"));
 				}

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "backend.h"
+#include "socket_errors.h"
 
 #include <libfilezilla/encode.hpp>
 
@@ -233,7 +234,7 @@ int CHttpRequestOpData::Send()
 					int written = controlSocket_.m_pBackend->Write(controlSocket_.sendBuffer_.get(), controlSocket_.sendBuffer_.size(), error);
 					if (written < 0) {
 						if (error != EAGAIN) {
-							LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket::error_description(error));
+							LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
 							LogMessage(MessageType::Error, _("Disconnected from server"));
 							return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 						}
@@ -372,7 +373,7 @@ int CHttpRequestOpData::OnReceive()
 		int read = controlSocket_.m_pBackend->Read(recv_buffer_.get(recv_size), recv_size, error);
 		if (read <= -1) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket::error_description(error));
+				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket_error_description(error));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			return FZ_REPLY_WOULDBLOCK;

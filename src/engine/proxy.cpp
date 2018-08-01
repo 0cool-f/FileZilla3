@@ -10,6 +10,7 @@
 #include <filezilla.h>
 #include "engineprivate.h"
 #include "proxy.h"
+#include "socket_errors.h"
 #include "ControlSocket.h"
 
 #include <libfilezilla/iputils.hpp>
@@ -205,7 +206,7 @@ void CProxySocket::OnSocketEvent(socket_event_source*, fz::socket_event_flag t, 
 	switch (t) {
 	case fz::socket_event_flag::connection_next:
 		if (error) {
-			m_pOwner->LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket::error_description(error));
+			m_pOwner->LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket_error_description(error));
 		}
 		break;
 	case fz::socket_event_flag::connection:

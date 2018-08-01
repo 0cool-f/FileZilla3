@@ -6,6 +6,7 @@
 #include "engine_context.h"
 #include "netconfwizard.h"
 #include "Options.h"
+#include "socket_errors.h"
 #include "dialogex.h"
 #include "filezillaapp.h"
 #include "externalipresolver.h"
@@ -217,7 +218,7 @@ void CNetConfWizard::OnPageChanging(wxWizardEvent& event)
 
 		int res = m_socket->connect(fzT("probe.filezilla-project.org"), 21);
 		if (res && res != EINPROGRESS) {
-			PrintMessage(wxString::Format(_("Connect failed: %s"), fz::socket::error_description(res)), 1);
+			PrintMessage(wxString::Format(_("Connect failed: %s"), fz::socket_error_description(res)), 1);
 			CloseSocket();
 		}
 	}

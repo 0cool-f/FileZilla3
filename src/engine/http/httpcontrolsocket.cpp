@@ -7,6 +7,7 @@
 #include "httpcontrolsocket.h"
 #include "internalconnect.h"
 #include "request.h"
+#include "socket_errors.h"
 #include "tlssocket.h"
 
 #include <libfilezilla/file.hpp>
@@ -296,7 +297,7 @@ void CHttpControlSocket::OnClose(int error)
 	}
 
 	if (error) {
-		LogMessage(MessageType::Error, _("Disconnected from server: %s"), fz::socket::error_description(error));
+		LogMessage(MessageType::Error, _("Disconnected from server: %s"), fz::socket_error_description(error));
 		ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
 		return;
 	}
