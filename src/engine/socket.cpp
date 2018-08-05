@@ -1494,7 +1494,7 @@ int socket::connect(native_string const& host, unsigned int port, address_type f
 
 	host_ = host;
 	port_ = port;
-	int res = socket_thread_->connect(bind, host_, port_);
+	int res = socket_thread_->connect(bind, to_utf8(host_), port_);
 	if (res) {
 		state_ = none;
 		delete socket_thread_;
