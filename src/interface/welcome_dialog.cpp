@@ -158,6 +158,7 @@ void CreateMessagePanel(wxWindow& dlg, char const* ctrl, wxXmlResource& resource
 			wxSize minSize = p->GetSizer()->GetMinSize();
 			parent->SetInitialSize(minSize);
 			MakeLinksFromTooltips(*p);
+			parent->GetContainingSizer()->Show(parent);
 		}
 		else {
 			delete p;
