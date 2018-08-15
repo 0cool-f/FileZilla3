@@ -409,8 +409,9 @@ public:
 		std::wstring const& sessionCipher,
 		std::wstring const& sessionMac,
 		int algorithmWarnings,
-	    std::vector<CCertificate> && certificates,
-	    bool hostnameMismatch);
+		std::vector<CCertificate> && certificates,
+		bool systemTrust,
+		bool hostnameMismatch);
 	virtual RequestId GetRequestID() const { return reqId_certificate; }
 
 	std::wstring const& GetHost() const { return m_host; }
@@ -436,6 +437,7 @@ public:
 
 	int GetAlgorithmWarnings() const { return m_algorithmWarnings; }
 
+	bool SystemTrust() const { return systemTrust_; }
 	bool MismatchedHostname() const { return hostnameMismatch_; }
 
 private:
@@ -450,6 +452,7 @@ private:
 
 	std::vector<CCertificate> m_certificates;
 
+	bool systemTrust_{};
 	bool hostnameMismatch_{};
 };
 

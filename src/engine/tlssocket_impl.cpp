@@ -169,8 +169,9 @@ bool CTlsSocketImpl::Init()
 		return false;
 	}
 
-	// Disable time checks. We allow expired/not yet valid certificates, though only after explicit user confirmation
-	gnutls_certificate_set_verify_flags(m_certCredentials, gnutls_certificate_get_verify_flags(m_certCredentials) | GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS);
+	m_defaultVerifyFlags = gnutls_certificate_get_verify_flags(m_certCredentials);
+
+	gnutls_certificate_set_x509_system_trust(m_certCredentials);
 
 	if (!InitSession()) {
 		return false;
@@ -793,8 +794,9 @@ int CTlsSocketImpl::Write(const void *buffer, unsigned int len, int& error)
 
 void CTlsSocketImpl::TriggerEvents()
 {
-	if (m_tlsState != CTlsSocket::TlsState::conn)
+	if (m_tlsState != CTlsSocket::TlsState::conn) {
 		return;
+	}
 
 	if (m_canTriggerRead) {
 		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
@@ -891,11 +893,13 @@ int CTlsSocketImpl::Shutdown()
 {
 	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::Shutdown()");
 
-	if (m_tlsState == CTlsSocket::TlsState::closed)
+	if (m_tlsState == CTlsSocket::TlsState::closed) {
 		return 0;
+	}
 
-	if (m_tlsState == CTlsSocket::TlsState::closing)
+	if (m_tlsState == CTlsSocket::TlsState::closing) {
 		return EAGAIN;
+	}
 
 	if (m_tlsState == CTlsSocket::TlsState::handshake || m_tlsState == CTlsSocket::TlsState::verifycert) {
 		// Shutdown during handshake is not a good idea.
@@ -904,8 +908,9 @@ int CTlsSocketImpl::Shutdown()
 		return EAGAIN;
 	}
 
-	if (m_tlsState != CTlsSocket::TlsState::conn)
+	if (m_tlsState != CTlsSocket::TlsState::conn) {
 		return ECONNABORTED;
+	}
 
 	m_tlsState = CTlsSocket::TlsState::closing;
 
@@ -1325,54 +1330,90 @@ int CTlsSocketImpl::VerifyCertificate()
 		return FZ_REPLY_ERROR;
 	}
 
-	gnutls_x509_crt_t root{};
-	clone_cert(certs.certs[certs.certs_size - 1], root);
-	if (!root) {
-		m_pOwner->LogMessage(MessageType::Error, _("Could not copy certificate"));
-		Failure(0, true);
-		return FZ_REPLY_ERROR;
-	}
+	bool const uses_hostname = !hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown;
+
+	bool systemTrust = false;
+	bool hostnameMismatch = false;
 
 	// Our trust-model is user-guided TOFU on the host's certificate.
+	// 
+	// First we verify it against the system trust store.
 	//
-	// Here we validate the certificate chain sent by the server on the assumption
-	// that it's signed by a trusted CA.
+	// If that fails, we validate the certificate chain sent by the server
+	// allowing three impairments:
+	// - Hostname mismatch
+	// - Out of validity
+	// - Signer not found
 	//
-	// For now, add the highest certificate from the chain to trust list. Otherweise
-	// gnutls_certificate_verify_peers2 always stops with GNUTLS_CERT_SIGNER_NOT_FOUND
-	// at the highest certificate in the chain.
-	//
-	// Actual trust decision is done later by the user.
-	gnutls_x509_trust_list_t tlist;
-	gnutls_certificate_get_trust_list(m_certCredentials, &tlist);
-	if (gnutls_x509_trust_list_add_cas(tlist, &root, 1, 0) != 1) {
-		m_pOwner->LogMessage(MessageType::Error, _("Could not add certificate to temporary trust list"));
-		Failure(0, true);
-		return FZ_REPLY_ERROR;
+	// In any case, actual trust decision is done later by the user.
+
+
+	// First, check system trust
+	if (uses_hostname) {
+		gnutls_certificate_set_verify_flags(m_certCredentials, m_defaultVerifyFlags);
+		unsigned int status = 0;
+		int verifyResult = gnutls_certificate_verify_peers3(m_session, fz::to_utf8(hostname_).c_str(), &status);
+		if (verifyResult < 0) {
+			m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
+			m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
+			Failure(0, true);
+			return FZ_REPLY_ERROR;
+		}
+
+		if (!status) {
+			systemTrust = true;
+		}
 	}
 
-	unsigned int status = 0;
-	int const verifyResult = gnutls_certificate_verify_peers2(m_session, &status);
+	if (!systemTrust) {
+		// System trust store cannot verify this certificate. Allow three impairments:
+		//
+		// 1. For now, add the highest certificate from the chain to trust list. Otherwise
+		// gnutls_certificate_verify_peers2 always stops with GNUTLS_CERT_SIGNER_NOT_FOUND
+		// at the highest certificate in the chain.
+		gnutls_x509_crt_t root{};
+		clone_cert(certs.certs[certs.certs_size - 1], root);
+		if (!root) {
+			m_pOwner->LogMessage(MessageType::Error, _("Could not copy certificate"));
+			Failure(0, true);
+			return FZ_REPLY_ERROR;
+		}
 
-	if (verifyResult < 0) {
-		m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
-		m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
-		Failure(0, true);
-		return FZ_REPLY_ERROR;
-	}
+		gnutls_x509_trust_list_t tlist;
+		gnutls_certificate_get_trust_list(m_certCredentials, &tlist);
+		if (gnutls_x509_trust_list_add_cas(tlist, &root, 1, 0) != 1) {
+			m_pOwner->LogMessage(MessageType::Error, _("Could not add certificate to temporary trust list"));
+			Failure(0, true);
+			return FZ_REPLY_ERROR;
+		}
 
-	if (status != 0) {
-		PrintVerificationError(status);
+		// 2. Also disable time checks. We allow expired/not yet valid certificates, though only
+		// after explicit user confirmation.
+		gnutls_certificate_set_verify_flags(m_certCredentials, m_defaultVerifyFlags | GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS);
 
-		Failure(0, true);
-		return FZ_REPLY_ERROR;
-	}
+		unsigned int status = 0;
+		int verifyResult = gnutls_certificate_verify_peers2(m_session, &status);
 
-	bool hostnameMismatch = false;
-	if (!hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown) {
-		if (!gnutls_x509_crt_check_hostname(certs.certs[0], fz::to_utf8(hostname_).c_str())) {
-			hostnameMismatch = true;
-			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Hostname does not match certificate SANs");
+		if (verifyResult < 0) {
+			m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
+			m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
+			Failure(0, true);
+			return FZ_REPLY_ERROR;
+		}
+
+		if (status != 0) {
+			PrintVerificationError(status);
+
+			Failure(0, true);
+			return FZ_REPLY_ERROR;
+		}
+
+		// 3. Hostname mismatch
+		if (uses_hostname) {
+			if (!gnutls_x509_crt_check_hostname(certs.certs[0], fz::to_utf8(hostname_).c_str())) {
+				hostnameMismatch = true;
+				m_pOwner->LogMessage(MessageType::Debug_Warning, L"Hostname does not match certificate SANs");
+			}
 		}
 	}
 
@@ -1430,6 +1471,7 @@ int CTlsSocketImpl::VerifyCertificate()
 		GetMacName(),
 		algorithmWarnings,
 		std::move(certificates),
+		systemTrust,
 		hostnameMismatch);
 
 	// Finally, ask user to verify the certificate chain

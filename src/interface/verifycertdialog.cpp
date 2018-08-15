@@ -391,7 +391,12 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 
 	bool const dnsname = fz::get_address_type(notification.GetHost()) == fz::address_type::unknown;
 	bool const sanTrustAllowed = !warning && dnsname && !notification.MismatchedHostname();
-		XRCCTRL(*m_pDlg, "ID_TRUST_SANS", wxCheckBox)->Enable(sanTrustAllowed);
+	XRCCTRL(*m_pDlg, "ID_TRUST_SANS", wxCheckBox)->Enable(sanTrustAllowed);
+
+	if (sanTrustAllowed && notification.SystemTrust()) {
+		xrc_call(*m_pDlg, "ID_ALWAYS", &wxCheckBox::SetValue, true);
+		xrc_call(*m_pDlg, "ID_TRUST_SANS", &wxCheckBox::SetValue, true);
+	}
 
 	m_pDlg->GetSizer()->Fit(m_pDlg);
 	m_pDlg->GetSizer()->SetSizeHints(m_pDlg);

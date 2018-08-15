@@ -137,6 +137,7 @@ CCertificateNotification::CCertificateNotification(std::wstring const& host, uns
 		std::wstring const& sessionMac,
 		int algorithmWarnings,
 		std::vector<CCertificate> && certificates,
+		bool systemTrust,
 		bool hostnameMismatch)
 	: m_host(host)
 	, m_port(port)
@@ -146,6 +147,7 @@ CCertificateNotification::CCertificateNotification(std::wstring const& host, uns
 	, m_sessionMac(sessionMac)
 	, m_algorithmWarnings(algorithmWarnings)
 	, m_certificates(certificates)
+	, systemTrust_(systemTrust)
 	, hostnameMismatch_(hostnameMismatch)
 {
 }
