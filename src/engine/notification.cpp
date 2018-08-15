@@ -151,3 +151,9 @@ CCertificateNotification::CCertificateNotification(std::wstring const& host, uns
 	, hostnameMismatch_(hostnameMismatch)
 {
 }
+
+
+CInsecureFTPNotification::CInsecureFTPNotification(CServer const& server)
+	: server_(server)
+{
+}

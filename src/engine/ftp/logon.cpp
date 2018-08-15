@@ -227,13 +227,14 @@ int CFtpLogonOpData::ParseResponse()
 			CServerCapabilities::SetCapability(currentServer_, (opState == LOGON_AUTH_TLS) ? auth_tls_command : auth_ssl_command, no);
 			if (opState == LOGON_AUTH_SSL) {
 				if (currentServer_.GetProtocol() == FTP) {
-					// For now. In future make TLS mandatory unless explicitly requested INSECURE_FTP as protocol
 					LogMessage(MessageType::Status, _("Insecure server, it does not support FTP over TLS."));
 					neededCommands[LOGON_PBSZ] = 0;
 					neededCommands[LOGON_PROT] = 0;
 
+					auto notification = new CInsecureFTPNotification(currentServer_);
+					controlSocket_.SendAsyncRequest(notification);
 					opState = LOGON_LOGON;
-					return FZ_REPLY_CONTINUE;
+					return FZ_REPLY_WOULDBLOCK;
 				}
 				else {
 					return FZ_REPLY_DISCONNECTED | (code == 5 ? FZ_REPLY_CRITICALERROR : FZ_REPLY_ERROR);

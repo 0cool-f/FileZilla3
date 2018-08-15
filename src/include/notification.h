@@ -53,8 +53,10 @@ enum RequestId
 	reqId_interactiveLogin, // gives a challenge prompt for a password
 	reqId_hostkey,			// used only by SSH/SFTP to indicate new host key
 	reqId_hostkeyChanged,	// used only by SSH/SFTP to indicate changed host key
-	reqId_certificate		// sent after a successful TLS handshake to allow certificate
+	reqId_certificate,		// sent after a successful TLS handshake to allow certificate
 							// validation
+	reqId_insecure_ftp		// If using opportunistic FTP over TLS, ask user whether he really wants
+							// to use plaintext FTP
 };
 
 class CNotification
@@ -464,6 +466,16 @@ class CLocalDirCreatedNotification final : public CNotificationHelper<nId_local_
 {
 public:
 	CLocalPath dir;
+};
+
+class CInsecureFTPNotification final : public CAsyncRequestNotification
+{
+public:
+	CInsecureFTPNotification(CServer const& server);
+	virtual RequestId GetRequestID() const { return reqId_insecure_ftp; }
+
+	CServer const server_;
+	bool allow_{};
 };
 
 #endif

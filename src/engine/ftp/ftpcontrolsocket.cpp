@@ -556,6 +556,18 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 			}
 		}
 		break;
+	case reqId_insecure_ftp:
+		{
+			auto & notification = static_cast<CInsecureFTPNotification&>(*pNotification);
+			if (!notification.allow_) {
+				ResetOperation(FZ_REPLY_CANCELED);
+				return false;
+			}
+			else {
+				SendNextCommand();
+				return true;
+			}
+		}
 	default:
 		LogMessage(MessageType::Debug_Warning, L"Unknown request %d", pNotification->GetRequestID());
 		ResetOperation(FZ_REPLY_INTERNALERROR);

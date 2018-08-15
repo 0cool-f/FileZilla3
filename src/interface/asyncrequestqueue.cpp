@@ -200,6 +200,15 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 
 		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
 	}
+	else if (entry.pNotification->GetRequestID() == reqId_insecure_ftp) {
+		if (!CheckWindowState()) {
+			return false;
+		}
+
+		auto & notification = static_cast<CInsecureFTPNotification&>(*entry.pNotification.get());
+		notification.allow_ = true;
+		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+	}
 	else {
 		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
 	}
