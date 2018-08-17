@@ -3,6 +3,8 @@
 
 #include "xmlfunctions.h"
 
+#include <set>
+
 class CertStore final
 {
 public:
@@ -10,6 +12,12 @@ public:
 
 	bool IsTrusted(CCertificateNotification const& notification);
 	void SetTrusted(CCertificateNotification const& notification, bool permanent, bool trustAllHostnames);
+
+	void SetInsecure(std::wstring const& host, unsigned int port, bool permanent);
+
+	bool IsInsecure(std::wstring const& host, unsigned int port, bool permanentOnly = false);
+
+	bool HasCertificate(std::wstring const& host, unsigned int port);
 
 private:
 	struct t_certData {
@@ -26,6 +34,8 @@ private:
 
 	std::list<t_certData> trustedCerts_;
 	std::list<t_certData> sessionTrustedCerts_;
+	std::set<std::tuple<std::wstring, unsigned int>> insecureHosts_;
+	std::set<std::tuple<std::wstring, unsigned int>> sessionInsecureHosts_;
 
 	CXmlFile m_xmlFile;
 };
@@ -59,5 +69,7 @@ private:
 
 	CertStore & certStore_;
 };
+
+void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & notification);
 
 #endif

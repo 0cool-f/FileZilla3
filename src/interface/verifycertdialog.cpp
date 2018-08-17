@@ -32,6 +32,41 @@ bool CertStore::IsTrusted(CCertificateNotification const& notification)
 	return IsTrusted(notification.GetHost(), notification.GetPort(), cert.GetRawData(), false, !notification.MismatchedHostname());
 }
 
+bool CertStore::IsInsecure(std::wstring const& host, unsigned int port, bool permanentOnly)
+{
+	auto const t = std::make_tuple(host, port);
+	if (!permanentOnly && sessionInsecureHosts_.find(t) != sessionInsecureHosts_.cend()) {
+		return true;
+	}
+
+	LoadTrustedCerts();
+
+	if (insecureHosts_.find(t) != insecureHosts_.cend()) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CertStore::HasCertificate(std::wstring const& host, unsigned int port)
+{
+	for (auto const& cert : sessionTrustedCerts_) {
+		if (cert.host == host && cert.port == port) {
+			return true;
+		}
+	}
+
+	LoadTrustedCerts();
+
+	for (auto const& cert : trustedCerts_) {
+		if (cert.host == host && cert.port == port) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool CertStore::DoIsTrusted(std::wstring const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<CertStore::t_certData> const& trustedCerts, bool allowSans)
 {
 	if (!data.size()) {
@@ -78,74 +113,170 @@ void CertStore::LoadTrustedCerts()
 		return;
 	}
 
-	auto element = m_xmlFile.Load();
-	if (!element) {
+	auto root = m_xmlFile.Load();
+	if (!root) {
 		return;
 	}
 
+	insecureHosts_.clear();
 	trustedCerts_.clear();
 
-	if (!(element = element.child("TrustedCerts"))) {
-		return;
-	}
+	pugi::xml_node element;
 
 	bool modified = false;
+	if ((element = root.child("TrustedCerts"))) {
 
-	auto const processEntry = [&](pugi::xml_node const& cert)
-	{
-		std::wstring value = GetTextElement(cert, "Data");
+		auto const processEntry = [&](pugi::xml_node const& cert)
+		{
+			std::wstring value = GetTextElement(cert, "Data");
 
-		pugi::xml_node remove;
+			t_certData data;
+			data.data = fz::hex_decode(value);
+			if (data.data.empty()) {
+				return false;
+			}
 
-		t_certData data;
-		data.data = fz::hex_decode(value);
-		if (data.data.empty()) {
-			return false;
+			data.host = GetTextElement(cert, "Host");
+			data.port = GetTextElementInt(cert, "Port");
+			if (data.host.empty() || data.port < 1 || data.port > 65535) {
+				return false;
+			}
+
+			fz::datetime const now = fz::datetime::now();
+			int64_t activationTime = GetTextElementInt(cert, "ActivationTime", 0);
+			if (activationTime == 0 || activationTime > now.get_time_t()) {
+				return false;
+			}
+
+			int64_t expirationTime = GetTextElementInt(cert, "ExpirationTime", 0);
+			if (expirationTime == 0 || expirationTime < now.get_time_t()) {
+				return false;
+			}
+
+			data.trustSans = GetTextElementBool(cert, "TrustSANs");
+
+			// Weed out duplicates
+			if (IsTrusted(data.host, data.port, data.data, true, false)) {
+				return false;
+			}
+
+			trustedCerts_.emplace_back(std::move(data));
+
+			return true;
+		};
+
+		auto cert = element.child("Certificate");
+		while (cert) {
+
+			auto nextCert = cert.next_sibling("Certificate");
+			if (!processEntry(cert)) {
+				modified = true;
+				element.remove_child(cert);
+			}
+			cert = nextCert;
 		}
+	}
 
-		data.host = GetTextElement(cert, "Host");
-		data.port = GetTextElementInt(cert, "Port");
-		if (data.host.empty() || data.port < 1 || data.port > 65535) {
-			return false;
+	if ((element = root.child("InsecureHosts"))) {
+
+		auto const processEntry = [&](pugi::xml_node const& node)
+		{
+			std::wstring host = GetTextElement(node);
+			unsigned int port = node.attribute("Port").as_uint();
+			if (host.empty() || port < 1 || port > 65535) {
+				return false;
+			}
+
+			for (auto const& cert : trustedCerts_) {
+				// A host can't be both trusted and insecure
+				if (cert.host == host && cert.port == port) {
+					return false;
+				}
+			}
+
+			insecureHosts_.emplace(std::make_tuple(host, port));
+
+			return true;
+		};
+
+		auto host = element.child("Host");
+		while (host) {
+
+			auto nextHost = host.next_sibling("Host");
+			if (!processEntry(host)) {
+				modified = true;
+				element.remove_child(host);
+			}
+			host = nextHost;
 		}
-
-		fz::datetime const now = fz::datetime::now();
-		int64_t activationTime = GetTextElementInt(cert, "ActivationTime", 0);
-		if (activationTime == 0 || activationTime > now.get_time_t()) {
-			return false;
-		}
-
-		int64_t expirationTime = GetTextElementInt(cert, "ExpirationTime", 0);
-		if (expirationTime == 0 || expirationTime < now.get_time_t()) {
-			return false;
-		}
-
-		data.trustSans = GetTextElementBool(cert, "TrustSANs");
-
-		// Weed out duplicates
-		if (IsTrusted(data.host, data.port, data.data, true, false)) {
-			return false;
-		}
-
-		trustedCerts_.emplace_back(std::move(data));
-
-		return true;
-	};
-
-	auto cert = element.child("Certificate");
-	while (cert) {
-
-		auto nextCert = cert.next_sibling("Certificate");
-		if (!processEntry(cert)) {
-			modified = true;
-			element.remove_child(cert);
-		}
-		cert = nextCert;
 	}
 
 	if (modified) {
 		m_xmlFile.Save(false);
 	}
+}
+
+void CertStore::SetInsecure(std::wstring const& host, unsigned int port, bool permanent)
+{
+	// A host can't be both trusted and insecure
+	sessionTrustedCerts_.erase(
+		std::remove_if(sessionTrustedCerts_.begin(), sessionTrustedCerts_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
+		sessionTrustedCerts_.end()
+	);
+
+	if (!permanent) {
+		sessionInsecureHosts_.emplace(std::make_tuple(host, port));
+		return;
+	}
+
+	CReentrantInterProcessMutexLocker mutex(MUTEX_TRUSTEDCERTS);
+	LoadTrustedCerts();
+
+	if (IsInsecure(host, port, true)) {
+		return;
+	}
+
+	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 2) {
+		auto root = m_xmlFile.GetElement();
+		if (root) {
+			auto certs = root.child("TrustedCerts");
+
+			// Purge certificates for this host
+			auto const processEntry = [&host, &port](pugi::xml_node const& cert)
+			{
+				return host != GetTextElement(cert, "Host") || port != GetTextElementInt(cert, "Port");
+			};
+
+			auto cert = certs.child("Certificate");
+			while (cert) {
+				auto nextCert = cert.next_sibling("Certificate");
+				if (!processEntry(cert)) {
+					certs.remove_child(cert);
+				}
+				cert = nextCert;
+			}
+
+			auto insecureHosts = root.child("InsecureHosts");
+			if (!insecureHosts) {
+				insecureHosts = root.append_child("InsecureHosts");
+			}
+
+			// Remember host as insecure
+			auto xhost = insecureHosts.append_child("Host");
+			xhost.append_attribute("Port").set_value(port);
+			xhost.text().set(fz::to_utf8(host).c_str());
+
+			m_xmlFile.Save(true);
+		}
+	}
+
+	// A host can't be both trusted and insecure
+	trustedCerts_.erase(
+		std::remove_if(trustedCerts_.begin(), trustedCerts_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
+		trustedCerts_.end()
+	);
+
+	insecureHosts_.emplace(std::make_tuple(host, port));
 }
 
 void CertStore::SetTrusted(CCertificateNotification const& notification, bool permanent, bool trustAllHostnames)
@@ -160,6 +291,9 @@ void CertStore::SetTrusted(CCertificateNotification const& notification, bool pe
 	if (trustAllHostnames) {
 		cert.trustSans = true;
 	}
+
+	// A host can't be both trusted and insecure
+	sessionInsecureHosts_.erase(std::make_tuple(cert.host, cert.port));
 
 	if (!permanent) {
 		t_certData cert;
@@ -176,11 +310,11 @@ void CertStore::SetTrusted(CCertificateNotification const& notification, bool pe
 	}
 
 	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 2) {
-		auto element = m_xmlFile.GetElement();
-		if (element) {
-			auto certs = element.child("TrustedCerts");
+		auto root = m_xmlFile.GetElement();
+		if (root) {
+			auto certs = root.child("TrustedCerts");
 			if (!certs) {
-				certs = element.append_child("TrustedCerts");
+				certs = root.append_child("TrustedCerts");
 			}
 
 			auto xCert = certs.append_child("Certificate");
@@ -191,9 +325,30 @@ void CertStore::SetTrusted(CCertificateNotification const& notification, bool pe
 			AddTextElement(xCert, "Port", cert.port);
 			AddTextElement(xCert, "TrustSANs", cert.trustSans ? L"1" : L"0");
 
+			// Purge insecure host
+			auto const processEntry = [&cert](pugi::xml_node const& xhost)
+			{
+				return cert.host != GetTextElement(xhost) || cert.port != xhost.attribute("Port").as_uint();
+			};
+
+			auto insecureHosts = root.child("InsecureHosts");
+			auto xhost = insecureHosts.child("Host");
+			while (xhost) {
+
+				auto nextHost = xhost.next_sibling("Host");
+				if (!processEntry(xhost)) {
+					insecureHosts.remove_child(xhost);
+				}
+				xhost = nextHost;
+			}
+
 			m_xmlFile.Save(true);
 		}
 	}
+
+	// A host can't be both trusted and insecure
+	insecureHosts_.erase(std::make_tuple(cert.host, cert.port));
+
 	trustedCerts_.emplace_back(std::move(cert));
 }
 
@@ -461,7 +616,7 @@ void CVerifyCertDialog::ParseDN(wxWindow* parent, const wxString& dn, wxSizer* p
 	}
 }
 
-void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::list<wxString>& tokens, wxString prefix, const wxString& name, wxSizer* pSizer, bool decode /*=false*/)
+void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::list<wxString>& tokens, wxString prefix, const wxString& name, wxSizer* pSizer, bool decode)
 {
 	prefix += _T("=");
 	int len = prefix.Length();
@@ -572,4 +727,74 @@ void CVerifyCertDialog::OnCertificateChoice(wxCommandEvent& event)
 	m_pDlg->Layout();
 	m_pDlg->GetSizer()->Fit(m_pDlg);
 	m_pDlg->Refresh();
+}
+
+
+void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & notification)
+{
+	wxDialogEx dlg;
+	dlg.Create(0, wxID_ANY, _("Insecure FTP connection"));
+
+	auto const& lay = dlg.layout();
+	auto outer = new wxBoxSizer(wxVERTICAL);
+	dlg.SetSizer(outer);
+
+	auto main = lay.createFlex(1);
+	outer->Add(main, 0, wxALL, lay.border);
+
+	bool const warning = certStore.HasCertificate(notification.server_.GetHost(), notification.server_.GetPort());
+
+	if (warning) {
+		main->Add(new wxStaticText(&dlg, -1, _T("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
+		main->Add(new wxStaticText(&dlg, -1, _T("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
+	}
+	else {
+		main->Add(new wxStaticText(&dlg, -1, _T("This server does not support FTP over TLS.")));
+	}
+	main->Add(new wxStaticText(&dlg, -1, _T("If you continue, your password and files will be sent in clear over the internet.")));
+
+
+	auto flex = lay.createFlex(2);
+	main->Add(flex, 0, wxALL, lay.border);
+	flex->Add(new wxStaticText(&dlg, -1, _("Host:")), lay.valign);
+	flex->Add(new wxStaticText(&dlg, -1, notification.server_.GetHost()), lay.valign);
+	flex->Add(new wxStaticText(&dlg, -1, _("Port:")), lay.valign);
+	flex->Add(new wxStaticText(&dlg, -1, fz::to_wstring(notification.server_.GetPort())), lay.valign);
+
+	auto always = new wxCheckBox(&dlg, -1, _("&Always allow insecure plain FTP for this server."));
+	main->Add(always);
+
+	auto buttons = lay.createButtonSizer(&dlg, main, true);
+
+	auto ok = new wxButton(&dlg, wxID_OK, _("&OK"));
+	if (!warning) {
+		ok->SetFocus();
+		ok->SetDefault();
+	}
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(&dlg, wxID_CANCEL, _("&Cancel"));
+	if (warning) {
+		cancel->SetFocus();
+		cancel->SetDefault();
+	}
+	buttons->AddButton(cancel);
+
+	dlg.Bind(wxEVT_BUTTON, [&dlg](wxEvent & evt) {dlg.EndModal(evt.GetId()); });
+
+	buttons->Realize();
+
+	dlg.WrapRecursive(&dlg, 2);
+	dlg.Layout();
+
+	dlg.GetSizer()->Fit(&dlg);
+
+
+
+	bool allow = dlg.ShowModal() == wxID_OK;
+	if (allow) {
+		notification.allow_ = true;
+
+		certStore.SetInsecure(notification.server_.GetHost(), notification.server_.GetPort(), always->GetValue());
+	}
 }

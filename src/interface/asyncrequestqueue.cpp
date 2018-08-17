@@ -103,6 +103,18 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 			return true;
 		}
 		break;
+	case reqId_insecure_ftp:
+		{
+			auto & insecureNotification = static_cast<CInsecureFTPNotification&>(*pNotification.get());
+			if (!certStore_->IsInsecure(insecureNotification.server_.GetHost(), insecureNotification.server_.GetPort())) {
+				break;
+			}
+
+			insecureNotification.allow_ = true;
+			pEngine->SetAsyncRequestReply(std::move(pNotification));
+
+			return true;
+		}
 	default:
 		break;
 	}
@@ -206,7 +218,9 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 		}
 
 		auto & notification = static_cast<CInsecureFTPNotification&>(*entry.pNotification.get());
-		notification.allow_ = true;
+
+		ConfirmInsecureConection(*certStore_.get(), notification);
+
 		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
 	}
 	else {
@@ -485,4 +499,3 @@ void CAsyncRequestQueue::OnTimer(wxTimerEvent&)
 {
 	TriggerProcessing();
 }
-
