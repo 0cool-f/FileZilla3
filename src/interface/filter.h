@@ -104,6 +104,9 @@ public:
 
 	ActiveFilters GetActiveFilters();
 
+	bool HasActiveLocalFilters() const;
+	bool HasActiveRemoteFilters() const;
+
 	static bool CompileRegexes(std::vector<CFilter>& filters);
 	static bool CompileRegexes(CFilter& filter);
 

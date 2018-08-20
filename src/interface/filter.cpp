@@ -1117,6 +1117,36 @@ void CFilterManager::ToggleFilters()
 	}
 }
 
+bool CFilterManager::HasActiveLocalFilters() const
+{
+	if (!m_filters_disabled) {
+		CFilterSet const& set = m_globalFilterSets[m_globalCurrentFilterSet];
+		// Check active filters
+		for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+			if (set.local[i]) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool CFilterManager::HasActiveRemoteFilters() const
+{
+	if (!m_filters_disabled) {
+		CFilterSet const& set = m_globalFilterSets[m_globalCurrentFilterSet];
+		// Check active filters
+		for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+			if (set.remote[i]) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 ActiveFilters CFilterManager::GetActiveFilters()
 {
 	ActiveFilters filters;
