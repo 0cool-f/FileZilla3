@@ -460,7 +460,9 @@ void CStatusBar::DisplayEncrypted()
 	if (server) {
 		CCertificateNotification* info;
 		auto const protocol = server.server.GetProtocol();
-		if (protocol == FTPS || protocol == FTPES || protocol == SFTP || protocol == S3 || protocol == WEBDAV || protocol == AZURE_BLOB || protocol == AZURE_FILE) {
+		if (protocol == FTPS || protocol == FTPES || protocol == SFTP || protocol == S3||
+				protocol == WEBDAV || protocol == AZURE_BLOB || protocol == AZURE_FILE ||
+				protocol == SWIFT || protocol == GOOGLE_CLOUD || protocol == GOOGLE_DRIVE) {
 			encrypted = true;
 		}
 		else if (protocol == FTP && pState->GetSecurityInfo(info)) {

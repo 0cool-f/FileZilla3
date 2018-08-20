@@ -997,19 +997,22 @@ bool CState::IsRemoteConnected() const
 
 bool CState::IsRemoteIdle(bool ignore_recursive) const
 {
-	if (!ignore_recursive && m_pRemoteRecursiveOperation && m_pRemoteRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_none)
+	if (!ignore_recursive && m_pRemoteRecursiveOperation && m_pRemoteRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_none) {
 		return false;
+	}
 
-	if (!m_pCommandQueue)
+	if (!m_pCommandQueue) {
 		return true;
+	}
 
 	return m_pCommandQueue->Idle(ignore_recursive ? CCommandQueue::normal : CCommandQueue::any);
 }
 
 bool CState::IsLocalIdle(bool ignore_recursive) const
 {
-	if (!ignore_recursive && m_pLocalRecursiveOperation && m_pLocalRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_none)
+	if (!ignore_recursive && m_pLocalRecursiveOperation && m_pLocalRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_none) {
 		return false;
+	}
 
 	return true;
 }

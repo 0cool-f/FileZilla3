@@ -25,9 +25,12 @@ enum ServerProtocol
 
 	SWIFT,
 
-	GOOGLE,
+	GOOGLE_CLOUD,
+	GOOGLE_DRIVE,
 
-	MAX_VALUE = GOOGLE
+	DROPBOX,
+
+	MAX_VALUE = DROPBOX
 };
 
 enum ServerType
@@ -79,7 +82,9 @@ enum class ProtocolFeature
 	ServerType,
 	EnterCommand,
 	DirectoryRename,
-	PostLoginCommands
+	PostLoginCommands,
+	S3Lifecycle,
+	RecursiveDelete
 };
 
 class Credentials;
@@ -228,6 +233,8 @@ struct ParameterTraits
 std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol protocol);
 
 std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol);
+
+bool ProtocolHasUser(ServerProtocol protocol);
 
 class Credentials
 {

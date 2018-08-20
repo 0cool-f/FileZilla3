@@ -251,8 +251,10 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		}
 	}
 
-	xrc_call(*this, "ID_USER_DESC", &wxStaticText::Show, type != LogonType::anonymous);
-	xrc_call(*this, "ID_USER", &wxTextCtrl::Show, type != LogonType::anonymous);
+	bool const hasUser = ProtocolHasUser(protocol) && type != LogonType::anonymous;
+
+	xrc_call(*this, "ID_USER_DESC", &wxStaticText::Show, hasUser);
+	xrc_call(*this, "ID_USER", &wxTextCtrl::Show, hasUser);
 	xrc_call(*this, "ID_PASS_DESC", &wxStaticText::Show, type != LogonType::anonymous && type != LogonType::interactive  && (protocol != SFTP || type != LogonType::key));
 	xrc_call(*this, "ID_PASS", &wxTextCtrl::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key));
 	xrc_call(*this, "ID_ACCOUNT_DESC", &wxStaticText::Show, isFtp && type == LogonType::account);
@@ -283,7 +285,7 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		userLabel = _("Storage &account:");
 		passLabel = _("Access &Key:");
 		break;
-	case GOOGLE:
+	case GOOGLE_CLOUD:
 		userLabel = _("Pro&ject ID:");
 		break;
 	case SWIFT:

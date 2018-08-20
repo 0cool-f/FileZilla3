@@ -30,7 +30,9 @@ static const t_protocolInfo protocolInfos[] = {
 	{ AZURE_FILE,   L"azfile", true, 443,  false, "Microsoft Azure File Storage Service",                                    L"https" },
 	{ AZURE_BLOB,   L"azblob", true, 443,  false, "Microsoft Azure Blob Storage Service",                                    L"https" },
 	{ SWIFT,        L"swift",  true, 443,  false, "OpenStack Swift",                                                         L"https" },
-	{ GOOGLE,       L"google", true, 443,  false, "Google Cloud Storage",                                                    L"https" },
+	{ GOOGLE_CLOUD, L"google", true, 443,  false, "Google Cloud Storage",                                                    L"https" },
+	{ GOOGLE_DRIVE, L"gdrive", true, 443,  false, "Google Drive",                                                            L"https" },
+	{ DROPBOX,		L"dropbox", true, 443, false, "Dropbox",                                                                 L"https" },
 	{ UNKNOWN,      L"",       false, 21,  false, "", L"" }
 };
 
@@ -589,7 +591,17 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 		}
 		break;
 	case ProtocolFeature::DirectoryRename:
-		if (protocol != AZURE_BLOB && protocol != AZURE_FILE) {
+		if (protocol != AZURE_FILE) {
+			return true;
+		}
+		break;
+	case ProtocolFeature::S3Lifecycle:
+		if (protocol == S3) {
+			return true;
+		}
+		break;
+	case ProtocolFeature::RecursiveDelete:
+		if (protocol == GOOGLE_DRIVE || protocol == DROPBOX) {
 			return true;
 		}
 		break;
@@ -771,7 +783,9 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 		return {LogonType::normal, LogonType::ask};
 	case WEBDAV:
 		return {LogonType::anonymous, LogonType::normal, LogonType::ask};
-	case GOOGLE:
+	case GOOGLE_CLOUD:
+	case GOOGLE_DRIVE:
+	case DROPBOX:
 		return {LogonType::interactive};
 	case HTTPS:
 	case UNKNOWN:
@@ -784,7 +798,7 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol protocol)
 {
 	switch (protocol) {
-	case GOOGLE:
+	case GOOGLE_CLOUD:
 		{
 			static std::vector<ParameterTraits> ret = []() {
 				std::vector<ParameterTraits> ret;
@@ -819,13 +833,22 @@ std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol)
 		return std::tuple<std::wstring, std::wstring>{L"file.core.windows.net", L""};
 	case AZURE_BLOB:
 		return std::tuple<std::wstring, std::wstring>{L"blob.core.windows.net", L""};
-	case GOOGLE:
+	case GOOGLE_CLOUD:
 		return std::tuple<std::wstring, std::wstring>{L"storage.googleapis.com", L""};
+	case GOOGLE_DRIVE:
+		return std::tuple<std::wstring, std::wstring>{L"www.googleapis.com", L""};
 	case S3:
 		return std::tuple<std::wstring, std::wstring>{L"s3.amazonaws.com", L""};
+	case DROPBOX:
+		return std::tuple<std::wstring, std::wstring>{L"api.dropboxapi.com", L""};
 	default:
 		break;
 	}
 
 	return std::tuple<std::wstring, std::wstring>{};
+}
+
+bool ProtocolHasUser(ServerProtocol protocol)
+{
+	return protocol != GOOGLE_DRIVE &&  protocol != DROPBOX;
 }

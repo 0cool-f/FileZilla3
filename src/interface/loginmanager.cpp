@@ -21,7 +21,9 @@ std::list<CLoginManager::t_passwordcache>::iterator CLoginManager::FindItem(CSer
 
 bool CLoginManager::GetPassword(ServerWithCredentials &server, bool silent, std::wstring const& name)
 {
-	if (server.credentials.logonType_ != LogonType::ask && !server.credentials.encrypted_ && (server.credentials.logonType_ != LogonType::interactive || !server.server.GetUser().empty())) {
+	bool const needsUser = ProtocolHasUser(server.server.GetProtocol()) && server.server.GetUser().empty() && (server.credentials.logonType_ == LogonType::ask || server.credentials.logonType_ == LogonType::interactive);
+
+	if (server.credentials.logonType_ != LogonType::ask && !server.credentials.encrypted_ && !needsUser) {
 		return true;
 	}
 

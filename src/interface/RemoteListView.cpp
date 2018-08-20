@@ -1489,53 +1489,90 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 		follow_symlink = XRCCTRL(dlg, "ID_RECURSE", wxRadioButton)->GetValue();
 	}
 
-	CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
-	wxASSERT(pRecursiveOperation);
+	if (CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::RecursiveDelete)) {
+		std::deque<std::wstring> filesToDelete;
 
-	std::deque<std::wstring> filesToDelete;
+		for (item = -1; ;) {
+			item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+			if (!item) {
+				continue;
+			}
+			if (item == -1) {
+				break;
+			}
 
-	recursion_root root(m_pDirectoryListing->path, false);
-	for (item = -1; ;) {
-		item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-		if (!item) {
-			continue;
-		}
-		if (item == -1) {
-			break;
-		}
+			int index = GetItemIndex(item);
+			if (index == -1) {
+				continue;
+			}
+			if (m_fileData[index].comparison_flags == fill) {
+				continue;
+			}
 
-		int index = GetItemIndex(item);
-		if (index == -1) {
-			continue;
-		}
-		if (m_fileData[index].comparison_flags == fill) {
-			continue;
-		}
+			const CDirentry& entry = (*m_pDirectoryListing)[index];
+			std::wstring const& name = entry.name;
 
-		const CDirentry& entry = (*m_pDirectoryListing)[index];
-		std::wstring const& name = entry.name;
-
-		if (entry.is_dir() && (follow_symlink || !entry.is_link())) {
-			CServerPath remotePath = m_pDirectoryListing->path;
-			if (remotePath.AddSegment(name)) {
-				root.add_dir_to_visit(m_pDirectoryListing->path, name, CLocalPath(), true);
+			if (entry.is_dir()) {
+				m_state.m_pCommandQueue->ProcessCommand(new CRemoveDirCommand(m_pDirectoryListing->path, name));
+			}
+			else {
+				filesToDelete.push_back(name);
 			}
 		}
-		else {
-			filesToDelete.push_back(name);
+
+		if (!filesToDelete.empty()) {
+			m_state.m_pCommandQueue->ProcessCommand(new CDeleteCommand(m_pDirectoryListing->path, std::move(filesToDelete)));
 		}
 	}
+	else {
+		CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
+		wxASSERT(pRecursiveOperation);
 
-	if (!filesToDelete.empty()) {
-		m_state.m_pCommandQueue->ProcessCommand(new CDeleteCommand(m_pDirectoryListing->path, std::move(filesToDelete)));
-	}
+		std::deque<std::wstring> filesToDelete;
 
-	if (!root.empty()) {
-		pRecursiveOperation->AddRecursionRoot(std::move(root));
+		recursion_root root(m_pDirectoryListing->path, false);
+		for (item = -1; ;) {
+			item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+			if (!item) {
+				continue;
+			}
+			if (item == -1) {
+				break;
+			}
 
-		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete,
-													 filter.GetActiveFilters(), m_pDirectoryListing->path);
+			int index = GetItemIndex(item);
+			if (index == -1) {
+				continue;
+			}
+			if (m_fileData[index].comparison_flags == fill) {
+				continue;
+			}
+
+			const CDirentry& entry = (*m_pDirectoryListing)[index];
+			std::wstring const& name = entry.name;
+
+			if (entry.is_dir() && (follow_symlink || !entry.is_link())) {
+				CServerPath remotePath = m_pDirectoryListing->path;
+				if (remotePath.AddSegment(name)) {
+					root.add_dir_to_visit(m_pDirectoryListing->path, name, CLocalPath(), true);
+				}
+			}
+			else {
+				filesToDelete.push_back(name);
+			}
+		}
+
+		if (!filesToDelete.empty()) {
+			m_state.m_pCommandQueue->ProcessCommand(new CDeleteCommand(m_pDirectoryListing->path, std::move(filesToDelete)));
+		}
+
+		if (!root.empty()) {
+			pRecursiveOperation->AddRecursionRoot(std::move(root));
+
+			CFilterManager filter;
+			pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete,
+														 filter.GetActiveFilters(), m_pDirectoryListing->path);
+		}
 	}
 }
 
