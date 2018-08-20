@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.36.0-rc1 (2018-08-20)
+
++ Ask for explicit confirmation prior to falling back to insecure plaintext FTP if a server refuses to use TLS
++ Warn if an FTP server refuses TLS that is known from previous connections to be capable of TLS
+
 3.35.2 (2018-08-06)
 
 - Fix functionality of --site and --local command-line options
