@@ -1489,7 +1489,8 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 		follow_symlink = XRCCTRL(dlg, "ID_RECURSE", wxRadioButton)->GetValue();
 	}
 
-	if (CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::RecursiveDelete)) {
+	CFilterManager filter;
+	if (CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
 		std::deque<std::wstring> filesToDelete;
 
 		for (item = -1; ;) {
@@ -1569,7 +1570,6 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 		if (!root.empty()) {
 			pRecursiveOperation->AddRecursionRoot(std::move(root));
 
-			CFilterManager filter;
 			pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete,
 														 filter.GetActiveFilters(), m_pDirectoryListing->path);
 		}
