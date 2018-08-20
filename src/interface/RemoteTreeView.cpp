@@ -1087,49 +1087,66 @@ void CRemoteTreeView::OnMenuDownload(wxCommandEvent& event)
 
 void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
 {
-	if (!m_state.IsRemoteIdle())
+	if (!m_state.IsRemoteIdle()) {
 		return;
+	}
 
-	if (!m_contextMenuItem)
+	if (!m_contextMenuItem) {
 		return;
+	}
 
 	CServerPath const& pathToDelete = GetPathFromItem(m_contextMenuItem);
-	if (pathToDelete.empty())
+	if (pathToDelete.empty()) {
 		return;
+	}
 
-	if (wxMessageBoxEx(_("Really delete all selected files and/or directories from the server?"), _("Confirmation needed"), wxICON_QUESTION | wxYES_NO, this) != wxYES)
+	if (wxMessageBoxEx(_("Really delete all selected files and/or directories from the server?"), _("Confirmation needed"), wxICON_QUESTION | wxYES_NO, this) != wxYES) {
 		return;
-
-	const bool hasParent = pathToDelete.HasParent();
-
-	CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
-
-	recursion_root root;
-	CServerPath startDir;
-	if (hasParent) {
-		std::wstring const name = GetItemText(m_contextMenuItem).ToStdWstring();
-		startDir = pathToDelete.GetParent();
-		root = recursion_root(startDir, !hasParent);
-		root.add_dir_to_visit(startDir, name);
 	}
-	else {
-		startDir = pathToDelete;
-		root = recursion_root(startDir, !hasParent);
-		root.add_dir_to_visit(startDir, std::wstring());
-	}
-	pRecursiveOperation->AddRecursionRoot(std::move(root));
 
-	CServerPath currentPath;
-	const wxTreeItemId selected = GetSelection();
-	if (selected)
-		currentPath = GetPathFromItem(selected);
-	if (!currentPath.empty() && (pathToDelete == currentPath || pathToDelete.IsParentOf(currentPath, false))) {
-		currentPath = startDir;
-		m_state.ChangeRemoteDir(startDir);
-	}
+	bool const hasParent = pathToDelete.HasParent();
 
 	CFilterManager filter;
-	pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters(), currentPath);
+	if (CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
+		if (hasParent) {
+			std::wstring const name = GetItemText(m_contextMenuItem).ToStdWstring();
+			m_state.m_pCommandQueue->ProcessCommand(new CRemoveDirCommand(pathToDelete.GetParent(), name));
+		}
+		else {
+			m_state.m_pCommandQueue->ProcessCommand(new CRemoveDirCommand(pathToDelete, std::wstring()));
+		}
+	}
+	else {
+
+		CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
+
+		recursion_root root;
+		CServerPath startDir;
+		if (hasParent) {
+			std::wstring const name = GetItemText(m_contextMenuItem).ToStdWstring();
+			startDir = pathToDelete.GetParent();
+			root = recursion_root(startDir, !hasParent);
+			root.add_dir_to_visit(startDir, name);
+		}
+		else {
+			startDir = pathToDelete;
+			root = recursion_root(startDir, !hasParent);
+			root.add_dir_to_visit(startDir, std::wstring());
+		}
+		pRecursiveOperation->AddRecursionRoot(std::move(root));
+
+		CServerPath currentPath;
+		const wxTreeItemId selected = GetSelection();
+		if (selected) {
+			currentPath = GetPathFromItem(selected);
+		}
+		if (!currentPath.empty() && (pathToDelete == currentPath || pathToDelete.IsParentOf(currentPath, false))) {
+			currentPath = startDir;
+			m_state.ChangeRemoteDir(startDir);
+		}
+
+		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters(), currentPath);
+	}
 }
 
 void CRemoteTreeView::OnMenuRename(wxCommandEvent&)
