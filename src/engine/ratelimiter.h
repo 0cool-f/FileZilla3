@@ -28,8 +28,8 @@ protected:
 
 	int GetBucketSize() const;
 
-	std::list<CRateLimiterObject*> m_objectList;
-	std::list<CRateLimiterObject*> m_wakeupList[2];
+	std::vector<CRateLimiterObject*> objects_;
+	std::vector<CRateLimiterObject*> wakeupList_[2];
 
 	fz::timer_id m_timer{};
 

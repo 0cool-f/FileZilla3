@@ -38,14 +38,14 @@ void CRateLimiter::AddObject(CRateLimiterObject* pObject)
 {
 	fz::scoped_lock lock(sync_);
 
-	m_objectList.push_back(pObject);
+	objects_.push_back(pObject);
 
 	for (int i = 0; i < 2; ++i) {
 		int64_t limit = GetLimit(static_cast<rate_direction>(i));
 		if (limit > 0) {
 			int64_t tokens = limit / (1000 / tickDelay);
 
-			tokens /= m_objectList.size();
+			tokens /= objects_.size();
 			if (m_tokenDebt[i] > 0) {
 				if (tokens >= m_tokenDebt[i]) {
 					tokens -= m_tokenDebt[i];
@@ -73,28 +73,32 @@ void CRateLimiter::RemoveObject(CRateLimiterObject* pObject)
 {
 	fz::scoped_lock lock(sync_);
 
-	for (auto iter = m_objectList.begin(); iter != m_objectList.end(); ++iter) {
-		if (*iter == pObject) {
-			for (int i = 0; i < 2; ++i) {
+	for (size_t i = 0; i < objects_.size(); ++i) {
+		auto * const object = objects_[i];
+		if (object == pObject) {
+			for (int direction = 0; direction < 2; ++direction) {
 				// If an object already used up some of its assigned tokens, add them to m_tokenDebt,
 				// so that newly created objects get less initial tokens.
 				// That ensures that rapidly adding and removing objects does not exceed the rate
-				int64_t limit = GetLimit(static_cast<rate_direction>(i));
+				int64_t limit = GetLimit(static_cast<rate_direction>(direction));
 				int64_t tokens = limit / (1000 / tickDelay);
-				tokens /= m_objectList.size();
-				if ((*iter)->m_bytesAvailable[i] < tokens) {
-					m_tokenDebt[i] += tokens - (*iter)->m_bytesAvailable[i];
+				tokens /= objects_.size();
+				if (object->m_bytesAvailable[direction] < tokens) {
+					m_tokenDebt[direction] += tokens - object->m_bytesAvailable[direction];
 				}
 			}
-			m_objectList.erase(iter);
+			objects_[i] = objects_[objects_.size() - 1];
+			objects_.pop_back();
 			break;
 		}
 	}
 
-	for (int i = 0; i < 2; ++i) {
-		for (auto iter = m_wakeupList[i].begin(); iter != m_wakeupList[i].end(); ++iter) {
-			if (*iter == pObject) {
-				m_wakeupList[i].erase(iter);
+	for (int direction = 0; direction < 2; ++direction) {
+		for (size_t i = 0; i < wakeupList_[direction].size(); ++i) {
+			auto * const object = wakeupList_[direction][i];
+			if (object == pObject) {
+				wakeupList_[direction][i] = wakeupList_[direction][wakeupList_[direction].size() - 1];
+				wakeupList_[direction].pop_back();
 				break;
 			}
 		}
@@ -110,15 +114,15 @@ void CRateLimiter::OnTimer(fz::timer_id)
 	for (int i = 0; i < 2; ++i) {
 		m_tokenDebt[i] = 0;
 
-		if (m_objectList.empty()) {
+		if (objects_.empty()) {
 			continue;
 		}
 
 		if (limits[i] == 0) {
-			for (auto iter = m_objectList.begin(); iter != m_objectList.end(); ++iter) {
+			for (auto iter = objects_.begin(); iter != objects_.end(); ++iter) {
 				(*iter)->m_bytesAvailable[i] = -1;
 				if ((*iter)->m_waiting[i]) {
-					m_wakeupList[i].push_back(*iter);
+					wakeupList_[i].push_back(*iter);
 				}
 			}
 			continue;
@@ -128,7 +132,7 @@ void CRateLimiter::OnTimer(fz::timer_id)
 		int64_t maxTokens = tokens * GetBucketSize();
 
 		// Get amount of tokens for each object
-		int64_t tokensPerObject = tokens / m_objectList.size();
+		int64_t tokensPerObject = tokens / objects_.size();
 
 		if (tokensPerObject == 0) {
 			tokensPerObject = 1;
@@ -138,25 +142,24 @@ void CRateLimiter::OnTimer(fz::timer_id)
 		// This list will hold all objects which didn't reach maxTokens
 		std::vector<CRateLimiterObject*> unsaturatedObjects;
 
-		for (auto iter = m_objectList.begin(); iter != m_objectList.end(); ++iter) {
-			if ((*iter)->m_bytesAvailable[i] == -1) {
-				assert(!(*iter)->m_waiting[i]);
-				(*iter)->m_bytesAvailable[i] = tokensPerObject;
-				unsaturatedObjects.push_back(*iter);
+		for (auto * object : objects_) {
+			if (object->m_bytesAvailable[i] == -1) {
+				assert(!object->m_waiting[i]);
+				object->m_bytesAvailable[i] = tokensPerObject;
+				unsaturatedObjects.push_back(object);
 			}
 			else {
-				(*iter)->m_bytesAvailable[i] += tokensPerObject;
-				if ((*iter)->m_bytesAvailable[i] > maxTokens)
-				{
-					tokens += (*iter)->m_bytesAvailable[i] - maxTokens;
-					(*iter)->m_bytesAvailable[i] = maxTokens;
+				object->m_bytesAvailable[i] += tokensPerObject;
+				if (object->m_bytesAvailable[i] > maxTokens) {
+					tokens += object->m_bytesAvailable[i] - maxTokens;
+					object->m_bytesAvailable[i] = maxTokens;
 				}
 				else {
-					unsaturatedObjects.push_back(*iter);
+					unsaturatedObjects.push_back(object);
 				}
 
-				if ((*iter)->m_waiting[i]) {
-					m_wakeupList[i].push_back(*iter);
+				if (object->m_waiting[i]) {
+					wakeupList_[i].push_back(object);
 				}
 			}
 		}
@@ -173,14 +176,14 @@ void CRateLimiter::OnTimer(fz::timer_id)
 			std::vector<CRateLimiterObject*> objects;
 			objects.swap(unsaturatedObjects);
 
-			for (auto iter = objects.begin(); iter != objects.end(); ++iter) {
-				(*iter)->m_bytesAvailable[i] += tokensPerObject;
-				if ((*iter)->m_bytesAvailable[i] > maxTokens) {
-					tokens += (*iter)->m_bytesAvailable[i] - maxTokens;
-					(*iter)->m_bytesAvailable[i] = maxTokens;
+			for (auto * object : objects) {
+				object->m_bytesAvailable[i] += tokensPerObject;
+				if (object->m_bytesAvailable[i] > maxTokens) {
+					tokens += object->m_bytesAvailable[i] - maxTokens;
+					object->m_bytesAvailable[i] = maxTokens;
 				}
 				else {
-					unsaturatedObjects.push_back(*iter);
+					unsaturatedObjects.push_back(object);
 				}
 			}
 		}
@@ -188,7 +191,7 @@ void CRateLimiter::OnTimer(fz::timer_id)
 
 	WakeupWaitingObjects(lock);
 
-	if (m_objectList.empty() || (limits[inbound] == 0 && limits[outbound] == 0)) {
+	if (objects_.empty() || (limits[inbound] == 0 && limits[outbound] == 0)) {
 		if (m_timer) {
 			stop_timer(m_timer);
 			m_timer = 0;
@@ -199,9 +202,9 @@ void CRateLimiter::OnTimer(fz::timer_id)
 void CRateLimiter::WakeupWaitingObjects(fz::scoped_lock & l)
 {
 	for (int i = 0; i < 2; ++i) {
-		while (!m_wakeupList[i].empty()) {
-			CRateLimiterObject* pObject = m_wakeupList[i].front();
-			m_wakeupList[i].pop_front();
+		while (!wakeupList_[i].empty()) {
+			CRateLimiterObject* pObject = wakeupList_[i].back();
+			wakeupList_[i].pop_back();
 			if (!pObject->m_waiting[i]) {
 				continue;
 			}
