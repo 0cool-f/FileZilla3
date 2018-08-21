@@ -29,16 +29,20 @@ CCommandLine::CCommandLine(int argc, wxChar** argv)
 
 bool CCommandLine::HasSwitch(CCommandLine::t_switches s) const
 {
-	if (s == sitemanager)
+	if (s == sitemanager) {
 		return m_parser.Found(_T("s"));
+	}
 #ifdef __WXMSW__
-	else if (s == close)
+	else if (s == close) {
 		return m_parser.Found(_T("close"));
+	}
 #endif
-	else if (s == version)
+	else if (s == version) {
 		return m_parser.Found(_T("v"));
-	else if (s == debug_startup)
+	}
+	else if (s == debug_startup) {
 		return m_parser.Found(_T("debug-startup"));
+	}
 
 	return false;
 }
@@ -49,16 +53,19 @@ wxString CCommandLine::GetOption(CCommandLine::t_option option) const
 	switch (option)
 	{
 	case site:
-		if (m_parser.Found(_T("c"), &value))
+		if (m_parser.Found(_T("c"), &value)) {
 			return value;
+		}
 		break;
 	case logontype:
-		if (m_parser.Found(_T("l"), &value))
+		if (m_parser.Found(_T("l"), &value)) {
 			return value;
+		}
 		break;
 	case local:
-		if (m_parser.Found(_T("a"), &value))
+		if (m_parser.Found(_T("a"), &value)) {
 			return value;
+		}
 		break;
 	}
 
@@ -68,38 +75,33 @@ wxString CCommandLine::GetOption(CCommandLine::t_option option) const
 bool CCommandLine::Parse()
 {
 	int res = m_parser.Parse(false);
-	if (res != 0)
+	if (res != 0) {
 		return false;
+	}
 
-	if (HasSwitch(sitemanager) && !GetOption(site).empty())
-	{
+	if (HasSwitch(sitemanager) && !GetOption(site).empty()) {
 		wxMessageBoxEx(_("-s and -c cannot be present at the same time."), _("Syntax error in command line"));
 		return false;
 	}
 
-	if (HasSwitch(sitemanager) && m_parser.GetParamCount())
-	{
+	if (HasSwitch(sitemanager) && m_parser.GetParamCount()) {
 		wxMessageBoxEx(_("-s cannot be used together with an FTP URL."), _("Syntax error in command line"));
 		return false;
 	}
 
-	if (!GetOption(site).empty() && m_parser.GetParamCount())
-	{
+	if (!GetOption(site).empty() && m_parser.GetParamCount()) {
 		wxMessageBoxEx(_("-c cannot be used together with an FTP URL."), _("Syntax error in command line"));
 		return false;
 	}
 
 	wxString type = GetOption(logontype);
-	if (!type.empty())
-	{
-		if (!m_parser.GetParamCount())
-		{
+	if (!type.empty()) {
+		if (!m_parser.GetParamCount()) {
 			wxMessageBoxEx(_("-l can only be used together with an FTP URL."), _("Syntax error in command line"));
 			return false;
 		}
 
-		if (type != _T("ask") && type != _T("interactive"))
-		{
+		if (type != _T("ask") && type != _T("interactive")) {
 			wxMessageBoxEx(_("Logontype has to be either 'ask' or 'interactive' (without the quotes)."), _("Syntax error in command line"));
 			return false;
 		}

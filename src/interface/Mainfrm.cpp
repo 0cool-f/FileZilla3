@@ -2513,7 +2513,7 @@ void CMainFrame::ProcessCommandLine()
 
 	std::wstring site;
 	if (pCommandLine->HasSwitch(CCommandLine::sitemanager)) {
-		if (COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION) == 1) {
+		if (COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION) != 1) {
 			OpenSiteManager();
 		}
 	}
