@@ -21,6 +21,10 @@ std::vector<CFileZillaEnginePrivate*> CFileZillaEnginePrivate::m_engineList;
 std::atomic_int CFileZillaEnginePrivate::m_activeStatus[2] = {{0}, {0}};
 std::list<CFileZillaEnginePrivate::t_failedLogins> CFileZillaEnginePrivate::m_failedLogins;
 
+struct invalid_current_working_dir_event_type{};
+typedef fz::simple_event<invalid_current_working_dir_event_type, CServer, CServerPath> CInvalidateCurrentWorkingDirEvent;
+
+
 namespace {
 unsigned int get_next_engine_id()
 {
@@ -42,7 +46,10 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 	, thread_pool_(context.GetThreadPool())
 	, encoding_converter_(context.GetCustomEncodingConverter())
 {
-	m_engineList.push_back(this);
+	{
+		fz::scoped_lock lock(global_mutex_);
+		m_engineList.push_back(this);
+	}
 
 	m_pLogging = new CLogging(*this);
 
@@ -68,6 +75,7 @@ bool CFileZillaEnginePrivate::ShouldQueueLogsFromOptions() const
 CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 {
 	remove_handler();
+
 	m_maySendNotificationEvent = false;
 
 	controlSocket_.reset();
@@ -79,11 +87,14 @@ CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 	}
 
 	// Remove ourself from the engine list
-	m_engineList.erase(std::remove(m_engineList.begin(), m_engineList.end(), this), m_engineList.end());
-	for (auto iter = m_engineList.begin(); iter != m_engineList.end(); ++iter) {
-		if (*iter == this) {
-			m_engineList.erase(iter);
-			break;
+	{
+		fz::scoped_lock lock(global_mutex_);
+		m_engineList.erase(std::remove(m_engineList.begin(), m_engineList.end(), this), m_engineList.end());
+		for (auto iter = m_engineList.begin(); iter != m_engineList.end(); ++iter) {
+			if (*iter == this) {
+				m_engineList.erase(iter);
+				break;
+			}
 		}
 	}
 
@@ -548,29 +559,31 @@ int CFileZillaEnginePrivate::ContinueConnect()
 	return FZ_REPLY_CONTINUE;
 }
 
+void CFileZillaEnginePrivate::OnInvalidateCurrentWorkingDir(CServer const& server, CServerPath const& path)
+{
+	if (!controlSocket_ || controlSocket_->GetCurrentServer() != server) {
+		return;
+	}
+	controlSocket_->InvalidateCurrentWorkingDir(path);
+}
+
 void CFileZillaEnginePrivate::InvalidateCurrentWorkingDirs(const CServerPath& path)
 {
-	fz::scoped_lock lock(mutex_);
-
-	assert(controlSocket_);
-	CServer const& ownServer  = controlSocket_->GetCurrentServer();
+	CServer ownServer;
+	{
+		fz::scoped_lock lock(mutex_);
+		assert(controlSocket_);
+		ownServer = controlSocket_->GetCurrentServer();
+	}
 	assert(ownServer);
 
+	fz::scoped_lock lock(global_mutex_);
 	for (auto & engine : m_engineList) {
 		if (!engine || engine == this) {
 			continue;
 		}
 
-		if (!engine->controlSocket_) {
-			continue;
-		}
-
-		CServer const& server = engine->controlSocket_->GetCurrentServer();
-		if (server != ownServer) {
-			continue;
-		}
-
-		engine->controlSocket_->InvalidateCurrentWorkingDir(path);
+		engine->send_event(new CInvalidateCurrentWorkingDirEvent(ownServer, path));
 	}
 }
 
@@ -578,11 +591,12 @@ void CFileZillaEnginePrivate::operator()(fz::event_base const& ev)
 {
 	fz::scoped_lock lock(mutex_);
 
-	fz::dispatch<CFileZillaEngineEvent, CCommandEvent, CAsyncRequestReplyEvent, fz::timer_event>(ev, this,
+	fz::dispatch<CFileZillaEngineEvent, CCommandEvent, CAsyncRequestReplyEvent, fz::timer_event, CInvalidateCurrentWorkingDirEvent>(ev, this,
 		&CFileZillaEnginePrivate::OnEngineEvent,
 		&CFileZillaEnginePrivate::OnCommandEvent,
 		&CFileZillaEnginePrivate::OnSetAsyncRequestReplyEvent,
-		&CFileZillaEnginePrivate::OnTimer
+		&CFileZillaEnginePrivate::OnTimer,
+		&CFileZillaEnginePrivate::OnInvalidateCurrentWorkingDir
 		);
 }
 

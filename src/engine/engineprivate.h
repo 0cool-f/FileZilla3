@@ -139,6 +139,7 @@ protected:
 	void OnEngineEvent(EngineNotificationType type);
 	void OnTimer(fz::timer_id);
 	void OnCommandEvent();
+	void OnInvalidateCurrentWorkingDir(CServer const& server, CServerPath const& path);
 
 	// Todo: More fine-grained locking, a global mutex isn't nice
 	static fz::mutex global_mutex_;
