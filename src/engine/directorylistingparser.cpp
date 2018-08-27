@@ -289,7 +289,7 @@ protected:
 class CLine final
 {
 public:
-	CLine(std::wstring && line, int trailing_whitespace = -1)
+	CLine(std::wstring && line, size_t trailing_whitespace = std::string::npos)
 		: trailing_whitespace_(trailing_whitespace)
 		, line_(line)
 	{
@@ -315,8 +315,9 @@ public:
 			if (line_[m_parsePos] == ' ' || line_[m_parsePos] == '\t') {
 				m_Tokens.emplace_back(line_.c_str() + start, m_parsePos - start);
 
-				while (m_parsePos < line_.size() && (line_[m_parsePos] == ' ' || line_[m_parsePos] == '\t'))
+				while (m_parsePos < line_.size() && (line_[m_parsePos] == ' ' || line_[m_parsePos] == '\t')) {
 					++m_parsePos;
+				}
 
 				if (m_Tokens.size() > n) {
 					return m_Tokens[n];
@@ -351,10 +352,11 @@ public:
 			}
 			wchar_t const* p = ref.GetToken() + ref.size() + 1;
 
-			auto const newLen = line_.size() - (p - line_.c_str());
-			if (newLen <= 0) {
+			if (static_cast<size_t>(p - line_.c_str()) >= line_.size()) {
 				return CToken();
 			}
+
+			auto newLen = line_.size() - (p - line_.c_str());
 			return CToken(p, newLen);
 		}
 
@@ -368,7 +370,7 @@ public:
 			}
 		}
 
-		if (trailing_whitespace_ == -1) {
+		if (trailing_whitespace_ == std::string::npos) {
 			trailing_whitespace_ = 0;
 			size_t i = line_.size() - 1;
 			while (i < line_.size() && (line_[i] == ' ' || line_[i] == '\t')) {
@@ -380,10 +382,10 @@ public:
 		for (unsigned int i = static_cast<unsigned int>(m_LineEndTokens.size()); i <= n; ++i) {
 			CToken const& refToken = m_Tokens[i];
 			const wchar_t* p = refToken.GetToken();
-			auto const newLen = line_.size() - (p - line_.c_str()) - trailing_whitespace_;
-			if (newLen <= 0) {
+			if ((p - line_.c_str()) + trailing_whitespace_ >= line_.size()) {
 				return CToken();
 			}
+			auto newLen = line_.size() - (p - line_.c_str()) - trailing_whitespace_;
 			m_LineEndTokens.emplace_back(p, newLen);
 		}
 		return m_LineEndTokens[n];
@@ -414,7 +416,7 @@ protected:
 	std::vector<CToken> m_Tokens;
 	std::vector<CToken> m_LineEndTokens;
 	size_t m_parsePos{};
-	int trailing_whitespace_;
+	size_t trailing_whitespace_;
 	std::wstring const line_;
 };
 
