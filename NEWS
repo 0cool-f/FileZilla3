@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.36.0 (2018-08-27)
+
+- Fix --site-manager command-line argument
+- Fix potential crash with malformed directory listings
+- Fix potential crash if opening/closing tabs or starting the queue while directories are being renamed or deleted
+
 3.36.0-rc1 (2018-08-20)
 
 + Ask for explicit confirmation prior to falling back to insecure plaintext FTP if a server refuses to use TLS
