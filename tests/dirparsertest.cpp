@@ -2,6 +2,7 @@
 #include <directorylistingparser.h>
 
 #include <libfilezilla/format.hpp>
+#include <libfilezilla/util.hpp>
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <list>
@@ -29,6 +30,7 @@ class CDirectoryListingParserTest final : public CppUnit::TestFixture
 		CPPUNIT_TEST(testIndividual);
 	}
 	CPPUNIT_TEST(testAll);
+	CPPUNIT_TEST(testSpecial);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1507,6 +1509,40 @@ void CDirectoryListingParserTest::testAll()
 		std::string msg = fz::sprintf("Data: %s  Expected:\n%s\n  Got:\n%s", iter->data, iter->reference.dump(), listing[i].dump());
 
 		CPPUNIT_ASSERT_MESSAGE(msg, listing[i] == iter->reference);
+	}
+}
+
+void CDirectoryListingParserTest::testSpecial()
+{
+	m_sync.lock();
+
+	static int index = 0;
+	t_entry const& entry = m_entries[index++];
+
+	m_sync.unlock();
+
+	CServer server;
+	server.SetType(entry.serverType);
+
+	// Insert random whitespace, test must not crash
+	static char const chars[] = {'\r', '\n', ' ', '\t', 0};
+	for (size_t pos = 0; pos <= entry.data.size(); ++pos) {
+		std::string const prefix = entry.data.substr(0, pos);
+		std::string const suffix = entry.data.substr(pos);
+		for (size_t j = 1; j <= 5; ++j) {
+			std::string line = prefix;
+			for (size_t k = 0; k < j; ++k) {
+				line += chars[fz::random_number(0, 4)];
+			}
+			line += suffix;
+
+			CDirectoryListingParser parser(0, server);
+
+			char* data = new char[line.size()];
+			memcpy(data, line.c_str(), line.size());
+			parser.AddData(data, line.size());
+			parser.Parse(CServerPath());
+		}
 	}
 }
 
