@@ -94,9 +94,9 @@ int CFtpMkdirOpData::ParseResponse()
 			// Don't fall back to using the full path if the error message
 			// is "already exists".
 			// Case 1: Full response a known "already exists" message.
-			// Case 2: Substrng of response contains "already exists". path may not
+			// Case 2: Substring of response contains "already exists". path may not
 			//         contain this substring as the path might be returned in the reply.
-			// Case 3: Substrng of response contains "file exists". path may not
+			// Case 3: Substring of response contains "file exists". path may not
 			//         contain this substring as the path might be returned in the reply.
 			std::wstring const response = fz::str_tolower_ascii(controlSocket_.m_Response.substr(4));
 			std::wstring const p = fz::str_tolower_ascii(path_.GetPath());
