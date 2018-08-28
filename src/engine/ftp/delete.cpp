@@ -52,7 +52,7 @@ int CFtpDeleteOpData::ParseResponse()
 
 		auto now = fz::monotonic_clock::now();
 		if (time_ && (now - time_).get_seconds() >= 1) {
-			controlSocket_.SendDirectoryListingNotification(path_, false, false);
+			controlSocket_.SendDirectoryListingNotification(path_, false);
 			time_ = now;
 			needSendListing_ = false;
 		}
@@ -90,7 +90,7 @@ int CFtpDeleteOpData::SubcommandResult(int prevResult, COpData const&)
 int CFtpDeleteOpData::Reset(int result)
 {
 	if (needSendListing_ && !(result & FZ_REPLY_DISCONNECTED)) {
-		controlSocket_.SendDirectoryListingNotification(path_, false, false);
+		controlSocket_.SendDirectoryListingNotification(path_, false);
 	}
 	return result;
 }

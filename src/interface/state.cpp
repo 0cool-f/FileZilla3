@@ -205,7 +205,7 @@ void CContextManager::ProcessDirectoryListing(CServer const& server, std::shared
 			continue;
 		}
 		if (state->GetServer() && state->GetServer().server == server) {
-			state->SetRemoteDir(listing, true);
+			state->SetRemoteDir(listing, false);
 		}
 	}
 }
@@ -334,18 +334,18 @@ bool CState::SetLocalDir(CLocalPath const& dir, std::wstring *error, bool rememb
 	return true;
 }
 
-bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryListing, bool modified)
+bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryListing, bool primary)
 {
 	if (!pDirectoryListing) {
 		m_changeDirFlags.compare = false;
 		SetSyncBrowse(false);
-		if (modified) {
+		if (!primary) {
 			return false;
 		}
 
 		if (m_pDirectoryListing) {
 			m_pDirectoryListing = 0;
-			NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &modified);
+			NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &primary);
 		}
 		m_previouslyVisitedRemoteSubdir.clear();
 		return true;
@@ -362,7 +362,7 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 		m_previouslyVisitedRemoteSubdir.clear();
 	}
 
-	if (modified) {
+	if (!primary) {
 		if (!m_pDirectoryListing || m_pDirectoryListing->path != pDirectoryListing->path) {
 			// We aren't interested in these listings
 			return true;
@@ -381,14 +381,14 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 
 	m_pDirectoryListing = pDirectoryListing;
 
-	NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &modified);
+	NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &primary);
 
 	bool compare = m_changeDirFlags.compare;
-	if (!modified) {
+	if (primary) {
 		m_changeDirFlags.compare = false;
 	}
 
-	if (m_changeDirFlags.syncbrowse && !modified) {
+	if (m_changeDirFlags.syncbrowse && primary) {
 		m_changeDirFlags.syncbrowse = false;
 		if (m_pDirectoryListing->path != m_sync_browse.remote_root && !m_pDirectoryListing->path.IsSubdirOf(m_sync_browse.remote_root, false)) {
 			SetSyncBrowse(false);
@@ -437,8 +437,9 @@ std::shared_ptr<CDirectoryListing> CState::GetRemoteDir() const
 
 const CServerPath CState::GetRemotePath() const
 {
-	if (!m_pDirectoryListing)
+	if (!m_pDirectoryListing) {
 		return CServerPath();
+	}
 
 	return m_pDirectoryListing->path;
 }
@@ -502,7 +503,7 @@ void CState::SetSite(Site const& site, CServerPath const& path)
 			return;
 		}
 
-		SetRemoteDir(0);
+		SetRemoteDir(nullptr, true);
 		m_pCertificate.reset();
 		m_pSftpEncryptionInfo.reset();
 	}

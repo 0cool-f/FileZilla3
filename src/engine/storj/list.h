@@ -6,12 +6,11 @@
 class CStorjListOpData final : public COpData, public CStorjOpData
 {
 public:
-	CStorjListOpData(CStorjControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int, bool topLevel)
+	CStorjListOpData(CStorjControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int)
 		: COpData(Command::list, L"CStorjListOpData")
 		, CStorjOpData(controlSocket)
 		, path_(path)
 		, subDir_(subDir)
-		, topLevel_(topLevel)
 	{
 	}
 
@@ -30,8 +29,6 @@ private:
 	std::vector<fz::shared_value<CDirentry>> entries_;
 
 	fz::monotonic_clock time_before_locking_;
-
-	bool topLevel_{};
 
 	std::wstring bucket_;
 	std::wstring pathId_;

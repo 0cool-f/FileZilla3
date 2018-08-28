@@ -47,14 +47,14 @@ int CStorjRemoveDirOpData::ParseResponse()
 	case rmd_rmbucket:
 		if (controlSocket_.result_ == FZ_REPLY_OK) {
 			engine_.GetDirectoryCache().RemoveDir(currentServer_, CServerPath(L"/"), path_.GetFirstSegment(), CServerPath());
-			controlSocket_.SendDirectoryListingNotification(CServerPath(L"/"), false, false);
+			controlSocket_.SendDirectoryListingNotification(CServerPath(L"/"), false);
 		}
 
 		return controlSocket_.result_;
 	case rmd_rmdir:
 		if (controlSocket_.result_ == FZ_REPLY_OK) {
 			engine_.GetDirectoryCache().RemoveDir(currentServer_, path_.GetParent(), path_.GetLastSegment(), CServerPath());
-			controlSocket_.SendDirectoryListingNotification(path_.GetParent(), false, false);
+			controlSocket_.SendDirectoryListingNotification(path_.GetParent(), false);
 		}
 		return controlSocket_.result_;
 	}

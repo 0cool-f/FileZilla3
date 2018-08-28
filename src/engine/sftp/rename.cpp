@@ -62,9 +62,9 @@ int CSftpRenameOpData::ParseResponse()
 
 	engine_.GetDirectoryCache().Rename(currentServer_, fromPath, command_.GetFromFile(), toPath, command_.GetToFile());
 
-	controlSocket_.SendDirectoryListingNotification(fromPath, false, false);
+	controlSocket_.SendDirectoryListingNotification(fromPath, false);
 	if (fromPath != toPath) {
-		controlSocket_.SendDirectoryListingNotification(toPath, false, false);
+		controlSocket_.SendDirectoryListingNotification(toPath, false);
 	}
 
 	return FZ_REPLY_OK;

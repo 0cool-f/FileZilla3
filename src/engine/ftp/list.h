@@ -18,7 +18,7 @@ enum listStates
 class CFtpListOpData final : public COpData, public CFtpOpData, public CFtpTransferOpData
 {
 public:
-	CFtpListOpData(CFtpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags, bool topLevel);
+	CFtpListOpData(CFtpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags);
 
 	virtual int Send() override;
 	virtual int ParseResponse() override;
@@ -48,8 +48,6 @@ private:
 	int mdtm_index_{};
 
 	fz::monotonic_clock time_before_locking_;
-
-	bool topLevel_{};
 };
 
 #endif

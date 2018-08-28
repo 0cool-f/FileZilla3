@@ -113,17 +113,20 @@ public:
 // You get this type of notification everytime a directory listing has been
 // requested explicitely or when a directory listing was retrieved implicitely
 // during another operation, e.g. file transfers.
+//
+// Primary notifications are those resulting from a CListCommand, other ones
+// can happen spontanously through other actions.
 class CDirectoryListing;
 class CDirectoryListingNotification final : public CNotificationHelper<nId_listing>
 {
 public:
-	explicit CDirectoryListingNotification(const CServerPath& path, const bool modified = false, const bool failed = false);
-	bool Modified() const { return m_modified; }
+	explicit CDirectoryListingNotification(CServerPath const& path, bool const primary, bool const failed = false);
+	bool Primary() const { return primary_; }
 	bool Failed() const { return m_failed; }
 	const CServerPath GetPath() const { return m_path; }
 
 protected:
-	bool m_modified{};
+	bool const primary_{};
 	bool m_failed{};
 	CServerPath m_path;
 };

@@ -7,13 +7,12 @@
 class CSftpListOpData final : public COpData, public CSftpOpData
 {
 public:
-	CSftpListOpData(CSftpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags, bool topLevel)
+	CSftpListOpData(CSftpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags)
 		: COpData(Command::list, L"CSftpListOpData")
 		, CSftpOpData(controlSocket)
 		, path_(path)
 		, subDir_(subDir)
 		, flags_(flags)
-		, topLevel_(topLevel)
 	{}
 
 	virtual int Send() override;
@@ -38,8 +37,6 @@ private:
 	CDirectoryListing directoryListing_;
 
 	fz::monotonic_clock time_before_locking_;
-
-	bool topLevel_{};
 };
 
 #endif

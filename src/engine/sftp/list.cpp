@@ -39,7 +39,7 @@ int CSftpListOpData::Send()
 		if (found && !is_outdated &&
 			(!refresh_ || (holdsLock_ && listing.m_firstListTime >= time_before_locking_)))
 		{
-			controlSocket_.SendDirectoryListingNotification(listing.path, topLevel_, false);
+			controlSocket_.SendDirectoryListingNotification(listing.path, false);
 			return FZ_REPLY_OK;
 		}
 
@@ -76,7 +76,7 @@ int CSftpListOpData::ParseResponse()
 
 		directoryListing_ = listing_parser_->Parse(currentPath_);
 		engine_.GetDirectoryCache().Store(directoryListing_, currentServer_);
-		controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, false);
+		controlSocket_.SendDirectoryListingNotification(currentPath_, false);
 
 		return FZ_REPLY_OK;
 	}

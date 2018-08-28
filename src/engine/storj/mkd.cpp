@@ -48,7 +48,7 @@ int CStorjMkdirOpData::ParseResponse()
 	case mkd_mkbucket:
 		if (controlSocket_.result_ == FZ_REPLY_OK) {
 			engine_.GetDirectoryCache().UpdateFile(currentServer_, CServerPath(L"/"), path_.GetFirstSegment(), true, CDirectoryCache::dir);
-			controlSocket_.SendDirectoryListingNotification(CServerPath(L"/"), false, false);
+			controlSocket_.SendDirectoryListingNotification(CServerPath(L"/"), false);
 		}
 
 		if (path_.SegmentCount() > 1) {
@@ -65,7 +65,7 @@ int CStorjMkdirOpData::ParseResponse()
 			while (path.SegmentCount() > 1) {
 				CServerPath parent = path.GetParent();
 				engine_.GetDirectoryCache().UpdateFile(currentServer_, parent, path.GetLastSegment(), true, CDirectoryCache::dir);
-				controlSocket_.SendDirectoryListingNotification(parent, false, false);
+				controlSocket_.SendDirectoryListingNotification(parent, false);
 				path = parent;
 			}
 		}

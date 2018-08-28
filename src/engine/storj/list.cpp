@@ -53,7 +53,7 @@ int CStorjListOpData::Send()
 			if (found && !is_outdated &&
 				listing.m_firstListTime >= time_before_locking_)
 			{
-				controlSocket_.SendDirectoryListingNotification(listing.path, topLevel_, false);
+				controlSocket_.SendDirectoryListingNotification(listing.path, false);
 				return FZ_REPLY_OK;
 			}
 		}
@@ -93,7 +93,7 @@ int CStorjListOpData::ParseResponse()
 		listing.Assign(std::move(entries_));
 
 		engine_.GetDirectoryCache().Store(listing, currentServer_);
-		controlSocket_.SendDirectoryListingNotification(listing.path, topLevel_, false);
+		controlSocket_.SendDirectoryListingNotification(listing.path, false);
 
 		currentPath_ = path_;
 		return FZ_REPLY_OK;

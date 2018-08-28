@@ -279,7 +279,7 @@ CRemoteTreeView::~CRemoteTreeView()
 void CRemoteTreeView::OnStateChange(t_statechange_notifications notification, const wxString&, const void* data2)
 {
 	if (notification == STATECHANGE_REMOTE_DIR) {
-		SetDirectoryListing(m_state.GetRemoteDir(), data2 ? *reinterpret_cast<bool const*>(data2) : false);
+		SetDirectoryListing(m_state.GetRemoteDir(), data2 ? *reinterpret_cast<bool const*>(data2) : true);
 	}
 	else if (notification == STATECHANGE_APPLYFILTER) {
 		ApplyFilters(false);
@@ -289,14 +289,14 @@ void CRemoteTreeView::OnStateChange(t_statechange_notifications notification, co
 	}
 }
 
-void CRemoteTreeView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> const& pListing, bool modified)
+void CRemoteTreeView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> const& pListing, bool primary)
 {
 	m_busy = true;
 
 	if (!pListing) {
 		m_ExpandAfterList = wxTreeItemId();
 		DeleteAllItems();
-		AddRoot(_T(""));
+		AddRoot(wxString());
 		m_busy = false;
 		if (FindFocus() == this) {
 			wxNavigationKeyEvent *evt = new wxNavigationKeyEvent();
@@ -325,7 +325,7 @@ void CRemoteTreeView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 #ifndef __WXMSW__
 	Freeze();
 #endif
-	wxTreeItemId parent = MakeParent(pListing->path, !modified);
+	wxTreeItemId parent = MakeParent(pListing->path, primary);
 	if (!parent) {
 		m_busy = false;
 #ifndef __WXMSW__
@@ -342,11 +342,11 @@ void CRemoteTreeView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 		DeleteChildren(parent);
 		CFilterManager filter;
 		if (HasSubdirs(*pListing, filter)) {
-			AppendItem(parent, _T(""), -1, -1);
+			AppendItem(parent, wxString(), -1, -1);
 		}
 	}
 	else {
-		RefreshItem(parent, *pListing, !modified);
+		RefreshItem(parent, *pListing, primary);
 
 		if (m_ExpandAfterList == parent) {
 #ifndef __WXMSW__
@@ -367,7 +367,7 @@ void CRemoteTreeView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 #ifndef __WXMSW__
 	Thaw();
 #endif
-	if (!modified) {
+	if (primary) {
 		SafeSelectItem(parent);
 	}
 #ifndef __WXMSW__

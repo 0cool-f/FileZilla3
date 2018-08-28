@@ -223,7 +223,7 @@ public:
 	int SendNextCommand();
 
 protected:
-	void SendDirectoryListingNotification(CServerPath const& path, bool onList, bool failed);
+	void SendDirectoryListingNotification(CServerPath const& path, bool failed);
 
 	fz::duration GetTimezoneOffset() const;
 

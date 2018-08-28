@@ -31,13 +31,12 @@ bool IsMisleadingListResponse(std::wstring const& response)
 }
 }
 
-CFtpListOpData::CFtpListOpData(CFtpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags, bool topLevel)
+CFtpListOpData::CFtpListOpData(CFtpControlSocket & controlSocket, CServerPath const& path, std::wstring const& subDir, int flags)
     : COpData(Command::list, L"CFtpListOpData")
     , CFtpOpData(controlSocket)
     , path_(path)
     , subDir_(subDir)
     , flags_(flags)
-	, topLevel_(topLevel)
 {
 	if (path_.GetType() == DEFAULT) {
 		path_.SetType(currentServer_.GetType());
@@ -63,7 +62,7 @@ int CFtpListOpData::Send()
 		if (found && !is_outdated &&
 			(!refresh_ || (holdsLock_ && listing.m_firstListTime >= time_before_locking_)))
 		{
-			controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, false);
+			controlSocket_.SendDirectoryListingNotification(currentPath_, false);
 			return FZ_REPLY_OK;
 		}
 
@@ -180,7 +179,7 @@ int CFtpListOpData::ParseResponse()
 
 	engine_.GetDirectoryCache().Store(directoryListing_, currentServer_);
 
-	controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, false);
+	controlSocket_.SendDirectoryListingNotification(currentPath_, false);
 
 	return FZ_REPLY_OK;
 }
@@ -254,7 +253,7 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 
 			engine_.GetDirectoryCache().Store(listing, currentServer_);
 
-			controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, false);
+			controlSocket_.SendDirectoryListingNotification(currentPath_, false);
 
 			return FZ_REPLY_OK;
 		}
@@ -302,7 +301,7 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 
 				engine_.GetDirectoryCache().Store(listing, currentServer_);
 
-				controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, false);
+				controlSocket_.SendDirectoryListingNotification(currentPath_, false);
 
 				return FZ_REPLY_OK;
 			}
@@ -323,14 +322,14 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 
 						engine_.GetDirectoryCache().Store(directoryListing_, currentServer_);
 
-						controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, false);
+						controlSocket_.SendDirectoryListingNotification(currentPath_, false);
 
 						return FZ_REPLY_OK;
 					}
 				}
 
 				if (prevResult & FZ_REPLY_ERROR) {
-					controlSocket_.SendDirectoryListingNotification(currentPath_, topLevel_, true);
+					controlSocket_.SendDirectoryListingNotification(currentPath_, true);
 				}
 			}
 

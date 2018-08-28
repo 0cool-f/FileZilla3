@@ -62,7 +62,7 @@ int CStorjDeleteOpData::ParseResponse()
 
 		auto const now = fz::datetime::now();
 		if (!time_.empty() && (now - time_).get_seconds() >= 1) {
-			controlSocket_.SendDirectoryListingNotification(path_, false, false);
+			controlSocket_.SendDirectoryListingNotification(path_, false);
 			time_ = now;
 			needSendListing_ = false;
 		}

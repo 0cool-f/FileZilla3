@@ -318,12 +318,12 @@ void CCommandQueue::ProcessDirectoryListing(CDirectoryListingNotification const&
 	}
 
 	if (listingIsRecursive) {
-		if (!listingNotification.Modified() && m_state.GetRemoteRecursiveOperation()->IsActive()) {
+		if (listingNotification.Primary() && m_state.GetRemoteRecursiveOperation()->IsActive()) {
 			m_state.NotifyHandlers(STATECHANGE_REMOTE_DIR_OTHER, wxString(), &pListing);
 		}
 	}
 	else {
-		m_state.SetRemoteDir(pListing, listingNotification.Modified());
+		m_state.SetRemoteDir(pListing, listingNotification.Primary());
 	}
 
 	if (pListing && !listingNotification.Failed() && m_state.GetServer()) {

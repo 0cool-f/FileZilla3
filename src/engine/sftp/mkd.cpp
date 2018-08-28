@@ -95,7 +95,7 @@ int CSftpMkdirOpData::ParseResponse()
 				return FZ_REPLY_INTERNALERROR;
 			}
 			engine_.GetDirectoryCache().UpdateFile(currentServer_, currentMkdPath_, segments_.back(), true, CDirectoryCache::dir);
-			controlSocket_.SendDirectoryListingNotification(currentMkdPath_, false, false);
+			controlSocket_.SendDirectoryListingNotification(currentMkdPath_, false);
 
 			currentMkdPath_.AddSegment(segments_.back());
 			segments_.pop_back();

@@ -100,7 +100,7 @@ public:
 	// directory.
 	void InvalidateCurrentWorkingDirs(const CServerPath& path);
 
-	unsigned int GetEngineId() const {return m_engine_id; }
+	unsigned int GetEngineId() const { return m_engine_id; }
 
 	CTransferStatusManager transfer_status_;
 

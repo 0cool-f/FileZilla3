@@ -457,7 +457,7 @@ void CSftpControlSocket::List(CServerPath const& path, std::wstring const& subDi
 		LogMessage(MessageType::Status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
 	}
 
-	Push(std::make_unique<CSftpListOpData>(*this, path, subDir, flags, operations_.empty()));
+	Push(std::make_unique<CSftpListOpData>(*this, path, subDir, flags));
 }
 
 void CSftpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& subDir, bool link_discovery)

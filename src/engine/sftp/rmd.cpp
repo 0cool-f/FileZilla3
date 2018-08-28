@@ -37,7 +37,7 @@ int CSftpRemoveDirOpData::ParseResponse()
 	}
 
 	engine_.GetDirectoryCache().RemoveDir(currentServer_, path_, subDir_, engine_.GetPathCache().Lookup(currentServer_, path_, subDir_));
-	controlSocket_.SendDirectoryListingNotification(path_, false, false);
+	controlSocket_.SendDirectoryListingNotification(path_, false);
 
 	return FZ_REPLY_OK;
 }

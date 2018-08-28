@@ -1,7 +1,7 @@
 #include <filezilla.h>
 
-CDirectoryListingNotification::CDirectoryListingNotification(const CServerPath& path, const bool modified /*=false*/, const bool failed /*=false*/)
-	: m_modified(modified), m_failed(failed), m_path(path)
+CDirectoryListingNotification::CDirectoryListingNotification(CServerPath const& path, bool const primary, bool const failed)
+	: primary_(primary), m_failed(failed), m_path(path)
 {
 }
 

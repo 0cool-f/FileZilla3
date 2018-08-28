@@ -67,7 +67,7 @@ void CStorjControlSocket::List(CServerPath const& path, std::wstring const& subD
 		LogMessage(MessageType::Status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
 	}
 
-	Push(std::make_unique<CStorjListOpData>(*this, newPath, std::wstring(), flags, operations_.empty()));
+	Push(std::make_unique<CStorjListOpData>(*this, newPath, std::wstring(), flags));
 }
 
 void CStorjControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
@@ -338,7 +338,7 @@ int CStorjControlSocket::ResetOperation(int nErrorCode)
 	if (!operations_.empty() && operations_.back()->opId == Command::del && !(nErrorCode & FZ_REPLY_DISCONNECTED)) {
 		auto &data = static_cast<CStorjDeleteOpData &>(*operations_.back());
 		if (data.needSendListing_) {
-			SendDirectoryListingNotification(data.path_, false, false);
+			SendDirectoryListingNotification(data.path_, false);
 		}
 	}
 

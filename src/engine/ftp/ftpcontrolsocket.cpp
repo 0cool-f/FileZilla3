@@ -341,7 +341,7 @@ void CFtpControlSocket::List(CServerPath const& path, std::wstring const& subDir
 		LogMessage(MessageType::Status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
 	}
 
-	Push(std::make_unique<CFtpListOpData>(*this, path, subDir, flags, operations_.empty()));
+	Push(std::make_unique<CFtpListOpData>(*this, path, subDir, flags));
 }
 
 int CFtpControlSocket::ResetOperation(int nErrorCode)

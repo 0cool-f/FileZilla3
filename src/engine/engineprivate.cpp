@@ -362,7 +362,7 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 					}
 					else {
 						if (!avoid) {
-							CDirectoryListingNotification *pNotification = new CDirectoryListingNotification(pListing->path);
+							CDirectoryListingNotification *pNotification = new CDirectoryListingNotification(pListing->path, true);
 							AddNotification(pNotification);
 						}
 						delete pListing;

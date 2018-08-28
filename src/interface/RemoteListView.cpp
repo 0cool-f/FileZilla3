@@ -2173,8 +2173,9 @@ void CRemoteListView::RepositionInfoText()
 
 void CRemoteListView::OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2)
 {
-	if (notification == STATECHANGE_REMOTE_DIR)
+	if (notification == STATECHANGE_REMOTE_DIR) {
 		SetDirectoryListing(m_state.GetRemoteDir());
+	}
 	else if (notification == STATECHANGE_REMOTE_LINKNOTDIR) {
 		wxASSERT(data2);
 		LinkIsNotDir(*(CServerPath*)data2, data.ToStdWstring());
