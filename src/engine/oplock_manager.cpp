@@ -140,8 +140,6 @@ void OpLockManager::Unlock(OpLock & lock)
 
 void OpLockManager::Wakeup()
 {
-	fz::scoped_lock l(mtx_);
-
 	for (auto & sli : socket_locks_) {
 		for (auto & lock : sli.locks_) {
 			if (lock.waiting) {
@@ -154,7 +152,8 @@ void OpLockManager::Wakeup()
 
 bool OpLockManager::ObtainWaiting(CControlSocket * socket)
 {
-	bool obtained;
+	bool obtained = false;
+
 	fz::scoped_lock l(mtx_);
 	for (auto & sli : socket_locks_) {
 		if (sli.control_socket_ == socket) {
