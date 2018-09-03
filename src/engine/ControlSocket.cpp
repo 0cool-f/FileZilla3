@@ -29,15 +29,11 @@
 	#endif
 #endif
 
-struct obtain_lock_event_type;
-typedef fz::simple_event<obtain_lock_event_type> CObtainLockEvent;
-
-std::list<CControlSocket::t_lockInfo> CControlSocket::m_lockInfoList;
-
 CControlSocket::CControlSocket(CFileZillaEnginePrivate & engine)
 	: CLogging(engine)
 	, event_handler(engine.event_loop_)
 	, engine_(engine)
+	, opLockManager_(engine.opLockManager_)
 {
 }
 
@@ -133,9 +129,6 @@ int CControlSocket::ResetOperation(int nErrorCode)
 
 	std::unique_ptr<COpData> oldOperation;
 	if (!operations_.empty()) {
-		if (operations_.back()->holdsLock_) {
-			ReleaseLock();
-		}
 		oldOperation = std::move(operations_.back());
 		operations_.pop_back();
 
@@ -514,7 +507,7 @@ void CControlSocket::OnTimer(fz::timer_id)
 	if (timeout > 0) {
 		fz::duration elapsed = fz::monotonic_clock::now() - m_lastActivity;
 
-		if ((operations_.empty() || !operations_.back()->waitForAsyncRequest) && !IsWaitingForLock()) {
+		if ((operations_.empty() || !operations_.back()->waitForAsyncRequest) && !opLockManager_.Waiting(this)) {
 			if (elapsed > fz::duration::from_seconds(timeout)) {
 				LogMessage(MessageType::Error, fztranslate("Connection timed out after %d second of inactivity", "Connection timed out after %d seconds of inactivity", timeout), timeout);
 				DoClose(FZ_REPLY_TIMEOUT);
@@ -624,211 +617,16 @@ int CControlSocket::ParseSubcommandResult(int prevResult, COpData const& opData)
 	}
 }
 
-const std::list<CControlSocket::t_lockInfo>::iterator CControlSocket::GetLockStatus()
+OpLock CControlSocket::Lock(locking_reason reason, CServerPath const& path, bool inclusive)
 {
-	std::list<t_lockInfo>::iterator iter;
-	for (iter = m_lockInfoList.begin(); iter != m_lockInfoList.end(); ++iter) {
-		if (iter->pControlSocket == this) {
-			break;
-		}
-	}
-
-	return iter;
-}
-
-bool CControlSocket::TryLock(locking_reason reason, CServerPath const& directory)
-{
-	assert(currentServer_);
-	assert(!operations_.empty());
-
-	std::list<t_lockInfo>::iterator own = GetLockStatus();
-	if (own == m_lockInfoList.end()) {
-		t_lockInfo info;
-		info.directory = directory;
-		info.pControlSocket = this;
-		info.waiting = true;
-		info.reason = reason;
-		info.lockcount = 0;
-		m_lockInfoList.push_back(info);
-		own = --m_lockInfoList.end();
-	}
-	else {
-		if (own->lockcount) {
-			if (!operations_.back()->holdsLock_) {
-				operations_.back()->holdsLock_ = true;
-				own->lockcount++;
-			}
-			return true;
-		}
-		assert(own->waiting);
-		assert(own->reason == reason);
-	}
-
-	// Needs to be set in any case so that ResetOperation
-	// unlocks or cancels the lock wait
-	operations_.back()->holdsLock_ = true;
-
-	// Try to find other instance holding the lock
-	for (auto iter = m_lockInfoList.cbegin(); iter != own; ++iter) {
-		if (currentServer_ != iter->pControlSocket->currentServer_) {
-			continue;
-		}
-		if (directory != iter->directory) {
-			continue;
-		}
-		if (reason != iter->reason) {
-			continue;
-		}
-
-		// Some other instance is holding the lock
-		return false;
-	}
-
-	own->lockcount++;
-	own->waiting = false;
-	return true;
-}
-
-bool CControlSocket::IsLocked(locking_reason reason, CServerPath const& directory)
-{
-	assert(currentServer_);
-
-	std::list<t_lockInfo>::iterator own = GetLockStatus();
-	if (own != m_lockInfoList.end()) {
-		return true;
-	}
-
-	// Try to find other instance holding the lock
-	for (auto iter = m_lockInfoList.cbegin(); iter != own; ++iter) {
-		if (currentServer_ != iter->pControlSocket->currentServer_) {
-			continue;
-		}
-		if (directory != iter->directory) {
-			continue;
-		}
-		if (reason != iter->reason) {
-			continue;
-		}
-
-		// Some instance is holding the lock
-		return true;
-	}
-
-	return false;
-}
-
-void CControlSocket::ReleaseLock()
-{
-	if (operations_.empty() || !operations_.back()->holdsLock_) {
-		return;
-	}
-	operations_.back()->holdsLock_ = false;
-
-	std::list<t_lockInfo>::iterator iter = GetLockStatus();
-	if (iter == m_lockInfoList.end()) {
-		return;
-	}
-
-	assert(!iter->waiting || iter->lockcount == 0);
-	if (!iter->waiting) {
-		iter->lockcount--;
-		assert(iter->lockcount >= 0);
-		if (iter->lockcount) {
-			return;
-		}
-	}
-
-	CServerPath directory = iter->directory;
-	locking_reason reason = iter->reason;
-
-	m_lockInfoList.erase(iter);
-
-	// Find other instance waiting for the lock
-	if (!currentServer_) {
-		LogMessage(MessageType::Debug_Warning, L"ReleaseLock called with !currentServer_");
-		return;
-	}
-	for (auto & lockInfo : m_lockInfoList) {
-		if (!lockInfo.pControlSocket->currentServer_) {
-			LogMessage(MessageType::Debug_Warning, L"ReleaseLock found other instance with !currentServer_");
-			continue;
-		}
-
-		if (currentServer_ != lockInfo.pControlSocket->currentServer_) {
-			continue;
-		}
-
-		if (lockInfo.directory != directory) {
-			continue;
-		}
-
-		if (lockInfo.reason != reason) {
-			continue;
-		}
-
-		// Send notification
-		lockInfo.pControlSocket->send_event<CObtainLockEvent>();
-		break;
-	}
-}
-
-locking_reason CControlSocket::ObtainLockFromEvent()
-{
-	if (operations_.empty()) {
-		return locking_reason::unknown;
-	}
-
-	std::list<t_lockInfo>::iterator own = GetLockStatus();
-	if (own == m_lockInfoList.end()) {
-		return locking_reason::unknown;
-	}
-
-	if (!own->waiting) {
-		return locking_reason::unknown;
-	}
-
-	for (auto iter = m_lockInfoList.cbegin(); iter != own; ++iter) {
-		if (currentServer_ != iter->pControlSocket->currentServer_) {
-			continue;
-		}
-
-		if (iter->directory != own->directory) {
-			continue;
-		}
-
-		if (iter->reason != own->reason) {
-			continue;
-		}
-
-		// Another instance comes before us
-		return locking_reason::unknown;
-	}
-
-	own->waiting = false;
-	own->lockcount++;
-
-	return own->reason;
+	return opLockManager_.Lock(this, reason, path, inclusive);
 }
 
 void CControlSocket::OnObtainLock()
 {
-	if (ObtainLockFromEvent() == locking_reason::unknown) {
-		return;
+	if (opLockManager_.ObtainWaiting(this)) {
+		SendNextCommand();
 	}
-
-	SendNextCommand();
-
-	ReleaseLock();
-}
-
-bool CControlSocket::IsWaitingForLock()
-{
-	std::list<t_lockInfo>::iterator own = GetLockStatus();
-	if (own == m_lockInfoList.end()) {
-		return false;
-	}
-
-	return own->waiting == true;
 }
 
 void CControlSocket::InvalidateCurrentWorkingDir(const CServerPath& path)

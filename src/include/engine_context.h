@@ -7,6 +7,7 @@ class CDirectoryCache;
 class COptionsBase;
 class CPathCache;
 class CRateLimiter;
+class OpLockManager;
 
 namespace fz {
 class event_loop;
@@ -37,6 +38,7 @@ public:
 	CDirectoryCache& GetDirectoryCache();
 	CPathCache& GetPathCache();
 	CustomEncodingConverterBase const& GetCustomEncodingConverter() { return customEncodingConverter_; }
+	OpLockManager& GetOpLockManager();
 
 protected:
 	COptionsBase& options_;

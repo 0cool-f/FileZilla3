@@ -37,17 +37,18 @@ int CSftpListOpData::Send()
 		bool is_outdated = false;
 		bool found = engine_.GetDirectoryCache().Lookup(listing, currentServer_, path_, false, is_outdated);
 		if (found && !is_outdated &&
-			(!refresh_ || (holdsLock_ && listing.m_firstListTime >= time_before_locking_)))
+			(!refresh_ || (opLock_ && listing.m_firstListTime >= time_before_locking_)))
 		{
 			controlSocket_.SendDirectoryListingNotification(listing.path, false);
 			return FZ_REPLY_OK;
 		}
 
-		if (!holdsLock_) {
-			if (!controlSocket_.TryLock(locking_reason::list, currentPath_)) {
-				time_before_locking_ = fz::monotonic_clock::now();
-				return FZ_REPLY_WOULDBLOCK;
-			}
+		if (!opLock_) {
+			opLock_ = controlSocket_.Lock(locking_reason::list, currentPath_);
+			time_before_locking_ = fz::monotonic_clock::now();
+		}
+		if (opLock_.waiting()) {
+			return FZ_REPLY_WOULDBLOCK;
 		}
 
 		opState = list_list;

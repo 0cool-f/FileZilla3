@@ -67,13 +67,14 @@ int CSftpChangeDirOpData::Send()
 		cmd = L"pwd";
 		break;
 	case cwd_cwd:
-		if (tryMkdOnFail_ && !holdsLock_) {
-			if (controlSocket_.IsLocked(locking_reason::mkdir, path_)) {
+		if (tryMkdOnFail_) {
+			if (!opLock_) {
+				opLock_ = controlSocket_.Lock(locking_reason::mkdir, path_);
+			}
+			if (opLock_.waiting()) {
 				// Some other engine is already creating this directory or
 				// performing an action that will lead to its creation
 				tryMkdOnFail_ = false;
-			}
-			if (!controlSocket_.TryLock(locking_reason::mkdir, path_)) {
 				return FZ_REPLY_WOULDBLOCK;
 			}
 		}

@@ -15,6 +15,7 @@
 class CControlSocket;
 class CLogging;
 class CRateLimiter;
+class OpLockManager;
 
 enum EngineNotificationType
 {
@@ -105,6 +106,8 @@ public:
 	CTransferStatusManager transfer_status_;
 
 	CustomEncodingConverterBase const& GetEncodingConverter() const { return encoding_converter_; }
+
+	OpLockManager & opLockManager_;
 protected:
 	virtual void OnOptionsChanged(changed_options_t const& options);
 

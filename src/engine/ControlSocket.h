@@ -6,6 +6,8 @@
 
 #include <libfilezilla/buffer.hpp>
 
+#include "oplock_manager.h"
+
 class COpData
 {
 public:
@@ -37,7 +39,7 @@ public:
 	Command const opId;
 
 	bool waitForAsyncRequest{};
-	bool holdsLock_{};
+	OpLock opLock_;
 
 	wchar_t const* const name_;
 
@@ -148,15 +150,6 @@ enum class TransferEndReason
 	failed_resumetest
 };
 
-enum class locking_reason
-{
-	unknown = -1,
-	list,
-	mkdir,
-
-	private1
-};
-
 class CBackend;
 class CTransferStatus;
 class CControlSocket: public CLogging, public fz::event_handler
@@ -248,6 +241,8 @@ protected:
 
 	void Push(std::unique_ptr<COpData> && pNewOpData);
 
+	OpLock Lock(locking_reason reason, CServerPath const& path, bool inclusive = false);
+
 	std::vector<std::unique_ptr<COpData>> operations_;
 	CFileZillaEnginePrivate & engine_;
 	CServer currentServer_;
@@ -260,45 +255,7 @@ protected:
 	fz::timer_id m_timer{};
 	fz::monotonic_clock m_lastActivity;
 
-	// -------------------------
-	// Begin cache locking stuff
-	// -------------------------
-
-	// Tries to obtain lock. Returns true on success.
-	// On failure, caller has to pass control.
-	// SendNextCommand will be called once the lock gets available
-	// and engine could obtain it.
-	// Lock is recursive. Lock counter increases on suboperations.
-	bool TryLock(locking_reason reason, CServerPath const& directory);
-	bool IsLocked(locking_reason reason, CServerPath const& directory);
-
-	// Unlocks the cache. Can be called if not holding the lock
-	// Doesn't need reason as one engine can at most hold one lock
-	void ReleaseLock();
-
-	// Called from the obtain_lock_event_type event.
-	// Returns reason != unknown iff engine is the first waiting engine
-	// and obtains the lock.
-	// On failure, the engine was not waiting for a lock.
-	locking_reason ObtainLockFromEvent();
-
-	bool IsWaitingForLock();
-
-	struct t_lockInfo
-	{
-		CControlSocket* pControlSocket;
-		CServerPath directory;
-		locking_reason reason;
-		bool waiting;
-		int lockcount;
-	};
-	static std::list<t_lockInfo> m_lockInfoList;
-
-	const std::list<t_lockInfo>::iterator GetLockStatus();
-
-	// -----------------------
-	// End cache locking stuff
-	// -----------------------
+	OpLockManager & opLockManager_;
 
 	bool m_invalidateCurrentPath{};
 

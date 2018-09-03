@@ -40,7 +40,7 @@ int CStorjListOpData::Send()
 		controlSocket_.Resolve(path_, std::wstring(), bucket_);
 		return FZ_REPLY_CONTINUE;
 	case list_waitlock:
-		if (!holdsLock_) {
+		if (!opLock_) {
 			LogMessage(MessageType::Debug_Warning, L"Not holding the lock as expected");
 			return FZ_REPLY_INTERNALERROR;
 		}
@@ -112,8 +112,11 @@ int CStorjListOpData::SubcommandResult(int prevResult, COpData const&)
 	switch (opState) {
 	case list_waitresolve:
 		opState = list_waitlock;
-		if (!controlSocket_.TryLock(locking_reason::list, path_)) {
+		if (!opLock_) {
+			opLock_ = controlSocket_.Lock(locking_reason::list, path_);
 			time_before_locking_ = fz::monotonic_clock::now();
+		}
+		if (opLock_.waiting()) {
 			return FZ_REPLY_WOULDBLOCK;
 		}
 

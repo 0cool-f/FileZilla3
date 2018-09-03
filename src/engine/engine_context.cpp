@@ -3,6 +3,7 @@
 
 #include "directorycache.h"
 #include "logging_private.h"
+#include "oplock_manager.h"
 #include "pathcache.h"
 #include "ratelimiter.h"
 
@@ -65,6 +66,7 @@ public:
 	CDirectoryCache directory_cache_;
 	CPathCache path_cache_;
 	CLoggingOptionsChanged optionChangeHandler_;
+	OpLockManager opLockManager_;
 };
 
 CFileZillaEngineContext::CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter)
@@ -101,4 +103,9 @@ CDirectoryCache& CFileZillaEngineContext::GetDirectoryCache()
 CPathCache& CFileZillaEngineContext::GetPathCache()
 {
 	return impl_->path_cache_;
+}
+
+OpLockManager& CFileZillaEngineContext::GetOpLockManager()
+{
+	return impl_->opLockManager_;
 }

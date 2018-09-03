@@ -14,10 +14,11 @@ enum mkdStates
 
 int CFtpMkdirOpData::Send()
 {
-	if (!holdsLock_) {
-		if (!controlSocket_.TryLock(locking_reason::mkdir, path_)) {
-			return FZ_REPLY_WOULDBLOCK;
-		}
+	if (!opLock_) {
+		opLock_ = controlSocket_.Lock(locking_reason::mkdir, path_);
+	}
+	if (opLock_.waiting()) {
+		return FZ_REPLY_WOULDBLOCK;
 	}
 
 	switch (opState)

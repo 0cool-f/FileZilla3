@@ -112,6 +112,7 @@
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="misc.cpp" />
     <ClCompile Include="notification.cpp" />
+    <ClCompile Include="oplock_manager.cpp" />
     <ClCompile Include="option_change_event_handler.cpp" />
     <ClCompile Include="pathcache.cpp" />
     <ClCompile Include="proxy.cpp">
@@ -194,6 +195,7 @@
     <ClInclude Include="..\include\option_change_event_handler.h" />
     <ClInclude Include="..\include\optionsbase.h" />
     <ClInclude Include="..\include\xmlutils.h" />
+    <ClInclude Include="oplock_manager.h" />
     <ClInclude Include="pathcache.h" />
     <ClInclude Include="proxy.h" />
     <ClInclude Include="ratelimiter.h" />

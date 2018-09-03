@@ -40,6 +40,7 @@ libengine_a_SOURCES = \
 		logging.cpp \
 		misc.cpp \
 		notification.cpp \
+		oplock_manager.cpp \
 		option_change_event_handler.cpp \
 		pathcache.cpp \
 		proxy.cpp \
@@ -93,6 +94,7 @@ noinst_HEADERS = backend.h \
 		http/request.h \
 		iothread.h \
 		logging_private.h \
+		oplock_manager.h \
 		pathcache.h \
 		proxy.h \
 		ratelimiter.h \
