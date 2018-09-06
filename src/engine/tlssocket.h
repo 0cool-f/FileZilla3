@@ -5,6 +5,7 @@
 
 class CControlSocket;
 class CTlsSocketImpl;
+
 class CTlsSocket final : protected fz::event_handler, public CBackend
 {
 public:

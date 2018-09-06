@@ -46,6 +46,7 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 	, parent_(parent)
 	, thread_pool_(context.GetThreadPool())
 	, encoding_converter_(context.GetCustomEncodingConverter())
+	, context_(context)
 {
 	{
 		fz::scoped_lock lock(global_mutex_);

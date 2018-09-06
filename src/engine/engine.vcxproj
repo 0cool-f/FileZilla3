@@ -152,6 +152,7 @@
     <ClCompile Include="storj\storjcontrolsocket.cpp" />
     <ClCompile Include="tlssocket.cpp" />
     <ClCompile Include="tlssocket_impl.cpp" />
+    <ClCompile Include="tls_system_trust_store.cpp" />
     <ClCompile Include="xmlutils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +231,8 @@
     <ClInclude Include="storj\storjcontrolsocket.h" />
     <ClInclude Include="tlssocket.h" />
     <ClInclude Include="tlssocket_impl.h" />
+    <ClInclude Include="tls_system_trust_store.h" />
+    <ClInclude Include="tls_system_trust_store_impl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

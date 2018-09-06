@@ -6,6 +6,7 @@
 #include "oplock_manager.h"
 #include "pathcache.h"
 #include "ratelimiter.h"
+#include "tls_system_trust_store.h"
 
 #include <libfilezilla/event_loop.hpp>
 #include <libfilezilla/thread_pool.hpp>
@@ -49,6 +50,7 @@ public:
 	Impl(COptionsBase& options)
 		: limiter_(loop_, options)
 		, optionChangeHandler_(options, loop_)
+		, tlsSystemTrustStore_(pool_)
 	{
 		CLogging::UpdateLogLevel(options);
 
@@ -67,6 +69,7 @@ public:
 	CPathCache path_cache_;
 	CLoggingOptionsChanged optionChangeHandler_;
 	OpLockManager opLockManager_;
+	TlsSystemTrustStore tlsSystemTrustStore_;
 };
 
 CFileZillaEngineContext::CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter)
@@ -108,4 +111,9 @@ CPathCache& CFileZillaEngineContext::GetPathCache()
 OpLockManager& CFileZillaEngineContext::GetOpLockManager()
 {
 	return impl_->opLockManager_;
+}
+
+TlsSystemTrustStore& CFileZillaEngineContext::GetTlsSystemTrustStore()
+{
+	return impl_->tlsSystemTrustStore_;
 }

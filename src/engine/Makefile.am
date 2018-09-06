@@ -65,6 +65,7 @@ libengine_a_SOURCES = \
 		socket_errors.cpp \
 		tlssocket.cpp \
 		tlssocket_impl.cpp \
+		tls_system_trust_storec
 		xmlutils.cpp
 
 noinst_HEADERS = backend.h \
@@ -113,7 +114,9 @@ noinst_HEADERS = backend.h \
 		sftp/rmd.h \
 		sftp/sftpcontrolsocket.h \
 		tlssocket.h \
-		tlssocket_impl.h
+		tlssocket_impl.h \
+		tls_system_trust_store.h \
+		tls_system_trust_store_impl
 
 if ENABLE_STORJ
 libengine_a_SOURCES += \

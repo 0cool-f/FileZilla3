@@ -8,6 +8,7 @@ class COptionsBase;
 class CPathCache;
 class CRateLimiter;
 class OpLockManager;
+class TlsSystemTrustStore;
 
 namespace fz {
 class event_loop;
@@ -39,6 +40,7 @@ public:
 	CPathCache& GetPathCache();
 	CustomEncodingConverterBase const& GetCustomEncodingConverter() { return customEncodingConverter_; }
 	OpLockManager& GetOpLockManager();
+	TlsSystemTrustStore& GetTlsSystemTrustStore();
 
 protected:
 	COptionsBase& options_;

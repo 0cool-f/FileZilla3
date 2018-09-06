@@ -3,6 +3,7 @@
 #include "socket_errors.h"
 #include "tlssocket.h"
 #include "tlssocket_impl.h"
+#include "tls_system_trust_store_impl.h"
 #include "ControlSocket.h"
 
 #include <libfilezilla/iputils.hpp>
@@ -168,10 +169,6 @@ bool CTlsSocketImpl::Init()
 		Uninit();
 		return false;
 	}
-
-	m_defaultVerifyFlags = gnutls_certificate_get_verify_flags(m_certCredentials);
-
-	gnutls_certificate_set_x509_system_trust(m_certCredentials);
 
 	if (!InitSession()) {
 		return false;
@@ -356,7 +353,7 @@ ssize_t CTlsSocketImpl::PushFunction(const void* data, size_t len)
 	}
 
 	int error;
-	int written = socketBackend_->Write(data, len, error);
+	int written = socketBackend_->Write(data, static_cast<unsigned int>(len), error);
 
 	if (written < 0) {
 		m_canWriteToSocket = false;
@@ -758,7 +755,7 @@ int CTlsSocketImpl::Write(const void *buffer, unsigned int len, int& error)
 	len -= m_writeSkip;
 	buffer = (char*)buffer + m_writeSkip;
 
-	int res = gnutls_record_send(m_session, buffer, len);
+	ssize_t res = gnutls_record_send(m_session, buffer, len);
 
 	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket)
 		res = gnutls_record_send(m_session, nullptr, 0);
@@ -1350,18 +1347,30 @@ int CTlsSocketImpl::VerifyCertificate()
 
 	// First, check system trust
 	if (uses_hostname) {
-		gnutls_certificate_set_verify_flags(m_certCredentials, m_defaultVerifyFlags);
-		unsigned int status = 0;
-		int verifyResult = gnutls_certificate_verify_peers3(m_session, fz::to_utf8(hostname_).c_str(), &status);
-		if (verifyResult < 0) {
-			m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
-			m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
-			Failure(0, true);
-			return FZ_REPLY_ERROR;
-		}
 
-		if (!status) {
-			systemTrust = true;
+		auto lease = m_pOwner->GetEngine().GetContext().GetTlsSystemTrustStore().impl_->lease();
+		auto cred = std::get<0>(lease);
+		if (cred) {
+			gnutls_credentials_set(m_session, GNUTLS_CRD_CERTIFICATE, cred);
+			unsigned int status = 0;
+			int verifyResult = gnutls_certificate_verify_peers3(m_session, fz::to_utf8(hostname_).c_str(), &status);
+			gnutls_credentials_set(m_session, GNUTLS_CRD_CERTIFICATE, m_certCredentials);
+			std::get<1>(lease).unlock();
+
+			if (verifyResult < 0) {
+				m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
+				m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
+				Failure(0, true);
+				return FZ_REPLY_ERROR;
+			}
+
+			if (!status) {
+				systemTrust = true;
+			}
+		}
+		else {
+			std::get<1>(lease).unlock();
+			m_pOwner->LogMessage(MessageType::Debug_Warning, L"System trust store could not be loaded");
 		}
 	}
 
@@ -1389,7 +1398,7 @@ int CTlsSocketImpl::VerifyCertificate()
 
 		// 2. Also disable time checks. We allow expired/not yet valid certificates, though only
 		// after explicit user confirmation.
-		gnutls_certificate_set_verify_flags(m_certCredentials, m_defaultVerifyFlags | GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS);
+		gnutls_certificate_set_verify_flags(m_certCredentials, gnutls_certificate_get_verify_flags(m_certCredentials) | GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS);
 
 		unsigned int status = 0;
 		int verifyResult = gnutls_certificate_verify_peers2(m_session, &status);

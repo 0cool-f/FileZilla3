@@ -100,7 +100,6 @@ protected:
 	gnutls_session_t m_session{};
 
 	gnutls_certificate_credentials_t m_certCredentials{};
-	unsigned int m_defaultVerifyFlags{};
 
 	bool m_canReadFromSocket{true};
 	bool m_canWriteToSocket{true};

@@ -91,6 +91,7 @@ public:
 	CDirectoryCache& GetDirectoryCache() { return directory_cache_; }
 	CPathCache& GetPathCache() { return path_cache_; }
 	fz::thread_pool& GetThreadPool() { return thread_pool_; }
+	CFileZillaEngineContext& GetContext() { return context_; }
 
 	// If deleting or renaming a directory, it could be possible that another
 	// engine's CControlSocket instance still has that directory as
@@ -203,11 +204,14 @@ protected:
 	CFileZillaEngine& parent_;
 
 	bool queue_logs_{true};
+
 	std::vector<CLogmsgNotification*> queued_logs_;
 
 	fz::thread_pool & thread_pool_;
 
 	CustomEncodingConverterBase const& encoding_converter_;
+
+	CFileZillaEngineContext& context_;
 };
 
 struct command_event_type{};
