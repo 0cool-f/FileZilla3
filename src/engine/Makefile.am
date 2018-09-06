@@ -116,7 +116,7 @@ noinst_HEADERS = backend.h \
 		tlssocket.h \
 		tlssocket_impl.h \
 		tls_system_trust_store.h \
-		tls_system_trust_store_impl
+		tls_system_trust_store_impl.h
 
 if ENABLE_STORJ
 libengine_a_SOURCES += \
