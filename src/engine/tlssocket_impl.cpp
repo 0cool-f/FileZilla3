@@ -389,7 +389,7 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 	}
 
 	int error;
-	int read = socketBackend_->Read(data, len, error);
+	int read = socketBackend_->Read(data, static_cast<unsigned int>(len), error);
 	if (read < 0) {
 		m_canReadFromSocket = false;
 		if (error == EAGAIN) {
@@ -698,7 +698,7 @@ int CTlsSocketImpl::Read(void *buffer, unsigned int len, int& error)
 		TriggerEvents();
 
 		error = 0;
-		return min;
+		return static_cast<int>(min);
 	}
 
 	int res = DoCallGnutlsRecordRecv(buffer, len);
@@ -762,7 +762,7 @@ int CTlsSocketImpl::Write(const void *buffer, unsigned int len, int& error)
 
 	if (res >= 0) {
 		error = 0;
-		int written = res + m_writeSkip;
+		int written = static_cast<int>(res) + m_writeSkip;
 		m_writeSkip = 0;
 
 		TriggerEvents();
@@ -783,7 +783,7 @@ int CTlsSocketImpl::Write(const void *buffer, unsigned int len, int& error)
 		}
 	}
 	else {
-		Failure(res, false, L"gnutls_record_send");
+		Failure(static_cast<int>(res), false, L"gnutls_record_send");
 		error = m_socket_error;
 		return -1;
 	}
@@ -809,7 +809,7 @@ void CTlsSocketImpl::TriggerEvents()
 void CTlsSocketImpl::CheckResumeFailedReadWrite()
 {
 	if (m_lastWriteFailed) {
-		int res = GNUTLS_E_AGAIN;
+		ssize_t res = GNUTLS_E_AGAIN;
 		while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
 			res = gnutls_record_send(m_session, nullptr, 0);
 		}
@@ -819,11 +819,11 @@ void CTlsSocketImpl::CheckResumeFailedReadWrite()
 		}
 
 		if (res < 0) {
-			Failure(res, true);
+			Failure(static_cast<int>(res), true);
 			return;
 		}
 
-		m_writeSkip += res;
+		m_writeSkip += static_cast<int>(res);
 		m_lastWriteFailed = false;
 		m_canTriggerWrite = true;
 	}
@@ -873,7 +873,7 @@ int CTlsSocketImpl::Peek(void *buffer, unsigned int len, int& error)
 		memcpy(buffer, peekBuffer_.get(), min);
 
 		error = 0;
-		return min;
+		return static_cast<int>(min);
 	}
 
 	int read = Read(peekBuffer_.get(len), len, error);
@@ -1134,7 +1134,7 @@ std::vector<CCertificate::SubjectName> CTlsSocketImpl::GetCertSubjectAltNames(gn
 			}
 		}
 		else if (type_or_error == GNUTLS_SAN_IPADDRESS) {
-			std::wstring ip = fz::to_wstring(fz::socket::address_to_string(san, san_size));
+			std::wstring ip = fz::to_wstring(fz::socket::address_to_string(san, static_cast<int>(san_size)));
 			if (!ip.empty()) {
 				ret.emplace_back(CCertificate::SubjectName{std::move(ip), false});
 			}
@@ -1573,7 +1573,7 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 		return list;
 	}
 	else {
-		for (size_t i = 0; ; ++i) {
+		for (unsigned int i = 0; ; ++i) {
 			unsigned int idx;
 			ret = gnutls_priority_get_cipher_suite_index(pcache, i, &idx);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
@@ -1603,7 +1603,7 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 
 int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
 {
-	int res = gnutls_record_recv(m_session, data, len);
+	ssize_t res = gnutls_record_recv(m_session, data, len);
 	while( (res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) && m_canReadFromSocket && !gnutls_record_get_direction(m_session)) {
 		// Spurious EAGAIN. Can happen if GnuTLS gets a partial
 		// record and the socket got closed.
@@ -1615,7 +1615,7 @@ int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
 		res = gnutls_record_recv(m_session, data, len);
 	}
 
-	return res;
+	return static_cast<int>(res);
 }
 
 std::wstring CTlsSocketImpl::GetGnutlsVersion()
