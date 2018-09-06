@@ -9,7 +9,7 @@ class thread_pool;
 
 #include <memory>
 
-// Loading system trust store can take a significant amoutn of time
+// Loading system trust store can take a significant amount of time
 // if there are large CRLs.
 // Use it as shared resource that is loaded asynchronously
 class TlsSystemTrustStore final
