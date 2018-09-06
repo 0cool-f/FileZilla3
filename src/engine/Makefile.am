@@ -65,7 +65,7 @@ libengine_a_SOURCES = \
 		socket_errors.cpp \
 		tlssocket.cpp \
 		tlssocket_impl.cpp \
-		tls_system_trust_storec
+		tls_system_trust_store.c \
 		xmlutils.cpp
 
 noinst_HEADERS = backend.h \
