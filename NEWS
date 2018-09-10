@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.37.0-rc1 (2018-09-10)
+
++ Use a cache for the system trust store to speed up connecting establishment on systems with huge certificate revocation lists in the system trust store
+- Fixed bug in GnuTLS causing crashes on connection establishment
+- Fixed enabled state of controls in the Site Manager if switching to a protocol not supporting the previously selected logontype
+
 3.36.0 (2018-08-27)
 
 - Fix --site-manager command-line argument
