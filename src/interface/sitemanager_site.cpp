@@ -999,6 +999,7 @@ void CSiteManagerSite::OnProtocolSelChanged(wxCommandEvent&)
 
 	auto const logonType = GetLogonType();
 	SetControlVisibility(protocol, logonType);
+	SetLogonTypeCtrlState();
 
 	previousProtocol_ = protocol;
 }
