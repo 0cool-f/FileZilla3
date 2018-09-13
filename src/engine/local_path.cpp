@@ -550,7 +550,7 @@ bool CLocalPath::IsParentOf(const CLocalPath &path) const
 		return false;
 	}
 
-	if (path.m_path->size() < m_path->size()) {
+	if (path.m_path->size() <= m_path->size()) {
 		return false;
 	}
 
@@ -569,25 +569,7 @@ bool CLocalPath::IsParentOf(const CLocalPath &path) const
 
 bool CLocalPath::IsSubdirOf(const CLocalPath &path) const
 {
-	if (empty() || path.empty()) {
-		return false;
-	}
-
-	if (path.m_path->size() > m_path->size()) {
-		return false;
-	}
-
-#ifdef FZ_WINDOWS
-	if (fz::stricmp(*path.m_path, m_path->substr(0, path.m_path->size()))) {
-		return false;
-	}
-#else
-	if (*path.m_path != m_path->substr(0, path.m_path->size())) {
-		return false;
-	}
-#endif
-
-	return true;
+	return path.IsParentOf(*this);
 }
 
 std::wstring CLocalPath::GetLastSegment() const

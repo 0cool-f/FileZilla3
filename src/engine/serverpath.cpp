@@ -468,14 +468,16 @@ bool CServerPath::IsSubdirOf(const CServerPath &path, bool cmpNoCase) const
 				return false;
 			}
 		}
-		if (!cmpNoCase && m_data->m_prefix != path.m_data->m_prefix)
+		if (!cmpNoCase && m_data->m_prefix != path.m_data->m_prefix) {
 			return false;
+		}
 	}
 
 	// On MVS, dirs like 'FOO.BAR' without trailing dot cannot have
 	// subdirectories
-	if (traits[m_type].prefixmode == 1 && !path.m_data->m_prefix)
+	if (traits[m_type].prefixmode == 1 && !path.m_data->m_prefix) {
 		return false;
+	}
 
 	tConstSegmentIter iter1 = m_data->m_segments.begin();
 	tConstSegmentIter iter2 = path.m_data->m_segments.begin();
@@ -927,17 +929,22 @@ std::wstring CServerPath::FormatFilename(std::wstring const& filename, bool omit
 
 int CServerPath::CmpNoCase(const CServerPath &op) const
 {
-	if (empty() != op.empty())
+	if (empty() != op.empty()) {
 		return 1;
-	else if (m_data->m_prefix != op.m_data->m_prefix)
+	}
+	else if (m_data->m_prefix != op.m_data->m_prefix) {
 		return 1;
-	else if (m_type != op.m_type)
+	}
+	else if (m_type != op.m_type) {
 		return 1;
+	}
 
-	if (m_data->m_segments.size() > op.m_data->m_segments.size())
+	if (m_data->m_segments.size() > op.m_data->m_segments.size()) {
 		return 1;
-	else if (m_data->m_segments.size() < op.m_data->m_segments.size())
+	}
+	else if (m_data->m_segments.size() < op.m_data->m_segments.size()) {
 		return -1;
+	}
 
 	tConstSegmentIter iter = m_data->m_segments.begin();
 	tConstSegmentIter iter2 = op.m_data->m_segments.begin();
@@ -1012,8 +1019,9 @@ CServerPath CServerPath::GetCommonParent(const CServerPath& path) const
 		}
 		parentData.m_prefix = GetParent().m_data->m_prefix;
 	}
-	else
+	else {
 		parentData.m_prefix = m_data->m_prefix;
+	}
 
 	tConstSegmentIter iter = m_data->m_segments.begin();
 	tConstSegmentIter iter2 = path.m_data->m_segments.begin();
