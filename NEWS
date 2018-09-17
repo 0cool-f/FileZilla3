@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.37.0 (2018-09-17)
+
+- Fix remote target path if uploading files through the search dialog
+
 3.37.0-rc1 (2018-09-10)
 
 + Use a cache for the system trust store to speed up connecting establishment on systems with huge certificate revocation lists in the system trust store
