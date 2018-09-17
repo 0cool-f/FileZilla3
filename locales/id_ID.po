@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: id_ID\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2018-07-20 14:07+0200\n"
-"PO-Revision-Date: 2018-07-18 07:40+0700\n"
+"POT-Creation-Date: 2018-09-10 15:23+0200\n"
+"PO-Revision-Date: 2018-09-14 23:24+0700\n"
 "Last-Translator: Willy Sudiarto Raharjo <willysr@gmail.com>\n"
 "Language-Team: Bahasa Indonesia <willysr@gmail.com>\n"
 "Language: id\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.1.1\n"
 
 #. @translator: This is a date/time formatting specifier. See https://wiki.filezilla-project.org/Date_and_Time_formatting
 #: ../../locales/../src/interface/statuslinectrl.cpp:59
@@ -74,7 +74,7 @@ msgid "%d file. Total size: At least %s"
 msgid_plural "%d files. Total size: At least %s"
 msgstr[0] "%d berkas. Ukuran total: Paling tidak %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:77
+#: ../../locales/../src/engine/ControlSocket.cpp:74
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -111,12 +111,12 @@ msgstr "%s (%s/s)"
 msgid "%s (? B/s)"
 msgstr "%s (? B/s)"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:229
+#: ../../locales/../src/interface/verifycertdialog.cpp:384
 #, c-format
 msgid "%s - Certificate expired!"
 msgstr "%s - Sertifikat kadaluarsa!"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:214
+#: ../../locales/../src/interface/verifycertdialog.cpp:369
 #, c-format
 msgid "%s - Not yet valid!"
 msgstr "%s - Belum juga valid!"
@@ -174,12 +174,12 @@ msgstr ""
 "PATH Anda.\n"
 "- Tentukan path lengkap pada %s pada variabel lingkungan %s."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:249
+#: ../../locales/../src/interface/verifycertdialog.cpp:404
 #, c-format
 msgid "%s with %d bits"
 msgstr "%s dengan %d bit"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:353
+#: ../../locales/../src/interface/verifycertdialog.cpp:508
 #, c-format
 msgid "%s:%d - Hostname does not match certificate"
 msgstr "%s:%d - Nama host tidak sesuai pada sertifikat"
@@ -193,16 +193,16 @@ msgstr "%u - Nama pengguna"
 msgid "%w - Proxy password"
 msgstr "%w - Kata sandi proxy"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3869
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3675
 msgid "&Abort previous connection and connect in current tab"
 msgstr "B&atalkan koneksi sebelumnya dan buka koneksi pada tab aktual"
 
-#: ../../locales/../src/interface/menu_bar.cpp:176
+#: ../../locales/../src/interface/menu_bar.cpp:178
 msgid "&About..."
 msgstr "&Tentang..."
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:276
+#: ../../locales/../src/interface/sitemanager_site.cpp:278
 msgid "&Access key ID:"
 msgstr "ID kunci &akses:"
 
@@ -221,7 +221,7 @@ msgstr "&Aktif"
 msgid "&Add bookmark..."
 msgstr "&Tambah penanda..."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4207
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4013
 msgid "&Add directory..."
 msgstr "T&ambahkan direktori..."
 
@@ -242,6 +242,10 @@ msgstr "&Tambahkan ke antrian"
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:546
 msgid "&Adjust server timezone offset:"
 msgstr "&Sesuaikan offset zone waktu server:"
+
+#: ../../locales/../src/interface/verifycertdialog.cpp:764
+msgid "&Always allow insecure plain FTP for this server."
+msgstr "&Selalu ijinkan koneksi FTP tidak aman untuk server ini."
 
 #: ../../locales/../src/interface/resources/xrc/certificate.xrc:256
 msgid "&Always trust certificate in future sessions."
@@ -269,7 +273,7 @@ msgstr "&Meminta sistem operasi anda untuk alamat IP eksternal"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1055
 #: ../../locales/../src/interface/menu_bar.cpp:118
-#: ../../locales/../src/interface/statusbar.cpp:561
+#: ../../locales/../src/interface/statusbar.cpp:563
 msgid "&Auto"
 msgstr "&Otomatis"
 
@@ -283,7 +287,7 @@ msgstr "Warna latar &belakang:"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1070
 #: ../../locales/../src/interface/menu_bar.cpp:120
-#: ../../locales/../src/interface/statusbar.cpp:563
+#: ../../locales/../src/interface/statusbar.cpp:565
 msgid "&Binary"
 msgstr "&Biner"
 
@@ -313,10 +317,11 @@ msgstr "&Toleransi burst:"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:386
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:494
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1227
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3996
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4098
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3802
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3904
 #: ../../locales/../src/interface/resources/xrc/inputdialog.xrc:40
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:35
+#: ../../locales/../src/interface/verifycertdialog.cpp:776
 msgid "&Cancel"
 msgstr "&Batal"
 
@@ -336,7 +341,7 @@ msgstr "&Tutup FileZilla"
 msgid "&Close FileZilla once"
 msgstr "&Tutup FileZilla sekali"
 
-#: ../../locales/../src/interface/statusbar.cpp:552
+#: ../../locales/../src/interface/statusbar.cpp:554
 msgid "&Configure speed limits..."
 msgstr "&Mengkonfigurasi batas kecepatan..."
 
@@ -368,7 +373,7 @@ msgstr "&Buat direktori"
 msgid "&Create new tab"
 msgstr "&Buka tab baru"
 
-#: ../../locales/../src/interface/menu_bar.cpp:184
+#: ../../locales/../src/interface/menu_bar.cpp:185
 msgid "&Debug"
 msgstr "&Debug"
 
@@ -410,14 +415,14 @@ msgstr "Hak akses &direktori..."
 msgid "&Directory comparison"
 msgstr "Perbandingan &direktori"
 
-#: ../../locales/../src/interface/state.cpp:1031
+#: ../../locales/../src/interface/state.cpp:1035
 msgid ""
 "&Disable synchronized browsing and continue changing the local directory"
 msgstr ""
 "&Nonaktifkan penjelajahan tersinkronisasi dan lanjutkan mengganti direktori "
 "remote"
 
-#: ../../locales/../src/interface/state.cpp:1109
+#: ../../locales/../src/interface/state.cpp:1113
 msgid ""
 "&Disable synchronized browsing and continue changing the remote directory"
 msgstr ""
@@ -432,7 +437,7 @@ msgstr "&Buang berkas lokal lalu download dan edit berkas baru"
 msgid "&Disconnect"
 msgstr "&Putuskan hubungan"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:163
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:165
 msgid "&Display momentary transfer speed instead of average speed"
 msgstr "&Tampilkan kecepatan transfer dan bukan kecepatan rata-rata"
 
@@ -440,7 +445,7 @@ msgstr "&Tampilkan kecepatan transfer dan bukan kecepatan rata-rata"
 msgid "&Display size in bytes"
 msgstr "&Tampilkan ukuran dalam byte"
 
-#: ../../locales/../src/interface/conditionaldialog.cpp:25
+#: ../../locales/../src/interface/conditionaldialog.cpp:28
 msgid "&Don't show this dialog again."
 msgstr "&Jangan tampilkan dialog ini lagi."
 
@@ -482,7 +487,7 @@ msgstr "&Edit aturan filter..."
 #: ../../locales/../src/interface/Mainfrm.cpp:2405
 #: ../../locales/../src/interface/menu_bar.cpp:89
 #: ../../locales/../src/interface/menu_bar.cpp:128
-#: ../../locales/../src/interface/statusbar.cpp:551
+#: ../../locales/../src/interface/statusbar.cpp:553
 msgid "&Enable"
 msgstr "&Aktifkan"
 
@@ -490,7 +495,7 @@ msgstr "&Aktifkan"
 msgid "&Enable compression"
 msgstr "&Aktifkan kompresi"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3924
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3730
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:897
 msgid "&Enable speed limits"
 msgstr "&Aktifkan batas kecepatan"
@@ -507,7 +512,7 @@ msgstr "&Enkripsi:"
 msgid "&Enter custom command..."
 msgstr "&Masukkan perintah sendiri..."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3862
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3668
 msgid "&Establish connection in a new tab"
 msgstr "Buat kon&eksi pada tab baru"
 
@@ -619,8 +624,8 @@ msgstr "&Port tertinggi yand ada:"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2637
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:156
-#: ../../locales/../src/interface/quickconnectbar.cpp:48
-#: ../../locales/../src/interface/sitemanager_site.cpp:268
+#: ../../locales/../src/interface/quickconnectbar.cpp:50
+#: ../../locales/../src/interface/sitemanager_site.cpp:270
 msgid "&Host:"
 msgstr "&Mesin:"
 
@@ -656,7 +661,7 @@ msgstr "&Pertahankan struktur path remote relatif pada root pencarian"
 msgid "&Key file:"
 msgstr "&Berkas kunci:"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:124
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:126
 msgid "&Layout of file and directory panes:"
 msgstr "&Layout dari berkas dan direktori:"
 
@@ -717,7 +722,7 @@ msgstr "&Jumlah maksimum percobaan:"
 msgid "&Message log"
 msgstr "Log &pesan"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:145
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:147
 msgid "&Minimize to tray"
 msgstr "&Minimalkan ke tray"
 
@@ -745,7 +750,7 @@ msgstr "&Situs Baru"
 msgid "&New version available!"
 msgstr "&Versi baru tersedia!"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:27
+#: ../../locales/../src/interface/netconfwizard.cpp:28
 msgid "&Next >"
 msgstr "&Lanjut >"
 
@@ -772,6 +777,7 @@ msgstr "&Nilai numerik:"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:486
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3127
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:114
+#: ../../locales/../src/interface/verifycertdialog.cpp:769
 msgid "&OK"
 msgstr "&OK"
 
@@ -802,7 +808,7 @@ msgstr "&Mainkan suara"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2650
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:169
-#: ../../locales/../src/interface/quickconnectbar.cpp:61
+#: ../../locales/../src/interface/quickconnectbar.cpp:63
 msgid "&Port:"
 msgstr "&Port:"
 
@@ -814,7 +820,7 @@ msgstr "&Pertahankan waktu pada berkas yang ditransfer"
 msgid "&Queue"
 msgstr "&Antrian"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:69
+#: ../../locales/../src/interface/quickconnectbar.cpp:71
 msgid "&Quickconnect"
 msgstr "&KoneksiCepat"
 
@@ -872,7 +878,7 @@ msgstr "&Hapus"
 msgid "&Remove key"
 msgstr "&Hapus kunci"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4212
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4018
 #: ../../locales/../src/interface/QueueView.cpp:1808
 msgid "&Remove selected"
 msgstr "&Hapus yang dipilih"
@@ -1013,15 +1019,15 @@ msgstr "&Batas kecepatan"
 msgid "&Start transfer immediately"
 msgstr "&Mulai transfer secepatnya"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:137
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:139
 msgid "&Swap local and remote panes"
 msgstr "&Tukar jendela lokal dan remote"
 
-#: ../../locales/../src/interface/menu_bar.cpp:182
+#: ../../locales/../src/interface/menu_bar.cpp:183
 msgid "&TLS Ciphers"
 msgstr "&TLS Cipher"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:232
+#: ../../locales/../src/interface/netconfwizard.cpp:233
 msgid "&Test"
 msgstr "&Tes"
 
@@ -1103,12 +1109,12 @@ msgstr "&Gunakan pemisah ribuan"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:323
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2704
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:260
-#: ../../locales/../src/interface/sitemanager_site.cpp:271
-#: ../../locales/../src/interface/sitemanager_site.cpp:348
+#: ../../locales/../src/interface/sitemanager_site.cpp:273
+#: ../../locales/../src/interface/sitemanager_site.cpp:350
 msgid "&User:"
 msgstr "&Pengguna:"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:53
+#: ../../locales/../src/interface/quickconnectbar.cpp:55
 msgid "&Username:"
 msgstr "&Nama pengguna:"
 
@@ -1158,13 +1164,13 @@ msgstr "'%s' tidak ada atau tidak bisa diakses."
 msgid "'%s' is not a directory."
 msgstr "'%s' bukan direktori."
 
-#: ../../locales/../src/engine/engineprivate.cpp:543
+#: ../../locales/../src/engine/engineprivate.cpp:556
 #, c-format
 msgid "'%s' is not a supported protocol."
 msgstr "'%s' bukan protokol yang didukung."
 
 #: ../../locales/../src/interface/manual_transfer.cpp:419
-#: ../../locales/../src/interface/sitemanager_site.cpp:490
+#: ../../locales/../src/interface/sitemanager_site.cpp:492
 msgid "'Account' logontype not supported by selected protocol"
 msgstr "Jenis login 'Akun' tidak didukung oleh protokol yang dipilih"
 
@@ -1176,7 +1182,7 @@ msgstr ""
 "Jenis login 'Normal' dan 'Account' tidak lagi tersedia, gunakan 'Tanya kata "
 "sandi'."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:507
+#: ../../locales/../src/interface/sitemanager_site.cpp:509
 msgid ""
 "'Normal' and 'Account' logontypes are not available. Your entry has been "
 "changed to 'Ask for password'."
@@ -1241,8 +1247,8 @@ msgstr "(contoh: %H:%M)"
 msgid "(example: %Y-%m-%d)"
 msgstr "(contoh: %Y-%m-%d)"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3943
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3960
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3749
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3766
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:920
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:945
 #, c-format
@@ -1257,19 +1263,19 @@ msgstr "-"
 msgid "--:--:-- left"
 msgstr "--:--:-- Lagi"
 
-#: ../../locales/../src/interface/cmdline.cpp:88
+#: ../../locales/../src/interface/cmdline.cpp:93
 msgid "-c cannot be used together with an FTP URL."
 msgstr "-c tidak bisa digunakan bersama dengan FTP URL."
 
-#: ../../locales/../src/interface/cmdline.cpp:97
+#: ../../locales/../src/interface/cmdline.cpp:100
 msgid "-l can only be used together with an FTP URL."
 msgstr "-l hanya bisa digunakan dengan FTP URL."
 
-#: ../../locales/../src/interface/cmdline.cpp:76
+#: ../../locales/../src/interface/cmdline.cpp:83
 msgid "-s and -c cannot be present at the same time."
 msgstr "-s dan -c tidak bisa ada pada waktu yang bersamaan."
 
-#: ../../locales/../src/interface/cmdline.cpp:82
+#: ../../locales/../src/interface/cmdline.cpp:88
 msgid "-s cannot be used together with an FTP URL."
 msgstr "-s tidak bisa digunakan bersama dengan FTP URL."
 
@@ -1301,7 +1307,7 @@ msgstr "4 - Debug"
 msgid "64-bit system"
 msgstr "Sistem 64-bit"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:28
+#: ../../locales/../src/interface/netconfwizard.cpp:29
 msgid "< &Back"
 msgstr "< &Kembali"
 
@@ -1316,7 +1322,7 @@ msgstr ""
 "Penanda dengan nama yang dimasukkan sudah ada. Harap masukkan nama yang "
 "belum terpakai."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1283
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1286
 msgid "A certificate in the chain was signed using an insecure algorithm"
 msgstr ""
 "Sebuah sertifikat dalam rangkaian ditandatangani menggunakan algoritma yang "
@@ -1328,7 +1334,7 @@ msgstr "Editor default harus ditentukan."
 
 #: ../../locales/../src/interface/RemoteListView.cpp:166
 #: ../../locales/../src/interface/RemoteTreeView.cpp:123
-#: ../../locales/../src/interface/state.cpp:853
+#: ../../locales/../src/interface/state.cpp:854
 msgid "A directory cannot be dragged into one of its subdirectories."
 msgstr "Sebuah direktori tidak bisa dipindah pada salah satu sub direktorinya."
 
@@ -1372,18 +1378,10 @@ msgstr ""
 "daftar.\n"
 "Tidak ada pesan lain yang akan ditampilkan pada sesi ini."
 
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:167
-#, fuzzy
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3885
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:169
 msgid ""
 "A lost master password cannot be recovered! Please thoroughly memorize your "
-"password."
-msgstr ""
-"Kata sandi utama yang hilang tidak dapat dikembalikan! Harap mengingat kata "
-"sandi Anda."
-
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4079
-msgid ""
-"A lost master password cannot be recovered! Please thorougly memorize your "
 "password."
 msgstr ""
 "Kata sandi utama yang hilang tidak dapat dikembalikan! Harap mengingat kata "
@@ -1422,7 +1420,7 @@ msgstr ""
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1063
 #: ../../locales/../src/interface/menu_bar.cpp:119
-#: ../../locales/../src/interface/statusbar.cpp:562
+#: ../../locales/../src/interface/statusbar.cpp:564
 msgid "A&SCII"
 msgstr "A&SCII"
 
@@ -1458,11 +1456,11 @@ msgstr "ASCII"
 msgid "About FileZilla"
 msgstr "Tentang FileZilla"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:126
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:135
 msgid "Above the file lists"
 msgstr "Diatas daftar berkas"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:284
+#: ../../locales/../src/interface/sitemanager_site.cpp:286
 msgid "Access &Key:"
 msgstr "&Kunci Akses:"
 
@@ -1470,8 +1468,8 @@ msgstr "&Kunci Akses:"
 msgid "Access to some local directories could not be restored:"
 msgstr "Akses ke beberapa direktori lokal tidak bisa dikembalikan:"
 
-#: ../../locales/../src/engine/server.cpp:672
-#: ../../locales/../src/engine/server.cpp:695
+#: ../../locales/../src/engine/server.cpp:684
+#: ../../locales/../src/engine/server.cpp:707
 #: ../../locales/../src/interface/manual_transfer.cpp:148
 #: ../../locales/../src/interface/manual_transfer.cpp:149
 #: ../../locales/../src/interface/manual_transfer.cpp:185
@@ -1500,7 +1498,7 @@ msgstr "Aksi:"
 msgid "Active mode"
 msgstr "Mode aktif"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:627
+#: ../../locales/../src/interface/netconfwizard.cpp:628
 msgid ""
 "Active mode FTP test failed. FileZilla does not know the correct external IP "
 "address."
@@ -1508,7 +1506,7 @@ msgstr ""
 "Pengujian mode aktif FTP gagal. FileZilla tidak tahu alamat IP eksternal "
 "yang benar."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:614
+#: ../../locales/../src/interface/netconfwizard.cpp:615
 msgid ""
 "Active mode FTP test failed. FileZilla does not know the correct external IP "
 "address. In addition to that, your router has modified the sent address."
@@ -1517,7 +1515,7 @@ msgstr ""
 "yang benar. Sebagai tambahan, router Anda telah memodifikasi alamat "
 "pengiriman."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:602
+#: ../../locales/../src/interface/netconfwizard.cpp:603
 msgid ""
 "Active mode FTP test failed. FileZilla knows the correct external IP "
 "address, but your router or firewall has misleadingly modified the sent "
@@ -1550,7 +1548,7 @@ msgstr "Masukkan berkas dan direktori yang dipilih pada antrian transfer"
 msgid "Add to queue"
 msgstr "Tambahkan ke antrian"
 
-#: ../../locales/../src/engine/proxy.cpp:509
+#: ../../locales/../src/engine/proxy.cpp:510
 msgid "Address type not supported"
 msgstr "Jenis alamat tidak didukung"
 
@@ -1572,7 +1570,7 @@ msgstr ""
 "dan mungkin merusak sistem Anda. Gunakan versi beta dan build harian dengan "
 "resiko Anda sendiri."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3879
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3685
 msgid "Al&ways perform this action"
 msgstr "&Selalu gunakan aksi ini"
 
@@ -1603,11 +1601,11 @@ msgstr "Ijinkan &kembali pada mode transfer lain jika gagal"
 msgid "Allow fallback to other transfer mode on failure"
 msgstr "Ijinkan kembali pada mode transfer lain jika gagal"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3839
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3645
 msgid "Already connected"
 msgstr "Sudah terhubung"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:270
+#: ../../locales/../src/interface/verifycertdialog.cpp:425
 msgid "Alternative name:"
 msgid_plural "Alternative names:"
 msgstr[0] "Nama alternatif:"
@@ -1653,7 +1651,7 @@ msgstr ""
 "Sebuah kesalahan memuat antrian transfer ke \"%s\".\n"
 "Beberapa antrian mungkin belum dikembalikan."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1287
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1290
 msgid "An issuer in the certificate chain is not a certificate authority"
 msgstr "Penyedia pada rangkaian sertifikat bukanlah certificate authority"
 
@@ -1665,16 +1663,16 @@ msgstr ""
 "Berkas dengan nama yang sama dengan berkas yang sedang di-geser sudah ada "
 "pada lokasi target."
 
-#: ../../locales/../src/engine/server.cpp:697
+#: ../../locales/../src/engine/server.cpp:709
 #: ../../locales/../src/interface/manual_transfer.cpp:147
 #: ../../locales/../src/interface/manual_transfer.cpp:188
 #: ../../locales/../src/interface/manual_transfer.cpp:203
 #: ../../locales/../src/interface/manual_transfer.cpp:534
-#: ../../locales/../src/interface/sitemanager_site.cpp:796
+#: ../../locales/../src/interface/sitemanager_site.cpp:798
 msgid "Anonymous"
 msgstr "Anonim"
 
-#: ../../locales/../src/interface/state.cpp:1085
+#: ../../locales/../src/interface/state.cpp:1089
 msgid ""
 "Another remote operation is already in progress, cannot change directory now."
 msgstr ""
@@ -1713,11 +1711,11 @@ msgstr "Terapkan pada &berkas saja"
 msgid "Archive"
 msgstr "Arsip"
 
-#: ../../locales/../src/engine/socket.cpp:1107
+#: ../../locales/../src/engine/socket_errors.cpp:83
 msgid "Argument buffer overflow"
 msgstr "Argument buffer overflow"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:128
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:137
 msgid "As tab in the transfer queue pane"
 msgstr "Sebagai tab dalam tampilan antrian transfer"
 
@@ -1725,12 +1723,12 @@ msgstr "Sebagai tab dalam tampilan antrian transfer"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1633
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1187
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1208
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:155
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:157
 msgid "Ask for action"
 msgstr "Meminta tindakan"
 
-#: ../../locales/../src/engine/server.cpp:663
-#: ../../locales/../src/engine/server.cpp:689
+#: ../../locales/../src/engine/server.cpp:675
+#: ../../locales/../src/engine/server.cpp:701
 #: ../../locales/../src/interface/manual_transfer.cpp:179
 msgid "Ask for password"
 msgstr "Meminta kata sandi"
@@ -1743,8 +1741,8 @@ msgstr "Meminta sistem operasi untuk sebuah port."
 msgid "Ask your operating system for the external IP address"
 msgstr "Meminta sistem operasi anda untuk alamat IP eksternal"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3740
-msgid "Asking questions in the FileZilla forums"
+#: ../../locales/../src/interface/welcome_dialog.cpp:98
+msgid "Asking questions in the FileZilla Forums"
 msgstr "Menanyakan pertanyaan pada forum FileZilla"
 
 #: ../../locales/../src/interface/settings/optionspage_edit_associations.cpp:63
@@ -1788,15 +1786,15 @@ msgstr "B <Simbol unit untuk byte. Hanya menterjemahkan huruf pertama>"
 msgid "B&ypass proxy"
 msgstr "L&ewati proxy"
 
-#: ../../locales/../src/engine/socket.cpp:1071
+#: ../../locales/../src/engine/socket_errors.cpp:47
 msgid "Bad file descriptor"
 msgstr "Deskriptor berkas rusak"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3777
+#: ../../locales/../src/interface/welcome_dialog.cpp:107
 msgid "Basic usage instructions"
 msgstr "Instruksi penggunaan dasar"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:139
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:141
 msgid "Behaviour"
 msgstr "Perilaku"
 
@@ -1805,7 +1803,7 @@ msgstr "Perilaku"
 msgid "Being edited"
 msgstr "Sedang diedit"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1273
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1276
 msgid "Beware! Certificate has been revoked"
 msgstr "Hati-hati! Sertifikat sudah dibatalkan"
 
@@ -1813,7 +1811,7 @@ msgstr "Hati-hati! Sertifikat sudah dibatalkan"
 msgid "Binary"
 msgstr "Biner"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:135
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:131
 msgid "Blackboard"
 msgstr "Blackboard"
 
@@ -1822,7 +1820,7 @@ msgid "Blue"
 msgstr "Biru"
 
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:271
-#: ../../locales/../src/interface/menu_bar.cpp:439
+#: ../../locales/../src/interface/menu_bar.cpp:440
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:334
 msgid "Bookmark"
 msgstr "Penanda"
@@ -1839,10 +1837,10 @@ msgstr "Penanda"
 msgid "Browse..."
 msgstr "Jelajah..."
 
-#: ../../locales/../src/engine/storj/resolve.cpp:70
-#: ../../locales/../src/engine/storj/resolve.cpp:158
-#: ../../locales/../src/engine/storj/resolve.cpp:226
-#: ../../locales/../src/engine/storj/resolve.cpp:299
+#: ../../locales/../src/engine/storj/resolve.cpp:68
+#: ../../locales/../src/engine/storj/resolve.cpp:148
+#: ../../locales/../src/engine/storj/resolve.cpp:214
+#: ../../locales/../src/engine/storj/resolve.cpp:279
 msgid "Bucket not found"
 msgstr "Keranjang tidak ditemukan"
 
@@ -1854,7 +1852,7 @@ msgstr "Tanggal pembuatan:"
 msgid "Build information"
 msgstr "Informasi pembuatan"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:433
+#: ../../locales/../src/interface/verifycertdialog.cpp:593
 msgid "Business category:"
 msgstr "Kategori bisnis:"
 
@@ -1901,21 +1899,21 @@ msgstr "Klasifikasi jenis berkas kustomisasi:"
 msgid "CPU features:"
 msgstr "Fitur CPU:"
 
-#: ../../locales/../src/engine/ftp/list.cpp:123
+#: ../../locales/../src/engine/ftp/list.cpp:121
 msgid "Calculating timezone offset of server..."
 msgstr "Menkalkulasi offset zona waktu server..."
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:690
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:691
 msgid "Can't read from file"
 msgstr "Tidak dapat membaca dari berkas"
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:667
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:744
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:668
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:745
 msgid "Can't write data to file."
 msgstr "Tidak dapat menulis data ke berkas."
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:670
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:747
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:671
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:748
 #, c-format
 msgid "Can't write data to file: %s"
 msgstr "Tidak dapat menulis data ke berkas: %s"
@@ -1940,8 +1938,8 @@ msgstr "Tidak dapat menulis data ke berkas: %s"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3463
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3558
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3628
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3897
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4160
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3703
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3966
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:121
 msgid "Cancel"
 msgstr "Batal"
@@ -1965,7 +1963,7 @@ msgstr ""
 msgid "Cannot add server to Site Manager"
 msgstr "Tidak bisa menambahkan server pada Manajemen Situs"
 
-#: ../../locales/../src/engine/socket.cpp:1124
+#: ../../locales/../src/engine/socket_errors.cpp:100
 msgid "Cannot assign requested address"
 msgstr "Tidak bisa memberikan alamat yang diminta"
 
@@ -2013,7 +2011,7 @@ msgstr "Tidak dapat mengedit berkas, tidak terhubung ke server."
 msgid "Cannot edit file, remote path unknown."
 msgstr "Tidak bisa mengedit berkas, path remote tidak diketahui."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:140
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:141
 msgid ""
 "Cannot establish FTP connection to an SFTP server. Please select proper "
 "protocol."
@@ -2038,11 +2036,11 @@ msgstr "Tidak bisa mengingat kata sandi"
 msgid "Cannot rename entry"
 msgstr "Tidak dapat mengganti nama daftar"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1672
+#: ../../locales/../src/interface/RemoteListView.cpp:1709
 msgid "Cannot rename file"
 msgstr "Tidak dapat mengganti nama berkas"
 
-#: ../../locales/../src/engine/proxy.cpp:136
+#: ../../locales/../src/engine/proxy.cpp:137
 msgid "Cannot resolve hostname to IPv4 address for use with SOCKS4 proxy."
 msgstr ""
 "Tidak dapat me-resolve nama host ke alamat IPv4 untuk digunakan dengan "
@@ -2095,7 +2093,7 @@ msgstr "Case insensitive (default)"
 msgid "Categories to clear"
 msgstr "Kategori yang hendak dibersihkan"
 
-#: ../../locales/../src/interface/statusbar.cpp:524
+#: ../../locales/../src/interface/statusbar.cpp:526
 msgid "Certificate and session data are not available yet."
 msgstr "Data sertifikat dan sesi tidak tersedia."
 
@@ -2107,7 +2105,7 @@ msgstr "Sertifikat dalam kendali:"
 msgid "Certificate issuer"
 msgstr "Pembuat sertifikat"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1279
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1282
 msgid "Certificate signature verification failed"
 msgstr "Verifikasi tandatangan sertifikat gagal"
 
@@ -2156,7 +2154,7 @@ msgstr "Periksa versi baru dari FileZilla"
 msgid "Check for updates failed"
 msgstr "Pemeriksaan update gagal"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:285
+#: ../../locales/../src/engine/ftp/logon.cpp:282
 msgid ""
 "Check your login credentials. The entered password starts or ends with a "
 "space character."
@@ -2164,7 +2162,7 @@ msgstr ""
 "Periksa hak akses login Anda. Kata sandi yang dimasukkan dimulai atau "
 "diakhiri dengan karakter spasi."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:281
+#: ../../locales/../src/engine/ftp/logon.cpp:278
 msgid ""
 "Check your login credentials. The entered username starts or ends with a "
 "space character."
@@ -2172,7 +2170,7 @@ msgstr ""
 "Periksa hak akses login Anda. Nama pengguna yang dimasukkan dimulai atau "
 "diakhiri dengan karakter spasi."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:780
+#: ../../locales/../src/interface/netconfwizard.cpp:781
 msgid "Checking for correct external IP address"
 msgstr "Memeriksa alamat IP eksternal yang benar"
 
@@ -2190,11 +2188,11 @@ msgstr "Pemeriksaan checksum cocok pada berkas %s\n"
 msgid "Checksum mismatch on file %s\n"
 msgstr "Pemeriksaan checksum tidak cocok pada berkas %s\n"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:1034
+#: ../../locales/../src/interface/sitemanager_site.cpp:1037
 msgid "Choose a key file"
 msgstr "Pilih berkas kunci"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:1025
+#: ../../locales/../src/interface/sitemanager_site.cpp:1028
 msgid "Choose the default local directory"
 msgstr "Pilih direktori lokal default"
 
@@ -2204,7 +2202,7 @@ msgstr "Pilih direktori lokal default"
 msgid "Choose the local directory"
 msgstr "Pilih direktori lokal"
 
-#: ../../locales/../src/engine/http/request.cpp:670
+#: ../../locales/../src/engine/http/request.cpp:664
 msgid "Chunk data improperly terminated"
 msgstr "Potongan data terhapus secara tidak benar"
 
@@ -2217,19 +2215,19 @@ msgstr "Cipher:"
 msgid "Cl&ose tab"
 msgstr "Tut&up tab"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:132
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:128
 msgid "Classic"
 msgstr "Klasik"
 
-#: ../../locales/../src/interface/menu_bar.cpp:181
+#: ../../locales/../src/interface/menu_bar.cpp:182
 msgid "Clear &layout cache"
 msgstr "Hapus cache &layout"
 
-#: ../../locales/../src/interface/menu_bar.cpp:183
+#: ../../locales/../src/interface/menu_bar.cpp:184
 msgid "Clear auto&update data"
 msgstr "Hapus data &update otomatis"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:198
+#: ../../locales/../src/interface/quickconnectbar.cpp:200
 msgid "Clear history"
 msgstr "Hapus sejarah"
 
@@ -2242,11 +2240,11 @@ msgstr "Hapus sejarah"
 msgid "Clear private data"
 msgstr "Hapus data privat"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:197
+#: ../../locales/../src/interface/quickconnectbar.cpp:199
 msgid "Clear quickconnect bar"
 msgstr "Hapus koneksi cepat"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:593
+#: ../../locales/../src/interface/netconfwizard.cpp:594
 msgid "Click on Finish to save your configuration."
 msgstr "Klik pada Selesai untuk menyimpan konfigurasi Anda."
 
@@ -2307,11 +2305,11 @@ msgstr "Perintah dan argumennya harus diberi tanda kutip dengan benar."
 msgid "Command failed"
 msgstr "Perintah gagal"
 
-#: ../../locales/../src/engine/proxy.cpp:506
+#: ../../locales/../src/engine/proxy.cpp:507
 msgid "Command not supported"
 msgstr "Perintah tidak didukung"
 
-#: ../../locales/../src/engine/engineprivate.cpp:224
+#: ../../locales/../src/engine/engineprivate.cpp:237
 msgid "Command not supported by this protocol"
 msgstr "Perintah tidak didukung oleh protokol ini"
 
@@ -2325,12 +2323,12 @@ msgstr "Perintah:"
 msgid "Comment"
 msgstr "Komentar"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:431
+#: ../../locales/../src/interface/verifycertdialog.cpp:591
 msgid "Common name:"
 msgstr "Nama umum:"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:449
-#: ../../locales/../src/interface/netconfwizard.cpp:462
+#: ../../locales/../src/interface/netconfwizard.cpp:450
+#: ../../locales/../src/interface/netconfwizard.cpp:463
 msgid "Communication tainted by router or firewall"
 msgstr "Komunikasi diputus oleh router atau firewall"
 
@@ -2393,7 +2391,7 @@ msgstr "Konfigurasi mode pasif"
 msgid "Configure port range"
 msgstr "Konfigurasi batasan port"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3783
+#: ../../locales/../src/interface/welcome_dialog.cpp:108
 msgid "Configuring FileZilla and your network"
 msgstr "Mengkonfigurasi FileZilla dan jaringan Anda"
 
@@ -2405,30 +2403,30 @@ msgstr "Konfirmasi penghapusan"
 #: ../../locales/../src/interface/file_utils.h:45
 #: ../../locales/../src/interface/LocalListView.cpp:1836
 #: ../../locales/../src/interface/RemoteListView.cpp:1474
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1100
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1103
 #: ../../locales/../src/interface/search.cpp:1222
 #: ../../locales/../src/interface/search.cpp:1488
 msgid "Confirmation needed"
 msgstr "Dibutuhkan konfirmasi"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:589
+#: ../../locales/../src/interface/netconfwizard.cpp:590
 msgid "Congratulations, your configuration seems to be working."
 msgstr "Selamat, konfigurasi Anda bekerja."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:195
+#: ../../locales/../src/interface/quickconnectbar.cpp:197
 msgid "Connect bypassing proxy settings"
 msgstr "Pengaturan koneksi tanpa melalui proxy"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:220
+#: ../../locales/../src/interface/netconfwizard.cpp:221
 #, c-format
 msgid "Connect failed: %s"
 msgstr "Koneksi gagal: %s"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:157
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:159
 msgid "Connect in current tab"
 msgstr "Hubungkan pada tab aktual"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:156
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:158
 msgid "Connect in new tab"
 msgstr "Hubungkan pada tab baru"
 
@@ -2440,20 +2438,20 @@ msgstr "Hubungkan ke situs Manajemen Situs yang ditentukan"
 msgid "Connecting"
 msgstr "Menghubungkan"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:214
+#: ../../locales/../src/interface/netconfwizard.cpp:215
 #: ../../locales/../src/interface/statuslinectrl.cpp:256
 #, c-format
 msgid "Connecting to %s"
 msgstr "Menghubungkan ke %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1065
-#: ../../locales/../src/engine/ftp/logon.cpp:96
+#: ../../locales/../src/engine/ControlSocket.cpp:866
+#: ../../locales/../src/engine/ftp/logon.cpp:94
 #, c-format
 msgid "Connecting to %s through %s proxy"
 msgstr "Menghubungkan ke %s melalui proxy %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:997
-#: ../../locales/../src/engine/proxy.cpp:236
+#: ../../locales/../src/engine/ControlSocket.cpp:798
+#: ../../locales/../src/engine/proxy.cpp:237
 #: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:43
 #: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:42
 #, c-format
@@ -2464,7 +2462,7 @@ msgstr "Menghubungkan ke %s..."
 msgid "Connection"
 msgstr "Koneksi"
 
-#: ../../locales/../src/engine/socket.cpp:1085
+#: ../../locales/../src/engine/socket_errors.cpp:61
 msgid "Connection aborted"
 msgstr "Koneksi dibatalkan"
 
@@ -2472,87 +2470,87 @@ msgstr "Koneksi dibatalkan"
 msgid "Connection attempt failed"
 msgstr "Percobaan koneksi gagal"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:959
-#: ../../locales/../src/engine/proxy.cpp:208
+#: ../../locales/../src/engine/ControlSocket.cpp:760
+#: ../../locales/../src/engine/proxy.cpp:209
 #, c-format
 msgid "Connection attempt failed with \"%s\", trying next address."
 msgstr "Percobaan koneksi gagal dengan \"%s\", mencoba alamat berikutnya."
 
-#: ../../locales/../src/engine/ControlSocket.cpp:965
+#: ../../locales/../src/engine/ControlSocket.cpp:766
 #, c-format
 msgid "Connection attempt failed with \"%s\"."
 msgstr "Percobaan koneksi gagal dengan \"%s\"."
 
-#: ../../locales/../src/engine/ControlSocket.cpp:175
-#: ../../locales/../src/engine/engineprivate.cpp:689
+#: ../../locales/../src/engine/ControlSocket.cpp:170
+#: ../../locales/../src/engine/engineprivate.cpp:705
 msgid "Connection attempt interrupted by user"
 msgstr "Percobaan koneksi diinterupsi oleh pengguna"
 
-#: ../../locales/../src/engine/socket.cpp:1078
+#: ../../locales/../src/engine/socket_errors.cpp:54
 msgid "Connection attempt timed out"
 msgstr "Koneksi time out"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:562
+#: ../../locales/../src/interface/netconfwizard.cpp:563
 msgid "Connection closed"
 msgstr "Koneksi tertutup"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1043
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:75
-#: ../../locales/../src/engine/http/request.cpp:305
-#: ../../locales/../src/engine/http/request.cpp:318
-#: ../../locales/../src/engine/http/request.cpp:329
-#: ../../locales/../src/engine/http/request.cpp:340
+#: ../../locales/../src/engine/ControlSocket.cpp:844
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:76
+#: ../../locales/../src/engine/http/request.cpp:299
+#: ../../locales/../src/engine/http/request.cpp:312
+#: ../../locales/../src/engine/http/request.cpp:323
+#: ../../locales/../src/engine/http/request.cpp:334
 msgid "Connection closed by server"
 msgstr "Koneksi ditutup oleh server"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:185
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:201
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:186
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:202
 msgid "Connection established, initializing TLS..."
 msgstr "Koneksi terbentuk, menginisialisasi TLS..."
 
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:224
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:225
 msgid "Connection established, sending HTTP request"
 msgstr "Koneksi terbentuk, mengirimkan permintaan HTTP"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:343
+#: ../../locales/../src/interface/netconfwizard.cpp:344
 msgid "Connection established, waiting for welcome message."
 msgstr "Koneksi terbentuk, menunggu ucapan selamat datang."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:215
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:216
 msgid "Connection established, waiting for welcome message..."
 msgstr "Koneksi terbentuk, menunggu ucapan selamat datang..."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:360
+#: ../../locales/../src/interface/netconfwizard.cpp:361
 msgid "Connection lost"
 msgstr "Koneksi putus"
 
-#: ../../locales/../src/engine/proxy.cpp:491
+#: ../../locales/../src/engine/proxy.cpp:492
 msgid "Connection not allowed by ruleset"
 msgstr "Koneksi tidak diijinkan oleh kumpulan aturan"
 
-#: ../../locales/../src/engine/proxy.cpp:500
+#: ../../locales/../src/engine/proxy.cpp:501
 msgid "Connection refused"
 msgstr "Koneksi ditolak"
 
-#: ../../locales/../src/engine/socket.cpp:1072
+#: ../../locales/../src/engine/socket_errors.cpp:48
 msgid "Connection refused by server"
 msgstr "Koneksi ditolak oleh server"
 
-#: ../../locales/../src/engine/socket.cpp:1081
+#: ../../locales/../src/engine/socket_errors.cpp:57
 msgid "Connection reset by network"
 msgstr "Koneksi diulang oleh jaringan"
 
-#: ../../locales/../src/engine/socket.cpp:1086
+#: ../../locales/../src/engine/socket_errors.cpp:62
 msgid "Connection reset by peer"
 msgstr "Koneksi diulang oleh peer"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:517
+#: ../../locales/../src/engine/ControlSocket.cpp:512
 #, c-format
 msgid "Connection timed out after %d second of inactivity"
 msgid_plural "Connection timed out after %d seconds of inactivity"
 msgstr[0] "Koneksi time out setelah %d detik tidak aktif"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:1079
+#: ../../locales/../src/interface/netconfwizard.cpp:1080
 msgid "Connection timed out."
 msgstr "Koneksi time out."
 
@@ -2560,15 +2558,15 @@ msgstr "Koneksi time out."
 msgid "Connection to server lost."
 msgstr "Koneksi ke server putus."
 
-#: ../../locales/../src/engine/proxy.cpp:219
+#: ../../locales/../src/engine/proxy.cpp:220
 msgid "Connection with proxy established, performing handshake..."
 msgstr "Koneksi dengan proxy terbentuk, melakukan handshake..."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:582
+#: ../../locales/../src/interface/netconfwizard.cpp:583
 msgid "Connection with server got closed prematurely."
 msgstr "Koneksi dengan server tertutup secara prematur."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:573
+#: ../../locales/../src/interface/netconfwizard.cpp:574
 msgid "Connection with the test server failed."
 msgstr "Koneksi dengan server pengujian gagal."
 
@@ -2598,7 +2596,7 @@ msgstr "Salin URL dari item yang dipilih pada clipboard, termasuk kata sandi."
 msgid "Copy the URLs of the selected items to clipboard."
 msgstr "Salin URL dari item yang dipilih pada clipboard."
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:179
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:180
 #, c-format
 msgid "Could not accept connection: %s"
 msgstr "Tidak dapat menerima hubungan: %s"
@@ -2608,7 +2606,7 @@ msgstr "Tidak dapat menerima hubungan: %s"
 msgid "Could not access path %s"
 msgstr "Tidak dapat mengakses path %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1348
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1394
 msgid "Could not add certificate to temporary trust list"
 msgstr ""
 "Tidak dapat menambahkan sertifikat pada daftar sertifikat yang terpercaya"
@@ -2618,21 +2616,21 @@ msgstr ""
 msgid "Could not add connection to Site Manager"
 msgstr "Tidak bisa menambahkan koneksi pada Manajemen Situs"
 
-#: ../../locales/../src/interface/state.cpp:869
+#: ../../locales/../src/interface/state.cpp:870
 msgid "Could not complete operation"
 msgstr "Tidak dapat menyelesaikan operasi"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:178
+#: ../../locales/../src/engine/ControlSocket.cpp:173
 msgid "Could not connect to server"
 msgstr "Tidak dapat terhubung ke server"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1098
+#: ../../locales/../src/engine/ControlSocket.cpp:899
 #, c-format
 msgid "Could not connect to server: %s"
 msgstr "Tidak dapat terhubung ke server: %s"
 
-#: ../../locales/../src/engine/sftp/filetransfer.cpp:76
-#: ../../locales/../src/engine/sftp/filetransfer.cpp:97
+#: ../../locales/../src/engine/sftp/filetransfer.cpp:74
+#: ../../locales/../src/engine/sftp/filetransfer.cpp:95
 #: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:342
 #: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:260
 msgid "Could not convert command to server encoding"
@@ -2643,13 +2641,13 @@ msgstr "Tidak dapat mengkonversi perintah ke enkoding server"
 msgid "Could not convert private key"
 msgstr "Tidak dapat mengkonversi kunci privat"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2690
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1442
+#: ../../locales/../src/interface/RemoteListView.cpp:2728
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1459
 #: ../../locales/../src/interface/search.cpp:1419
 msgid "Could not copy URLs"
 msgstr "Tidak dapat menyalin URL"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1330
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1386
 msgid "Could not copy certificate"
 msgstr "Tidak dapat menyalin sertifikat"
 
@@ -2663,7 +2661,7 @@ msgstr "Tidak dapat menyalin data"
 msgid "Could not create CFURL from path %s"
 msgstr "Tidak bisa membuat CFURL dari path %s"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:30
+#: ../../locales/../src/engine/http/filetransfer.cpp:28
 msgid "Could not create URI for this transfer."
 msgstr "Tidak bisa membuat URI untuk transfer ini."
 
@@ -2682,7 +2680,7 @@ msgstr "Tidak bisa membuat mutex %s"
 msgid "Could not create security-scoped bookmark from URL:"
 msgstr "Tidak bisa membuat bookmark dari URL:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2333
+#: ../../locales/../src/interface/RemoteListView.cpp:2371
 #: ../../locales/../src/interface/RemoteTreeView.cpp:881
 msgid ""
 "Could not determine the target of the Drag&Drop operation.\n"
@@ -2693,7 +2691,7 @@ msgstr ""
 "Entah ekstensi shell tidak terinstal dengan benar atau Anda tidak meletakkan "
 "berkas pada jendela Explorer."
 
-#: ../../locales/../src/engine/ftp/rawtransfer.cpp:236
+#: ../../locales/../src/engine/ftp/rawtransfer.cpp:232
 msgid "Could not establish connection to server"
 msgstr "Tidak dapat menjalin hubungan dengan server"
 
@@ -2709,7 +2707,7 @@ msgstr ""
 "perintah '--datadir <custompath>' atau dengan menentukan variabel lingkungan "
 "FZ_DATADIR."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:751
+#: ../../locales/../src/engine/ftp/logon.cpp:748
 msgid "Could not generate custom login sequence."
 msgstr "Tidak dapat menghasilkan urutan login."
 
@@ -2718,7 +2716,7 @@ msgstr "Tidak dapat menghasilkan urutan login."
 msgid "Could not generate key"
 msgstr "Tidak dapat menghasilkan kunci"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1070
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1073
 msgid ""
 "Could not get distinguished name of certificate issuer, "
 "gnutls_x509_get_issuer_dn failed"
@@ -2726,7 +2724,7 @@ msgstr ""
 "Tidak dapat mendapatkan nama unik dari pemberi sertifikat, "
 "gnutls_x509_get_issuer_dn gagal"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1046
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1049
 msgid ""
 "Could not get distinguished name of certificate subject, gnutls_x509_get_dn "
 "failed"
@@ -2734,7 +2732,7 @@ msgstr ""
 "Tidak dapat mendapatkan nama unik dari pemberi sertifikat, "
 "gnutls_x509_get_dn gagal"
 
-#: ../../locales/../src/interface/state.cpp:1070
+#: ../../locales/../src/interface/state.cpp:1074
 msgid "Could not get full remote path."
 msgstr "Tidak dapat memperoleh path remote lengkap."
 
@@ -2787,7 +2785,7 @@ msgstr "Tidak dapat memuat berkas kunci"
 msgid "Could not load private key"
 msgstr "Tidak bisa memuat kunci privat"
 
-#: ../../locales/../src/interface/state.cpp:1093
+#: ../../locales/../src/interface/state.cpp:1097
 #, c-format
 msgid ""
 "Could not obtain corresponding local directory for the remote directory "
@@ -2830,8 +2828,8 @@ msgid "Could not open '%s'"
 msgstr "Tidak bisa membuka '%s'"
 
 #: ../../locales/../src/interface/aboutdialog.cpp:220
-#: ../../locales/../src/interface/RemoteListView.cpp:2690
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1442
+#: ../../locales/../src/interface/RemoteListView.cpp:2728
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1459
 #: ../../locales/../src/interface/search.cpp:1419
 msgid "Could not open clipboard"
 msgstr "Tidak dapat membuka clipboard"
@@ -2849,7 +2847,7 @@ msgstr "Tidak bisa membuka berkas log: %s"
 msgid "Could not parse remote path."
 msgstr "Tidak dapat memproses path remote."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:115
+#: ../../locales/../src/interface/quickconnectbar.cpp:117
 msgid "Could not parse server address:"
 msgstr "Tidak dapat memproses alamat server:"
 
@@ -2858,12 +2856,12 @@ msgstr "Tidak dapat memproses alamat server:"
 msgid "Could not read from '%s'"
 msgstr "Tidak bisa membaca dari '%s'"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:1002
+#: ../../locales/../src/interface/netconfwizard.cpp:1003
 msgid "Could not read from data socket."
 msgstr "Tidak bisa menulis dari socket data."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:64
-#: ../../locales/../src/engine/http/request.cpp:382
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:65
+#: ../../locales/../src/engine/http/request.cpp:376
 #, c-format
 msgid "Could not read from socket: %s"
 msgstr "Tidak bisa menulis dari socket: %s"
@@ -2872,7 +2870,7 @@ msgstr "Tidak bisa menulis dari socket: %s"
 msgid "Could not read server item."
 msgstr "Tidak dapat membaca item server."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:354
+#: ../../locales/../src/interface/netconfwizard.cpp:355
 msgid "Could not receive data from server."
 msgstr "Tidak dapat menerima data dari server."
 
@@ -2880,21 +2878,21 @@ msgstr "Tidak dapat menerima data dari server."
 msgid "Could not restore directory access"
 msgstr "Tidak dapat mengembalikan akses direktori"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:132
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:174
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:74
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:130
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:172
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:75
 #, c-format
 msgid "Could not seek to offset %d within file"
 msgstr "Tidak dapat mencari ke offset %d pada berkas"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:120
-#: ../../locales/../src/engine/http/filetransfer.cpp:179
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:71
+#: ../../locales/../src/engine/http/filetransfer.cpp:112
+#: ../../locales/../src/engine/http/filetransfer.cpp:171
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:72
 msgid "Could not seek to the beginning of the file"
 msgstr "Tidak dapat mencari ke awal berkas"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:90
-#: ../../locales/../src/engine/http/filetransfer.cpp:103
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:88
+#: ../../locales/../src/engine/http/filetransfer.cpp:95
 msgid "Could not seek to the end of the file"
 msgstr "Tidak dapat mencari hingga ke akhir berkas"
 
@@ -2906,15 +2904,15 @@ msgstr "Tidak dapat mengirimkan perintah ke fzputtygen."
 msgid "Could not send command to fzstorj."
 msgstr "Tidak dapat mengirimkan perintah ke fzstorj."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1256
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1259
 msgid "Could not sort peer certificates"
 msgstr "Tidak dapat mengurutkan sertifikat peer"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:202
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:200
 msgid "Could not spawn IO thread"
 msgstr "Tidak dapat mengulang thread IO"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1079
+#: ../../locales/../src/engine/ControlSocket.cpp:880
 #, c-format
 msgid "Could not start proxy handshake: %s"
 msgstr "Tidak dapat memulai handshake proxy: %s"
@@ -2980,14 +2978,14 @@ msgstr "Tidak bisa menulis ke berkas lokal"
 msgid "Could not write to log file: %s"
 msgstr "Tidak bisa menulis ke berkas log: %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:920
-#: ../../locales/../src/engine/ControlSocket.cpp:1015
+#: ../../locales/../src/engine/ControlSocket.cpp:721
+#: ../../locales/../src/engine/ControlSocket.cpp:816
 #: ../../locales/../src/engine/http/request.cpp:237
 #, c-format
 msgid "Could not write to socket: %s"
 msgstr "Tidak bisa menulis ke socket: %s"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:436
+#: ../../locales/../src/interface/verifycertdialog.cpp:596
 msgid "Country:"
 msgstr "Negara:"
 
@@ -2995,11 +2993,11 @@ msgstr "Negara:"
 msgid "Crea&te new file"
 msgstr "Membua&t berkas baru"
 
-#: ../../locales/../src/interface/state.cpp:1108
+#: ../../locales/../src/interface/state.cpp:1112
 msgid "Create &missing local directory and enter it"
 msgstr "Membuat direktori lokal yang tidak ada dan &masuk"
 
-#: ../../locales/../src/interface/state.cpp:1030
+#: ../../locales/../src/interface/state.cpp:1034
 msgid "Create &missing remote directory and enter it"
 msgstr "Membuat direktori remote yang tidak ada dan &masuk"
 
@@ -3033,11 +3031,11 @@ msgstr "Membuat direktor&i dan masuk"
 #: ../../locales/../src/interface/LocalListView.cpp:972
 #: ../../locales/../src/interface/LocalTreeView.cpp:1194
 #: ../../locales/../src/interface/RemoteListView.cpp:1372
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1282
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1299
 msgid "Create directory"
 msgstr "Membuat direktori"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2779
+#: ../../locales/../src/interface/RemoteListView.cpp:2817
 msgid "Create empty file"
 msgstr "Membuat berkas kosong"
 
@@ -3045,26 +3043,26 @@ msgstr "Membuat berkas kosong"
 msgid "Creating directory"
 msgstr "Membuat direktori"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:599
-#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:560
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:614
+#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:561
 #: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:105
 #, c-format
 msgid "Creating directory '%s'..."
 msgstr "Membuat direktori '%s'..."
 
-#: ../../locales/../src/engine/ControlSocket.cpp:170
+#: ../../locales/../src/engine/ControlSocket.cpp:165
 msgid "Critical error"
 msgstr "Kesalahan kritis"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:161
+#: ../../locales/../src/engine/ControlSocket.cpp:156
 msgid "Critical error:"
 msgstr "Kesalahan kritis:"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:112
+#: ../../locales/../src/engine/ControlSocket.cpp:109
 msgid "Critical file transfer error"
 msgstr "Kesalahan transfer berkas kritis"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:92
+#: ../../locales/../src/engine/ControlSocket.cpp:89
 #, c-format
 msgid "Critical file transfer error after transferring %s in %s"
 msgstr "Kesalahan transfer berkas kritis setelah mentransfer %s pada %s"
@@ -3138,8 +3136,8 @@ msgstr "Perbandingan d&irektori"
 msgid "D&isable all"
 msgstr "&Nonaktifkan semua"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4035
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:155
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3841
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:157
 msgid "D&o not save passwords"
 msgstr "J&angan simpan kata kunci"
 
@@ -3152,7 +3150,7 @@ msgstr "A&ksi klik ganda pada direktori:"
 msgid "D&uplicate"
 msgstr "D&uplikat"
 
-#: ../../locales/../src/engine/server.cpp:57
+#: ../../locales/../src/engine/server.cpp:59
 msgid "DOS-like with virtual paths"
 msgstr "Seperi DOS dengan path virtual"
 
@@ -3164,8 +3162,8 @@ msgstr "Jenis berkas berbahaya"
 msgid "Data"
 msgstr "Data"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:996
-#: ../../locales/../src/interface/netconfwizard.cpp:1061
+#: ../../locales/../src/interface/netconfwizard.cpp:997
+#: ../../locales/../src/interface/netconfwizard.cpp:1062
 msgid "Data socket closed too early."
 msgstr "Soket data tertutup terlalu cepat."
 
@@ -3197,7 +3195,7 @@ msgstr "Pengaturan debug"
 msgid "Default &local directory:"
 msgstr "Direktori &lokal default:"
 
-#: ../../locales/../src/engine/server.cpp:49
+#: ../../locales/../src/engine/server.cpp:51
 msgid "Default (Autodetect)"
 msgstr "Default (Deteksi Otomatis)"
 
@@ -3215,7 +3213,7 @@ msgstr "Aksi berkas sudah ada default"
 msgid "Default r&emote directory:"
 msgstr "Direktori r&emote default:"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:637
+#: ../../locales/../src/interface/sitemanager_site.cpp:639
 msgid ""
 "Default remote path cannot be parsed. Make sure it is a valid absolute path "
 "for the selected server type."
@@ -3247,7 +3245,7 @@ msgstr ""
 "Keterlambatan diantara percobaan koneksi yang gagal harus diantara 1 dan 999 "
 "detik."
 
-#: ../../locales/../src/engine/engineprivate.cpp:516
+#: ../../locales/../src/engine/engineprivate.cpp:529
 #, c-format
 msgid ""
 "Delaying connection for %d second due to previously failed connection "
@@ -3273,12 +3271,12 @@ msgstr "Hapus direktori yang dipilih"
 msgid "Delete selected files and directories"
 msgstr "Hapus berkas-berkas dan direktori yang dipilih"
 
-#: ../../locales/../src/engine/engineprivate.cpp:392
+#: ../../locales/../src/engine/engineprivate.cpp:405
 #, c-format
 msgid "Deleting \"%s\""
 msgstr "Menghapus \"%s\""
 
-#: ../../locales/../src/engine/engineprivate.cpp:395
+#: ../../locales/../src/engine/engineprivate.cpp:408
 #, c-format
 msgid "Deleting %u files from \"%s\""
 msgstr "Menghapus %u berkas dari \"%s\""
@@ -3313,7 +3311,7 @@ msgstr "Dire&ktori"
 msgid "Direction"
 msgstr "Arah"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4193
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3999
 msgid "Directories:"
 msgstr "Direktori:"
 
@@ -3321,7 +3319,7 @@ msgstr "Direktori:"
 msgid "Directory"
 msgstr "Direktori"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4236
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4042
 msgid "Directory access permissions"
 msgstr "Hak akses direktori"
 
@@ -3348,11 +3346,11 @@ msgstr "Direktori berisi berkas log tidak ada atau nama berkas tidak valid."
 msgid "Directory listing &filters..."
 msgstr "&Filter pendataan direktori..."
 
-#: ../../locales/../src/engine/ControlSocket.cpp:183
+#: ../../locales/../src/engine/ControlSocket.cpp:178
 msgid "Directory listing aborted by user"
 msgstr "Pendataan direktori dibatalkan oleh pengguna"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2162
+#: ../../locales/../src/interface/RemoteListView.cpp:2200
 msgid "Directory listing failed"
 msgstr "Pendataan direktori gagal"
 
@@ -3360,12 +3358,12 @@ msgstr "Pendataan direktori gagal"
 msgid "Directory listing filters"
 msgstr "Filter pendataan direktori"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:193
+#: ../../locales/../src/engine/ControlSocket.cpp:188
 #, c-format
 msgid "Directory listing of \"%s\" successful"
 msgstr "Pendataan direktori \"%s\" berhasil"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:190
+#: ../../locales/../src/engine/ControlSocket.cpp:185
 msgid "Directory listing successful"
 msgstr "Pendataan direktori berhasil"
 
@@ -3373,7 +3371,7 @@ msgstr "Pendataan direktori berhasil"
 msgid "Disa&ble all"
 msgstr "&Nonaktifkan semua"
 
-#: ../../locales/../src/interface/state.cpp:1101
+#: ../../locales/../src/interface/state.cpp:1105
 msgid ""
 "Disable synchronized browsing and continue changing the remote directory?"
 msgstr ""
@@ -3392,17 +3390,17 @@ msgstr ""
 msgid "Disconnect from server"
 msgstr "Putuskan hubungan dari server"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:52
-#: ../../locales/../src/engine/ControlSocket.cpp:921
-#: ../../locales/../src/engine/ControlSocket.cpp:1017
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:66
+#: ../../locales/../src/engine/ControlSocket.cpp:49
+#: ../../locales/../src/engine/ControlSocket.cpp:722
+#: ../../locales/../src/engine/ControlSocket.cpp:818
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:67
 #: ../../locales/../src/engine/http/request.cpp:238
 #: ../../locales/../src/interface/queue.cpp:352
 msgid "Disconnected from server"
 msgstr "Telah terputus dari server"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1046
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:299
+#: ../../locales/../src/engine/ControlSocket.cpp:847
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:300
 #, c-format
 msgid "Disconnected from server: %s"
 msgstr "Telah terputus dari server: %s"
@@ -3416,7 +3414,7 @@ msgstr "Memutuskan dari server sebelumnya"
 msgid "Disconnects from the currently visible server"
 msgstr "Memutuskan dari server yang terlihat sekarang"
 
-#: ../../locales/../src/interface/menu_bar.cpp:176
+#: ../../locales/../src/interface/menu_bar.cpp:178
 msgid "Display about dialog"
 msgstr "Tampilkan dialog tentang"
 
@@ -3462,7 +3460,7 @@ msgstr "Apakah Anda hendak mengirimkan '%s' pada server?"
 msgid "Do you want to reopen this file?"
 msgstr "Apakah Anda hendak membuka kembali berkas ini?"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3765
+#: ../../locales/../src/interface/welcome_dialog.cpp:103
 msgid "Documentation"
 msgstr "Dokumentasi"
 
@@ -3484,17 +3482,17 @@ msgstr "Aksi klik ganda"
 msgid "Download"
 msgstr "Download"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3932
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3738
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:906
 msgid "Download &limit:"
 msgstr "&Batasan download:"
 
-#: ../../locales/../src/interface/statusbar.cpp:608
+#: ../../locales/../src/interface/statusbar.cpp:610
 #, c-format
 msgid "Download limit: %s/s"
 msgstr "Batasan download %s/s"
 
-#: ../../locales/../src/interface/statusbar.cpp:611
+#: ../../locales/../src/interface/statusbar.cpp:613
 msgid "Download limit: none"
 msgstr "Batasan download: tidak ada"
 
@@ -3525,7 +3523,7 @@ msgstr ""
 msgid "Downloading"
 msgstr "Mendownload"
 
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:236
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:237
 #, c-format
 msgid "Downloading %s"
 msgstr "Mendownload %s"
@@ -3579,11 +3577,11 @@ msgstr "Ke&luar"
 msgid "E&xport..."
 msgstr "E&kspor..."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:341
+#: ../../locales/../src/interface/sitemanager_site.cpp:343
 msgid "E-&mail account:"
 msgstr "Akun e-&mail:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:442
+#: ../../locales/../src/interface/verifycertdialog.cpp:602
 msgid "E-Mail:"
 msgstr "E-Mail:"
 
@@ -3627,7 +3625,7 @@ msgstr "Masukkan perintah sendiri"
 msgid "Empty command."
 msgstr "Perintah kosong."
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2164
+#: ../../locales/../src/interface/RemoteListView.cpp:2202
 msgid "Empty directory listing"
 msgstr "Daftar direktori kosong"
 
@@ -3693,7 +3691,7 @@ msgstr "Akhiri perbandingan dan buka pencarian cepat?"
 msgid "Enter &custom command..."
 msgstr "Masukkan &perintah sendiri..."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3973
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3779
 msgid "Enter 0 for unlimited speed."
 msgstr "Masukkan 0 untuk kecepatan tidak terbatas."
 
@@ -3737,7 +3735,7 @@ msgstr "Masukkan Kata kunci"
 msgid "Enter selected directory"
 msgstr "Masukkan direktori yang terpilih"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:50
+#: ../../locales/../src/interface/quickconnectbar.cpp:52
 msgid ""
 "Enter the address of the server. To specify the server protocol, prepend the "
 "host with the protocol identifier. If no protocol is specified, the default "
@@ -3772,7 +3770,7 @@ msgstr ""
 "Masukkan kata sandi untuk berkas '%s'.\n"
 "Berkas yang dikonversi akan diproteksi dengan kata sandi yang sama."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:63
+#: ../../locales/../src/interface/quickconnectbar.cpp:65
 msgid ""
 "Enter the port on which the server listens. The default for FTP is 21, the "
 "default for SFTP is 22."
@@ -3780,11 +3778,11 @@ msgstr ""
 "Masukkan port yang digunakan oleh server. Port default FTP adalah 21, port "
 "default SFTP adalah 22."
 
-#: ../../locales/../src/interface/loginmanager.cpp:167
+#: ../../locales/../src/interface/loginmanager.cpp:169
 msgid "Enter username"
 msgstr "Masukkan nama pengguna"
 
-#: ../../locales/../src/interface/loginmanager.cpp:176
+#: ../../locales/../src/interface/loginmanager.cpp:178
 msgid "Enter username and password"
 msgstr "Masukkan nama pengguna dan kata kunci"
 
@@ -3878,7 +3876,7 @@ msgstr "Jal&ankan"
 msgid "Executable contains no version info, cannot check for updates."
 msgstr "Aplikasi tidak berisi informasi versi, tidak bisa memeriksa update."
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:133
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:129
 msgid "Explorer"
 msgstr "Penjelajah"
 
@@ -3918,7 +3916,7 @@ msgstr "FTP - File Transfer Protocol dengan enkripsi opsional"
 msgid "FTP - Insecure File Transfer Protocol"
 msgstr "FTP - File Transfer Protocol Tidak Aman"
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:100
+#: ../../locales/../src/interface/quickconnectbar.cpp:102
 msgid "FTP Engine not initialized, can't connect"
 msgstr "Mesin FTP tidak bisa diinisialisasi, tidak terhubung"
 
@@ -3971,7 +3969,7 @@ msgstr "Gagal mengganti direktori"
 msgid "Failed to change language"
 msgstr "Gagal mengganti bahasa"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:308
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:311
 msgid "Failed to convert command to 8 bit charset"
 msgstr "Tidak dapat mengkonversi perintah ke karakter set 8 bit"
 
@@ -3983,17 +3981,17 @@ msgstr "Gagal menyalin atau memindahkan situs"
 msgid "Failed to create backup copy of xml file"
 msgstr "Gagal membuat salinan backup dari berkas xml"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:812
+#: ../../locales/../src/interface/netconfwizard.cpp:813
 #, c-format
 msgid "Failed to create listen socket on port %d, aborting."
 msgstr "Gagal membuat soket pada port %d, membatalkan."
 
-#: ../../locales/../src/engine/ftp/rawtransfer.cpp:217
-#: ../../locales/../src/engine/ftp/rawtransfer.cpp:220
+#: ../../locales/../src/engine/ftp/rawtransfer.cpp:213
+#: ../../locales/../src/engine/ftp/rawtransfer.cpp:216
 msgid "Failed to create listening socket for active mode transfer"
 msgstr "Gagal membuat soket untuk mengirim mode transfer aktif"
 
-#: ../../locales/../src/interface/loginmanager.cpp:113
+#: ../../locales/../src/interface/loginmanager.cpp:115
 msgid "Failed to decrypt server password."
 msgstr "Gagal untuk mendekripsi kata sandi server."
 
@@ -4005,12 +4003,12 @@ msgstr "Gagal untuk mendapatkan path 'Dokumen Saya'"
 msgid "Failed to get desktop path"
 msgstr "Gagal mengambil path desktop"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:969
+#: ../../locales/../src/interface/netconfwizard.cpp:970
 msgid "Failed to get peer address of control connection, connection closed."
 msgstr ""
 "Gagal untuk mendapatkan alamat peer dari kontrol koneksi, koneksi terputus."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:976
+#: ../../locales/../src/interface/netconfwizard.cpp:977
 msgid "Failed to get peer address of data connection, connection closed."
 msgstr ""
 "Gagal untuk mendapatkan alamat peer dari koneksi data, koneksi terputus."
@@ -4019,9 +4017,9 @@ msgstr ""
 msgid "Failed to initialize FTP engine"
 msgstr "Gagal untuk menginisialisasi mesin FTP"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:193
-#: ../../locales/../src/engine/ftp/logon.cpp:259
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:208
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:194
+#: ../../locales/../src/engine/ftp/logon.cpp:256
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:209
 msgid "Failed to initialize TLS."
 msgstr "Gagal untuk menginisialisasi TLS."
 
@@ -4038,55 +4036,55 @@ msgstr "Gagal memuat panel, berkas resource tidak valid?"
 msgid "Failed to load private key: %s"
 msgstr "Gagal memuat kunci privat: %s"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:81
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:79
 #, c-format
 msgid "Failed to open \"%s\" for appending/writing"
 msgstr "Gagal membuka \"%s\" untuk menambah/menulis"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:141
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:139
 #, c-format
 msgid "Failed to open \"%s\" for reading"
 msgstr "Gagal membuka \"%s\" untuk dibaca"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:107
-#: ../../locales/../src/engine/http/filetransfer.cpp:96
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:105
+#: ../../locales/../src/engine/http/filetransfer.cpp:88
 #, c-format
 msgid "Failed to open \"%s\" for writing"
 msgstr "Gagal membuka \"%s\" untuk ditulis"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:350
+#: ../../locales/../src/engine/ControlSocket.cpp:345
 msgid "Failed to parse returned path."
 msgstr "Tidak dapat memproses path."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:1028
+#: ../../locales/../src/interface/netconfwizard.cpp:1029
 msgid "Failed to receive data"
 msgstr "Gagal menerima data"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:186
+#: ../../locales/../src/engine/ControlSocket.cpp:181
 msgid "Failed to retrieve directory listing"
 msgstr "Gagal mengambil daftar direktori"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:737
+#: ../../locales/../src/interface/netconfwizard.cpp:738
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "Gagal mendapatkan alamat IP eksternal, membatalkan."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:670
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:685
 msgid "Failed to retrieve external IP address, using local address"
 msgstr "Gagal mengambil alamat IP eksternal, menggunakan alamat lokal"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:712
+#: ../../locales/../src/interface/netconfwizard.cpp:713
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "Gagal mendapatkan alamat IP lokal. Membatalkan."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:688
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:703
 msgid "Failed to retrieve local IP address."
 msgstr "Gagal mengambil alamat IP lokal."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:638
+#: ../../locales/../src/interface/netconfwizard.cpp:639
 msgid "Failed to retrieve the external IP address."
 msgstr "Gagal mengambil alamat IP eksternal."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:323
+#: ../../locales/../src/interface/netconfwizard.cpp:324
 msgid "Failed to send command."
 msgstr "Gagal mengirimkan perintah."
 
@@ -4123,15 +4121,16 @@ msgstr "Gagal menentukan bahasa ke %s, gunakan bahasa sistem default (%s, %s)."
 msgid "Failed to set language to %s, using default system language."
 msgstr "Gagal menentukan bahasa ke %s, menggunakan bahasa sistem default."
 
-#: ../../locales/../src/interface/settings/optionspage.cpp:225
+#: ../../locales/../src/interface/settings/optionspage.cpp:221
 msgid "Failed to validate settings"
 msgstr "Gagal memvalidasi pengaturan"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1358
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1362
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1408
 msgid "Failed to verify peer certificate"
 msgstr "Gagal memverifikasi sertifikat peer"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:216
+#: ../../locales/../src/engine/http/filetransfer.cpp:208
 #, c-format
 msgid "Failed to write to file %s"
 msgstr "Gagal menulis ke berkas %s"
@@ -4160,7 +4159,7 @@ msgstr "B&erkas"
 msgid "File"
 msgstr "Berkas"
 
-#: ../../locales/../src/engine/socket.cpp:1077
+#: ../../locales/../src/engine/socket_errors.cpp:53
 msgid "File descriptor not a socket"
 msgstr "Deskriptor berkas bukan sebuah socket"
 
@@ -4172,7 +4171,7 @@ msgstr "Berkas tidak mengandung data yang dapat diimpor."
 msgid "File editing"
 msgstr "Pengeditan berkas"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1684
+#: ../../locales/../src/interface/RemoteListView.cpp:1721
 msgid "File exists"
 msgstr "Berkas ada"
 
@@ -4188,8 +4187,8 @@ msgstr "Berkas sudah berubah"
 msgid "File lists"
 msgstr "Daftar berkas"
 
-#: ../../locales/../src/engine/storj/resolve.cpp:113
-#: ../../locales/../src/engine/storj/resolve.cpp:184
+#: ../../locales/../src/engine/storj/resolve.cpp:111
+#: ../../locales/../src/engine/storj/resolve.cpp:174
 #: ../../locales/../src/interface/edithandler.cpp:1602
 #: ../../locales/../src/interface/FileZilla.cpp:640
 #: ../../locales/../src/interface/FileZilla.cpp:730
@@ -4204,34 +4203,34 @@ msgstr "Berkas tidak ditemukan"
 msgid "File search"
 msgstr "Pencarian berkas"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:101
+#: ../../locales/../src/engine/ControlSocket.cpp:98
 msgid "File transfer aborted by user"
 msgstr "Transfer berkas dibatalkan oleh pengguna"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:89
+#: ../../locales/../src/engine/ControlSocket.cpp:86
 #, c-format
 msgid "File transfer aborted by user after transferring %s in %s"
 msgstr ""
 "Transfer berkas dibatalkan oleh pengguna setelah mentransfer %s pada %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:115
+#: ../../locales/../src/engine/ControlSocket.cpp:112
 msgid "File transfer failed"
 msgstr "Transfer berkas gagal"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:95
+#: ../../locales/../src/engine/ControlSocket.cpp:92
 #, c-format
 msgid "File transfer failed after transferring %s in %s"
 msgstr "Transfer berkas gagal setelah mentransfer %s pada %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:108
+#: ../../locales/../src/engine/ControlSocket.cpp:105
 msgid "File transfer skipped"
 msgstr "Pengiriman berkas dilewatkan"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:105
+#: ../../locales/../src/engine/ControlSocket.cpp:102
 msgid "File transfer successful"
 msgstr "Transfer berkas berhasil"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:86
+#: ../../locales/../src/engine/ControlSocket.cpp:83
 #, c-format
 msgid "File transfer successful, transferred %s in %s"
 msgstr "Transfer berkas berhasil, tertransfer %s pada %s"
@@ -4249,7 +4248,7 @@ msgid "File would transfer with binary data type."
 msgstr "Berkas akan ditransfer dengan tipe data biner."
 
 #: ../../locales/../src/interface/FileZilla.cpp:453
-#: ../../locales/../src/interface/quickconnectbar.cpp:100
+#: ../../locales/../src/interface/quickconnectbar.cpp:102
 msgid "FileZilla Error"
 msgstr "FileZilla Bermasalah"
 
@@ -4261,7 +4260,7 @@ msgstr ""
 "FileZilla sekarang bisa menguji konfigurasi Anda untuk memastikan semua "
 "sudah sudah benar."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3857
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3663
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla sudah terhubung ke sebuah server."
 
@@ -4286,17 +4285,17 @@ msgstr "&Status bar daftar berkas"
 msgid "Filename"
 msgstr "Nama berkas"
 
-#: ../../locales/../src/engine/ftp/delete.cpp:31
-#: ../../locales/../src/engine/sftp/delete.cpp:18
+#: ../../locales/../src/engine/ftp/delete.cpp:29
+#: ../../locales/../src/engine/sftp/delete.cpp:16
 #, c-format
 msgid "Filename cannot be constructed for directory %s and filename %s"
 msgstr "Nama berkas tidak bisa dibuat untuk direktori %s dan nama berkas %s"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1672
+#: ../../locales/../src/interface/RemoteListView.cpp:1709
 msgid "Filename invalid"
 msgstr "Nama berkas tidak valid"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:336
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:359
 msgid "Filename unchanged"
 msgstr "Nama berkas tidak berubah"
 
@@ -4324,7 +4323,7 @@ msgstr "Berkas saat ini sedang diedit"
 msgid "Files matching a filter rule are removed from directory listings."
 msgstr "Berkas yang sesuai dengan aturan dihapus dari daftar isi direktori."
 
-#: ../../locales/../src/engine/storj/resolve.cpp:321
+#: ../../locales/../src/engine/storj/resolve.cpp:301
 msgid "Files not found"
 msgstr "Berkas tidak ditemukan"
 
@@ -4418,7 +4417,7 @@ msgstr "Sidik jari (SHA-256):"
 msgid "Fingerprints:"
 msgstr "Sidik jari:"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:54
+#: ../../locales/../src/interface/netconfwizard.cpp:55
 msgid "Firewall and router configuration wizard"
 msgstr "Panduan konfigurasi firewall dan router"
 
@@ -4475,7 +4474,7 @@ msgstr "Menemukan %s %s baru\n"
 msgid "Function %s failed"
 msgstr "Fungsi %s gagal"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3789
+#: ../../locales/../src/interface/welcome_dialog.cpp:109
 msgid "Further documentation"
 msgstr "Dokumentasi lebih lanjut"
 
@@ -4483,7 +4482,7 @@ msgstr "Dokumentasi lebih lanjut"
 msgid "General"
 msgstr "Umum"
 
-#: ../../locales/../src/engine/proxy.cpp:488
+#: ../../locales/../src/engine/proxy.cpp:489
 msgid "General SOCKS server failure"
 msgstr "Kegagalan server SOCKS umum"
 
@@ -4500,7 +4499,7 @@ msgstr "Proxy generik"
 msgid "Get external IP address from the following URL:"
 msgstr "Dapatkan alamat IP eksternal dari URL berikut:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3728
+#: ../../locales/../src/interface/welcome_dialog.cpp:94
 msgid "Getting help"
 msgstr "Mendapatkan bantuan"
 
@@ -4513,22 +4512,22 @@ msgstr "Karena nama filter sudah ada, timpa kumpulan filter yang ada?"
 msgid "Global bookmarks"
 msgstr "Penanda global"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:315
+#: ../../locales/../src/engine/tlssocket_impl.cpp:314
 #, c-format
 msgid "GnuTLS error %d"
 msgstr "Kesalahan GnuTLS %d"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:318
+#: ../../locales/../src/engine/tlssocket_impl.cpp:317
 #, c-format
 msgid "GnuTLS error %d in %s"
 msgstr "Kesalahan GnuTLS %d pada %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:310
+#: ../../locales/../src/engine/tlssocket_impl.cpp:309
 #, c-format
 msgid "GnuTLS error %d in %s: %s"
 msgstr "Kesalahan GnuTLS %d pada %s: %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:307
+#: ../../locales/../src/engine/tlssocket_impl.cpp:306
 #, c-format
 msgid "GnuTLS error %d: %s"
 msgstr "Kesalahan GnuTLS %d: %s"
@@ -4587,7 +4586,7 @@ msgstr ""
 msgid "Homepage:"
 msgstr "Situs:"
 
-#: ../../locales/../src/engine/socket.cpp:1088
+#: ../../locales/../src/engine/socket_errors.cpp:64
 msgid "Host is down"
 msgstr "Situs tidak bisa diakses"
 
@@ -4596,7 +4595,7 @@ msgid "Host key mismatch"
 msgstr "Kunci mesin tidak cocok"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:293
+#: ../../locales/../src/interface/sitemanager_site.cpp:295
 msgid "Host name of identity service"
 msgstr "Nama host dari layanan identitas"
 
@@ -4604,7 +4603,7 @@ msgstr "Nama host dari layanan identitas"
 msgid "Host starts with '[' but no closing bracket found."
 msgstr "Host dimulai dengan '[' tetapi tidak ada kurung penutup."
 
-#: ../../locales/../src/engine/proxy.cpp:497
+#: ../../locales/../src/engine/proxy.cpp:498
 msgid "Host unreachable"
 msgstr "Host tidak dapat dicapai"
 
@@ -4613,6 +4612,7 @@ msgstr "Host tidak dapat dicapai"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:420
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1040
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1161
+#: ../../locales/../src/interface/verifycertdialog.cpp:759
 msgid "Host:"
 msgstr "Mesin:"
 
@@ -4636,17 +4636,17 @@ msgstr ""
 msgid "I&SO 8601 (example: 15:47)"
 msgstr "I&SO 8601 (contoh: 15:47)"
 
-#: ../../locales/../src/engine/proxy.cpp:115
+#: ../../locales/../src/engine/proxy.cpp:116
 msgid "IPv6 addresses are not supported with SOCKS4 proxy"
 msgstr "Alamat IPv6 tidak didukung oleh SOCKS4 proxy"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:291
+#: ../../locales/../src/interface/sitemanager_site.cpp:293
 msgid "Identity &host:"
 msgstr "&Host identitas:"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:345
+#: ../../locales/../src/interface/sitemanager_site.cpp:347
 msgid "Identity service path:"
 msgstr "Path layanan identitas:"
 
@@ -4694,7 +4694,7 @@ msgstr ""
 "Jika perubahan pada kunci mesin tidak diharapkan, harap menghubungi "
 "administrator situs."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:575
+#: ../../locales/../src/interface/netconfwizard.cpp:576
 msgid ""
 "If the problem persists, some router and/or firewall keeps blocking "
 "FileZilla."
@@ -4702,7 +4702,7 @@ msgstr ""
 "Jika masalah ini tetap muncul, beberapa router dan/atau firewall akan "
 "menghalangi FileZilla."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:584
+#: ../../locales/../src/interface/netconfwizard.cpp:585
 msgid ""
 "If the problem persists, some router and/or firewall keeps interrupting the "
 "connection."
@@ -4728,7 +4728,7 @@ msgstr ""
 "Jika symlink mengacu ke direktori, FileZilla bisa menghapus link simbolis "
 "atau menghapus isi dari direktori yang dituju."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:646
+#: ../../locales/../src/interface/netconfwizard.cpp:647
 msgid ""
 "If this problem persists, please contact your router or firewall "
 "manufacturer for a solution."
@@ -4736,7 +4736,7 @@ msgstr ""
 "Jika masalah ini tetap muncul, harap hubungi pembuat router atau firewall "
 "Anda untuk solusinya."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:604
+#: ../../locales/../src/interface/netconfwizard.cpp:605
 msgid "If this problem stays, please contact your router manufacturer."
 msgstr "Jika masalah ini tetap ada, harap hubungi pembuat router Anda."
 
@@ -4797,7 +4797,7 @@ msgstr ""
 "Jika Anda memiliki masalah mendapatkan daftar direktori atau mentransfer "
 "berkas, coba untuk mengganti mode transfer default."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:591
+#: ../../locales/../src/interface/netconfwizard.cpp:592
 msgid ""
 "If you keep having problems with a specific server, the server itself or a "
 "remote router or firewall might be misconfigured. In this case try to toggle "
@@ -4832,7 +4832,7 @@ msgstr ""
 "Jika Anda menggunakan router, pastikan semua port diteruskan pada mesin "
 "dimana Anda menjalankan FileZilla."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:617
+#: ../../locales/../src/interface/netconfwizard.cpp:618
 msgid ""
 "If your router keeps changing the IP address, please contact your router "
 "manufacturer."
@@ -4904,20 +4904,24 @@ msgstr ""
 "Informasi tentang versi terbaru dari FileZilla tidak bisa didapatkan. Harap "
 "mencoba kembali nanti."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:250
+#: ../../locales/../src/engine/ftp/logon.cpp:247
 msgid "Initializing TLS..."
 msgstr "Menginisialisasi TLS..."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:297
+#: ../../locales/../src/interface/verifycertdialog.cpp:736
+msgid "Insecure FTP connection"
+msgstr "Koneksi FTP tidak aman"
+
+#: ../../locales/../src/interface/verifycertdialog.cpp:452
 msgid "Insecure algorithm!"
 msgstr "Algoritma tidak aman!"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:235
+#: ../../locales/../src/engine/ftp/logon.cpp:230
 msgid "Insecure server, it does not support FTP over TLS."
 msgstr "Server tidak aman, tidak mendukung FTP diatas TLS."
 
-#: ../../locales/../src/engine/server.cpp:669
-#: ../../locales/../src/engine/server.cpp:693
+#: ../../locales/../src/engine/server.cpp:681
+#: ../../locales/../src/engine/server.cpp:705
 #: ../../locales/../src/interface/manual_transfer.cpp:182
 msgid "Interactive"
 msgstr "Interaktif"
@@ -4926,29 +4930,29 @@ msgstr "Interaktif"
 msgid "Interface"
 msgstr "Antarmuka"
 
-#: ../../locales/../src/engine/socket.cpp:1074
+#: ../../locales/../src/engine/socket_errors.cpp:50
 msgid "Interrupted by signal"
 msgstr "DIinterupsi oleh sinyal"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:213
+#: ../../locales/../src/engine/ControlSocket.cpp:208
 #: ../../locales/../src/interface/queue.cpp:355
 msgid "Interrupted by user"
 msgstr "Diinterupsi oleh pengguna"
 
-#: ../../locales/../src/engine/http/request.cpp:161
-#: ../../locales/../src/engine/http/request.cpp:584
+#: ../../locales/../src/engine/http/request.cpp:160
+#: ../../locales/../src/engine/http/request.cpp:578
 msgid "Invalid Content-Length"
 msgstr "Ukuran konten tidak valid"
 
-#: ../../locales/../src/engine/http/request.cpp:490
+#: ../../locales/../src/engine/http/request.cpp:484
 msgid "Invalid HTTP Response"
 msgstr "Respon HTTP tidak valid"
 
-#: ../../locales/../src/engine/socket.cpp:1062
+#: ../../locales/../src/engine/socket_errors.cpp:38
 msgid "Invalid argument passed"
 msgstr "Argumen yang dikirimkan tidak valid"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:460
+#: ../../locales/../src/engine/ControlSocket.cpp:455
 msgid ""
 "Invalid character sequence received, disabling UTF-8. Select UTF-8 option in "
 "site manager to force UTF-8."
@@ -4956,19 +4960,19 @@ msgstr ""
 "Urutan karakter yang diterima tidak valid, menonaktifkan UTF-8. Memilih opsi "
 "UTF-8 pada manajemen situs untuk memaksa UTF-8."
 
-#: ../../locales/../src/engine/http/request.cpp:705
+#: ../../locales/../src/engine/http/request.cpp:699
 msgid "Invalid chunk size"
 msgstr "Ukuran potongan berkas tidak valid"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:373
-#: ../../locales/../src/interface/netconfwizard.cpp:382
-#: ../../locales/../src/interface/netconfwizard.cpp:390
-#: ../../locales/../src/interface/netconfwizard.cpp:407
+#: ../../locales/../src/interface/netconfwizard.cpp:374
+#: ../../locales/../src/interface/netconfwizard.cpp:383
+#: ../../locales/../src/interface/netconfwizard.cpp:391
+#: ../../locales/../src/interface/netconfwizard.cpp:408
 msgid "Invalid data received"
 msgstr "Data yang diterima tidak valid"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:224
-#: ../../locales/../src/interface/verifycertdialog.cpp:239
+#: ../../locales/../src/interface/verifycertdialog.cpp:379
+#: ../../locales/../src/interface/verifycertdialog.cpp:394
 msgid "Invalid date"
 msgstr "Tanggal tidak valid"
 
@@ -4988,27 +4992,27 @@ msgstr ""
 "Host tidak valid, setelah kurung penutup hanya titik dua dan port yang boleh "
 "mengikuti."
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:165
+#: ../../locales/../src/engine/http/filetransfer.cpp:157
 #, c-format
 msgid "Invalid hostname: %s"
 msgstr "Nama host tidak valid: %s"
 
 #: ../../locales/../src/interface/asksavepassworddialog.cpp:41
 #: ../../locales/../src/interface/asksavepassworddialog.cpp:46
-#: ../../locales/../src/interface/loginmanager.cpp:108
-#: ../../locales/../src/interface/loginmanager.cpp:113
-#: ../../locales/../src/interface/loginmanager.cpp:207
-#: ../../locales/../src/interface/loginmanager.cpp:309
+#: ../../locales/../src/interface/loginmanager.cpp:110
+#: ../../locales/../src/interface/loginmanager.cpp:115
+#: ../../locales/../src/interface/loginmanager.cpp:209
+#: ../../locales/../src/interface/loginmanager.cpp:311
 msgid "Invalid input"
 msgstr "Masukan tidak valid"
 
-#: ../../locales/../src/engine/http/request.cpp:518
+#: ../../locales/../src/engine/http/request.cpp:512
 msgid "Invalid line"
 msgstr "Baris tidak valid"
 
-#: ../../locales/../src/engine/storj/list.cpp:21
-#: ../../locales/../src/engine/storj/mkd.cpp:22
-#: ../../locales/../src/engine/storj/rmd.cpp:24
+#: ../../locales/../src/engine/storj/list.cpp:19
+#: ../../locales/../src/engine/storj/mkd.cpp:20
+#: ../../locales/../src/engine/storj/rmd.cpp:22
 msgid "Invalid path"
 msgstr "Path tidak valid"
 
@@ -5017,7 +5021,7 @@ msgstr "Path tidak valid"
 msgid "Invalid port given. The port has to be a value from 1 to 65535."
 msgstr "Port yang diberikan tidak valid. Port harus bernilai 1 sampai 65535."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:161
+#: ../../locales/../src/interface/quickconnectbar.cpp:163
 #: ../../locales/../src/interface/serverdata.cpp:40
 msgid ""
 "Invalid protocol specified. Valid protocols are:\n"
@@ -5032,7 +5036,7 @@ msgstr ""
 "ftps:// untuk FTP diatas TLS (implisit) dan\n"
 "ftpes:// untuk FTP diatas TLS (eksplisit)."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:70
+#: ../../locales/../src/engine/ftp/logon.cpp:68
 msgid ""
 "Invalid proxy host, after closing bracket only colon and port may follow."
 msgstr ""
@@ -5047,7 +5051,7 @@ msgstr "Regular expression tidak valid"
 msgid "Invalid regular expression in search conditions."
 msgstr "Regular expression pada kondisi pencarian tidak valid."
 
-#: ../../locales/../src/engine/http/request.cpp:499
+#: ../../locales/../src/engine/http/request.cpp:493
 msgid "Invalid response code"
 msgstr "Kode respon tidak valid"
 
@@ -5071,11 +5075,11 @@ msgstr "Ukuran tidak valid"
 msgid "Invalid username given."
 msgstr "Nama Pengguna tidak valid."
 
-#: ../../locales/../src/engine/socket.cpp:1095
+#: ../../locales/../src/engine/socket_errors.cpp:71
 msgid "Invalid value for ai_flags"
 msgstr "Nilai tidak valid untuk ai_flags"
 
-#: ../../locales/../src/engine/socket.cpp:1097
+#: ../../locales/../src/engine/socket_errors.cpp:73
 msgid "Invalid value for hints"
 msgstr "Nilai tidak valid"
 
@@ -5083,15 +5087,15 @@ msgstr "Nilai tidak valid"
 msgid "Invert Filter"
 msgstr "Filter Invert"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:444
+#: ../../locales/../src/interface/verifycertdialog.cpp:604
 msgid "Jurisdiction country:"
 msgstr "Negara yuridiksi:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:446
+#: ../../locales/../src/interface/verifycertdialog.cpp:606
 msgid "Jurisdiction locality:"
 msgstr "Lokalitas yuridiksi:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:445
+#: ../../locales/../src/interface/verifycertdialog.cpp:605
 msgid "Jurisdiction state or province:"
 msgstr "Kota atau provinsi yuridiksi:"
 
@@ -5118,8 +5122,8 @@ msgstr "Pertukaran kunci"
 msgid "Key exchange:"
 msgstr "Pertukaran kunci:"
 
-#: ../../locales/../src/engine/server.cpp:666
-#: ../../locales/../src/engine/server.cpp:691
+#: ../../locales/../src/engine/server.cpp:678
+#: ../../locales/../src/engine/server.cpp:703
 msgid "Key file"
 msgstr "Berkas kunci"
 
@@ -5147,17 +5151,17 @@ msgstr "Bahasa sudah berubah"
 msgid "Last modified"
 msgstr "Terakhir dimodifikasi"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:116
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:118
 msgid "Layout"
 msgstr "Layout"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:875
+#: ../../locales/../src/interface/sitemanager_site.cpp:877
 msgid "Leave empty to keep existing data."
 msgstr "Biarkan kosong untuk menyimpan data yang ada."
 
 #. @translator: Keep this string as short as possible
 #: ../../locales/../src/interface/settings/optionspage_passwords.cpp:44
-#: ../../locales/../src/interface/sitemanager_site.cpp:873
+#: ../../locales/../src/interface/sitemanager_site.cpp:875
 msgid "Leave empty to keep existing password."
 msgstr "Biarkan kosong untuk menyimpan kata sandi yang ada."
 
@@ -5181,7 +5185,7 @@ msgstr "Batas ukuran untuk berkas log"
 msgid "Limit:"
 msgstr "Batas:"
 
-#: ../../locales/../src/engine/http/request.cpp:659
+#: ../../locales/../src/engine/http/request.cpp:653
 msgid "Line length exceeded"
 msgstr "Ukuran baris kelebihan"
 
@@ -5189,8 +5193,8 @@ msgstr "Ukuran baris kelebihan"
 msgid "Linked against"
 msgstr "Dihubungkan dengan"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:274
-#: ../../locales/../src/interface/netconfwizard.cpp:280
+#: ../../locales/../src/interface/netconfwizard.cpp:275
+#: ../../locales/../src/interface/netconfwizard.cpp:281
 msgid "Listen socket closed"
 msgstr "Soket ditutup"
 
@@ -5209,11 +5213,11 @@ msgstr "Port ter&endah yang tersedia:"
 msgid "Local"
 msgstr "Lokal"
 
-#: ../../locales/../src/engine/socket.cpp:1059
+#: ../../locales/../src/engine/socket_errors.cpp:35
 msgid "Local address in use"
 msgstr "Alamat lokal digunakan"
 
-#: ../../locales/../src/engine/socket.cpp:1087
+#: ../../locales/../src/engine/socket_errors.cpp:63
 msgid "Local endpoint has been closed"
 msgstr "Titik ujung lokal sudah ditutup"
 
@@ -5262,7 +5266,7 @@ msgid "Local size of '%s' does not match expected size: %d != %d"
 msgstr ""
 "Ukuran lokal dari '%s' tidak sesuai dengan ukuran yang diharapkan: %d != %d"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:438
+#: ../../locales/../src/interface/verifycertdialog.cpp:598
 msgid "Locality:"
 msgstr "Lokalitas:"
 
@@ -5270,7 +5274,7 @@ msgstr "Lokalitas:"
 msgid "Log file"
 msgstr "Berkas log"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:418
+#: ../../locales/../src/engine/ftp/logon.cpp:415
 msgid "Logged in"
 msgstr "Login"
 
@@ -5279,7 +5283,7 @@ msgstr "Login"
 msgid "Logging"
 msgstr "Melakukan pencatatan"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:304
+#: ../../locales/../src/engine/ftp/logon.cpp:301
 msgid ""
 "Login data contains non-ASCII characters and server might not be UTF-8 "
 "aware. Cannot fall back to local charset since using proxy."
@@ -5287,7 +5291,7 @@ msgstr ""
 "Data login berisi karakter non-ASCII dan server mungkin tidak mendukung "
 "UTF-8. Tidak bisa kembali ke charset lokal karena menggunakan proxy."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:311
+#: ../../locales/../src/engine/ftp/logon.cpp:308
 msgid ""
 "Login data contains non-ASCII characters and server might not be UTF-8 "
 "aware. Trying local charset."
@@ -5295,11 +5299,11 @@ msgstr ""
 "Data login berisi karakter non-ASCII dan server mungkin tidak mendukung "
 "UTF-8. Mencoba charset lokal."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:338
+#: ../../locales/../src/engine/ftp/logon.cpp:335
 msgid "Login sequence fully executed yet not logged in, aborting."
 msgstr "Urutan login dilakukan, namun belum login, membatalkan."
 
-#: ../../locales/../src/interface/cmdline.cpp:103
+#: ../../locales/../src/interface/cmdline.cpp:105
 msgid "Logontype has to be either 'ask' or 'interactive' (without the quotes)."
 msgstr "Jenis login harus berupa 'ask' atau 'interactive' (tanpa kutip)."
 
@@ -5339,33 +5343,33 @@ msgid "Make sure the file can be accessed and is a well-formed XML document."
 msgstr ""
 "Pastikan berkas dapat diakses dan merupakan dokumen XML yang well-formed."
 
+#: ../../locales/../src/engine/http/request.cpp:640
 #: ../../locales/../src/engine/http/request.cpp:646
-#: ../../locales/../src/engine/http/request.cpp:652
-#: ../../locales/../src/engine/http/request.cpp:659
-#: ../../locales/../src/engine/http/request.cpp:670
-#: ../../locales/../src/engine/http/request.cpp:705
+#: ../../locales/../src/engine/http/request.cpp:653
+#: ../../locales/../src/engine/http/request.cpp:664
+#: ../../locales/../src/engine/http/request.cpp:699
 #, c-format
 msgid "Malformed chunk data: %s"
 msgstr "Bagian data rusak: %s"
 
-#: ../../locales/../src/engine/http/request.cpp:161
+#: ../../locales/../src/engine/http/request.cpp:160
 #, c-format
 msgid "Malformed request header: %s"
 msgstr "Header request rusak: %s"
 
+#: ../../locales/../src/engine/http/request.cpp:453
 #: ../../locales/../src/engine/http/request.cpp:459
-#: ../../locales/../src/engine/http/request.cpp:465
-#: ../../locales/../src/engine/http/request.cpp:518
-#: ../../locales/../src/engine/http/request.cpp:574
-#: ../../locales/../src/engine/http/request.cpp:584
+#: ../../locales/../src/engine/http/request.cpp:512
+#: ../../locales/../src/engine/http/request.cpp:568
+#: ../../locales/../src/engine/http/request.cpp:578
 #, c-format
 msgid "Malformed response header: %s"
 msgstr "Isi header rusak: %s"
 
-#: ../../locales/../src/engine/http/request.cpp:406
-#: ../../locales/../src/engine/http/request.cpp:420
-#: ../../locales/../src/engine/http/request.cpp:438
-#: ../../locales/../src/engine/http/request.cpp:783
+#: ../../locales/../src/engine/http/request.cpp:400
+#: ../../locales/../src/engine/http/request.cpp:414
+#: ../../locales/../src/engine/http/request.cpp:432
+#: ../../locales/../src/engine/http/request.cpp:777
 #, c-format
 msgid "Malformed response: %s"
 msgstr "Respon yang tidak benar: %s"
@@ -5387,8 +5391,8 @@ msgstr "Transfer manual"
 msgid "Master &Password:"
 msgstr "&Kata kunci utama:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4051
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:160
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3857
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:162
 msgid "Master password:"
 msgstr "Kata kunci utama:"
 
@@ -5412,7 +5416,7 @@ msgstr "Cocok sebagian dari pilihan berikut"
 msgid "Maximum simultaneous &transfers:"
 msgstr "Jumlah maksimum &transfer secara simultan:"
 
-#: ../../locales/../src/engine/socket.cpp:1101
+#: ../../locales/../src/engine/socket_errors.cpp:77
 msgid "Memory allocation failure"
 msgstr "Kegagalan alokasi memori"
 
@@ -5421,11 +5425,11 @@ msgstr "Kegagalan alokasi memori"
 msgid "Message log"
 msgstr "Pesan log"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:130
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:133
 msgid "Message log positio&n:"
 msgstr "Posisi pesa&n log:"
 
-#: ../../locales/../src/engine/socket.cpp:1084
+#: ../../locales/../src/engine/socket_errors.cpp:60
 msgid "Message too large"
 msgstr "Pesan terlalu besar"
 
@@ -5499,15 +5503,15 @@ msgstr "Harus memasukkan nama path lokal yang valid"
 msgid "Need to enter valid remote path"
 msgstr "Harus memasukkan nama path remote yang valid"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:541
+#: ../../locales/../src/interface/sitemanager_site.cpp:543
 msgid "Need to specify a character encoding"
 msgstr "Harus menentukan enkoding karakter"
 
-#: ../../locales/../src/engine/socket.cpp:1105
+#: ../../locales/../src/engine/socket_errors.cpp:81
 msgid "Neither nodename nor servname provided, or not known"
 msgstr "Nama node atau nama server disediakan atau tidak diketahui"
 
-#: ../../locales/../src/engine/socket.cpp:1092
+#: ../../locales/../src/engine/socket_errors.cpp:68
 msgid ""
 "Network host does not have any network addresses in the requested address "
 "family"
@@ -5515,8 +5519,8 @@ msgstr ""
 "Host jaringan tidak memiliki alamat jaringan pada keluarga alamat yang "
 "diminta"
 
-#: ../../locales/../src/engine/proxy.cpp:494
-#: ../../locales/../src/engine/socket.cpp:1076
+#: ../../locales/../src/engine/proxy.cpp:495
+#: ../../locales/../src/engine/socket_errors.cpp:52
 msgid "Network unreachable"
 msgstr "Jaringan tidak dapat dicapai"
 
@@ -5558,11 +5562,11 @@ msgstr "Penanda baru"
 
 #: ../../locales/../src/interface/LocalTreeView.cpp:1198
 #: ../../locales/../src/interface/RemoteListView.cpp:1385
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1295
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1312
 msgid "New directory"
 msgstr "Direktori baru"
 
-#: ../../locales/../src/interface/welcome_dialog.cpp:65
+#: ../../locales/../src/interface/welcome_dialog.cpp:89
 #, c-format
 msgid "New features and improvements in %s"
 msgstr "Fitur dan peningkatan baru pada %s"
@@ -5581,7 +5585,7 @@ msgstr "Direktori baru"
 msgid "New site"
 msgstr "Situs baru"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:127
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:136
 msgid "Next to the transfer queue"
 msgstr "Disebelah antrian transfer"
 
@@ -5589,7 +5593,7 @@ msgstr "Disebelah antrian transfer"
 msgid "No"
 msgstr "Tidak"
 
-#: ../../locales/../src/engine/socket.cpp:1103
+#: ../../locales/../src/engine/socket_errors.cpp:79
 msgid "No address associated with nodename"
 msgstr "Tidak ada alamat yang terasosiasi dengan nama node"
 
@@ -5601,7 +5605,7 @@ msgstr "Tidak ada kategori yang akan diekspor"
 msgid "No command given, aborting."
 msgstr "Tidak ada perintah yang diberikan, membatalkan."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:643
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:658
 msgid "No external IP address set, trying default."
 msgstr ""
 "Tidak ada alamat IP eksternal yang ditentukan, mencoba menggunakan default."
@@ -5640,7 +5644,7 @@ msgstr ""
 "Tidak ada program yang sudah diasosiasikan untuk mengedit berkas dengan "
 "ekstensi '%s'."
 
-#: ../../locales/../src/engine/socket.cpp:1079
+#: ../../locales/../src/engine/socket_errors.cpp:55
 msgid "No route to host"
 msgstr "Tidak ada rute"
 
@@ -5652,18 +5656,18 @@ msgstr "Tidak ada hasil pencarian"
 msgid "No sites available"
 msgstr "Tidak ada situs yang tersedia"
 
-#: ../../locales/../src/engine/proxy.cpp:466
+#: ../../locales/../src/engine/proxy.cpp:467
 msgid "No supported SOCKS5 auth method"
 msgstr "Tidak ada metode SOCKS5 auth yang didukung"
 
-#: ../../locales/../src/interface/loginmanager.cpp:207
+#: ../../locales/../src/interface/loginmanager.cpp:209
 msgid "No username given."
 msgstr "Tidak ada nama pengguna yang diberikan."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1683
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1702
 #: ../../locales/../src/interface/sitemanager.cpp:17
-#: ../../locales/../src/interface/verifycertdialog.cpp:246
+#: ../../locales/../src/interface/verifycertdialog.cpp:401
 msgid "None"
 msgstr "Tidak ada"
 
@@ -5671,13 +5675,13 @@ msgstr "Tidak ada"
 msgid "None selected yet"
 msgstr "Tidak ada yang terpilih"
 
-#: ../../locales/../src/engine/socket.cpp:1099
+#: ../../locales/../src/engine/socket_errors.cpp:75
 msgid "Nonrecoverable failure in name resolution"
 msgstr "Kegagalan yang tidak dapat diperbaiki pada resolusi nama"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:963
-#: ../../locales/../src/engine/server.cpp:660
-#: ../../locales/../src/engine/server.cpp:687
+#: ../../locales/../src/engine/server.cpp:672
+#: ../../locales/../src/engine/server.cpp:699
 #: ../../locales/../src/interface/manual_transfer.cpp:148
 #: ../../locales/../src/interface/manual_transfer.cpp:176
 #: ../../locales/../src/interface/manual_transfer.cpp:535
@@ -5692,11 +5696,11 @@ msgid "Not all items could be requeued for transfer."
 msgstr "Tidak semua bisa diantrikan ulang untuk transfer."
 
 #: ../../locales/../src/interface/state.cpp:216
-#: ../../locales/../src/interface/state.cpp:1312
+#: ../../locales/../src/interface/state.cpp:1316
 msgid "Not connected"
 msgstr "Tidak terhubung"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2160
+#: ../../locales/../src/interface/RemoteListView.cpp:2198
 msgid "Not connected to any server"
 msgstr "Tidak terhubung pada sembarang server"
 
@@ -5708,7 +5712,7 @@ msgstr "Tidak terhubung pada sembarang server."
 msgid "Not connected."
 msgstr "Tidak terhubung."
 
-#: ../../locales/../src/engine/socket.cpp:1120
+#: ../../locales/../src/engine/socket_errors.cpp:96
 msgid "Not initialized, need to call WSAStartup"
 msgstr "Tidak diinisialisasi, perlu memanggil WSAStartup"
 
@@ -5729,8 +5733,8 @@ msgid "Note: Using a generic proxy forces passive mode on FTP connections."
 msgstr ""
 "Catatan: Menggunakan proxy generik memaksa mode pasif pada koneksi FTP."
 
-#: ../../locales/../src/engine/http/request.cpp:465
-#: ../../locales/../src/engine/http/request.cpp:652
+#: ../../locales/../src/engine/http/request.cpp:459
+#: ../../locales/../src/engine/http/request.cpp:646
 msgid "Null character in line"
 msgstr "Karakter null pada baris"
 
@@ -5769,13 +5773,13 @@ msgstr "Bu&ka"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3457
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3552
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3621
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3824
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3990
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4092
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4226
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3796
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3898
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4032
 #: ../../locales/../src/interface/resources/xrc/inputdialog.xrc:34
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:28
 #: ../../locales/../src/interface/resources/xrc/storj.xrc:37
+#: ../../locales/../src/interface/welcome_dialog.cpp:117
 msgid "OK"
 msgstr "OK"
 
@@ -5783,7 +5787,7 @@ msgstr "OK"
 msgid "OS version:"
 msgstr "Versi SO:"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:148
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:150
 msgid "On startup of FileZilla:"
 msgstr "Saat memulai FileZilla:"
 
@@ -5880,15 +5884,15 @@ msgstr ""
 msgid "Operating System:"
 msgstr "Sistem Operasi:"
 
-#: ../../locales/../src/engine/socket.cpp:1070
+#: ../../locales/../src/engine/socket_errors.cpp:46
 msgid "Operation already in progress"
 msgstr "Operasi sudah berjalan"
 
-#: ../../locales/../src/engine/socket.cpp:1061
+#: ../../locales/../src/engine/socket_errors.cpp:37
 msgid "Operation in progress"
 msgstr "Operasi sedang berjalan"
 
-#: ../../locales/../src/engine/socket.cpp:1082
+#: ../../locales/../src/engine/socket_errors.cpp:58
 msgid "Operation not supported"
 msgstr "Operasi tidak didukung"
 
@@ -5900,7 +5904,7 @@ msgstr "Opsi"
 msgid "Orange"
 msgstr "Jingga"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:432
+#: ../../locales/../src/interface/verifycertdialog.cpp:592
 msgid "Organization:"
 msgstr "Organisasi:"
 
@@ -5908,16 +5912,16 @@ msgstr "Organisasi:"
 msgid "Other SFTP options"
 msgstr "Opsi SFTP lain"
 
-#: ../../locales/../src/engine/socket.cpp:1115
+#: ../../locales/../src/engine/socket_errors.cpp:91
 msgid "Other system error"
 msgstr "Kesalahan sistem lainnya"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:454
+#: ../../locales/../src/interface/verifycertdialog.cpp:614
 msgid "Other:"
 msgstr "Lainnya:"
 
-#: ../../locales/../src/engine/socket.cpp:1065
-#: ../../locales/../src/engine/socket.cpp:1066
+#: ../../locales/../src/engine/socket_errors.cpp:41
+#: ../../locales/../src/engine/socket_errors.cpp:42
 msgid "Out of memory"
 msgstr "Kehabisan memori"
 
@@ -5979,7 +5983,7 @@ msgstr "Hak akses pemilik"
 msgid "Owner/Group"
 msgstr "Pemilik/Grup"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:146
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:148
 msgid ""
 "P&revent system from entering idle sleep during transfers and other "
 "operations"
@@ -5990,7 +5994,7 @@ msgstr "M&encegah sistem untuk memasuki idle ketika transfer dan operasi lain"
 msgid "P&roxy host:"
 msgstr "Host p&roxy:"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:507
+#: ../../locales/../src/interface/netconfwizard.cpp:508
 msgid "PORT command tainted by router or firewall."
 msgstr "Perintah PORT diabaikan oleh router atau firewall."
 
@@ -6009,8 +6013,8 @@ msgstr "Mem-parsing %d byte informasi versi.\n"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2714
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:286
-#: ../../locales/../src/interface/quickconnectbar.cpp:57
-#: ../../locales/../src/interface/sitemanager_site.cpp:272
+#: ../../locales/../src/interface/quickconnectbar.cpp:59
+#: ../../locales/../src/interface/sitemanager_site.cpp:274
 msgid "Pass&word:"
 msgstr "Kata &kunci:"
 
@@ -6023,14 +6027,14 @@ msgstr "Pasif (disarankan)"
 msgid "Passive mode"
 msgstr "Mode pasif"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:610
-#: ../../locales/../src/interface/netconfwizard.cpp:623
-#: ../../locales/../src/interface/netconfwizard.cpp:634
+#: ../../locales/../src/interface/netconfwizard.cpp:611
+#: ../../locales/../src/interface/netconfwizard.cpp:624
+#: ../../locales/../src/interface/netconfwizard.cpp:635
 msgid "Passive mode has been set as default transfer mode."
 msgstr "Mode pasif telah ditentukan sebagai mode transfer default."
 
-#: ../../locales/../src/engine/storj/connect.cpp:82
-#: ../../locales/../src/engine/storj/connect.cpp:93
+#: ../../locales/../src/engine/storj/connect.cpp:80
+#: ../../locales/../src/engine/storj/connect.cpp:91
 msgid "Password or encryption key is not set"
 msgstr "Kata sandi atau kunci enkripsi belum ditentukan"
 
@@ -6038,7 +6042,7 @@ msgstr "Kata sandi atau kunci enkripsi belum ditentukan"
 msgid "Password required"
 msgstr "Kata sandi diperlukan"
 
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:148
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:150
 #: ../../locales/../src/interface/settings/settingsdialog.cpp:107
 msgid "Passwords"
 msgstr "Kata kunci"
@@ -6048,9 +6052,9 @@ msgstr "Kata kunci"
 msgid "Path"
 msgstr "Path"
 
-#: ../../locales/../src/engine/ftp/rmd.cpp:28
-#: ../../locales/../src/engine/ftp/rmd.cpp:44
-#: ../../locales/../src/engine/sftp/rmd.cpp:16
+#: ../../locales/../src/engine/ftp/rmd.cpp:26
+#: ../../locales/../src/engine/ftp/rmd.cpp:42
+#: ../../locales/../src/engine/sftp/rmd.cpp:14
 #, c-format
 msgid "Path cannot be constructed for directory %s and subdir %s"
 msgstr "Path tidak bisa dibuat untuk direktori %s dan sub direktori %s"
@@ -6059,7 +6063,7 @@ msgstr "Path tidak bisa dibuat untuk direktori %s dan sub direktori %s"
 msgid "Path not found:"
 msgstr "Path tidak ditemukan:"
 
-#: ../../locales/../src/engine/server.cpp:800
+#: ../../locales/../src/engine/server.cpp:814
 msgid "Path of identity service"
 msgstr "Path dari layanan identitas"
 
@@ -6078,8 +6082,8 @@ msgstr "Penghapusan tertunda"
 msgid "Permission"
 msgstr "Hak akses"
 
-#: ../../locales/../src/engine/socket.cpp:1058
-#: ../../locales/../src/engine/socket.cpp:1067
+#: ../../locales/../src/engine/socket_errors.cpp:34
+#: ../../locales/../src/engine/socket_errors.cpp:43
 msgid "Permission denied"
 msgstr "Hak akses ditolak"
 
@@ -6092,13 +6096,13 @@ msgstr "Hak akses"
 msgid "Platform:"
 msgstr "Platform:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4185
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3991
 msgid "Please add the local directories you want to use FileZilla with."
 msgstr ""
 "Harap menambahkan ulang direktori lokal yang hendak Anda gunakan pada "
 "FileZilla."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:574
+#: ../../locales/../src/interface/netconfwizard.cpp:575
 msgid ""
 "Please check on https://filezilla-project.org/probe.php that the server is "
 "running and carefully check your settings again."
@@ -6122,13 +6126,13 @@ msgstr ""
 "Harap konfigurasi sembarang firewall dan router sehingga FileZilla bisa "
 "membuat koneksi keluar pada sembarang port."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:645
+#: ../../locales/../src/interface/netconfwizard.cpp:646
 msgid "Please disable settings like 'DMZ mode' or 'Game mode' on your router."
 msgstr ""
 "Harap nonaktifkan pengaturan seperti 'mode DMZ' atau 'mode Game' pada router "
 "Anda."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:583
+#: ../../locales/../src/interface/netconfwizard.cpp:584
 msgid ""
 "Please ensure you have a stable internet connection and carefully check your "
 "settings again."
@@ -6210,11 +6214,11 @@ msgstr "Harap masukkan nama unik untuk kumpulan filter ini"
 msgid "Please enter a username for this server:"
 msgstr "Harap masukkan nama pengguna untuk server ini:"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:185
+#: ../../locales/../src/interface/netconfwizard.cpp:186
 msgid "Please enter a valid portrange."
 msgstr "Harap masukkan jarak port yang valid."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:166
+#: ../../locales/../src/interface/netconfwizard.cpp:167
 msgid "Please enter an URL where to get your external address from"
 msgstr "Harap masukkan URL untuk mendapatkan alamat eksternal Anda"
 
@@ -6250,11 +6254,11 @@ msgstr ""
 #: ../../locales/../src/interface/LocalListView.cpp:972
 #: ../../locales/../src/interface/LocalTreeView.cpp:1194
 #: ../../locales/../src/interface/RemoteListView.cpp:1372
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1282
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1299
 msgid "Please enter the name of the directory which should be created:"
 msgstr "Masukkan nama direktori yang akan dibuat:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2779
+#: ../../locales/../src/interface/RemoteListView.cpp:2817
 msgid "Please enter the name of the file which should be created:"
 msgstr "Harap masukkan nama berkas yang akan dibuat:"
 
@@ -6268,12 +6272,12 @@ msgid ""
 msgstr ""
 "Harap masukkan kata sandi utama Anda untuk mengubah pengaturan kata sandi."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:150
+#: ../../locales/../src/interface/netconfwizard.cpp:151
 msgid "Please enter your external IP address"
 msgstr "Harap masukkan alamat IP eksternal Anda"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:615
-#: ../../locales/../src/interface/netconfwizard.cpp:628
+#: ../../locales/../src/interface/netconfwizard.cpp:616
+#: ../../locales/../src/interface/netconfwizard.cpp:629
 msgid ""
 "Please enter your external IP address on the active mode page of this "
 "wizard. In case you have a dynamic address or don't know your external "
@@ -6298,7 +6302,7 @@ msgstr ""
 "Harap ikuti instruksi dengan benar, karena konfigurasi yang salah akan "
 "mencegah koneksi FTP yang sukses."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:639
+#: ../../locales/../src/interface/netconfwizard.cpp:640
 msgid ""
 "Please make sure FileZilla is allowed to establish outgoing connections and "
 "make sure you typed the address of the address resolver correctly."
@@ -6310,7 +6314,7 @@ msgstr ""
 msgid "Please make sure the requested locale is installed on your system."
 msgstr "Harap pastikan lokal yang diminta sudah terinstall pada sistem Anda."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:616
+#: ../../locales/../src/interface/netconfwizard.cpp:617
 msgid ""
 "Please make sure your router is using the latest available firmware. "
 "Furthermore, your router has to be configured properly. You will have to use "
@@ -6350,7 +6354,7 @@ msgstr ""
 "Harap perhatikan bahwa beberapa server bisa memblokir Anda jika Anda terlalu "
 "banyak melakukan hubungan ulang pada interval yang singkat."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:592
+#: ../../locales/../src/interface/netconfwizard.cpp:593
 msgid ""
 "Please run this wizard again should you change your network environment or "
 "in case you suddenly encounter problems with servers that did work "
@@ -6403,7 +6407,7 @@ msgstr "Harap pilih atribut baru dari berkas dan direktori yang dipilih."
 msgid "Please select the new attributes for the selected files."
 msgstr "Harap pilih attribut baru untuk berkas yang dipilih."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:603
+#: ../../locales/../src/interface/netconfwizard.cpp:604
 msgid ""
 "Please update your firewall and make sure your router is using the latest "
 "available firmware. Furthermore, your router has to be configured properly. "
@@ -6417,8 +6421,12 @@ msgstr ""
 "pada 'mode DMZ' atau 'mode game'. Hal-hal seperti inspeksi protokol atau "
 "'perbaikan' pada protokol tertentu harus dinonaktifkan"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:439
-#: ../../locales/../src/interface/verifycertdialog.cpp:440
+#: ../../locales/../src/interface/verifycertdialog.cpp:761
+msgid "Port:"
+msgstr "Port:"
+
+#: ../../locales/../src/interface/verifycertdialog.cpp:599
+#: ../../locales/../src/interface/verifycertdialog.cpp:600
 msgid "Postal code:"
 msgstr "Kode pos:"
 
@@ -6443,7 +6451,7 @@ msgstr "Mempertahankan berkas waktu"
 msgid "Preview"
 msgstr "Preview"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1388
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1439
 msgid "Primary connection and data connection certificates don't match."
 msgstr "Sertifikat koneksi utama dan koneksi data tidak sesuai."
 
@@ -6476,11 +6484,11 @@ msgstr ""
 msgid "Private &keys:"
 msgstr "&Kunci privat:"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:287
+#: ../../locales/../src/interface/sitemanager_site.cpp:289
 msgid "Pro&ject ID:"
 msgstr "ID pro&yek:"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:294
+#: ../../locales/../src/interface/sitemanager_site.cpp:296
 msgid "Pro&ject:"
 msgstr "Pro&yek:"
 
@@ -6498,7 +6506,7 @@ msgstr "Katasandi pro&xy:"
 msgid "Process &Queue"
 msgstr "Proses &Antrian"
 
-#: ../../locales/../src/engine/socket.cpp:1063
+#: ../../locales/../src/engine/socket_errors.cpp:39
 msgid "Process file table overflow"
 msgstr "Memproses tabel berkas overflow"
 
@@ -6509,15 +6517,15 @@ msgid "Processed %s in %s."
 msgstr "Terproses %s dalam %s."
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:296
+#: ../../locales/../src/interface/sitemanager_site.cpp:298
 msgid "Project (or tenant) name or ID"
 msgstr "Nama atau ID proyek"
 
-#: ../../locales/../src/engine/socket.cpp:1068
+#: ../../locales/../src/engine/socket_errors.cpp:44
 msgid "Protocol not supported"
 msgstr "Protokol tidak didukung"
 
-#: ../../locales/../src/engine/socket.cpp:1122
+#: ../../locales/../src/engine/socket_errors.cpp:98
 msgid "Protocol not supported on given socket type"
 msgstr "Protokol tidak didukung pada jenis socket yang diberikan"
 
@@ -6534,40 +6542,40 @@ msgstr "&Port proxy:"
 msgid "Proxy &user:"
 msgstr "&Pengguna proxy:"
 
-#: ../../locales/../src/engine/proxy.cpp:475
+#: ../../locales/../src/engine/proxy.cpp:476
 msgid "Proxy authentication failed"
 msgstr "Authentikasi proxy gagal"
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:103
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:115
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:104
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:116
 #, c-format
 msgid "Proxy handshake failed: %s"
 msgstr "Handshake proxy gagal: %s"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:65
+#: ../../locales/../src/engine/ftp/logon.cpp:63
 msgid "Proxy host starts with '[' but no closing bracket found."
 msgstr "Host proxy dimulai dengan '[' tetapi tidak ada kurung penutup."
 
-#: ../../locales/../src/engine/proxy.cpp:329
+#: ../../locales/../src/engine/proxy.cpp:330
 #, c-format
 msgid "Proxy reply: %s"
 msgstr "Balasan proxy: %s"
 
-#: ../../locales/../src/engine/proxy.cpp:516
+#: ../../locales/../src/engine/proxy.cpp:517
 #, c-format
 msgid "Proxy request failed. Reply from proxy: %s"
 msgstr "Request proxy gagal. Jawaban dari proxy: %s"
 
-#: ../../locales/../src/engine/proxy.cpp:386
+#: ../../locales/../src/engine/proxy.cpp:387
 #, c-format
 msgid "Proxy request failed: %s"
 msgstr "Request proxy gagal: %s"
 
-#: ../../locales/../src/engine/proxy.cpp:540
+#: ../../locales/../src/engine/proxy.cpp:541
 msgid "Proxy request failed: Unknown address type in CONNECT reply"
 msgstr "Request proxy gagal: Jenis alamat tidak diketahui pada balasan CONNECT"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:92
+#: ../../locales/../src/engine/ftp/logon.cpp:90
 msgid "Proxy set but proxy host or port invalid"
 msgstr "Proxy ditentukan tetapi host atau port proxy tidak valid"
 
@@ -6649,7 +6657,7 @@ msgstr "Per&barui"
 msgid "Re&name"
 msgstr "Ganti &nama"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:598
+#: ../../locales/../src/interface/netconfwizard.cpp:599
 msgid ""
 "Re-run the wizard and carefully check your settings and configure all "
 "routers and firewalls accordingly."
@@ -6665,7 +6673,7 @@ msgstr "Bac&a"
 msgid "Read-only"
 msgstr "Hanya-baca"
 
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:44
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:45
 msgid "Reading from local file failed"
 msgstr "Membaca dari berkas lokal gagal"
 
@@ -6694,7 +6702,7 @@ msgstr[0] "Yakin menghapus %d berkas? dari server?"
 msgid "Really delete %s and %s from the server?"
 msgstr "Yakin menghapus %s dan %s dari server?"
 
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1100
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1103
 msgid "Really delete all selected files and/or directories from the server?"
 msgstr ""
 "Yakin menghapus semua berkas dan/atau direktori yang dipilih dari server?"
@@ -6717,22 +6725,22 @@ msgstr "Reboot sistem sekarang"
 msgid "Rec&urse into subdirectories"
 msgstr "Mas&uk jauh kedalam sub direktori"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:329
+#: ../../locales/../src/engine/tlssocket_impl.cpp:328
 #, c-format
 msgid "Received TLS alert from the server: %s (%d)"
 msgstr "Menerima peringatan TLS dari server: %s (%d)"
 
-#: ../../locales/../src/engine/directorylistingparser.cpp:3165
+#: ../../locales/../src/engine/directorylistingparser.cpp:3167
 msgid "Received a directory listing which appears to be encoded in EBCDIC."
 msgstr ""
 "Menerima sebuah daftar direktori yang tampaknya dikodekan dalam EBCDIC."
 
-#: ../../locales/../src/engine/directorylistingparser.cpp:2130
-#: ../../locales/../src/engine/directorylistingparser.cpp:2147
+#: ../../locales/../src/engine/directorylistingparser.cpp:2132
+#: ../../locales/../src/engine/directorylistingparser.cpp:2149
 msgid "Received a line exceeding 10000 characters, aborting."
 msgstr "Menerima baris melebihi 10000 karakter, dibatalkan."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1301
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1304
 #, c-format
 msgid ""
 "Received certificate chain could not be verified. Verification status is %d."
@@ -6740,9 +6748,9 @@ msgstr ""
 "Rangkaian sertifikat yang diterima tidak dapat diverifikasi. Status "
 "verifikasi %d."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:1014
-#: ../../locales/../src/interface/netconfwizard.cpp:1022
-#: ../../locales/../src/interface/netconfwizard.cpp:1043
+#: ../../locales/../src/interface/netconfwizard.cpp:1015
+#: ../../locales/../src/interface/netconfwizard.cpp:1023
+#: ../../locales/../src/interface/netconfwizard.cpp:1044
 msgid "Received data tainted"
 msgstr "Data yang diterima ditolak"
 
@@ -6750,7 +6758,7 @@ msgstr "Data yang diterima ditolak"
 msgid "Received invalid character in version information"
 msgstr "Menerima karakter tidak valid pada informasi versi"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:332
+#: ../../locales/../src/engine/tlssocket_impl.cpp:331
 #, c-format
 msgid "Received unknown TLS alert %d from the server"
 msgstr "Menerima peringatan TLS %d yang tidak diketahui dari server"
@@ -6791,12 +6799,12 @@ msgstr "Menghapus berkas dan direktori secara rekursif."
 msgid "Red"
 msgstr "Merah"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:152
+#: ../../locales/../src/engine/http/filetransfer.cpp:144
 #, c-format
 msgid "Redirection to invalid or unsupported URI: %s"
 msgstr "Pengalihan ke URI yang tidak valid atau tidak didukung: %s"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:158
+#: ../../locales/../src/engine/http/filetransfer.cpp:150
 #, c-format
 msgid "Redirection to invalid or unsupported address: %s"
 msgstr "Pengalihan ke alamat yang tidak valid atau tidak didukung: %s"
@@ -6805,7 +6813,7 @@ msgstr "Pengalihan ke alamat yang tidak valid atau tidak didukung: %s"
 msgid "Refresh the file and folder lists"
 msgstr "Perbarui daftar berkas dan direktori"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4112
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3918
 msgid "Remember passwords?"
 msgstr "Ingat kata kunci?"
 
@@ -6813,7 +6821,7 @@ msgstr "Ingat kata kunci?"
 msgid "Remote"
 msgstr "Remote"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:972
+#: ../../locales/../src/engine/tlssocket_impl.cpp:975
 msgid "Remote certificate not trusted."
 msgstr "Sertifikat remote tidak dipercaya."
 
@@ -6889,7 +6897,7 @@ msgstr "Hapus &yang terpilih"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1639
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1193
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1214
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:326
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:349
 msgid "Rename file"
 msgstr "Ganti nama berkas"
 
@@ -6903,34 +6911,34 @@ msgstr "Ganti nama direktori yang terpilih"
 msgid "Rename selected files and directories"
 msgstr "Ganti nama berkas dan direktori yang terpilih"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:610
-#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:604
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:625
+#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:605
 #, c-format
 msgid "Renaming '%s' to '%s'"
 msgstr "Mengganti nama '%s' menjadi '%s'"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4063
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:163
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3869
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:165
 msgid "Repeat password:"
 msgstr "Ulangi kata sandi:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3746
+#: ../../locales/../src/interface/welcome_dialog.cpp:99
 msgid "Reporting bugs and feature requests"
 msgstr "Melaporkan kesalahan dan permintaan fitur"
 
-#: ../../locales/../src/engine/proxy.cpp:377
+#: ../../locales/../src/engine/proxy.cpp:378
 msgid ""
 "Request failed - client is not running identd (or not reachable from server)"
 msgstr ""
 "Permintaan gagal - klien tidak menjalankan identd (atau tidak dapat "
 "dihubungi dari server)"
 
-#: ../../locales/../src/engine/proxy.cpp:380
+#: ../../locales/../src/engine/proxy.cpp:381
 msgid "Request failed - client's identd could not confirm the user ID string"
 msgstr ""
 "Permintaan gagal - identd milik klien tidak dapat mengkonfirmasi string ID"
 
-#: ../../locales/../src/engine/proxy.cpp:374
+#: ../../locales/../src/engine/proxy.cpp:375
 msgid "Request rejected or failed"
 msgstr "Permintaan ditolak atau gagal"
 
@@ -6946,27 +6954,27 @@ msgstr "Membutuhkan FTP diatas TLS secara implisit"
 msgid "Reset and requeue &all"
 msgstr "Ulangi dan antri ulang &semua berkas"
 
-#: ../../locales/../src/engine/socket.cpp:1110
+#: ../../locales/../src/engine/socket_errors.cpp:86
 msgid "Resolved protocol is unknown"
 msgstr "Protokol yang di-resolve tidak diketahui"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1088
+#: ../../locales/../src/engine/ControlSocket.cpp:889
 #, c-format
 msgid "Resolving address of %s"
 msgstr "Me-resolve alamat dari %s"
 
-#: ../../locales/../src/engine/socket.cpp:1069
+#: ../../locales/../src/engine/socket_errors.cpp:45
 msgid "Resource temporarily unavailable"
 msgstr "Sumberdaya tidak tersedia"
 
 #: ../../locales/../src/engine/logging.cpp:115
-#: ../../locales/../src/interface/netconfwizard.cpp:421
+#: ../../locales/../src/interface/netconfwizard.cpp:422
 #: ../../locales/../src/interface/StatusView.cpp:290
 #: ../../locales/../src/interface/StatusView.cpp:358
 msgid "Response:"
 msgstr "Respon:"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:151
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:153
 msgid "Restore ta&bs and reconnect"
 msgstr "Kembalikan ta&b dan koneksikan ulang"
 
@@ -6989,21 +6997,21 @@ msgstr ""
 "Melanjutkan berkas ASCII dapat menimbulkan masalah jika server menggunakan "
 "format akhir baris yang berbeda dengan klien."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:338
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:341
 #: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:457
 #: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:67
 #, c-format
 msgid "Retrieving directory listing of \"%s\"..."
 msgstr "Mengambil daftar direktori dari \"%s\"..."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:335
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:338
 #: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:454
 #: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:64
 msgid "Retrieving directory listing..."
 msgstr "Mengambil daftar direktori..."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:658
-#: ../../locales/../src/interface/netconfwizard.cpp:725
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:673
+#: ../../locales/../src/interface/netconfwizard.cpp:726
 #, c-format
 msgid "Retrieving external IP address from %s"
 msgstr "Menerima alamat IP eksternal dari %s"
@@ -7012,7 +7020,7 @@ msgstr "Menerima alamat IP eksternal dari %s"
 msgid "S&how files currently being edited..."
 msgstr "&Tampilkan berkas yang sedang diedit..."
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:150
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:152
 msgid "S&how the Site Manager on startup"
 msgstr "Ta&mpilkan Manajemen Situs di awal"
 
@@ -7020,7 +7028,7 @@ msgstr "Ta&mpilkan Manajemen Situs di awal"
 msgid "S&hutdown system once"
 msgstr "&Mematikan sistem sekali"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:149
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:151
 msgid "S&tart normally"
 msgstr "&Jalankan secara normal"
 
@@ -7048,12 +7056,12 @@ msgstr "Dukungan SFTP"
 msgid "SOC&KS 4"
 msgstr "&SOCKS 4"
 
-#: ../../locales/../src/engine/proxy.cpp:141
+#: ../../locales/../src/engine/proxy.cpp:142
 #, c-format
 msgid "SOCKS4 proxy will connect to: %s"
 msgstr "SOCKS4 proxy akan tersambung ke: %s"
 
-#: ../../locales/../src/engine/proxy.cpp:168
+#: ../../locales/../src/engine/proxy.cpp:169
 msgid ""
 "SOCKS5 does not support usernames or passwords longer than 255 characters."
 msgstr ""
@@ -7064,28 +7072,28 @@ msgstr ""
 msgid "SQLite:"
 msgstr "SQLite:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4040
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:156
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3846
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:158
 msgid "Sa&ve passwords protected by a master password"
 msgstr "Si&mpan kata sandi yang terlindungi dengan kata sandi utama"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4030
-#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:154
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3836
+#: ../../locales/../src/interface/settings/optionspage_passwords.cpp:156
 msgid "Sav&e passwords"
 msgstr "Si&mpan kata kunci"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:867
+#: ../../locales/../src/interface/netconfwizard.cpp:868
 msgid "Save settings?"
 msgstr "Simpan pengaturan?"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:429
-#: ../../locales/../src/interface/sitemanager_site.cpp:501
+#: ../../locales/../src/interface/sitemanager_site.cpp:503
 msgid "Saving of password has been disabled by your system administrator."
 msgstr ""
 "Penyimpanan kata sandi telah dinonaktifkan oleh administrator sistem Anda."
 
 #: ../../locales/../src/interface/manual_transfer.cpp:432
-#: ../../locales/../src/interface/sitemanager_site.cpp:504
+#: ../../locales/../src/interface/sitemanager_site.cpp:506
 msgid "Saving of passwords has been disabled by you."
 msgstr "Penyimpanan kata sandi telah dinonaktifkan oleh Anda."
 
@@ -7114,16 +7122,16 @@ msgid "Search type:"
 msgstr "Jenis pencarian:"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:278
+#: ../../locales/../src/interface/sitemanager_site.cpp:280
 msgid "Secret Access &Key:"
 msgstr "&Kunci Akses Rahasia:"
 
-#: ../../locales/../src/interface/statusbar.cpp:524
+#: ../../locales/../src/interface/statusbar.cpp:526
 msgid "Security information"
 msgstr "Informasi keamanan"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:585
-#: ../../locales/../src/interface/netconfwizard.cpp:599
+#: ../../locales/../src/interface/netconfwizard.cpp:586
+#: ../../locales/../src/interface/netconfwizard.cpp:600
 msgid "See also: https://wiki.filezilla-project.org/Network_Configuration"
 msgstr "Lihat juga: https://wiki.filezilla-project.org/Network_Configuration"
 
@@ -7295,7 +7303,7 @@ msgstr "Berkas yang dipilih masih diedit"
 msgid "Selected filter only works for local files."
 msgstr "Filter yang dipilih hanya bekerja untuk berkas lokal."
 
-#: ../../locales/../src/interface/menu_bar.cpp:439
+#: ../../locales/../src/interface/menu_bar.cpp:440
 msgid ""
 "Selected global bookmark and current server use a different server type.\n"
 "Use site-specific bookmarks for this server."
@@ -7304,7 +7312,7 @@ msgstr ""
 "berbeda.\n"
 "Gunakan penanda situs khusus untuk server ini."
 
-#: ../../locales/../src/engine/engineprivate.cpp:307
+#: ../../locales/../src/engine/engineprivate.cpp:320
 msgid "Selected port usually in use by a different protocol."
 msgstr "Port yang dipilih biasanya digunakan oleh protokol lain."
 
@@ -7316,12 +7324,12 @@ msgstr "Kirim perintah FTP &keep-alive"
 msgid "Send custom command to the server otherwise not available"
 msgstr "Kirim perintah tertentu ke server jika tidak tersedia"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:780
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:795
 msgid "Sending keep-alive command"
 msgstr "Mengirimkan perintah keep-alive"
 
 #: ../../locales/../src/interface/resources/xrc/certificate.xrc:65
-#: ../../locales/../src/interface/verifycertdialog.cpp:443
+#: ../../locales/../src/interface/verifycertdialog.cpp:603
 msgid "Serial number:"
 msgstr "Nomor seri:"
 
@@ -7333,17 +7341,17 @@ msgstr "&Jenis Server:"
 msgid "Server did not properly shut down TLS connection"
 msgstr "Server tidak memutuskan koneksi TLS dengan benar"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:398
-#: ../../locales/../src/engine/ftp/logon.cpp:458
+#: ../../locales/../src/engine/ftp/logon.cpp:395
+#: ../../locales/../src/engine/ftp/logon.cpp:455
 msgid "Server does not support non-ASCII characters."
 msgstr "Server tidak mendukung karakter bukan ASCII."
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:270
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:268
 #, c-format
 msgid "Server does not support resume of files > %d GB."
 msgstr "Server tidak mendukung proses kelanjutan dari berkas > %d GB."
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:267
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:265
 #, c-format
 msgid ""
 "Server does not support resume of files > %d GB. End transfer since file "
@@ -7352,11 +7360,11 @@ msgstr ""
 "Server tidak mendukung proses kelanjutan dari berkas > %d GB. Mengakhiri "
 "transfer karena ukuran berkas sesuai."
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:529
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:523
 msgid "Server does not support resume of files > 2GB."
 msgstr "Server tidak mendukung proses kelanjutan dari berkas > 2 GB."
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:525
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:519
 msgid "Server does not support resume of files > 4GB."
 msgstr "Server tidak mendukung proses kelanjutan dari berkas > 4 GB."
 
@@ -7364,7 +7372,7 @@ msgstr "Server tidak mendukung proses kelanjutan dari berkas > 4 GB."
 msgid "Server host key"
 msgstr "Kunci host server"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:278
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:276
 #, c-format
 msgid ""
 "Server may not support resume of files > %d GB. End transfer since file "
@@ -7373,7 +7381,7 @@ msgstr ""
 "Server mungkin tidak mendukung proses kelanjutan dari berkas > %d GB. "
 "Mengakhiri transfer karena ukuran berkas sesuai."
 
-#: ../../locales/../src/engine/ftp/logon.cpp:340
+#: ../../locales/../src/engine/ftp/logon.cpp:337
 msgid ""
 "Server might require an account. Try specifying an account using the Site "
 "Manager"
@@ -7381,7 +7389,7 @@ msgstr ""
 "Server mungkin membutuhkan akun. Harap tentukan sebuah akun menggunakan "
 "Manajemen Situs"
 
-#: ../../locales/../src/engine/http/request.cpp:459
+#: ../../locales/../src/engine/http/request.cpp:453
 msgid "Server not sending proper line endings"
 msgstr "Server tidak mengirimkan akhir baris yang benar"
 
@@ -7395,7 +7403,7 @@ msgstr "Server meminta algoritma otentikasi yang tidak didukung: %s"
 msgid "Server requested unsupported quality-of-protection: %s"
 msgstr "Server meminta kualitas pengamanan yang tidak didukung: %s"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:347
+#: ../../locales/../src/engine/ControlSocket.cpp:342
 msgid "Server returned empty path."
 msgstr "Server mengirimkan path kosong."
 
@@ -7407,17 +7415,17 @@ msgstr ""
 "Server mengirimkan prompt login tambahan. Anda harus menggunakan jenis login "
 "interaktif."
 
-#: ../../locales/../src/engine/http/request.cpp:309
+#: ../../locales/../src/engine/http/request.cpp:303
 msgid "Server sent data even before request headers were sent"
 msgstr "Server mengirimkan data sebelum header permintaan dikirimkan"
 
-#: ../../locales/../src/engine/ftp/rawtransfer.cpp:347
+#: ../../locales/../src/engine/ftp/rawtransfer.cpp:343
 msgid "Server sent passive reply with unroutable address. Passive mode failed."
 msgstr ""
 "Server mengirimkan balasan pasif dengan alamat yang tidak ada rutenya. Mode "
 "pasif gagal."
 
-#: ../../locales/../src/engine/ftp/rawtransfer.cpp:342
+#: ../../locales/../src/engine/ftp/rawtransfer.cpp:338
 msgid ""
 "Server sent passive reply with unroutable address. Using server address "
 "instead."
@@ -7425,26 +7433,26 @@ msgstr ""
 "Server mengirimkan balasan pasif dengan alamat yang tidak ada rutenya. "
 "Menggunakan alamat server."
 
-#: ../../locales/../src/engine/http/request.cpp:406
-#: ../../locales/../src/engine/http/request.cpp:420
-#: ../../locales/../src/engine/http/request.cpp:438
-#: ../../locales/../src/engine/http/request.cpp:783
+#: ../../locales/../src/engine/http/request.cpp:400
+#: ../../locales/../src/engine/http/request.cpp:414
+#: ../../locales/../src/engine/http/request.cpp:432
+#: ../../locales/../src/engine/http/request.cpp:777
 msgid "Server sent too much data."
 msgstr "Server mengirimkan terlalu banyak data."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:428
-#: ../../locales/../src/interface/netconfwizard.cpp:434
-#: ../../locales/../src/interface/netconfwizard.cpp:469
-#: ../../locales/../src/interface/netconfwizard.cpp:478
-#: ../../locales/../src/interface/netconfwizard.cpp:490
-#: ../../locales/../src/interface/netconfwizard.cpp:513
-#: ../../locales/../src/interface/netconfwizard.cpp:520
-#: ../../locales/../src/interface/netconfwizard.cpp:529
-#: ../../locales/../src/interface/netconfwizard.cpp:540
+#: ../../locales/../src/interface/netconfwizard.cpp:429
+#: ../../locales/../src/interface/netconfwizard.cpp:435
+#: ../../locales/../src/interface/netconfwizard.cpp:470
+#: ../../locales/../src/interface/netconfwizard.cpp:479
+#: ../../locales/../src/interface/netconfwizard.cpp:491
+#: ../../locales/../src/interface/netconfwizard.cpp:514
+#: ../../locales/../src/interface/netconfwizard.cpp:521
+#: ../../locales/../src/interface/netconfwizard.cpp:530
+#: ../../locales/../src/interface/netconfwizard.cpp:541
 msgid "Server sent unexpected reply."
 msgstr "Server mengirimkan balasan yang tidak diharapkan."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1249
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1252
 msgid ""
 "Server sent unsorted certificate chain in violation of the TLS specifications"
 msgstr ""
@@ -7480,8 +7488,8 @@ msgstr "Detail sesi"
 msgid "Set &Priority"
 msgstr "Tentukan &Prioritas"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:617
-#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:598
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:632
+#: ../../locales/../src/engine/sftp/sftpcontrolsocket.cpp:599
 #, c-format
 msgid "Setting permissions of '%s' to '%s'"
 msgstr "Hak akses dari '%s' menjadi '%s'"
@@ -7524,7 +7532,7 @@ msgstr "Tampilkan detail fornat tanggal dan waktu"
 msgid "Show in file &manager"
 msgstr "Tampilkan pada &manajemen situs"
 
-#: ../../locales/../src/interface/menu_bar.cpp:182
+#: ../../locales/../src/interface/menu_bar.cpp:183
 msgid "Shows available TLS ciphers"
 msgstr "Tampilkan cipher TLS yang tersedia"
 
@@ -7552,7 +7560,7 @@ msgstr "Daftar &Manajemen Situs"
 msgid "Site Manager"
 msgstr "Manajemen Situs"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:511
+#: ../../locales/../src/interface/sitemanager_site.cpp:513
 msgid "Site Manager - Cannot remember password"
 msgstr "Manajer Situs - Tidak bisa mengingat kata sandi"
 
@@ -7563,19 +7571,19 @@ msgstr "Daftar Manajemen Situs - Kunci yang dihasilkan"
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:897
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:906
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:913
-#: ../../locales/../src/interface/sitemanager_site.cpp:477
-#: ../../locales/../src/interface/sitemanager_site.cpp:490
-#: ../../locales/../src/interface/sitemanager_site.cpp:524
-#: ../../locales/../src/interface/sitemanager_site.cpp:541
-#: ../../locales/../src/interface/sitemanager_site.cpp:554
-#: ../../locales/../src/interface/sitemanager_site.cpp:569
-#: ../../locales/../src/interface/sitemanager_site.cpp:579
-#: ../../locales/../src/interface/sitemanager_site.cpp:587
-#: ../../locales/../src/interface/sitemanager_site.cpp:612
-#: ../../locales/../src/interface/sitemanager_site.cpp:621
-#: ../../locales/../src/interface/sitemanager_site.cpp:637
-#: ../../locales/../src/interface/sitemanager_site.cpp:646
-#: ../../locales/../src/interface/sitemanager_site.cpp:662
+#: ../../locales/../src/interface/sitemanager_site.cpp:479
+#: ../../locales/../src/interface/sitemanager_site.cpp:492
+#: ../../locales/../src/interface/sitemanager_site.cpp:526
+#: ../../locales/../src/interface/sitemanager_site.cpp:543
+#: ../../locales/../src/interface/sitemanager_site.cpp:556
+#: ../../locales/../src/interface/sitemanager_site.cpp:571
+#: ../../locales/../src/interface/sitemanager_site.cpp:581
+#: ../../locales/../src/interface/sitemanager_site.cpp:589
+#: ../../locales/../src/interface/sitemanager_site.cpp:614
+#: ../../locales/../src/interface/sitemanager_site.cpp:623
+#: ../../locales/../src/interface/sitemanager_site.cpp:639
+#: ../../locales/../src/interface/sitemanager_site.cpp:648
+#: ../../locales/../src/interface/sitemanager_site.cpp:664
 msgid "Site Manager - Invalid data"
 msgstr "Manajemen Situs - Data tidak valid"
 
@@ -7636,10 +7644,10 @@ msgstr "Ukuran tidak diketahui"
 msgid "Skip file"
 msgstr "Lewati berkas"
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1158
-#: ../../locales/../src/engine/ControlSocket.cpp:1175
-#: ../../locales/../src/engine/ControlSocket.cpp:1201
-#: ../../locales/../src/engine/ControlSocket.cpp:1279
+#: ../../locales/../src/engine/ControlSocket.cpp:959
+#: ../../locales/../src/engine/ControlSocket.cpp:976
+#: ../../locales/../src/engine/ControlSocket.cpp:1002
+#: ../../locales/../src/engine/ControlSocket.cpp:1080
 #, c-format
 msgid "Skipping download of %s"
 msgstr "Lewati download %s"
@@ -7649,31 +7657,31 @@ msgstr "Lewati download %s"
 msgid "Skipping non-existing key file \"%s\""
 msgstr "Mengabaikan berkas kunci yang tidak ada \"%s\""
 
-#: ../../locales/../src/engine/ControlSocket.cpp:1161
-#: ../../locales/../src/engine/ControlSocket.cpp:1178
-#: ../../locales/../src/engine/ControlSocket.cpp:1204
-#: ../../locales/../src/engine/ControlSocket.cpp:1282
+#: ../../locales/../src/engine/ControlSocket.cpp:962
+#: ../../locales/../src/engine/ControlSocket.cpp:979
+#: ../../locales/../src/engine/ControlSocket.cpp:1005
+#: ../../locales/../src/engine/ControlSocket.cpp:1083
 #, c-format
 msgid "Skipping upload of %s"
 msgstr "Lewati upload %s"
 
-#: ../../locales/../src/engine/socket.cpp:1073
+#: ../../locales/../src/engine/socket_errors.cpp:49
 msgid "Socket address outside address space"
 msgstr "Alamat socket diluar ruang alamat"
 
-#: ../../locales/../src/engine/socket.cpp:1075
+#: ../../locales/../src/engine/socket_errors.cpp:51
 msgid "Socket already connected"
 msgstr "Socket sudah terhubung"
 
-#: ../../locales/../src/engine/socket.cpp:1083
+#: ../../locales/../src/engine/socket_errors.cpp:59
 msgid "Socket has been shut down"
 msgstr "Socket telah berhenti"
 
-#: ../../locales/../src/engine/socket.cpp:1080
+#: ../../locales/../src/engine/socket_errors.cpp:56
 msgid "Socket not connected"
 msgstr "Socket tidak terhubung"
 
-#: ../../locales/../src/engine/socket.cpp:1123
+#: ../../locales/../src/engine/socket_errors.cpp:99
 msgid "Socket type not supported for address family"
 msgstr "Jenis socket tidak didukung pada keluarga alamat"
 
@@ -7722,7 +7730,7 @@ msgstr "Sumber dan target dari operasi drop sama"
 msgid "Source file:"
 msgstr "Berkas sumber:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4008
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3814
 #: ../../locales/../src/interface/speedlimits_dialog.cpp:64
 #: ../../locales/../src/interface/speedlimits_dialog.cpp:72
 msgid "Speed Limits"
@@ -7732,11 +7740,11 @@ msgstr "Batas Kecepatan"
 msgid "Speed limits"
 msgstr "Batas kecepatan"
 
-#: ../../locales/../src/interface/statusbar.cpp:602
+#: ../../locales/../src/interface/statusbar.cpp:604
 msgid "Speed limits are disabled, click to change."
 msgstr "Batas kecepatan dinonaktifkan, klik untuk mengubahnya."
 
-#: ../../locales/../src/interface/statusbar.cpp:605
+#: ../../locales/../src/interface/statusbar.cpp:607
 msgid "Speed limits are enabled, click to change."
 msgstr "Batas kecepatan diaktifkan, klik untuk mengubahnya."
 
@@ -7765,16 +7773,16 @@ msgstr "Mulai dengan Manajemen Situs yang terbuka"
 msgid "Started update check on %s\n"
 msgstr "Pemeriksaan update dimulai pada %s\n"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:36
-#: ../../locales/../src/engine/sftp/filetransfer.cpp:35
-#: ../../locales/../src/engine/storj/file_transfer.cpp:41
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:34
+#: ../../locales/../src/engine/sftp/filetransfer.cpp:33
+#: ../../locales/../src/engine/storj/file_transfer.cpp:39
 #, c-format
 msgid "Starting download of %s"
 msgstr "Mulai mendownload %s"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:39
-#: ../../locales/../src/engine/sftp/filetransfer.cpp:38
-#: ../../locales/../src/engine/storj/file_transfer.cpp:44
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:37
+#: ../../locales/../src/engine/sftp/filetransfer.cpp:36
+#: ../../locales/../src/engine/storj/file_transfer.cpp:42
 #, c-format
 msgid "Starting upload of %s"
 msgstr "Mulai upload %s"
@@ -7783,7 +7791,7 @@ msgstr "Mulai upload %s"
 msgid "Starts the local site in the given path"
 msgstr "Menjalankan situs lokal pada path yang diberikan"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:437
+#: ../../locales/../src/interface/verifycertdialog.cpp:597
 msgid "State or province:"
 msgstr "Kota atau provinsi:"
 
@@ -7807,7 +7815,7 @@ msgid "Stop recursive operation"
 msgstr "Menghentikan operasi rekursif"
 
 #. @translator: Keep short
-#: ../../locales/../src/interface/sitemanager_site.cpp:283
+#: ../../locales/../src/interface/sitemanager_site.cpp:285
 msgid "Storage &account:"
 msgstr "&Akun penyimpanan:"
 
@@ -7819,7 +7827,7 @@ msgstr "Storj - Penyimpanan Cloud Terdesentralisasi"
 msgid "Storj support"
 msgstr "Dukungan Storj"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:441
+#: ../../locales/../src/interface/verifycertdialog.cpp:601
 msgid "Street:"
 msgstr "Jalan:"
 
@@ -7847,7 +7855,7 @@ msgstr ""
 "Symlink ke berkas tidak terpengaruh oleh pilihan ini, karena symlink selalu "
 "dihapus."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4115
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3921
 #: ../../locales/../src/interface/state.cpp:268
 #: ../../locales/../src/interface/state.cpp:283
 #: ../../locales/../src/interface/state.cpp:290
@@ -7855,11 +7863,11 @@ msgstr ""
 #: ../../locales/../src/interface/state.cpp:398
 #: ../../locales/../src/interface/state.cpp:406
 #: ../../locales/../src/interface/state.cpp:414
-#: ../../locales/../src/interface/state.cpp:1071
-#: ../../locales/../src/interface/state.cpp:1079
-#: ../../locales/../src/interface/state.cpp:1086
-#: ../../locales/../src/interface/state.cpp:1095
-#: ../../locales/../src/interface/state.cpp:1122
+#: ../../locales/../src/interface/state.cpp:1075
+#: ../../locales/../src/interface/state.cpp:1083
+#: ../../locales/../src/interface/state.cpp:1090
+#: ../../locales/../src/interface/state.cpp:1099
+#: ../../locales/../src/interface/state.cpp:1126
 #: ../../locales/../src/interface/toolbar.cpp:52
 msgid "Synchronized browsing"
 msgstr "Penjelajahan tersinkronisasi"
@@ -7872,16 +7880,16 @@ msgstr "Penjelajahan tersinkronisasi sudah dinonaktifkan."
 msgid "Synchronizing directories."
 msgstr "Sinkronisasi direktori."
 
-#: ../../locales/../src/interface/quickconnectbar.cpp:118
-#: ../../locales/../src/interface/quickconnectbar.cpp:162
+#: ../../locales/../src/interface/quickconnectbar.cpp:120
+#: ../../locales/../src/interface/quickconnectbar.cpp:164
 msgid "Syntax error"
 msgstr "Kesalahan sintaks"
 
-#: ../../locales/../src/interface/cmdline.cpp:76
-#: ../../locales/../src/interface/cmdline.cpp:82
+#: ../../locales/../src/interface/cmdline.cpp:83
 #: ../../locales/../src/interface/cmdline.cpp:88
-#: ../../locales/../src/interface/cmdline.cpp:97
-#: ../../locales/../src/interface/cmdline.cpp:103
+#: ../../locales/../src/interface/cmdline.cpp:93
+#: ../../locales/../src/interface/cmdline.cpp:100
+#: ../../locales/../src/interface/cmdline.cpp:105
 #: ../../locales/../src/interface/Mainfrm.cpp:2504
 #: ../../locales/../src/interface/Mainfrm.cpp:2546
 msgid "Syntax error in command line"
@@ -7895,11 +7903,11 @@ msgstr "Sistem"
 msgid "System details"
 msgstr "Detail sistem"
 
-#: ../../locales/../src/engine/socket.cpp:1064
+#: ../../locales/../src/engine/socket_errors.cpp:40
 msgid "System limit of open files exceeded"
 msgstr "Batas sistem untuk berkas yang terbuka sudah terlampaui"
 
-#: ../../locales/../src/engine/socket.cpp:1121
+#: ../../locales/../src/engine/socket_errors.cpp:97
 msgid "System's network subsystem has failed"
 msgstr "Sub sistem jaringan gagal"
 
@@ -7907,19 +7915,19 @@ msgstr "Sub sistem jaringan gagal"
 msgid "T&oolbar"
 msgstr "T&oolbar"
 
-#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:219
+#: ../../locales/../src/engine/http/httpcontrolsocket.cpp:220
 msgid "TLS connection established, sending HTTP request"
 msgstr "Koneksi TLS terbentuk, mengirimkan permintaan HTTP"
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:206
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:207
 msgid "TLS connection established, waiting for welcome message..."
 msgstr "Koneksi TLS terjalin, menunggu ucapan selamat datang..."
 
-#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:210
+#: ../../locales/../src/engine/ftp/ftpcontrolsocket.cpp:211
 msgid "TLS connection established."
 msgstr "Koneksi TLS terjalin."
 
-#: ../../locales/../src/engine/proxy.cpp:503
+#: ../../locales/../src/engine/proxy.cpp:504
 msgid "TTL expired"
 msgstr "TLS kadaluarsa"
 
@@ -7931,19 +7939,19 @@ msgstr "Berkas tujuan telah ada"
 msgid "Target file:"
 msgstr "Berkas target:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2797
+#: ../../locales/../src/interface/RemoteListView.cpp:2835
 msgid "Target filename already exists!"
 msgstr "Nama berkas tujuan telah ada!"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:1684
+#: ../../locales/../src/interface/RemoteListView.cpp:1721
 msgid "Target filename already exists, really continue?"
 msgstr "Berkas tujuan telah ada, yakin melanjutkan?"
 
-#: ../../locales/../src/engine/socket.cpp:1094
+#: ../../locales/../src/engine/socket_errors.cpp:70
 msgid "Temporary failure in name resolution"
 msgstr "Kegagalan sementara dalam resolusi nama"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:588
+#: ../../locales/../src/interface/netconfwizard.cpp:589
 msgid "Test finished successfully"
 msgstr "Pengujian selesai dengan baik"
 
@@ -7951,7 +7959,7 @@ msgstr "Pengujian selesai dengan baik"
 msgid "Test results"
 msgstr "Hasil pengujian"
 
-#: ../../locales/../src/engine/ftp/filetransfer.cpp:282
+#: ../../locales/../src/engine/ftp/filetransfer.cpp:280
 msgid "Testing resume capabilities of server"
 msgstr "Menguji kemampuan melanjutkan dari server"
 
@@ -7981,16 +7989,16 @@ msgstr ""
 "Manajemen Situs telah dibuka pada FileZilla 3 lainnya.\n"
 "Harap menutupnya atau data tidak akan bisa dihapus."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:640
+#: ../../locales/../src/interface/netconfwizard.cpp:641
 #, c-format
 msgid "The address you entered was: %s"
 msgstr "Alamat yang Anda masukkan adalah: %s"
 
-#: ../../locales/../src/engine/socket.cpp:1100
+#: ../../locales/../src/engine/socket_errors.cpp:76
 msgid "The ai_family member is not supported"
 msgstr "Anggota ai_family tidak didukung"
 
-#: ../../locales/../src/engine/socket.cpp:1113
+#: ../../locales/../src/engine/socket_errors.cpp:89
 msgid "The ai_socktype member is not supported"
 msgstr "Anggota ai_socktype tidak didukung"
 
@@ -8003,7 +8011,7 @@ msgstr "Penanda tidak bisa ditambahkan."
 msgid "The bookmarks could not be cleared."
 msgstr "Penanda tidak bisa dibersihkan."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1296
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1299
 msgid ""
 "The certificate requires the server to include an OCSP status in its "
 "response, but the OCSP status is missing."
@@ -8011,7 +8019,7 @@ msgstr ""
 "Sertifikat mengharuskan server menyertakan status OCSP pada responnya, "
 "tetapi status OCSP tidak ditemukan."
 
-#: ../../locales/../src/interface/statusbar.cpp:483
+#: ../../locales/../src/interface/statusbar.cpp:485
 msgid "The connection is encrypted. Click icon for details."
 msgstr "Koneksi terenkripsi. Klik ikon untuk lebih detail."
 
@@ -8029,7 +8037,7 @@ msgid ""
 "The custom time format is invalid or contains unsupported format specifiers."
 msgstr "Format jam tidak valid atau mengandung format yang tidak didukung."
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:141
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:142
 #, c-format
 msgid "The data connection could not be established: %s"
 msgstr "Koneksi data tidak dapat terbentuk: %s"
@@ -8061,8 +8069,8 @@ msgstr "Kata sandi yang dimasukkan tidak sama."
 msgid "The extension '%s' does already exist in the list"
 msgstr "Ektensi '%s' sudah ada ada pada daftar"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:315
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:323
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:338
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:346
 #, c-format
 msgid ""
 "The file %s already exists.\n"
@@ -8183,7 +8191,7 @@ msgstr "Karakter berikut akan diganti: %s"
 msgid "The following characters will be replaced: %s"
 msgstr "Karakter berikut akan diganti: %s"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3665
+#: ../../locales/../src/interface/welcome_dialog.cpp:72
 msgid "The free open source FTP solution"
 msgstr "Solusi FTP open source yang gratis"
 
@@ -8208,12 +8216,12 @@ msgstr ""
 msgid "The limit needs to be between 1 and 2000 MiB"
 msgstr "Batas harus diantara 1 dan 2000 MiB"
 
-#: ../../locales/../src/interface/state.cpp:1122
+#: ../../locales/../src/interface/state.cpp:1126
 #, c-format
 msgid "The local directory '%s' could not be created."
 msgstr "Direktori lokal '%s' tidak bisa dibuat."
 
-#: ../../locales/../src/interface/state.cpp:1107
+#: ../../locales/../src/interface/state.cpp:1111
 #, c-format
 msgid "The local directory '%s' does not exist."
 msgstr "Direktori lokal '%s' tidak ada."
@@ -8253,12 +8261,12 @@ msgstr "Versi baru telah disimpan pada direktori Downloads Anda."
 msgid "The queue will not be saved."
 msgstr "Antrian tidak akan disimpan."
 
-#: ../../locales/../src/interface/state.cpp:1029
+#: ../../locales/../src/interface/state.cpp:1033
 #, c-format
 msgid "The remote directory '%s' does not exist."
 msgstr "Direktori remote '%s' tidak ada."
 
-#: ../../locales/../src/interface/state.cpp:1076
+#: ../../locales/../src/interface/state.cpp:1080
 #, c-format
 msgid ""
 "The remote directory '%s' is not below the synchronization root (%s).\n"
@@ -8302,7 +8310,7 @@ msgstr ""
 msgid "The server could not be added."
 msgstr "Server tidak bisa ditambahkan."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:596
+#: ../../locales/../src/interface/netconfwizard.cpp:597
 msgid "The server sent an unexpected or unrecognized reply."
 msgstr "Server mengirimkan balasan yang tidak diharapkan atau tidak dikenali."
 
@@ -8336,11 +8344,11 @@ msgstr ""
 "Kunci mesin server tidak diketahui. Anda tidak memiliki jaminan bahwa server "
 "ini adalah komputer yang Anda harapkan."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1291
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1294
 msgid "The server's hostname does not match the certificate's hostname"
 msgstr "Nama host server tidak sesuai dengan nama host pada sertifikat"
 
-#: ../../locales/../src/engine/socket.cpp:1112
+#: ../../locales/../src/engine/socket_errors.cpp:88
 msgid "The servname parameter is not supported for ai_socktype"
 msgstr "{arameter servname tidak didukung untuk ai_socktype"
 
@@ -8352,11 +8360,11 @@ msgstr ""
 "Pengaturan sudah berhasil diimpor. Anda harus menjalankan ulang FileZilla "
 "agar efek pengaturan berjalan."
 
-#: ../../locales/../src/engine/socket.cpp:1060
+#: ../../locales/../src/engine/socket_errors.cpp:36
 msgid "The specified address family is not supported"
 msgstr "Jenis alamat tidak didukung"
 
-#: ../../locales/../src/engine/socket.cpp:1125
+#: ../../locales/../src/engine/socket_errors.cpp:101
 msgid "The specified network name is no longer available"
 msgstr "Nama jaringan yang ditentukan tidak lagi tersedia"
 
@@ -8376,7 +8384,7 @@ msgstr ""
 "Berkas target telah ada.\n"
 "Harap pilih sebuah aksi."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:867
+#: ../../locales/../src/interface/netconfwizard.cpp:868
 msgid "The test did not succeed. Do you really want to save the settings?"
 msgstr "Pengujian tidak sukses. Apakah Anda hendak menyimpan perubahan?"
 
@@ -8397,7 +8405,7 @@ msgstr "Kumpulan filter ini tidak bisa dihapus."
 msgid "This filter set cannot be renamed."
 msgstr "Filter ini tidak bisa diganti namanya."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:597
+#: ../../locales/../src/interface/netconfwizard.cpp:598
 msgid ""
 "This means that some router and/or firewall is still interfering with "
 "FileZilla."
@@ -8437,7 +8445,7 @@ msgstr "Time&out dalam detik:"
 msgid "Timeout"
 msgstr "Timeout"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:435
+#: ../../locales/../src/interface/verifycertdialog.cpp:595
 msgid "Title:"
 msgstr "Judul:"
 
@@ -8511,11 +8519,11 @@ msgstr "Mengganti tampilan pohon direktori remote"
 msgid "Toggles the display of the transfer queue"
 msgstr "Mengganti tampilan antrian pengiriman"
 
-#: ../../locales/../src/engine/http/request.cpp:472
+#: ../../locales/../src/engine/http/request.cpp:466
 msgid "Too long header line"
 msgstr "Baris header terlalu panjang"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:137
+#: ../../locales/../src/engine/http/filetransfer.cpp:129
 msgid "Too many redirects"
 msgstr "Terlalu banyak pengalihan"
 
@@ -8542,7 +8550,7 @@ msgstr "&Mode Transfer"
 msgid "Transfer Mode"
 msgstr "Mode Transfer"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:160
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:162
 msgid "Transfer Queue"
 msgstr "Antrian Transfer"
 
@@ -8550,13 +8558,13 @@ msgstr "Antrian Transfer"
 msgid "Transfer Settings"
 msgstr "Pengaturan Transfer"
 
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:453
-#: ../../locales/../src/engine/ftp/transfersocket.cpp:475
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:454
+#: ../../locales/../src/engine/ftp/transfersocket.cpp:476
 #, c-format
 msgid "Transfer connection interrupted: %s"
 msgstr "Percobaan koneksi diinterupsi: %s"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:643
+#: ../../locales/../src/interface/netconfwizard.cpp:644
 msgid "Transferred data got tainted."
 msgstr "Data transfer rusak."
 
@@ -8623,7 +8631,7 @@ msgstr "Jenis proxy generik:"
 msgid "U&pload"
 msgstr "U&pload"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3949
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3755
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:931
 msgid "U&pload limit:"
 msgstr "Batasn U&pload:"
@@ -8640,13 +8648,13 @@ msgstr "Gunakan default si&stem untuk bahasa terpilih"
 msgid "USER@&HOST"
 msgstr "PENGGUNA@HOST"
 
-#: ../../locales/../src/engine/proxy.cpp:383
-#: ../../locales/../src/engine/proxy.cpp:512
+#: ../../locales/../src/engine/proxy.cpp:384
+#: ../../locales/../src/engine/proxy.cpp:513
 #, c-format
 msgid "Unassigned error code %d"
 msgstr "Kode kesalahan yang belum ditentukan %d"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:434
+#: ../../locales/../src/interface/verifycertdialog.cpp:594
 msgid "Unit:"
 msgstr "Unit:"
 
@@ -8661,11 +8669,11 @@ msgstr "Unit:"
 msgid "Unknown"
 msgstr "Tidak diketahui"
 
-#: ../../locales/../src/engine/ftp/logon.cpp:756
+#: ../../locales/../src/engine/ftp/logon.cpp:753
 msgid "Unknown FTP proxy type, cannot generate login sequence."
 msgstr "Jenis Proxy FTP tidak diketahui, tidak bisa menghasilkan urutan login."
 
-#: ../../locales/../src/engine/proxy.cpp:434
+#: ../../locales/../src/engine/proxy.cpp:435
 #, c-format
 msgid "Unknown SOCKS protocol version: %d"
 msgstr "Versi protokol SOCKS tidak diketahui: %d"
@@ -8689,7 +8697,7 @@ msgstr "Kesalahan tidak diketahui %u"
 msgid "Unknown host key"
 msgstr "Kunci mesin tidak diketahui"
 
-#: ../../locales/../src/engine/proxy.cpp:442
+#: ../../locales/../src/engine/proxy.cpp:443
 #, c-format
 msgid ""
 "Unknown protocol version of SOCKS Username/Password Authentication "
@@ -8705,12 +8713,12 @@ msgstr ""
 "Elemen root tidak diketahui, berkas tampaknya bukan dihasilkan oleh "
 "FileZilla."
 
-#: ../../locales/../src/engine/http/request.cpp:574
+#: ../../locales/../src/engine/http/request.cpp:568
 msgid "Unknown transfer encoding"
 msgstr "Pengkodean transfer tidak diketahui"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:618
-#: ../../locales/../src/interface/netconfwizard.cpp:629
+#: ../../locales/../src/interface/netconfwizard.cpp:619
+#: ../../locales/../src/interface/netconfwizard.cpp:630
 msgid ""
 "Unless these problems get fixed, active mode FTP will not work and passive "
 "mode has to be used."
@@ -8718,7 +8726,7 @@ msgstr ""
 "Kecuali masalah ini diperbaiki, mode aktif FTP tidak akan bekerja dan mode "
 "pasif harus digunakan."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:605
+#: ../../locales/../src/interface/netconfwizard.cpp:606
 msgid ""
 "Unless this problem gets fixed, active mode FTP will not work and passive "
 "mode has to be used."
@@ -8726,11 +8734,11 @@ msgstr ""
 "Kecuali masalah ini diperbaiki, mode aktif FTP tidak akan bekerja dan mode "
 "pasif harus digunakan."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1316
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1319
 msgid "Unsupported certificate type"
 msgstr "Jenis sertifikat tidak didukung"
 
-#: ../../locales/../src/engine/http/filetransfer.cpp:142
+#: ../../locales/../src/engine/http/filetransfer.cpp:134
 msgid "Unsupported redirect"
 msgstr "Pengalihan tidak didukung"
 
@@ -8751,12 +8759,12 @@ msgstr "Upload"
 msgid "Upload failed"
 msgstr "Upload gagal"
 
-#: ../../locales/../src/interface/statusbar.cpp:615
+#: ../../locales/../src/interface/statusbar.cpp:617
 #, c-format
 msgid "Upload limit: %s/s"
 msgstr "Batasan Upload: %s/s"
 
-#: ../../locales/../src/interface/statusbar.cpp:618
+#: ../../locales/../src/interface/statusbar.cpp:620
 msgid "Upload limit: none"
 msgstr "Batasn Upload: tidak ada"
 
@@ -8881,7 +8889,7 @@ msgid "User:"
 msgstr "Pengguna:"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:491
-#: ../../locales/../src/interface/sitemanager_site.cpp:569
+#: ../../locales/../src/interface/sitemanager_site.cpp:571
 msgid "Username cannot be a series of spaces"
 msgstr "Pengguna tidak bisa merupakan kumpulan spasi"
 
@@ -8904,7 +8912,7 @@ msgstr "Valid hingga:"
 msgid "Verbose log messages from wxWidgets"
 msgstr "Pesan log detail dari wxWidgets"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1401
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1452
 msgid "Verifying certificate..."
 msgstr "Memverifikasi sertifikat..."
 
@@ -8912,7 +8920,7 @@ msgstr "Memverifikasi sertifikat..."
 msgid "Very high"
 msgstr "Sangat tinggi"
 
-#: ../../locales/../src/engine/ftp/list.cpp:109
+#: ../../locales/../src/engine/ftp/list.cpp:107
 msgid "View hidden option set, but unsupported by server"
 msgstr "Opsi sudah ditentukan, tetapi tidak didukung oleh server"
 
@@ -8940,11 +8948,11 @@ msgstr "Menunggu kata sandi"
 msgid "Waiting for transfer to be cancelled"
 msgstr "Menunggu transer untuk dibatalkan"
 
-#: ../../locales/../src/engine/engineprivate.cpp:242
+#: ../../locales/../src/engine/engineprivate.cpp:255
 msgid "Waiting to retry..."
 msgstr "Menunggu untuk mencoba kembali..."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:983
+#: ../../locales/../src/interface/netconfwizard.cpp:984
 msgid "Warning, ignoring data connection from wrong IP."
 msgstr "Peringatan, mengabaikan koneksi data dari IP yang salah."
 
@@ -8967,11 +8975,11 @@ msgstr ""
 msgid "Warning: Potential security breach!"
 msgstr "Peringatan: Kemungkinan masalah keamanan!"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3836
+#: ../../locales/../src/interface/welcome_dialog.cpp:53
 msgid "Welcome to FileZilla"
 msgstr "Selamat datang ke FileZilla"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3697
+#: ../../locales/../src/interface/welcome_dialog.cpp:86
 msgid "What's new"
 msgstr "Apa yang baru"
 
@@ -8979,9 +8987,9 @@ msgstr "Apa yang baru"
 msgid "What's new:"
 msgstr "Apa yang baru:"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4023
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3829
 msgid ""
-"When allowing FileZilla to remember passwords, you can reconnnect without "
+"When allowing FileZilla to remember passwords, you can reconnect without "
 "having to re-enter a password after restarting FileZilla."
 msgstr ""
 "Ketika mengijinkan FileZilla untuk mengingat kata sandi, Anda bisa terhubung "
@@ -8996,15 +9004,15 @@ msgstr ""
 "Bila diaktifkan, karakter yang tidak didukung oleh sistem operasi lokal "
 "dalam nama berkas akan diganti jika mendownload berkas tersebut."
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:153
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:155
 msgid "When st&arting a new connection while already connected:"
 msgstr "Ketika memul&ai koneksi baru ketika sudah terhubung:"
 
-#: ../../locales/../src/interface/settings/optionspage_interface.cpp:134
+#: ../../locales/../src/interface/settings/optionspage_interface.cpp:130
 msgid "Widescreen"
 msgstr "Layar lebar"
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4018
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3824
 msgid "Would you like FileZilla to remember passwords?"
 msgstr "Apakah Anda menghendaki FileZilla untuk mengingat kata sandi ini?"
 
@@ -9012,16 +9020,16 @@ msgstr "Apakah Anda menghendaki FileZilla untuk mengingat kata sandi ini?"
 msgid "Wr&ite"
 msgstr "Tu&lis"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:455
-#: ../../locales/../src/interface/netconfwizard.cpp:461
+#: ../../locales/../src/interface/netconfwizard.cpp:456
+#: ../../locales/../src/interface/netconfwizard.cpp:462
 msgid "Wrong external IP address"
 msgstr "Alamat IP eksternal salah"
 
-#: ../../locales/../src/engine/http/request.cpp:646
+#: ../../locales/../src/engine/http/request.cpp:640
 msgid "Wrong line endings"
 msgstr "Akhir baris salah"
 
-#: ../../locales/../src/interface/loginmanager.cpp:309
+#: ../../locales/../src/interface/loginmanager.cpp:311
 msgid ""
 "Wrong master password entered, it cannot be used to decrypt the stored "
 "passwords."
@@ -9029,7 +9037,7 @@ msgstr ""
 "Kata sandi utama yang dimasukan salah, tidak dapat digunakan untuk "
 "mendekripsi kata sandi yang tersimpan."
 
-#: ../../locales/../src/interface/loginmanager.cpp:108
+#: ../../locales/../src/interface/loginmanager.cpp:110
 msgid "Wrong master password entered, it cannot be used to decrypt this item."
 msgstr ""
 "Kata sandi utama yang dimasukkan salah, tidak dapat digunakan untuk "
@@ -9043,7 +9051,7 @@ msgstr "Kuning"
 msgid "Yes"
 msgstr "Ya"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:786
+#: ../../locales/../src/interface/netconfwizard.cpp:787
 msgid ""
 "You appear to be using an IPv6-only host. This wizard does not support this "
 "environment."
@@ -9055,7 +9063,7 @@ msgstr ""
 msgid "You are using the latest version of FileZilla."
 msgstr "Anda menggunakan versi terbaru dari FileZilla."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3806
+#: ../../locales/../src/interface/welcome_dialog.cpp:111
 msgid "You can always open this dialog again through the help menu."
 msgstr "Anda selalu bisa membuka dialog ini kemudian melalui menu bantuan."
 
@@ -9076,7 +9084,7 @@ msgstr ""
 "Anda dapat menggunakan x disegala posisi untuk mempertahankan hak akses "
 "berkas asli."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:612
+#: ../../locales/../src/interface/sitemanager_site.cpp:614
 msgid ""
 "You cannot change password and encryption key individually if using a master "
 "password."
@@ -9098,11 +9106,11 @@ msgstr ""
 "tidak valid lagi. Silakan masukkan karakter yang diperbolehkan dalam nama "
 "berkas."
 
-#: ../../locales/../src/engine/storj/file_transfer.cpp:34
+#: ../../locales/../src/engine/storj/file_transfer.cpp:32
 msgid "You cannot upload files into the root directory."
 msgstr "Anda tidak bisa meng-upload berkas pada direktori induk."
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:336
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:359
 msgid "You did not enter a new name for the file. Overwrite the file instead?"
 msgstr "Anda tidak memasukkan nama baru untuk berkas ini. Timpa berkas ini?"
 
@@ -9129,11 +9137,11 @@ msgstr ""
 "Anda hendak melanjutkan?"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:407
-#: ../../locales/../src/interface/sitemanager_site.cpp:477
+#: ../../locales/../src/interface/sitemanager_site.cpp:479
 msgid "You have to enter a hostname."
 msgstr "Anda harus memasukkan nama host."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:587
+#: ../../locales/../src/interface/sitemanager_site.cpp:589
 msgid "You have to enter a key file path"
 msgstr "Anda harus memasukkan path berkas kunci"
 
@@ -9145,12 +9153,12 @@ msgstr "Anda harus memasukkan direktori lokal."
 msgid "You have to enter a remote directory."
 msgstr "Anda harus memasukkan direktori remote."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:156
+#: ../../locales/../src/interface/netconfwizard.cpp:157
 #: ../../locales/../src/interface/settings/optionspage_connection_active.cpp:91
 msgid "You have to enter a valid IPv4 address."
 msgstr "Anda harus memasukkan alamat IPv4 valid."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:621
+#: ../../locales/../src/interface/sitemanager_site.cpp:623
 msgid "You have to enter a valid encryption key"
 msgstr "Anda harus memasukkan kunci enkripsi yang valid"
 
@@ -9159,16 +9167,16 @@ msgid "You have to enter a writable local directory."
 msgstr "Anda harus memasukkan direktori lokal yang dapat ditulisi."
 
 #: ../../locales/../src/interface/manual_transfer.cpp:502
-#: ../../locales/../src/interface/sitemanager_site.cpp:579
+#: ../../locales/../src/interface/sitemanager_site.cpp:581
 msgid "You have to enter an account name"
 msgstr "Anda harus memasukkan nama akun"
 
 #: ../../locales/../src/interface/manual_transfer.cpp:476
-#: ../../locales/../src/interface/sitemanager_site.cpp:554
+#: ../../locales/../src/interface/sitemanager_site.cpp:556
 msgid "You have to specify a user name"
 msgstr "Anda harus memasukkan nama pengguna"
 
-#: ../../locales/../src/interface/netconfwizard.cpp:644
+#: ../../locales/../src/interface/netconfwizard.cpp:645
 msgid ""
 "You likely have a router or firewall which erroneously modified the "
 "transferred data."
@@ -9201,7 +9209,7 @@ msgstr "Anda harus memasukkan host proxy."
 msgid "You need to enter a proxy port in the range from 1 to 65535"
 msgstr "Anda harus memasukkan port proxy antara 1 hingga 65535"
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:662
+#: ../../locales/../src/interface/sitemanager_site.cpp:664
 msgid "You need to enter a value."
 msgstr "Anda harus memasukkan sebuah nilai."
 
@@ -9222,7 +9230,7 @@ msgstr ""
 "Anda harus memasukkan path lokal dan remote untuk mengaktifkan penjelajahan "
 "tersinkronisasi untuk penanda ini."
 
-#: ../../locales/../src/interface/sitemanager_site.cpp:646
+#: ../../locales/../src/interface/sitemanager_site.cpp:648
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
 "browsing for this site."
@@ -9230,7 +9238,7 @@ msgstr ""
 "Anda harus memasukkan path lokal dan remote untuk mengaktifkan penjelajahan "
 "tersinkronisasi untuk situs ini."
 
-#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:4180
+#: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3986
 msgid ""
 "You need to grant FileZilla access to the directories you want to download "
 "files into or to upload files from."
@@ -9254,7 +9262,7 @@ msgstr "Anda harus menentukan path remote."
 msgid "You need to specify a server."
 msgstr "Anda harus menentukan sebuah server."
 
-#: ../../locales/../src/interface/netconfwizard.cpp:590
+#: ../../locales/../src/interface/netconfwizard.cpp:591
 msgid ""
 "You should have no problems connecting to other servers, file transfers "
 "should work properly."
@@ -9331,19 +9339,19 @@ msgstr ""
 "Harap pastikan program ini ada pada direktori yang sama dengan program utama "
 "FileZilla."
 
-#: ../../locales/../src/engine/sftp/connect.cpp:104
+#: ../../locales/../src/engine/sftp/connect.cpp:100
 msgid "fzsftp belongs to a different version of FileZilla"
 msgstr "fzsftp bagian dari versi terbaru dari FileZilla"
 
-#: ../../locales/../src/engine/sftp/connect.cpp:146
+#: ../../locales/../src/engine/sftp/connect.cpp:140
 msgid "fzsftp could not be started"
 msgstr "fzsftp tidak bisa dijalankan"
 
-#: ../../locales/../src/engine/storj/connect.cpp:119
+#: ../../locales/../src/engine/storj/connect.cpp:115
 msgid "fzstorj belongs to a different version of FileZilla"
 msgstr "fzstorj merupakan bagian dari versi yang berbeda pada FileZilla"
 
-#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:336
+#: ../../locales/../src/engine/storj/storjcontrolsocket.cpp:335
 msgid "fzstorj could not be started"
 msgstr "fzstorj tidak bisa dijalankan"
 
@@ -9358,11 +9366,11 @@ msgstr ""
 "Harap pastikan program ini ada pada direktori yang sama dengan program utama "
 "FileZilla."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1212
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1215
 msgid "gnutls_certificate_get_peers returned no certificates"
 msgstr "gnutls_certificate_get_peers tidak menghasilkan sertifikat"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1224
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1227
 msgid "gnutls_pem_base64_encode2 failed"
 msgstr "gnutls_pem_base64_encode2 gagal"
 
@@ -9406,7 +9414,7 @@ msgstr "kurang dari"
 msgid "matches regex"
 msgstr "cocok dengan regex"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:318
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:341
 msgid "new name"
 msgstr "nama baru"
 
@@ -9422,11 +9430,11 @@ msgstr "dapat dibaca pemilik"
 msgid "owner writeable"
 msgstr "dapat ditulisi pemilik"
 
-#: ../../locales/../src/engine/proxy.cpp:63
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1454
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1470
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1486
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1502
+#: ../../locales/../src/engine/proxy.cpp:64
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1506
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1522
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1538
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1554
 #: ../../locales/../src/interface/sftp_crypt_info_dlg.cpp:43
 msgid "unknown"
 msgstr "tidak diketahui"
@@ -9446,6 +9454,13 @@ msgstr "dapat ditulisi oleh semua"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:890
 msgid "wxWidgets:"
 msgstr "wxWidgets:"
+
+#~ msgid ""
+#~ "A lost master password cannot be recovered! Please thorougly memorize "
+#~ "your password."
+#~ msgstr ""
+#~ "Kata sandi utama yang hilang tidak dapat dikembalikan! Harap mengingat "
+#~ "kata sandi Anda."
 
 #~ msgid "Positio&n of the message log:"
 #~ msgstr "Posisi dari pesa&n log:"
