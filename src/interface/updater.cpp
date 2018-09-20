@@ -129,7 +129,7 @@ void CUpdater::AutoRunIfNeeded()
 #if FZ_AUTOUPDATECHECK
 	if (state_ == UpdaterState::failed || state_ == UpdaterState::idle) {
 		if (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK) != 0 && LongTimeSinceLastCheck()) {
-			Run();
+			Run(false);
 		}
 	}
 #endif
@@ -142,7 +142,7 @@ void CUpdater::RunIfNeeded()
 		LongTimeSinceLastCheck() || (state_ == UpdaterState::newversion && !b.url_.empty()) ||
 		(state_ == UpdaterState::newversion_ready && !VerifyChecksum(DownloadedFile(), b.size_, b.hash_)))
 	{
-		Run();
+		Run(true);
 	}
 }
 
@@ -237,10 +237,14 @@ std::wstring CUpdater::GetUrl()
 		url += L"&initial=0";
 	}
 
+	if (manual_) {
+		url += L"&manual=1";
+	}
+
 	return url;
 }
 
-bool CUpdater::Run()
+bool CUpdater::Run(bool manual)
 {
 	if (state_ != UpdaterState::idle && state_ != UpdaterState::failed &&
 		state_ != UpdaterState::newversion && state_ != UpdaterState::newversion_ready)
@@ -248,11 +252,12 @@ bool CUpdater::Run()
 		return false;
 	}
 
-	auto  const t = fz::datetime::now();
+	auto const t = fz::datetime::now();
 	COptions::Get()->SetOption(OPTION_UPDATECHECK_LASTDATE, t.format(_T("%Y-%m-%d %H:%M:%S"), fz::datetime::utc));
 
 	local_file_.clear();
 	log_ = wxString::Format(_("Started update check on %s\n"), t.format(_T("%Y-%m-%d %H:%M:%S"), fz::datetime::local));
+	manual_ = manual;
 
 	wxString build = CBuildInfo::GetBuildType();
 	if (build.empty())  {
