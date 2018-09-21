@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.37.1 (2018-09-21)
+
+- Local path is no longer forgotten when exit synchronized browsing mode
+
 3.37.0 (2018-09-17)
 
 - Fix remote target path if uploading files through the search dialog
