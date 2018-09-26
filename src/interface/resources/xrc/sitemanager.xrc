@@ -543,7 +543,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>&amp;Adjust server timezone offset:</label>
+              <label>&amp;Adjust server time, offset by:</label>
             </object>
             <flag>wxALL|wxGROW</flag>
             <border>3d</border>
