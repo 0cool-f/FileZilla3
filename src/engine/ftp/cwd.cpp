@@ -71,16 +71,14 @@ int CFtpChangeDirOpData::Send()
 		cmd = L"PWD";
 		break;
 	case cwd_cwd:
-		if (tryMkdOnFail_) {
-			if (!opLock_) {
-				opLock_ = controlSocket_.Lock(locking_reason::mkdir, path_);
-			}
-			if (opLock_.waiting()) {
-				// Some other engine is already creating this directory or
-				// performing an action that will lead to its creation
-				tryMkdOnFail_ = false;
-				return FZ_REPLY_WOULDBLOCK;
-			}
+		if (tryMkdOnFail_ && !opLock_) {
+			opLock_ = controlSocket_.Lock(locking_reason::mkdir, path_);
+		}
+		if (opLock_.waiting()) {
+			// Some other engine is already creating this directory or
+			// performing an action that will lead to its creation
+			tryMkdOnFail_ = false;
+			return FZ_REPLY_WOULDBLOCK;
 		}
 		cmd = L"CWD " + path_.GetPath();
 		currentPath_.clear();
