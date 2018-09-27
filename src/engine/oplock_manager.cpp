@@ -187,6 +187,8 @@ bool OpLockManager::ObtainWaiting(socket_lock_info const& sli, lock_info& lock)
 			}
 		}
 	}
+
+	lock.waiting = false;
 	return true;
 }
 
