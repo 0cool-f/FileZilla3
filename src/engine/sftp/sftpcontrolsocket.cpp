@@ -647,14 +647,14 @@ void CSftpControlSocket::OnQuotaRequest(CRateLimiter::rate_direction direction)
 		else {
 			b = static_cast<int>(bytes);
 		}
-		AddToStream(fz::sprintf(L"-%d%d,%d\n", direction, b, engine_.GetOptions().GetOptionVal(OPTION_SPEEDLIMIT_INBOUND + static_cast<int>(direction))));
+		AddToStream(fz::sprintf("-%d%d,%d\n", direction, b, engine_.GetOptions().GetOptionVal(OPTION_SPEEDLIMIT_INBOUND + static_cast<int>(direction))));
 		UpdateUsage(direction, b);
 	}
 	else if (bytes == 0) {
 		Wait(direction);
 	}
 	else if (bytes < 0) {
-		AddToStream(fz::sprintf(L"-%d-\n", direction));
+		AddToStream(fz::sprintf("-%d-\n", direction));
 	}
 }
 
