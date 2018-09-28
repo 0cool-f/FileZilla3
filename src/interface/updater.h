@@ -31,9 +31,9 @@ struct version_information
 
 	build available_;
 
-	wxString changelog_;
+	std::wstring changelog_;
 
-	wxString resources_;
+	std::wstring resources_;
 };
 
 enum class UpdaterState
@@ -67,14 +67,14 @@ public:
 
 	UpdaterState GetState() const { return state_; }
 	build AvailableBuild() const { return version_information_.available_; }
-	wxString GetChangelog() const { return version_information_.changelog_; }
-	wxString GetResources() const { return version_information_.resources_; }
+	std::wstring GetChangelog() const { return version_information_.changelog_; }
+	std::wstring GetResources() const { return version_information_.resources_; }
 
-	wxString DownloadedFile() const;
+	std::wstring DownloadedFile() const;
 
 	int64_t BytesDownloaded() const; // Returns -1 on error
 
-	wxString GetLog() const { return log_; }
+	std::wstring GetLog() const { return log_; }
 
 	bool LongTimeSinceLastCheck() const;
 
@@ -102,11 +102,11 @@ protected:
 	UpdaterState ProcessFinishedDownload();
 	UpdaterState ProcessFinishedData(bool can_download);
 
-	bool VerifyChecksum(wxString const& file, int64_t size, std::wstring const& checksum);
+	bool VerifyChecksum(std::wstring const& file, int64_t size, std::wstring const& checksum);
 
 	std::wstring GetTempFile() const;
-	wxString GetFilename(wxString const& url) const;
-	wxString GetLocalFile(build const& b, bool allow_existing);
+	std::wstring GetFilename(std::wstring const& url) const;
+	std::wstring GetLocalFile(build const& b, bool allow_existing);
 
 	void SetState(UpdaterState s);
 
@@ -117,17 +117,17 @@ protected:
 	void OnTimer(wxTimerEvent& ev);
 
 	UpdaterState state_;
-	wxString local_file_;
+	std::wstring local_file_;
 	CFileZillaEngine* engine_;
 	bool m_use_internal_rootcert{};
 
-	wxString raw_version_information_;
+	std::wstring raw_version_information_;
 
 	version_information version_information_;
 
 	std::list<CUpdateHandler*> handlers_;
 
-	wxString log_;
+	std::wstring log_;
 
 	wxTimer update_timer_;
 

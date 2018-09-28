@@ -253,17 +253,17 @@ bool CUpdater::Run(bool manual)
 	}
 
 	auto const t = fz::datetime::now();
-	COptions::Get()->SetOption(OPTION_UPDATECHECK_LASTDATE, t.format(_T("%Y-%m-%d %H:%M:%S"), fz::datetime::utc));
+	COptions::Get()->SetOption(OPTION_UPDATECHECK_LASTDATE, t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::utc));
 
 	local_file_.clear();
-	log_ = wxString::Format(_("Started update check on %s\n"), t.format(_T("%Y-%m-%d %H:%M:%S"), fz::datetime::local));
+	log_ = fz::sprintf(_("Started update check on %s\n"), t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::local));
 	manual_ = manual;
 
-	wxString build = CBuildInfo::GetBuildType();
+	std::wstring build = CBuildInfo::GetBuildType();
 	if (build.empty())  {
-		build = _("custom");
+		build = _("custom").ToStdWstring();
 	}
-	log_ += wxString::Format(_("Own build type: %s\n"), build);
+	log_ += fz::sprintf(_("Own build type: %s\n"), build);
 
 	SetState(UpdaterState::checking);
 
@@ -404,7 +404,7 @@ void CUpdater::ProcessNotification(std::unique_ptr<CNotification> && notificatio
 	case nId_logmsg:
 		{
 			auto const& msg = static_cast<CLogmsgNotification const&>(*notification.get());
-			log_ += msg.msg + _T("\n");
+			log_ += msg.msg + L"\n";
 		}
 		break;
 	default:
@@ -424,10 +424,10 @@ UpdaterState CUpdater::ProcessFinishedData(bool can_download)
 	else if (!version_information_.available_.url_.empty()) {
 
 		std::wstring const temp = GetTempFile();
-		wxString const local_file = GetLocalFile(version_information_.available_, true);
+		std::wstring const local_file = GetLocalFile(version_information_.available_, true);
 		if (!local_file.empty() && fz::local_filesys::get_file_type(fz::to_native(local_file)) != fz::local_filesys::unknown) {
 			local_file_ = local_file;
-			log_ += wxString::Format(_("Local file is %s\n"), local_file);
+			log_ += fz::sprintf(_("Local file is %s\n"), local_file);
 			s = UpdaterState::newversion_ready;
 		}
 		else {
@@ -510,48 +510,48 @@ UpdaterState CUpdater::ProcessFinishedDownload()
 	else {
 		s = UpdaterState::newversion_ready;
 
-		wxString local_file = GetLocalFile(version_information_.available_, false);
+		std::wstring local_file = GetLocalFile(version_information_.available_, false);
 
 		wxLogNull log;
 		if (local_file.empty() || !wxRenameFile(temp, local_file, false)) {
 			s = UpdaterState::newversion;
 			wxRemoveFile(temp);
-			log_ += wxString::Format(_("Could not create local file %s\n"), local_file);
+			log_ += fz::sprintf(_("Could not create local file %s\n"), local_file);
 		}
 		else {
 			local_file_ = local_file;
-			log_ += wxString::Format(_("Local file is %s\n"), local_file);
+			log_ += fz::sprintf(_("Local file is %s\n"), local_file);
 		}
 	}
 	return s;
 }
 
-wxString CUpdater::GetLocalFile(build const& b, bool allow_existing)
+std::wstring CUpdater::GetLocalFile(build const& b, bool allow_existing)
 {
-	wxString const fn = GetFilename(b.url_);
-	wxString const dl = GetDownloadDir().GetPath();
+	std::wstring const fn = GetFilename(b.url_);
+	std::wstring const dl = GetDownloadDir().GetPath();
 
 	int i = 1;
-	wxString f = dl + fn;
+	std::wstring f = dl + fn;
 
 	while (fz::local_filesys::get_file_type(fz::to_native(f)) != fz::local_filesys::unknown && (!allow_existing || !VerifyChecksum(f, b.size_, b.hash_))) {
 		if (++i > 99) {
-			return wxString();
+			return std::wstring();
 		}
-		wxString ext;
-		int pos;
-		if (!fn.Right(8).CmpNoCase(_T(".tar.bz2"))) {
+
+		size_t pos;
+		if (fn.size() > 8 && fz::str_tolower_ascii(fn.substr(fn.size() - 8)) == L".tar.bz2") {
 			pos = fn.size() - 8;
 		}
 		else {
-			pos = fn.Find('.', true);
+			pos = fn.rfind('.');
 		}
 
-		if (pos == -1) {
-			f = dl + fn + wxString::Format(_T(" (%d)"), i);
+		if (pos == std::wstring::npos) {
+			f = dl + fn + fz::sprintf(L" (%d)", i);
 		}
 		else {
-			f = dl + fn.Left(pos) + wxString::Format(_T(" (%d)"), i) + fn.Mid(pos);
+			f = dl + fn.substr(0, pos) + fz::sprintf(L" (%d)", i) + fn.substr(pos);
 		}
 	}
 
@@ -568,18 +568,18 @@ void CUpdater::ProcessData(CDataNotification& dataNotification)
 	char* data = dataNotification.Detach(len);
 
 	if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-		log_ += wxString::Format(_T("ProcessData %d\n"), len);
+		log_ += fz::sprintf(_T("ProcessData %d\n"), len);
 	}
 
 	if (raw_version_information_.size() + len > 0x40000) {
-		log_ += _("Received version information is too large") + L"\n";
+		log_ += _("Received version information is too large").ToStdWstring() + L"\n";
 		engine_->Cancel();
 		SetState(UpdaterState::failed);
 	}
 	else {
 		for (int i = 0; i < len; ++i) {
 			if (data[i] < 10 || (unsigned char)data[i] > 127) {
-				log_ += _("Received invalid character in version information") + L"\n";
+				log_ += _("Received invalid character in version information").ToStdWstring() + L"\n";
 				SetState(UpdaterState::failed);
 				engine_->Cancel();
 				break;
@@ -588,7 +588,7 @@ void CUpdater::ProcessData(CDataNotification& dataNotification)
 	}
 
 	if (state_ == UpdaterState::checking) {
-		raw_version_information_ += wxString(data, wxConvUTF8, len);
+		raw_version_information_ += fz::to_wstring_from_utf8(std::string(data, data + len));
 	}
 	delete [] data;
 }
@@ -598,16 +598,16 @@ void CUpdater::ParseData()
 	int64_t const ownVersionNumber = CBuildInfo::ConvertToVersionNumber(CBuildInfo::GetVersion().c_str());
 	version_information_ = version_information();
 
-	wxString raw_version_information = raw_version_information_;
+	std::wstring raw_version_information = raw_version_information_;
 
-	log_ += wxString::Format(_("Parsing %d bytes of version information.\n"), static_cast<int>(raw_version_information.size()));
+	log_ += fz::sprintf(_("Parsing %d bytes of version information.\n"), static_cast<int>(raw_version_information.size()));
 
 	while (!raw_version_information.empty()) {
 		wxString line;
-		int pos = raw_version_information.Find('\n');
-		if (pos != -1) {
-			line = raw_version_information.Left(pos);
-			raw_version_information = raw_version_information.Mid(pos + 1);
+		size_t pos = raw_version_information.find('\n');
+		if (pos != std::wstring::npos) {
+			line = raw_version_information.substr(0, pos);
+			raw_version_information = raw_version_information.substr(pos + 1);
 		}
 		else {
 			line = raw_version_information;
@@ -618,16 +618,15 @@ void CUpdater::ParseData()
 		if (!tokens.CountTokens()) {
 			// After empty line, changelog follows
 			version_information_.changelog_ = raw_version_information;
-			version_information_.changelog_.Trim(true);
-			version_information_.changelog_.Trim(false);
+			fz::trim(version_information_.changelog_);
 
 			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-				log_ += wxString::Format(_T("Changelog: %s\n"), version_information_.changelog_);
+				log_ += fz::sprintf(L"Changelog: %s\n", version_information_.changelog_);
 			}
 			break;
 		}
 
-		wxString const type = tokens.GetNextToken();
+		std::wstring const type = tokens.GetNextToken().ToStdWstring();
 		if (type == _T("resources")) {
 			if (tokens.HasMoreTokens()) {
 				if (UpdatableBuild()) {
@@ -639,7 +638,7 @@ void CUpdater::ParseData()
 
 		if (tokens.CountTokens() != 1 && tokens.CountTokens() != 5) {
 			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-				log_ += wxString::Format(_T("Skipping line with %d tokens\n"), static_cast<int>(tokens.CountTokens() + 1));
+				log_ += fz::sprintf(L"Skipping line with %d tokens\n", static_cast<int>(tokens.CountTokens() + 1));
 			}
 			continue;
 		}
@@ -674,14 +673,14 @@ void CUpdater::ParseData()
 		b.version_ = versionOrDate;
 
 		if (UpdatableBuild() && tokens.CountTokens() == 4) {
-			wxString const url = tokens.GetNextToken();
+			std::wstring const url = tokens.GetNextToken().ToStdWstring();
 			wxString const sizestr = tokens.GetNextToken();
 			wxString const hash_algo = tokens.GetNextToken();
-			wxString const hash = tokens.GetNextToken();
+			std::wstring const hash = tokens.GetNextToken().ToStdWstring();
 
 			if (GetFilename(url).empty()) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-					log_ += wxString::Format(_T("Could not extract filename from URL: %s\n"), url);
+					log_ += fz::sprintf(L"Could not extract filename from URL: %s\n", url);
 				}
 				continue;
 			}
@@ -693,14 +692,14 @@ void CUpdater::ParseData()
 			unsigned long long l = 0;
 			if (!sizestr.ToULongLong(&l)) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-					log_ += wxString::Format(_T("Could not parse size: %s"), sizestr) + L"\n";
+					log_ += fz::sprintf(L"Could not parse size: %s", sizestr.ToStdWstring()) + L"\n";
 				}
 				continue;
 			}
 
 			b.url_ = url;
 			b.size_ = l;
-			b.hash_ = fz::str_tolower_ascii(hash.ToStdWstring());
+			b.hash_ = fz::str_tolower_ascii(hash);
 			bool valid_hash = true;
 			for (auto const& c : b.hash_) {
 				if ((c < 'a' || c > 'f') && (c < '0' || c > '9')) {
@@ -709,12 +708,12 @@ void CUpdater::ParseData()
 				}
 			}
 			if (!valid_hash) {
-				log_ += wxString::Format(_("Invalid hash: %s\n"), hash);
+				log_ += fz::sprintf(_("Invalid hash: %s\n"), hash);
 				continue;
 			}
 
 			// @translator: Two examples: Found new nightly 2014-04-03\n, Found new release 3.9.0.1\n
-			log_ += wxString::Format(_("Found new %s %s\n"), type, b.version_);
+			log_ += fz::sprintf(_("Found new %s %s\n"), type, b.version_);
 		}
 
 		if (type == _T("nightly") && UpdatableBuild()) {
@@ -730,7 +729,7 @@ void CUpdater::ParseData()
 
 	version_information_.update_available();
 
-	COptions::Get()->SetOption(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_.ToStdWstring());
+	COptions::Get()->SetOption(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_);
 }
 
 void CUpdater::OnTimer(wxTimerEvent&)
@@ -738,7 +737,7 @@ void CUpdater::OnTimer(wxTimerEvent&)
 	AutoRunIfNeeded();
 }
 
-bool CUpdater::VerifyChecksum(wxString const& file, int64_t size, std::wstring const& checksum)
+bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstring const& checksum)
 {
 	if (file.empty() || checksum.empty()) {
 		return false;
@@ -746,7 +745,7 @@ bool CUpdater::VerifyChecksum(wxString const& file, int64_t size, std::wstring c
 
 	auto filesize = fz::local_filesys::get_size(fz::to_native(file));
 	if (filesize < 0) {
-		log_ += wxString::Format(_("Could not obtain size of '%s'"), file) + L"\n";
+		log_ += fz::sprintf(_("Could not obtain size of '%s'"), file) + L"\n";
 		return false;
 	}
 	else if (filesize != size) {
@@ -760,7 +759,7 @@ bool CUpdater::VerifyChecksum(wxString const& file, int64_t size, std::wstring c
 	{
 		fz::file f(fz::to_native(file), fz::file::reading);
 		if (!f.opened()) {
-			log_ += wxString::Format(_("Could not open '%s'"), file) + L"\n";
+			log_ += fz::sprintf(_("Could not open '%s'"), file) + L"\n";
 			return false;
 		}
 		unsigned char buffer[65536];
@@ -769,7 +768,7 @@ bool CUpdater::VerifyChecksum(wxString const& file, int64_t size, std::wstring c
 			sha512_update(&state, static_cast<size_t>(read), buffer);
 		}
 		if (read < 0) {
-			log_ += wxString::Format(_("Could not read from '%s'"), file) + L"\n";
+			log_ += fz::sprintf(_("Could not read from '%s'"), file) + L"\n";
 			return false;
 		}
 	}
@@ -781,11 +780,11 @@ bool CUpdater::VerifyChecksum(wxString const& file, int64_t size, std::wstring c
 	auto const digest = fz::hex_encode<std::wstring>(raw_digest);
 
 	if (digest != checksum) {
-		log_ += wxString::Format(_("Checksum mismatch on file %s\n"), file);
+		log_ += fz::sprintf(_("Checksum mismatch on file %s\n"), file);
 		return false;
 	}
 
-	log_ += wxString::Format(_("Checksum match on file %s\n"), file);
+	log_ += fz::sprintf(_("Checksum match on file %s\n"), file);
 	return true;
 }
 
@@ -804,19 +803,19 @@ std::wstring CUpdater::GetTempFile() const
 	return ret;
 }
 
-wxString CUpdater::GetFilename(wxString const& url) const
+std::wstring CUpdater::GetFilename(std::wstring const& url) const
 {
-	wxString ret;
-	int pos = url.Find('/', true);
-	if (pos != -1) {
-		ret = url.Mid(pos + 1);
+	std::wstring ret;
+	size_t pos = url.rfind('/');
+	if (pos != std::wstring::npos) {
+		ret = url.substr(pos + 1);
 	}
 	size_t p = ret.find_first_of(_T("?#"));
 	if (p != std::string::npos) {
 		ret = ret.substr(0, p);
 	}
 #ifdef __WXMSW__
-	ret.Replace(_T(":"), _T("_"));
+	fz::replace_substrings(ret, L":", L"_");
 #endif
 
 	return ret;
@@ -839,9 +838,9 @@ void CUpdater::SetState(UpdaterState s)
 	}
 }
 
-wxString CUpdater::DownloadedFile() const
+std::wstring CUpdater::DownloadedFile() const
 {
-	wxString ret;
+	std::wstring ret;
 	if (state_ == UpdaterState::newversion_ready) {
 		ret = local_file_;
 	}
