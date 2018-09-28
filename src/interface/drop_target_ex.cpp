@@ -61,8 +61,9 @@ bool CScrollableDropTarget<Control>::IsTopScroll(wxPoint p) const
 	}
 
 	wxRect itemRect;
-	if (!m_pCtrl->GetItemRect(m_pCtrl->GetTopItem(), itemRect))
+	if (!m_pCtrl->GetItemRect(m_pCtrl->GetTopItem(), itemRect)) {
 		return false;
+	}
 
 	wxRect windowRect = m_pCtrl->GetActualClientRect();
 
@@ -73,11 +74,13 @@ bool CScrollableDropTarget<Control>::IsTopScroll(wxPoint p) const
 		itemRect.SetHeight(wxMax(windowRect.GetHeight() / 4, 8));
 	}
 
-	if (p.y < 0 || p.y >= itemRect.GetBottom())
+	if (p.y < 0 || p.y >= itemRect.GetBottom()) {
 		return false;
+	}
 
-	if (p.x < 0 || p.x > windowRect.GetWidth())
+	if (p.x < 0 || p.x > windowRect.GetWidth()) {
 		return false;
+	}
 
 	auto top = m_pCtrl->GetTopItem();
 	if (!m_pCtrl->Valid(top) || top == m_pCtrl->GetFirstItem()) {
@@ -97,8 +100,9 @@ bool CScrollableDropTarget<Control>::IsBottomScroll(wxPoint p) const
 	}
 
 	wxRect itemRect;
-	if (!m_pCtrl->GetItemRect(m_pCtrl->GetFirstItem(), itemRect))
+	if (!m_pCtrl->GetItemRect(m_pCtrl->GetFirstItem(), itemRect)) {
 		return false;
+	}
 
 	wxRect const windowRect = m_pCtrl->GetActualClientRect();
 
@@ -107,11 +111,13 @@ bool CScrollableDropTarget<Control>::IsBottomScroll(wxPoint p) const
 		scrollHeight = wxMax(windowRect.GetHeight() / 4, 8);
 	}
 
-	if (p.y > windowRect.GetBottom() || p.y < windowRect.GetBottom() - scrollHeight)
+	if (p.y > windowRect.GetBottom() || p.y < windowRect.GetBottom() - scrollHeight) {
 		return false;
+	}
 
-	if (p.x < 0 || p.x > windowRect.GetWidth())
+	if (p.x < 0 || p.x > windowRect.GetWidth()) {
 		return false;
+	}
 
 	auto bottom = m_pCtrl->GetBottomItem();
 	if (!m_pCtrl->Valid(bottom) || bottom == m_pCtrl->GetLastItem()) {
@@ -152,8 +158,9 @@ void CScrollableDropTarget<Control>::OnTimer(wxTimerEvent& /*event*/)
 
 	DisplayDropHighlight(p);
 
-	if (m_count < 90)
+	if (m_count < 90) {
 		++m_count;
+	}
 	m_timer.Start(100 - m_count, true);
 }
 

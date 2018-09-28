@@ -28,19 +28,13 @@ public:
 	CServerPath m_path;
 };
 
-class CRemoteTreeViewDropTarget final : public CScrollableDropTarget<wxTreeCtrlEx>
+class CRemoteTreeViewDropTarget final : public CFileDropTarget<wxTreeCtrlEx>
 {
 public:
 	CRemoteTreeViewDropTarget(CRemoteTreeView* pRemoteTreeView)
-		: CScrollableDropTarget<wxTreeCtrlEx>(pRemoteTreeView)
+		: CFileDropTarget<wxTreeCtrlEx>(pRemoteTreeView)
 		, m_pRemoteTreeView(pRemoteTreeView)
-		, m_pFileDataObject(new wxFileDataObject())
-		, m_pRemoteDataObject(new CRemoteDataObject())
 	{
-		m_pDataObject = new wxDataObjectComposite;
-		m_pDataObject->Add(m_pRemoteDataObject, true);
-		m_pDataObject->Add(m_pFileDataObject, false);
-		SetDataObject(m_pDataObject);
 	}
 
 	void ClearDropHighlight()
@@ -69,7 +63,9 @@ public:
 		if (def == wxDragError ||
 			def == wxDragNone ||
 			def == wxDragCancel)
+		{
 			return def;
+		}
 
 		wxTreeItemId hit = GetHit(wxPoint(x, y));
 		if (!hit) {
@@ -90,8 +86,12 @@ public:
 			pDragDropManager->pDropTarget = m_pRemoteTreeView;
 		}
 
-		if (m_pDataObject->GetReceivedFormat() == m_pFileDataObject->GetFormat()) {
+		auto const format = m_pDataObject->GetReceivedFormat();
+		if (format == m_pFileDataObject->GetFormat()) {
 			m_pRemoteTreeView->m_state.UploadDroppedFiles(m_pFileDataObject, path, false);
+		}
+		else if (format == m_pLocalDataObject->GetFormat()) {
+			m_pRemoteTreeView->m_state.UploadDroppedFiles(m_pLocalDataObject, path, false);
 		}
 		else {
 			if (m_pRemoteDataObject->GetProcessId() != (int)wxGetProcessId()) {
@@ -146,12 +146,14 @@ public:
 		ClearDropHighlight();
 
 		wxTreeItemId hit = GetHit(wxPoint(x, y));
-		if (!hit)
+		if (!hit) {
 			return false;
+		}
 
 		const CServerPath& path = m_pRemoteTreeView->GetPathFromItem(hit);
-		if (path.empty())
+		if (path.empty()) {
 			return false;
+		}
 
 		return true;
 	}
@@ -172,8 +174,9 @@ public:
 		}
 
 		const wxTreeItemId dropHighlight = m_pRemoteTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId())
+		if (dropHighlight != wxTreeItemId()) {
 			m_pRemoteTreeView->SetItemDropHighlight(dropHighlight, false);
+		}
 
 		m_pRemoteTreeView->SetItemDropHighlight(hit, true);
 		m_pRemoteTreeView->m_dropHighlight = hit;
@@ -194,11 +197,13 @@ public:
 		}
 
 		wxTreeItemId hit = DisplayDropHighlight(wxPoint(x, y));
-		if (!hit.IsOk())
+		if (!hit.IsOk()) {
 			return wxDragNone;
+		}
 
-		if (def == wxDragLink)
+		if (def == wxDragLink) {
 			def = wxDragCopy;
+		}
 
 		return def;
 	}
@@ -216,10 +221,7 @@ public:
 	}
 
 protected:
-	CRemoteTreeView *m_pRemoteTreeView;
-	wxFileDataObject* m_pFileDataObject;
-	CRemoteDataObject* m_pRemoteDataObject;
-	wxDataObjectComposite* m_pDataObject;
+	CRemoteTreeView *m_pRemoteTreeView{};
 };
 
 BEGIN_EVENT_TABLE(CRemoteTreeView, wxTreeCtrlEx)

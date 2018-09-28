@@ -36,26 +36,19 @@
 std::map<ServerProtocol, CRemoteListView::ChmodHandler> CRemoteListView::chmodHandlers = {
 };
 
-class CRemoteListViewDropTarget final : public CScrollableDropTarget<wxListCtrlEx>
+class CRemoteListViewDropTarget final : public CFileDropTarget<wxListCtrlEx>
 {
 public:
 	CRemoteListViewDropTarget(CRemoteListView* pRemoteListView)
-		: CScrollableDropTarget<wxListCtrlEx>(pRemoteListView)
-		, m_pRemoteListView(pRemoteListView),
-		  m_pFileDataObject(new wxFileDataObject()),
-		  m_pRemoteDataObject(new CRemoteDataObject()),
-		  m_pDataObject(new wxDataObjectComposite())
+		: CFileDropTarget<wxListCtrlEx>(pRemoteListView)
+		, m_pRemoteListView(pRemoteListView)
 	{
-		m_pDataObject->Add(m_pRemoteDataObject, true);
-		m_pDataObject->Add(m_pFileDataObject);
-		SetDataObject(m_pDataObject);
 	}
 
 	void ClearDropHighlight()
 	{
 		const int dropTarget = m_pRemoteListView->m_dropTarget;
-		if (dropTarget != -1)
-		{
+		if (dropTarget != -1) {
 			m_pRemoteListView->m_dropTarget = -1;
 #ifdef __WXMSW__
 			m_pRemoteListView->SetItemState(dropTarget, 0, wxLIST_STATE_DROPHILITED);
@@ -89,7 +82,8 @@ public:
 			pDragDropManager->pDropTarget = m_pRemoteListView;
 		}
 
-		if (m_pDataObject->GetReceivedFormat() == m_pFileDataObject->GetFormat()) {
+		auto const format = m_pDataObject->GetReceivedFormat();
+		if (format == m_pFileDataObject->GetFormat() || format == m_pLocalDataObject->GetFormat()) {
 			wxString subdir;
 			int flags = 0;
 			int hit = m_pRemoteListView->HitTest(wxPoint(x, y), flags, 0);
@@ -105,7 +99,12 @@ public:
 				}
 			}
 
-			m_pRemoteListView->m_state.UploadDroppedFiles(m_pFileDataObject, subdir, false);
+			if (format == m_pFileDataObject->GetFormat()) {
+				m_pRemoteListView->m_state.UploadDroppedFiles(m_pFileDataObject, subdir, false);
+			}
+			else {
+				m_pRemoteListView->m_state.UploadDroppedFiles(m_pLocalDataObject, subdir, false);
+			}
 			return wxDragCopy;
 		}
 
@@ -219,8 +218,9 @@ public:
 				else {
 					const CDragDropManager* pDragDropManager = CDragDropManager::Get();
 					if (pDragDropManager && pDragDropManager->pDragSource == m_pRemoteListView) {
-						if (m_pRemoteListView->GetItemState(hit, wxLIST_STATE_SELECTED))
+						if (m_pRemoteListView->GetItemState(hit, wxLIST_STATE_SELECTED)) {
 							hit = -1;
+						}
 					}
 				}
 			}
@@ -285,11 +285,7 @@ public:
 	}
 
 protected:
-	CRemoteListView *m_pRemoteListView;
-	wxFileDataObject* m_pFileDataObject;
-	CRemoteDataObject* m_pRemoteDataObject;
-
-	wxDataObjectComposite* m_pDataObject;
+	CRemoteListView *m_pRemoteListView{};
 };
 
 class CInfoText final : public wxWindow

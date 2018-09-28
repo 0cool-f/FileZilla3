@@ -7,19 +7,31 @@
 #define FZ3_USESHELLEXT 0
 #endif
 
+#include "drop_target_ex.h"
 #include "xmlfunctions.h"
 
 #include <wx/dnd.h>
 
 #include <memory>
 
-class wxRemoteDataFormat final : public wxDataFormat
+class CLocalDataObject final : public wxDataObjectSimple
 {
 public:
-	wxRemoteDataFormat()
-		: wxDataFormat(_T("FileZilla3 remote data format v1"))
-	{
-	}
+	CLocalDataObject();
+
+	virtual size_t GetDataSize() const;
+	virtual bool GetDataHere(void *buf) const;
+
+	virtual bool SetData(size_t len, const void* buf);
+
+	std::vector<std::string> const& GetFiles() const { return files_; }
+	std::vector<std::wstring> GetFilesW() const;
+
+	void Reserve(size_t count);
+	void AddFile(std::wstring const& file);
+
+protected:
+	std::vector<std::string> files_;
 };
 
 class CRemoteDataObject final : public wxDataObjectSimple
@@ -101,5 +113,17 @@ protected:
 };
 
 #endif
+
+template<typename Control>
+class CFileDropTarget : public CScrollableDropTarget<Control>
+{
+protected:
+	CFileDropTarget(Control* ctrl);
+
+	CLocalDataObject* m_pLocalDataObject{};
+	wxFileDataObject* m_pFileDataObject{};
+	CRemoteDataObject* m_pRemoteDataObject{};
+	wxDataObjectComposite* m_pDataObject{};
+};
 
 #endif

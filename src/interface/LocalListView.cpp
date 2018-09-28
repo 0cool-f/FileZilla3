@@ -29,18 +29,13 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/recursive_remove.hpp>
 
-class CLocalListViewDropTarget final : public CScrollableDropTarget<wxListCtrlEx>
+class CLocalListViewDropTarget final : public CFileDropTarget<wxListCtrlEx>
 {
 public:
 	CLocalListViewDropTarget(CLocalListView* pLocalListView)
-		: CScrollableDropTarget<wxListCtrlEx>(pLocalListView)
-		, m_pLocalListView(pLocalListView), m_pFileDataObject(new wxFileDataObject()),
-		m_pRemoteDataObject(new CRemoteDataObject())
+		: CFileDropTarget<wxListCtrlEx>(pLocalListView)
+		, m_pLocalListView(pLocalListView)
 	{
-		m_pDataObject = new wxDataObjectComposite;
-		m_pDataObject->Add(m_pRemoteDataObject, true);
-		m_pDataObject->Add(m_pFileDataObject, false);
-		SetDataObject(m_pDataObject);
 	}
 
 	void ClearDropHighlight()
@@ -106,8 +101,12 @@ public:
 			return wxDragError;
 		}
 
-		if (m_pDataObject->GetReceivedFormat() == m_pFileDataObject->GetFormat()) {
+		auto const format = m_pDataObject->GetReceivedFormat();
+		if (format == m_pFileDataObject->GetFormat()) {
 			m_pLocalListView->m_state.HandleDroppedFiles(m_pFileDataObject, dir, def == wxDragCopy);
+		}
+		else if (format == m_pLocalDataObject->GetFormat()) {
+			m_pLocalListView->m_state.HandleDroppedFiles(m_pLocalDataObject, dir, def == wxDragCopy);
 		}
 		else {
 			if (m_pRemoteDataObject->GetProcessId() != (int)wxGetProcessId()) {
@@ -243,10 +242,7 @@ public:
 	}
 
 protected:
-	CLocalListView *m_pLocalListView;
-	wxFileDataObject* m_pFileDataObject;
-	CRemoteDataObject* m_pRemoteDataObject;
-	wxDataObjectComposite* m_pDataObject;
+	CLocalListView *m_pLocalListView{};
 };
 
 BEGIN_EVENT_TABLE(CLocalListView, CFileListCtrl<CLocalFileData>)
@@ -1401,11 +1397,20 @@ void CLocalListView::OnBeginDrag(wxListEvent&)
 		}
 	}
 
+#ifdef __WXMAC__
+	// Don't use wxFileDataObject on Mac, crashes on Mojave, wx bug #18232
+	CLocalDataObject obj;
+#else
 	wxFileDataObject obj;
+#endif
 
 	CDragDropManager* pDragDropManager = CDragDropManager::Init();
 	pDragDropManager->pDragSource = this;
 	pDragDropManager->localParent = m_dir;
+
+	auto const path = m_dir.GetPath();
+
+	bool added = false;
 
 	item = -1;
 	for (;;) {
@@ -1423,11 +1428,12 @@ void CLocalListView::OnBeginDrag(wxListEvent&)
 			continue;
 		}
 
-		wxString const name = m_dir.GetPath() + data->name;
+		std::wstring name = path + data->name;
 		obj.AddFile(name);
+		added = true;
 	}
 
-	if (obj.GetFilenames().empty()) {
+	if (!added) {
 		pDragDropManager->Release();
 		return;
 	}

@@ -51,6 +51,7 @@ enum t_statechange_notifications
 class CDirectoryListing;
 class CFileZillaEngine;
 class CCommandQueue;
+class CLocalDataObject; 
 class CLocalRecursiveOperation;
 class CMainFrame;
 class CGlobalStateEventHandler;
@@ -138,7 +139,7 @@ public:
 	bool SetLocalDir(CLocalPath const& dir, std::wstring *error = 0, bool rememberPreviousSubdir = true);
 	bool SetLocalDir(std::wstring const& dir, std::wstring *error = 0, bool rememberPreviousSubdir = true);
 
-	bool Connect(Site const& site, const CServerPath& path = CServerPath(), bool compare = false);
+	bool Connect(Site const& site, CServerPath const& path = CServerPath(), bool compare = false);
 	bool Disconnect();
 
 	bool ChangeRemoteDir(CServerPath const& path, std::wstring const& subdir = std::wstring(), int flags = 0, bool ignore_busy = false, bool compare = false);
@@ -152,7 +153,7 @@ public:
 
 	void RefreshLocal();
 	void RefreshLocalFile(std::wstring const& file);
-	void LocalDirCreated(const CLocalPath& path);
+	void LocalDirCreated(CLocalPath const& path);
 
 	bool RefreshRemote();
 
@@ -163,12 +164,15 @@ public:
 	CCommandQueue* m_pCommandQueue{};
 	CComparisonManager* GetComparisonManager() { return m_pComparisonManager; }
 
-	void UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const wxString& subdir, bool queueOnly);
-	void UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const CServerPath& path, bool queueOnly);
-	void HandleDroppedFiles(const wxFileDataObject* pFileDataObject, const CLocalPath& path, bool copy);
-	bool DownloadDroppedFiles(const CRemoteDataObject* pRemoteDataObject, const CLocalPath& path, bool queueOnly = false);
+	void UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, wxString const& subdir, bool queueOnly);
+	void UploadDroppedFiles(wxFileDataObject const* pFileDataObject, wxString const& subdir, bool queueOnly);
+	void UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, CServerPath const& path, bool queueOnly);
+	void UploadDroppedFiles(wxFileDataObject const* pFileDataObject, CServerPath const& path, bool queueOnly);
+	void HandleDroppedFiles(CLocalDataObject const* pLocalDataObject, CLocalPath const& path, bool copy);
+	void HandleDroppedFiles(wxFileDataObject const* pFileDataObject, CLocalPath const& path, bool copy);
+	bool DownloadDroppedFiles(CRemoteDataObject const* pRemoteDataObject, CLocalPath const& path, bool queueOnly = false);
 
-	static bool RecursiveCopy(CLocalPath source, const CLocalPath& targte);
+	static bool RecursiveCopy(CLocalPath source, CLocalPath const& targte);
 
 	bool IsRemoteConnected() const;
 	bool IsRemoteIdle(bool ignore_recursive = false) const;
@@ -177,15 +181,15 @@ public:
 	CLocalRecursiveOperation* GetLocalRecursiveOperation() { return m_pLocalRecursiveOperation; }
 	CRemoteRecursiveOperation* GetRemoteRecursiveOperation() { return m_pRemoteRecursiveOperation; }
 
-	void NotifyHandlers(t_statechange_notifications notification, wxString const& data = wxString(), const void* data2 = 0);
+	void NotifyHandlers(t_statechange_notifications notification, wxString const& data = wxString(), void const* data2 = 0);
 
 	bool SuccessfulConnect() const { return m_successful_connect; }
 	void SetSuccessfulConnect() { m_successful_connect = true; }
 
 	void ListingFailed(int error);
-	void LinkIsNotDir(const CServerPath& path, const wxString& subdir);
+	void LinkIsNotDir(CServerPath const& path, wxString const& subdir);
 
-	bool SetSyncBrowse(bool enable, const CServerPath& assumed_remote_root = CServerPath());
+	bool SetSyncBrowse(bool enable, CServerPath const& assumed_remote_root = CServerPath());
 	bool GetSyncBrowse() const { return !m_sync_browse.local_root.empty(); }
 
 	Site GetLastSite() const { return m_last_site; }

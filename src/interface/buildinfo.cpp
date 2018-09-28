@@ -32,14 +32,14 @@ std::wstring GetDependencyName(gui_lib_dependency d)
 
 std::wstring CBuildInfo::GetVersion()
 {
-	return fz::to_wstring(PACKAGE_VERSION);
+	return fz::to_wstring(std::string(PACKAGE_VERSION));
 }
 
 std::wstring CBuildInfo::GetBuildDateString()
 {
 	// Get build date. Unfortunately it is in the ugly Mmm dd yyyy format.
 	// Make a good yyyy-mm-dd out of it
-	std::wstring date = fz::to_wstring(__DATE__);
+	std::wstring date = fz::to_wstring(std::string(__DATE__));
 	while (date.find(L"  ") != std::wstring::npos) {
 		fz::replace_substrings(date, L"  ", L" ");
 	}
@@ -86,7 +86,7 @@ std::wstring CBuildInfo::GetBuildDateString()
 
 std::wstring CBuildInfo::GetBuildTimeString()
 {
-	return fz::to_wstring(__TIME__);
+	return fz::to_wstring(std::string(__TIME__));
 }
 
 fz::datetime CBuildInfo::GetBuildDate()

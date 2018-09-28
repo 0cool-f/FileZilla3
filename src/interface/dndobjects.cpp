@@ -1,6 +1,95 @@
 #include <filezilla.h>
 #include "dndobjects.h"
 
+#include "listctrlex.h"
+#include "treectrlex.h"
+
+CLocalDataObject::CLocalDataObject()
+	: wxDataObjectSimple(wxDataFormat(_T("FileZilla3LocalDataObject")))
+{
+}
+
+size_t CLocalDataObject::GetDataSize() const
+{
+	size_t ret = 1;
+	for (auto const& file : files_) {
+		ret += file.size() + 1;
+	}
+
+	return ret;
+}
+
+bool CLocalDataObject::GetDataHere(void *buf) const
+{
+	auto p = static_cast<char*>(buf);
+	*p = 1;
+	++p;
+
+	for (auto const& file : files_) {
+		strcpy(p, file.c_str());
+		p += file.size() + 1;
+	}
+
+	return true;
+}
+
+bool CLocalDataObject::SetData(size_t len, const void* buf)
+{
+	files_.clear();
+
+	auto p = static_cast<char const*>(buf);
+	auto const end = p + len;
+
+	if (!len || !buf || p[len - 1] != 0) {
+		return false;
+	}
+
+	if (p[0] != 1) {
+		return false;
+	}
+	++p;
+
+	while (p < end) {
+		size_t filelen = strlen(p);
+
+		if (filelen) {
+			files_.push_back(std::string(p, p + filelen));
+		}
+
+		p += filelen + 1;
+	}
+
+	return true;
+}
+
+void CLocalDataObject::Reserve(size_t count)
+{
+	files_.reserve(count);
+}
+
+void CLocalDataObject::AddFile(std::wstring const& file)
+{
+	std::string utf8 = fz::to_utf8(file);
+	if (!utf8.empty()) {
+		files_.push_back(utf8);
+	}
+}
+
+std::vector<std::wstring> CLocalDataObject::GetFilesW() const
+{
+	std::vector<std::wstring> ret;
+	ret.reserve(files_.size());
+
+	for (auto const& file : files_) {
+		std::wstring wide = fz::to_wstring_from_utf8(file);
+		if (!wide.empty()) {
+			ret.emplace_back(std::move(wide));
+		}
+	}
+
+	return ret;
+}
+
 #if FZ3_USESHELLEXT
 
 #include <initguid.h>
@@ -339,3 +428,22 @@ void CRemoteDataObject::AddFile(const wxString& name, bool dir, int64_t size, bo
 
 	m_fileList.push_back(info);
 }
+
+
+
+template<class Control>
+CFileDropTarget<Control>::CFileDropTarget(Control* ctrl)
+	: CScrollableDropTarget<Control>(ctrl)
+	, m_pLocalDataObject(new CLocalDataObject())
+	, m_pFileDataObject(new wxFileDataObject())
+	, m_pRemoteDataObject(new CRemoteDataObject())
+	, m_pDataObject(new wxDataObjectComposite)
+{
+	m_pDataObject->Add(m_pRemoteDataObject, true);
+	m_pDataObject->Add(m_pLocalDataObject, false);
+	m_pDataObject->Add(m_pFileDataObject, false);
+	this->SetDataObject(m_pDataObject);
+}
+
+template class CFileDropTarget<wxTreeCtrlEx>;
+template class CFileDropTarget<wxListCtrlEx>;

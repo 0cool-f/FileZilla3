@@ -35,25 +35,19 @@ public:
 	std::wstring m_known_subdir;
 };
 
-class CLocalTreeViewDropTarget final : public CScrollableDropTarget<wxTreeCtrlEx>
+class CLocalTreeViewDropTarget final : public CFileDropTarget<wxTreeCtrlEx>
 {
 public:
 	CLocalTreeViewDropTarget(CLocalTreeView* pLocalTreeView)
-		: CScrollableDropTarget(pLocalTreeView)
-		, m_pLocalTreeView(pLocalTreeView), m_pFileDataObject(new wxFileDataObject()),
-		m_pRemoteDataObject(new CRemoteDataObject())
+		: CFileDropTarget(pLocalTreeView)
+		, m_pLocalTreeView(pLocalTreeView)
 	{
-		m_pDataObject = new wxDataObjectComposite;
-		m_pDataObject->Add(m_pRemoteDataObject, true);
-		m_pDataObject->Add(m_pFileDataObject, false);
-		SetDataObject(m_pDataObject);
 	}
 
 	void ClearDropHighlight()
 	{
 		const wxTreeItemId dropHighlight = m_pLocalTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId())
-		{
+		if (dropHighlight != wxTreeItemId()) {
 			m_pLocalTreeView->SetItemDropHighlight(dropHighlight, false);
 			m_pLocalTreeView->m_dropHighlight = wxTreeItemId();
 		}
@@ -89,8 +83,10 @@ public:
 		if (def == wxDragError ||
 			def == wxDragNone ||
 			def == wxDragCancel)
+		{
 			return def;
-		if( def == wxDragLink ) {
+		}
+		if (def == wxDragLink) {
 			def = wxDragCopy;
 		}
 
@@ -113,8 +109,12 @@ public:
 			pDragDropManager->pDropTarget = m_pLocalTreeView;
 		}
 
-		if (m_pDataObject->GetReceivedFormat() == m_pFileDataObject->GetFormat()) {
+		auto const format = m_pDataObject->GetReceivedFormat();
+		if (format == m_pFileDataObject->GetFormat()) {
 			m_pLocalTreeView->m_state.HandleDroppedFiles(m_pFileDataObject, path, def == wxDragCopy);
+		}
+		else if (format == m_pLocalDataObject->GetFormat()) {
+			m_pLocalTreeView->m_state.HandleDroppedFiles(m_pLocalDataObject, path, def == wxDragCopy);
 		}
 		else {
 			if (m_pRemoteDataObject->GetProcessId() != (int)wxGetProcessId()) {
@@ -172,12 +172,12 @@ public:
 		}
 
 		const wxTreeItemId dropHighlight = m_pLocalTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId())
+		if (dropHighlight != wxTreeItemId()) {
 			m_pLocalTreeView->SetItemDropHighlight(dropHighlight, false);
+		}
 
 		m_pLocalTreeView->SetItemDropHighlight(hit, true);
 		m_pLocalTreeView->m_dropHighlight = hit;
-
 
 		return hit;
 	}
@@ -195,11 +195,13 @@ public:
 		}
 
 		wxTreeItemId hit = DisplayDropHighlight(wxPoint(x, y));
-		if (!hit.IsOk())
+		if (!hit.IsOk()) {
 			return wxDragNone;
+		}
 
-		if (def == wxDragLink)
+		if (def == wxDragLink) {
 			def = wxDragCopy;
+		}
 
 		return def;
 	}
@@ -217,10 +219,7 @@ public:
 	}
 
 protected:
-	CLocalTreeView *m_pLocalTreeView;
-	wxFileDataObject* m_pFileDataObject;
-	CRemoteDataObject* m_pRemoteDataObject;
-	wxDataObjectComposite* m_pDataObject;
+	CLocalTreeView *m_pLocalTreeView{};
 };
 
 BEGIN_EVENT_TABLE(CLocalTreeView, wxTreeCtrlEx)
@@ -909,27 +908,36 @@ void CLocalTreeView::OnBeginDrag(wxTreeEvent& event)
 #endif
 
 	wxString dir = GetDirFromItem(item);
-	if (dir == _T("/"))
+	if (dir == _T("/")) {
 		return;
+	}
 
 #ifdef __WXMSW__
-	if (!dir.empty() && dir.Last() == '\\')
+	if (!dir.empty() && dir.Last() == '\\') {
 		dir.RemoveLast();
+	}
 #endif
-	if (!dir.empty() && dir.Last() == '/')
+	if (!dir.empty() && dir.Last() == '/') {
 		dir.RemoveLast();
+	}
 
 #ifdef __WXMSW__
-	if (!dir.empty() && dir.Last() == ':')
+	if (!dir.empty() && dir.Last() == ':') {
 		return;
+	}
 #endif
 
 	CDragDropManager* pDragDropManager = CDragDropManager::Init();
 	pDragDropManager->pDragSource = this;
 
+#ifdef __WXMAC__
+	// Don't use wxFileDataObject on Mac, crashes on Mojave, wx bug #18232
+	CLocalDataObject obj;
+	obj.AddFile(dir.ToStdWstring());
+#else
 	wxFileDataObject obj;
-
 	obj.AddFile(dir);
+#endif
 
 	wxDropSource source(this);
 	source.SetData(obj);
@@ -939,8 +947,7 @@ void CLocalTreeView::OnBeginDrag(wxTreeEvent& event)
 
 	pDragDropManager->Release();
 
-	if (!handled_internally && (res == wxDragCopy || res == wxDragMove))
-	{
+	if (!handled_internally && (res == wxDragCopy || res == wxDragMove)) {
 		// We only need to refresh local side if the operation got handled
 		// externally, the internal handlers do this for us already
 		m_state.RefreshLocal();

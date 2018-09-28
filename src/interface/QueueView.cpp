@@ -36,19 +36,13 @@
 #include <powrprof.h>
 #endif
 
-class CQueueViewDropTarget final : public CScrollableDropTarget<wxListCtrlEx>
+class CQueueViewDropTarget final : public CFileDropTarget<wxListCtrlEx>
 {
 public:
 	CQueueViewDropTarget(CQueueView* pQueueView)
-		: CScrollableDropTarget<wxListCtrlEx>(pQueueView)
+		: CFileDropTarget<wxListCtrlEx>(pQueueView)
 		, m_pQueueView(pQueueView)
-		, m_pFileDataObject(new wxFileDataObject())
-		, m_pRemoteDataObject(new CRemoteDataObject())
 	{
-		m_pDataObject = new wxDataObjectComposite;
-		m_pDataObject->Add(m_pRemoteDataObject, true);
-		m_pDataObject->Add(m_pFileDataObject, false);
-		SetDataObject(m_pDataObject);
 	}
 
 	virtual wxDragResult OnData(wxCoord, wxCoord, wxDragResult def)
@@ -57,16 +51,21 @@ public:
 		if (def == wxDragError ||
 			def == wxDragNone ||
 			def == wxDragCancel)
+		{
 			return def;
+		}
 
-		if (!GetData())
+		if (!GetData()) {
 			return wxDragError;
+		}
 
 		CDragDropManager* pDragDropManager = CDragDropManager::Get();
-		if (pDragDropManager)
+		if (pDragDropManager) {
 			pDragDropManager->pDropTarget = m_pQueueView;
+		}
 
-		if (m_pDataObject->GetReceivedFormat() == m_pFileDataObject->GetFormat()) {
+		auto const format = m_pDataObject->GetReceivedFormat();
+		if (format == m_pFileDataObject->GetFormat() || format == m_pRemoteDataObject->GetFormat()) {
 			CState* const pState = CContextManager::Get()->GetCurrentContext();
 			if (!pState) {
 				return wxDragNone;
@@ -81,7 +80,12 @@ public:
 				return wxDragNone;
 			}
 
-			pState->UploadDroppedFiles(m_pFileDataObject, path, true);
+			if (format == m_pFileDataObject->GetFormat()) {
+				pState->UploadDroppedFiles(m_pFileDataObject, path, true);
+			}
+			else {
+				pState->UploadDroppedFiles(m_pLocalDataObject, path, true);
+			}
 		}
 		else {
 			if (m_pRemoteDataObject->GetProcessId() != (int)wxGetProcessId()) {
@@ -103,7 +107,7 @@ public:
 				return wxDragNone;
 			}
 
-			const CLocalPath& target = pState->GetLocalDir();
+			CLocalPath const& target = pState->GetLocalDir();
 			if (!target.IsWriteable()) {
 				wxBell();
 				return wxDragNone;
@@ -133,8 +137,7 @@ public:
 		}
 
 		CDragDropManager* pDragDropManager = CDragDropManager::Get();
-		if (pDragDropManager && !pDragDropManager->remoteParent.empty())
-		{
+		if (pDragDropManager && !pDragDropManager->remoteParent.empty()) {
 			// Drag from remote to queue, check if local path is writeable
 			CState* const pState = CContextManager::Get()->GetCurrentContext();
 			if (!pState) {
@@ -162,10 +165,7 @@ public:
 
 	int DisplayDropHighlight(wxPoint) { return -1; }
 protected:
-	CQueueView *m_pQueueView;
-	wxFileDataObject* m_pFileDataObject;
-	CRemoteDataObject* m_pRemoteDataObject;
-	wxDataObjectComposite* m_pDataObject;
+	CQueueView *m_pQueueView{};
 };
 
 BEGIN_EVENT_TABLE(CQueueView, CQueueViewBase)

@@ -12,6 +12,7 @@
 #include "xrc_helper.h"
 
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/glue/wx.hpp>
 
 #include <algorithm>
 
@@ -717,6 +718,23 @@ CGlobalStateEventHandler::~CGlobalStateEventHandler()
 	CContextManager::Get()->UnregisterHandler(this, STATECHANGE_NONE);
 }
 
+void CState::UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, const wxString& subdir, bool queueOnly)
+{
+	if (!m_site.server_ || !m_pDirectoryListing) {
+		return;
+	}
+
+	CServerPath path = m_pDirectoryListing->path;
+	if (subdir == _T("..") && path.HasParent()) {
+		path = path.GetParent();
+	}
+	else if (!subdir.empty()) {
+		path.AddSegment(subdir.ToStdWstring());
+	}
+
+	UploadDroppedFiles(pLocalDataObject, path, queueOnly);
+}
+
 void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const wxString& subdir, bool queueOnly)
 {
 	if (!m_site.server_ || !m_pDirectoryListing) {
@@ -734,9 +752,15 @@ void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const w
 	UploadDroppedFiles(pFileDataObject, path, queueOnly);
 }
 
-void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const CServerPath& path, bool queueOnly)
+namespace {
+template <typename T>
+void DoUploadDroppedFiles(CState& state, CMainFrame & mainFrame, T const& files, const CServerPath& path, bool queueOnly)
 {
-	if (!m_site.server_) {
+	if (files.empty()) {
+		return;
+	}
+
+	if (!state.GetServer()) {
 		return;
 	}
 
@@ -744,26 +768,24 @@ void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const C
 		return;
 	}
 
-	auto recursiveOperation = GetLocalRecursiveOperation();
+	auto recursiveOperation = state.GetLocalRecursiveOperation();
 	if (!recursiveOperation || recursiveOperation->IsActive()) {
 		wxBell();
 		return;
 	}
 
-	wxArrayString const& files = pFileDataObject->GetFilenames();
-
-	for (unsigned int i = 0; i < files.Count(); ++i) {
+	for (auto const& file : files) {
 		int64_t size;
 		bool is_link;
-		fz::local_filesys::type type = fz::local_filesys::get_file_info(fz::to_native(files[i]), is_link, &size, 0, 0);
+		fz::local_filesys::type type = fz::local_filesys::get_file_info(fz::to_native(file), is_link, &size, 0, 0);
 		if (type == fz::local_filesys::file) {
 			std::wstring localFile;
-			const CLocalPath localPath(files[i].ToStdWstring(), &localFile);
-			m_mainFrame.GetQueue()->QueueFile(queueOnly, false, localFile, wxEmptyString, localPath, path, m_site.server_, size);
-			m_mainFrame.GetQueue()->QueueFile_Finish(!queueOnly);
+			CLocalPath const localPath(fz::to_wstring(file), &localFile);
+			mainFrame.GetQueue()->QueueFile(queueOnly, false, localFile, wxEmptyString, localPath, path, state.GetServer(), size);
+			mainFrame.GetQueue()->QueueFile_Finish(!queueOnly);
 		}
 		else if (type == fz::local_filesys::dir) {
-			CLocalPath localPath(files[i].ToStdWstring());
+			CLocalPath localPath(fz::to_wstring(file));
 			if (localPath.HasParent()) {
 
 				CServerPath remotePath = path;
@@ -781,55 +803,67 @@ void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const C
 	CFilterManager filter;
 	recursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queueOnly);
 }
+}
 
-void CState::HandleDroppedFiles(const wxFileDataObject* pFileDataObject, const CLocalPath& path, bool copy)
+void CState::UploadDroppedFiles(const CLocalDataObject* pLocalDataObject, const CServerPath& path, bool queueOnly)
 {
-	const wxArrayString &files = pFileDataObject->GetFilenames();
-	if (!files.Count()) {
+	auto const files = pLocalDataObject->GetFilesW();
+	DoUploadDroppedFiles(*this, m_mainFrame, files, path, queueOnly);
+}
+
+void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const CServerPath& path, bool queueOnly)
+{
+	wxArrayString const& files = pFileDataObject->GetFilenames();
+	DoUploadDroppedFiles(*this, m_mainFrame, files, path, queueOnly);
+}
+
+namespace {
+template<typename T>
+void DoHandleDroppedFiles(CState & state, CMainFrame & mainFrame, T const& files, CLocalPath const& path, bool copy)
+{
+	if (files.empty()) {
 		return;
 	}
 
 #ifdef __WXMSW__
 	int len = 1;
 
-	for (unsigned int i = 0; i < files.Count(); ++i) {
-		len += files[i].Len() + 1;
+	for (unsigned int i = 0; i < files.size(); ++i) {
+		len += files[i].size() + 1;
 	}
 
 	// SHFILEOPSTRUCT's pTo and pFrom accept null-terminated lists
 	// of null-terminated filenames.
-	wxChar* from = new wxChar[len];
-	wxChar* p = from;
-	for (unsigned int i = 0; i < files.Count(); ++i) {
-		wxStrcpy(p, files[i]);
-		p += files[i].Len() + 1;
+	wchar_t* from = new wchar_t[len];
+	wchar_t* p = from;
+	for (auto const& file : files) {
+		memcpy(p, file.c_str(), (file.size() + 1) * sizeof(wchar_t));
+		p += file.size() + 1;
 	}
 	*p = 0; // End of list
 
-	wxChar* to = new wxChar[path.GetPath().size() + 2];
-	wxStrcpy(to, path.GetPath());
+	wchar_t* to = new wchar_t[path.GetPath().size() + 2];
+	memcpy(to, path.GetPath().c_str(), (path.GetPath().size() + 1) * sizeof(wchar_t));
 	to[path.GetPath().size() + 1] = 0; // End of list
 
-	SHFILEOPSTRUCT op = {0};
+	SHFILEOPSTRUCT op = { 0 };
 	op.pFrom = from;
 	op.pTo = to;
 	op.wFunc = copy ? FO_COPY : FO_MOVE;
-	op.hwnd = (HWND)m_mainFrame.GetHandle();
+	op.hwnd = (HWND)mainFrame.GetHandle();
 	SHFileOperation(&op);
 
-	delete [] to;
-	delete [] from;
+	delete[] to;
+	delete[] from;
 #else
 	wxString error;
-	for (unsigned int i = 0; i < files.Count(); ++i) {
-		std::wstring const file(files[i].ToStdWstring());
-
+	for (auto const& file : files) {
 		int64_t size;
 		bool is_link;
 		fz::local_filesys::type type = fz::local_filesys::get_file_info(fz::to_native(file), is_link, &size, 0, 0);
 		if (type == fz::local_filesys::file) {
 			std::wstring name;
-			CLocalPath sourcePath(file, &name);
+			CLocalPath sourcePath(fz::to_wstring(file), &name);
 			if (name.empty()) {
 				continue;
 			}
@@ -846,7 +880,7 @@ void CState::HandleDroppedFiles(const wxFileDataObject* pFileDataObject, const C
 			}
 		}
 		else if (type == fz::local_filesys::dir) {
-			CLocalPath sourcePath(file);
+			CLocalPath sourcePath(fz::to_wstring(file));
 			if (sourcePath == path || sourcePath.GetParent() == path) {
 				continue;
 			}
@@ -856,7 +890,7 @@ void CState::HandleDroppedFiles(const wxFileDataObject* pFileDataObject, const C
 			}
 
 			if (copy) {
-				RecursiveCopy(sourcePath, path);
+				state.RecursiveCopy(sourcePath, path);
 			}
 			else {
 				if (!sourcePath.HasParent()) {
@@ -871,7 +905,20 @@ void CState::HandleDroppedFiles(const wxFileDataObject* pFileDataObject, const C
 	}
 #endif
 
-	RefreshLocal();
+	state.RefreshLocal();
+}
+}
+
+void CState::HandleDroppedFiles(CLocalDataObject const* pLocalDataObject, CLocalPath const& path, bool copy)
+{
+	auto const files = pLocalDataObject->GetFilesW();
+	DoHandleDroppedFiles(*this, m_mainFrame, files, path, copy);
+}
+
+void CState::HandleDroppedFiles(const wxFileDataObject* pFileDataObject, const CLocalPath& path, bool copy)
+{
+	wxArrayString const& files = pFileDataObject->GetFilenames();
+	DoHandleDroppedFiles(*this, m_mainFrame, files, path, copy);
 }
 
 bool CState::RecursiveCopy(CLocalPath source, const CLocalPath& target)
