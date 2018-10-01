@@ -241,6 +241,10 @@ std::wstring CUpdater::GetUrl()
 		url += L"&manual=1";
 	}
 
+	wxString v;
+	if (wxGetEnv(_T("FZUPDATETEST"), &v) && v == _T("1")) {
+		url += L"&test=1";
+	}
 	return url;
 }
 
