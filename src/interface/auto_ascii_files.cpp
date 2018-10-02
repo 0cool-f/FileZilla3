@@ -9,31 +9,31 @@ std::vector<wxString> CAutoAsciiFiles::m_ascii_extensions;
 void CAutoAsciiFiles::SettingsChanged()
 {
 	m_ascii_extensions.clear();
-	wxString extensions = COptions::Get()->GetOption(OPTION_ASCIIFILES);
-	wxString ext;
-	int pos = extensions.Find(_T("|"));
-	while (pos != -1) {
+	std::wstring extensions = COptions::Get()->GetOption(OPTION_ASCIIFILES);
+	std::wstring ext;
+	size_t pos = extensions.find('|');
+	while (pos != std::wstring::npos) {
 		if (!pos) {
 			if (!ext.empty()) {
-				ext.Replace(_T("\\\\"), _T("\\"));
+				fz::replace_substrings(ext, L"\\\\", L"\\");
 				m_ascii_extensions.push_back(ext);
 				ext.clear();
 			}
 		}
-		else if (extensions.c_str()[pos - 1] != '\\') {
-			ext += extensions.Left(pos);
-			ext.Replace(_T("\\\\"), _T("\\"));
+		else if (extensions[pos - 1] != '\\') {
+			ext += extensions.substr(0, pos);
+			fz::replace_substrings(ext, L"\\\\", L"\\");
 			m_ascii_extensions.push_back(ext);
 			ext.clear();
 		}
 		else {
-			ext += extensions.Left(pos - 1) + _T("|");
+			ext += extensions.substr(0, pos - 1) + L"|";
 		}
-		extensions = extensions.Mid(pos + 1);
-		pos = extensions.Find(_T("|"));
+		extensions = extensions.substr(pos + 1);
+		pos = extensions.find('|');
 	}
 	ext += extensions;
-	ext.Replace(_T("\\\\"), _T("\\"));
+	fz::replace_substrings(ext, L"\\\\", L"\\");
 	m_ascii_extensions.push_back(ext);
 }
 
@@ -54,17 +54,20 @@ bool CAutoAsciiFiles::TransferLocalAsAscii(wxString const& local_file, ServerTyp
 bool CAutoAsciiFiles::TransferRemoteAsAscii(wxString const& remote_file, ServerType server_type)
 {
 	int mode = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
-	if (mode == 1)
+	if (mode == 1) {
 		return true;
-	else if (mode == 2)
+	}
+	else if (mode == 2) {
 		return false;
+	}
 
 	if (server_type == VMS) {
 		return TransferRemoteAsAscii(StripVMSRevision(remote_file.ToStdWstring()), DEFAULT);
 	}
 
-	if (!remote_file.empty() && remote_file[0] == '.')
+	if (!remote_file.empty() && remote_file[0] == '.') {
 		return COptions::Get()->GetOptionVal(OPTION_ASCIIDOTFILE) != 0;
+	}
 
 	int pos = remote_file.Find('.', true);
 	if (pos < 0 || static_cast<unsigned int>(pos) + 1 == remote_file.size()) {
