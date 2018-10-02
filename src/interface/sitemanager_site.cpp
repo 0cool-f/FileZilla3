@@ -719,7 +719,7 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	std::wstring const serverType = xrc_call(*this, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
 	site.server_.server.SetType(CServer::GetServerTypeFromName(serverType));
 
-	site.m_default_bookmark.m_localDir = xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::GetValue);
+	site.m_default_bookmark.m_localDir = xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
 	site.m_default_bookmark.m_remoteDir = CServerPath();
 	site.m_default_bookmark.m_remoteDir.SetType(site.server_.server.GetType());
 	site.m_default_bookmark.m_remoteDir.SetPath(xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());

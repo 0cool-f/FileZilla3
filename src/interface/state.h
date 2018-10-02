@@ -204,8 +204,8 @@ public:
 
 	// If the previously selected directory was a direct child of the current directory, this
 	// returns the relative name of the subdirectory.
-	wxString GetPreviouslyVisitedLocalSubdir() const { return m_previouslyVisitedLocalSubdir; }
-	wxString GetPreviouslyVisitedRemoteSubdir() const { return m_previouslyVisitedRemoteSubdir; }
+	std::wstring GetPreviouslyVisitedLocalSubdir() const { return m_previouslyVisitedLocalSubdir; }
+	std::wstring GetPreviouslyVisitedRemoteSubdir() const { return m_previouslyVisitedRemoteSubdir; }
 	void ClearPreviouslyVisitedLocalSubdir() { m_previouslyVisitedLocalSubdir.clear(); }
 	void ClearPreviouslyVisitedRemoteSubdir() { m_previouslyVisitedRemoteSubdir.clear(); }
 
@@ -268,8 +268,8 @@ protected:
 	std::unique_ptr<CCertificateNotification> m_pCertificate;
 	std::unique_ptr<CSftpEncryptionNotification> m_pSftpEncryptionInfo;
 
-	wxString m_previouslyVisitedLocalSubdir;
-	wxString m_previouslyVisitedRemoteSubdir;
+	std::wstring m_previouslyVisitedLocalSubdir;
+	std::wstring m_previouslyVisitedRemoteSubdir;
 };
 
 class CGlobalStateEventHandler

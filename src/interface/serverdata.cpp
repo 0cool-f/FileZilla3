@@ -10,9 +10,9 @@ bool ServerWithCredentials::ParseUrl(std::wstring const& host, std::wstring cons
 	if (!port.empty()) {
 		nPort = fz::to_integral<unsigned int>(fz::trimmed(port));
 		if (port.size() > 5 || !nPort || nPort > 65535) {
-			error = _("Invalid port given. The port has to be a value from 1 to 65535.");
+			error = fztranslate("Invalid port given. The port has to be a value from 1 to 65535.");
 			error += L"\n";
-			error += _("You can leave the port field empty to use the default port.");
+			error += fztranslate("You can leave the port field empty to use the default port.");
 			return false;
 		}
 	}
@@ -24,7 +24,7 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 	server.SetType(DEFAULT);
 
 	if (host.empty()) {
-		error = _("No host given, please enter a host.");
+		error = fztranslate("No host given, please enter a host.");
 		return false;
 	}
 
@@ -37,7 +37,7 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 		}
 		auto p = CServer::GetProtocolFromPrefix(protocol, hint);
 		if (p == UNKNOWN) {
-			error = _("Invalid protocol specified. Valid protocols are:\nftp:// for normal FTP with optional encryption,\nsftp:// for SSH file transfer protocol,\nftps:// for FTP over TLS (implicit) and\nftpes:// for FTP over TLS (explicit).");
+			error = fztranslate("Invalid protocol specified. Valid protocols are:\nftp:// for normal FTP with optional encryption,\nsftp:// for SSH file transfer protocol,\nftps:// for FTP over TLS (implicit) and\nftpes:// for FTP over TLS (explicit).");
 			return false;
 		}
 		server.SetProtocol(p);
@@ -76,7 +76,7 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 		fz::trim(user);
 
 		if (user.empty()) {
-			error = _("Invalid username given.");
+			error = fztranslate("Invalid username given.");
 			return false;
 		}
 	}
@@ -95,12 +95,12 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 		// Probably IPv6 address
 		pos = host.find(']');
 		if (pos == std::wstring::npos) {
-			error = _("Host starts with '[' but no closing bracket found.");
+			error = fztranslate("Host starts with '[' but no closing bracket found.");
 			return false;
 		}
 		if (pos < host.size() - 1) {
 			if (host[pos + 1] != ':') {
-				error = _("Invalid host, after closing bracket only colon and port may follow.");
+				error = fztranslate("Invalid host, after closing bracket only colon and port may follow.");
 				return false;
 			}
 			++pos;
@@ -114,7 +114,7 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 	}
 	if (pos != std::wstring::npos) {
 		if (!pos) {
-			error = _("No host given, please enter a host.");
+			error = fztranslate("No host given, please enter a host.");
 			return false;
 		}
 
@@ -128,14 +128,14 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 	}
 
 	if (port < 1 || port > 65535) {
-		error = _("Invalid port given. The port has to be a value from 1 to 65535.");
+		error = fztranslate("Invalid port given. The port has to be a value from 1 to 65535.");
 		return false;
 	}
 
 	fz::trim(host);
 
 	if (host.empty()) {
-		error = _("No host given, please enter a host.");
+		error = fztranslate("No host given, please enter a host.");
 		return false;
 	}
 

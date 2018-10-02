@@ -35,12 +35,12 @@ pugi::xml_node CXmlFile::Load(bool overwriteInvalid)
 
 	GetXmlFile(redirectedName);
 	if (!m_element) {
-		wxString err = wxString::Format(_("The file '%s' could not be loaded."), m_fileName);
+		std::wstring err = fz::sprintf(fztranslate("The file '%s' could not be loaded."), m_fileName);
 		if (m_error.empty()) {
-			err += wxString(_T("\n")) + _("Make sure the file can be accessed and is a well-formed XML document.");
+			err += L"\n" + fztranslate("Make sure the file can be accessed and is a well-formed XML document.");
 		}
 		else {
-			err += _T("\n") + m_error;
+			err += L"\n" + m_error;
 		}
 
 		// Try the backup file
@@ -74,13 +74,13 @@ pugi::xml_node CXmlFile::Load(bool overwriteInvalid)
 		bool res;
 		{
 			wxLogNull null;
-			res = wxCopyFile(redirectedName + _T("~"), redirectedName);
+			res = wxCopyFile(redirectedName + L"~", redirectedName);
 		}
 		if (!res) {
 			// Could not restore backup, give up.
 			Close();
-			m_error = err.ToStdWstring();
-			m_error += _T("\n") + wxString::Format(_("The valid backup file %s could not be restored"), redirectedName + _T("~")).ToStdWstring();
+			m_error = err;
+			m_error += L"\n" + fz::sprintf(fztranslate("The valid backup file %s could not be restored"), redirectedName + L"~");
 			m_modificationTime.clear();
 			return m_element;
 		}

@@ -26,8 +26,8 @@ public:
 	void DisplayUsage();
 
 	bool HasSwitch(t_switches s) const;
-	wxString GetOption(t_option option) const;
-	wxString GetParameter() const;
+	std::wstring GetOption(t_option option) const;
+	std::wstring GetParameter() const;
 
 	bool BlocksReconnectAtStartup() const;
 

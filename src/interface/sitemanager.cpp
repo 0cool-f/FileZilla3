@@ -170,7 +170,7 @@ std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
 
 	// Bookmarks
 	for (auto bookmark = element.child("Bookmark"); bookmark; bookmark = bookmark.next_sibling("Bookmark")) {
-		wxString name = GetTextElement_Trimmed(bookmark, "Name");
+		std::wstring name = GetTextElement_Trimmed(bookmark, "Name");
 		if (name.empty()) {
 			continue;
 		}
@@ -572,7 +572,7 @@ std::pair<std::unique_ptr<Site>, Bookmark> CSiteManager::DoGetSiteByPath(std::ws
 	return ret;
 }
 
-wxString CSiteManager::AddServer(ServerWithCredentials server)
+std::wstring CSiteManager::AddServer(ServerWithCredentials server)
 {
 	// We have to synchronize access to sitemanager.xml so that multiple processed don't write
 	// to the same file or one is reading while the other one writes.
@@ -584,7 +584,7 @@ wxString CSiteManager::AddServer(ServerWithCredentials server)
 		wxString msg = file.GetError() + _T("\n") + _("The server could not be added.");
 		wxMessageBoxEx(msg, _("Error loading xml file"), wxICON_ERROR);
 
-		return wxString();
+		return std::wstring();
 	}
 
 	auto element = document.child("Servers");
@@ -592,9 +592,9 @@ wxString CSiteManager::AddServer(ServerWithCredentials server)
 		element = document.append_child("Servers");
 	}
 
-	std::list<wxString> names;
+	std::vector<std::wstring> names;
 	for (auto child = element.child("Server"); child; child = child.next_sibling("Server")) {
-		wxString name = GetTextElement(child, "Name");
+		std::wstring name = GetTextElement(child, "Name");
 		if (name.empty()) {
 			continue;
 		}
@@ -602,21 +602,21 @@ wxString CSiteManager::AddServer(ServerWithCredentials server)
 		names.push_back(name);
 	}
 
-	std::wstring name = _("New site").ToStdWstring();
+	std::wstring name = fztranslate("New site");
 	int i = 1;
 
 	for (;;) {
-		std::list<wxString>::const_iterator iter;
-		for (iter = names.begin(); iter != names.end(); ++iter) {
+		std::vector<std::wstring>::const_iterator iter;
+		for (iter = names.cbegin(); iter != names.cend(); ++iter) {
 			if (*iter == name) {
 				break;
 			}
 		}
-		if (iter == names.end()) {
+		if (iter == names.cend()) {
 			break;
 		}
 
-		name = _("New site") + wxString::Format(_T(" %d"), ++i);
+		name = _("New site").ToStdWstring() + fz::sprintf(L" %d", ++i);
 	}
 
 	server.server.SetName(name);
@@ -627,15 +627,15 @@ wxString CSiteManager::AddServer(ServerWithCredentials server)
 
 	if (!file.Save(false)) {
 		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
-			return wxString();
+			return std::wstring();
 		}
 
-		wxString msg = wxString::Format(_("Could not write \"%s\", any changes to the Site Manager could not be saved: %s"), file.GetFileName(), file.GetError());
+		std::wstring msg = fz::sprintf(fztranslate("Could not write \"%s\", any changes to the Site Manager could not be saved: %s"), file.GetFileName(), file.GetError());
 		wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
-		return wxString();
+		return std::wstring();
 	}
 
-	return _T("0/") + EscapeSegment(name);
+	return L"0/" + EscapeSegment(name);
 }
 
 pugi::xml_node CSiteManager::GetElementByPath(pugi::xml_node node, std::vector<std::wstring> const& segments)
@@ -906,7 +906,7 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 	AddTextElement(element, "Colour", CSiteManager::GetColourIndex(site.m_colour));
 
 	// Save local dir
-	AddTextElement(element, "LocalDir", site.m_default_bookmark.m_localDir.ToStdWstring());
+	AddTextElement(element, "LocalDir", site.m_default_bookmark.m_localDir);
 
 	// Save remote dir
 	AddTextElement(element, "RemoteDir", site.m_default_bookmark.m_remoteDir.GetSafePath());
@@ -917,10 +917,10 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 	for (auto const& bookmark : site.m_bookmarks) {
 		auto node = element.append_child("Bookmark");
 
-		AddTextElement(node, "Name", bookmark.m_name.ToStdWstring());
+		AddTextElement(node, "Name", bookmark.m_name);
 
 		// Save local dir
-		AddTextElement(node, "LocalDir", bookmark.m_localDir.ToStdWstring());
+		AddTextElement(node, "LocalDir", bookmark.m_localDir);
 
 		// Save remote dir
 		AddTextElement(node, "RemoteDir", bookmark.m_remoteDir.GetSafePath());

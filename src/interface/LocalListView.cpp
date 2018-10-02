@@ -627,9 +627,9 @@ void CLocalListView::DisplayDrives()
 
 	std::list<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
 	for (auto it = drives.begin(); it != drives.end(); ++it) {
-		wxString drive = *it;
-		if (drive.Right(1) == _T("\\")) {
-			drive.RemoveLast();
+		std::wstring drive = *it;
+		if (!drive.empty() && drive.back() == '\\') {
+			drive.pop_back();
 		}
 
 		CLocalFileData data;
@@ -641,7 +641,7 @@ void CLocalListView::DisplayDrives()
 
 		m_fileData.push_back(data);
 		m_indexMapping.push_back(count);
-		count++;
+		++count;
 	}
 
 	if (m_pFilelistStatusBar) {
@@ -1133,9 +1133,9 @@ bool CLocalListView::OnAcceptRename(const wxListEvent& event)
 		return false;
 	}
 
-	wxString newname = event.GetLabel();
+	std::wstring newname = event.GetLabel().ToStdWstring();
 #ifdef __WXMSW__
-	newname = newname.Left(255);
+	newname = newname.substr(0, 255);
 #endif
 
 	if (newname == data->name) {
@@ -1375,7 +1375,7 @@ void CLocalListView::OnStateChange(t_statechange_notifications notification, con
 	}
 	else {
 		wxASSERT(notification == STATECHANGE_LOCAL_REFRESH_FILE);
-		RefreshFile(data);
+		RefreshFile(data.ToStdWstring());
 	}
 }
 
@@ -1455,7 +1455,7 @@ void CLocalListView::OnBeginDrag(wxListEvent&)
 	}
 }
 
-void CLocalListView::RefreshFile(const wxString& file)
+void CLocalListView::RefreshFile(std::wstring const& file)
 {
 	CLocalFileData data;
 

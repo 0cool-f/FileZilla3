@@ -418,7 +418,7 @@ void CRemoteDataObject::Reserve(size_t count)
 	m_fileList.reserve(count);
 }
 
-void CRemoteDataObject::AddFile(const wxString& name, bool dir, int64_t size, bool link)
+void CRemoteDataObject::AddFile(std::wstring const& name, bool dir, int64_t size, bool link)
 {
 	t_fileInfo info;
 	info.name = name;

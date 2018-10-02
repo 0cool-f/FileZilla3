@@ -144,7 +144,7 @@ public:
 	{
 	}
 
-	CBookmarkItemData(const wxString& local_dir, const CServerPath& remote_dir, bool sync, bool comparison)
+	CBookmarkItemData(std::wstring const& local_dir, const CServerPath& remote_dir, bool sync, bool comparison)
 		: m_local_dir(local_dir), m_remote_dir(remote_dir), m_sync(sync)
 		, m_comparison(comparison)
 	{
@@ -178,7 +178,7 @@ void CBookmarksDialog::LoadGlobalBookmarks()
 
 	for (auto bookmark = element.child("Bookmark"); bookmark; bookmark = bookmark.next_sibling("Bookmark")) {
 		wxString name;
-		wxString local_dir;
+		std::wstring local_dir;
 		std::wstring remote_dir_raw;
 		CServerPath remote_dir;
 
@@ -498,7 +498,7 @@ void CBookmarksDialog::UpdateBookmark()
 		data->m_remote_dir.SetPath(remotePathRaw.ToStdWstring());
 	}
 
-	data->m_local_dir = xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetValue);
+	data->m_local_dir = xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
 
 	data->m_sync = xrc_call(*this, "ID_BOOKMARK_SYNC", &wxCheckBox::GetValue);
 	data->m_comparison = xrc_call(*this, "ID_BOOKMARK_COMPARISON", &wxCheckBox::GetValue);
@@ -508,8 +508,8 @@ void CBookmarksDialog::DisplayBookmark()
 {
 	wxTreeItemId item = m_pTree->GetSelection();
 	if (!item) {
-		xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::ChangeValue, _T(""));
-		xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::ChangeValue, _T(""));
+		xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::ChangeValue, L"");
+		xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::ChangeValue, L"");
 		xrc_call(*this, "ID_DELETE", &wxButton::Enable, false);
 		xrc_call(*this, "ID_RENAME", &wxButton::Enable, false);
 		xrc_call(*this, "ID_COPY", &wxButton::Enable, false);
@@ -519,8 +519,8 @@ void CBookmarksDialog::DisplayBookmark()
 
 	CBookmarkItemData *data = (CBookmarkItemData *)m_pTree->GetItemData(item);
 	if (!data) {
-		xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::ChangeValue, _T(""));
-		xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::ChangeValue, _T(""));
+		xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::ChangeValue, L"");
+		xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::ChangeValue, L"");
 		xrc_call(*this, "ID_DELETE", &wxButton::Enable, false);
 		xrc_call(*this, "ID_RENAME", &wxButton::Enable, false);
 		xrc_call(*this, "ID_COPY", &wxButton::Enable, false);

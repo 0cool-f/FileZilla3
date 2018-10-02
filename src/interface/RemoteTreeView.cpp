@@ -819,7 +819,7 @@ void CRemoteTreeView::OnBeginDrag(wxTreeEvent& event)
 	}
 
 	const CServerPath& parent = path.GetParent();
-	const wxString& lastSegment = path.GetLastSegment();
+	std::wstring const lastSegment = path.GetLastSegment();
 	if (lastSegment.empty()) {
 		return;
 	}

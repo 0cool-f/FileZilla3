@@ -263,7 +263,7 @@ bool COptionsPageThemes::OnDisplayedFirstTime()
 	if (pTheme->GetSelection() == wxNOT_FOUND) {
 		pTheme->SetSelection(pTheme->FindString(firstName));
 	}
-	activeTheme = ((wxStringClientData*)pTheme->GetClientObject(pTheme->GetSelection()))->GetData();
+	activeTheme = ((wxStringClientData*)pTheme->GetClientObject(pTheme->GetSelection()))->GetData().ToStdWstring();
 
 	if (!DisplayTheme(activeTheme)) {
 		failure = true;

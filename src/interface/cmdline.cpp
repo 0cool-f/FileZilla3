@@ -47,29 +47,29 @@ bool CCommandLine::HasSwitch(CCommandLine::t_switches s) const
 	return false;
 }
 
-wxString CCommandLine::GetOption(CCommandLine::t_option option) const
+std::wstring CCommandLine::GetOption(CCommandLine::t_option option) const
 {
 	wxString value;
 	switch (option)
 	{
 	case site:
 		if (m_parser.Found(_T("c"), &value)) {
-			return value;
+			return value.ToStdWstring();
 		}
 		break;
 	case logontype:
 		if (m_parser.Found(_T("l"), &value)) {
-			return value;
+			return value.ToStdWstring();
 		}
 		break;
 	case local:
 		if (m_parser.Found(_T("a"), &value)) {
-			return value;
+			return value.ToStdWstring();
 		}
 		break;
 	}
 
-	return wxString();
+	return std::wstring();
 }
 
 bool CCommandLine::Parse()
@@ -119,13 +119,13 @@ void CCommandLine::DisplayUsage()
 	m_parser.Usage();
 }
 
-wxString CCommandLine::GetParameter() const
+std::wstring CCommandLine::GetParameter() const
 {
 	if (!m_parser.GetParamCount()) {
-		return wxString();
+		return std::wstring();
 	}
 
-	return m_parser.GetParam();
+	return m_parser.GetParam().ToStdWstring();
 }
 
 bool CCommandLine::BlocksReconnectAtStartup() const

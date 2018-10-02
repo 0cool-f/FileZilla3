@@ -11,13 +11,13 @@ public:
 	bool operator==(Bookmark const& b) const;
 	bool operator!=(Bookmark const& b) const { return !(*this == b); }
 
-	wxString m_localDir;
+	std::wstring m_localDir;
 	CServerPath m_remoteDir;
 
 	bool m_sync{};
 	bool m_comparison{};
 
-	wxString m_name;
+	std::wstring m_name;
 };
 
 class Site final
@@ -68,7 +68,7 @@ public:
 
 	static std::pair<std::unique_ptr<Site>, Bookmark> GetSiteByPath(std::wstring const& sitePath, bool printErrors = true);
 
-	static wxString AddServer(ServerWithCredentials server);
+	static std::wstring AddServer(ServerWithCredentials server);
 	static bool AddBookmark(std::wstring sitePath, const wxString& name, const wxString &local_dir, const CServerPath &remote_dir, bool sync, bool comparison);
 	static bool ClearBookmarks(std::wstring sitePath);
 

@@ -317,11 +317,13 @@ bool CState::SetLocalDir(CLocalPath const& dir, std::wstring *error, bool rememb
 #ifdef __WXMSW__
 		if (dir.GetPath() == _T("\\")) {
 			m_previouslyVisitedLocalSubdir = m_localDir.GetPath();
-			m_previouslyVisitedLocalSubdir.RemoveLast();
+			m_previouslyVisitedLocalSubdir.pop_back();
 		}
 		else
 #endif
+		{
 			m_previouslyVisitedLocalSubdir = m_localDir.GetLastSegment();
+		}
 	}
 	else {
 		m_previouslyVisitedLocalSubdir.clear();

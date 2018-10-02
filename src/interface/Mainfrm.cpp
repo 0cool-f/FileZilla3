@@ -2081,7 +2081,7 @@ bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pS
 	// Apply comparison and sync browsing options
 	// FIXME: Move to state?
 	if (!bookmark.m_localDir.empty()) {
-		bool set = pState->SetLocalDir(bookmark.m_localDir.ToStdWstring(), 0, false);
+		bool set = pState->SetLocalDir(bookmark.m_localDir, 0, false);
 
 		if (set && bookmark.m_sync) {
 			wxASSERT(!bookmark.m_remoteDir.empty());
@@ -2525,7 +2525,7 @@ void CMainFrame::ProcessCommandLine()
 		}
 	}
 
-	std::wstring param = pCommandLine->GetParameter().ToStdWstring();
+	std::wstring param = pCommandLine->GetParameter();
 	if (!param.empty()) {
 		std::wstring error;
 

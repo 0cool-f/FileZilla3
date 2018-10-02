@@ -338,7 +338,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 				msg.Printf(_("The file %s already exists.\nPlease enter a new name:"), notification.localFile);
 				CLocalPath fn(notification.localFile, &defaultName);
 				if (fn.empty() || defaultName.empty()) {
-					defaultName = _("new name");
+					defaultName = fztranslate("new name");
 				}
 			}
 			else {
@@ -372,7 +372,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 					}
 					else {
 						notification.overwriteAction = CFileExistsNotification::rename;
-						notification.newName = dlg.GetValue();
+						notification.newName = dlg.GetValue().ToStdWstring();
 
 						// If request got processed successfully, notify queue about filename change
 						if (entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification)) && m_pQueueView) {

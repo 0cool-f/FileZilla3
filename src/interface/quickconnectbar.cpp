@@ -135,7 +135,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 		break;
 	default:
 		{
-			const wxString prefix = server.server.GetPrefixFromProtocol(protocol);
+			std::wstring const prefix = server.server.GetPrefixFromProtocol(protocol);
 			if (!prefix.empty()) {
 				host = prefix + _T("://") + host;
 			}

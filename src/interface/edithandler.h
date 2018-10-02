@@ -150,7 +150,7 @@ protected:
 	void RemoveTemporaryFilesInSpecificDir(wxString const& temp);
 
 	std::wstring GetTemporaryFile(std::wstring name);
-	wxString TruncateFilename(wxString const path, wxString const& name, int max);
+	std::wstring TruncateFilename(std::wstring const& path, std::wstring const& name, size_t max);
 	bool FilenameExists(wxString const& file);
 
 	int DisplayChangeNotification(fileType type, std::list<t_fileData>::const_iterator iter, bool& remove);

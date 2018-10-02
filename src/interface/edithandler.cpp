@@ -322,17 +322,19 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, 
 	}
 	else {
 		data.file = fileName;
-		data.name = wxFileName(fileName).GetFullName();
+		data.name = wxFileName(fileName).GetFullName().ToStdWstring();
 		data.state = edit;
 	}
 	data.remotePath = remotePath;
 	data.server = server;
 
-	if (type == local && !COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL))
+	if (type == local && !COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
 		return StartEditing(local, data);
+	}
 
-	if (type == remote || StartEditing(type, data))
+	if (type == remote || StartEditing(type, data)) {
 		m_fileDataList[type].push_back(data);
+	}
 
 	return true;
 }
@@ -340,12 +342,14 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, 
 bool CEditHandler::Remove(const wxString& fileName)
 {
 	std::list<t_fileData>::iterator iter = GetFile(fileName);
-	if (iter == m_fileDataList[local].end())
+	if (iter == m_fileDataList[local].end()) {
 		return true;
+	}
 
 	wxASSERT(iter->state != upload && iter->state != upload_and_remove);
-	if (iter->state == upload || iter->state == upload_and_remove)
+	if (iter->state == upload || iter->state == upload_and_remove) {
 		return false;
+	}
 
 	m_fileDataList[local].erase(iter);
 
@@ -992,12 +996,12 @@ std::wstring CEditHandler::GetTemporaryFile(std::wstring name)
 #ifdef __WXMSW__
 	// MAX_PATH - 1 is theoretical limit, we subtract another 4 to allow
 	// editors which create temporary files
-	int max = MAX_PATH - 5;
+	size_t max = MAX_PATH - 5;
 #else
-	int max = -1;
+	size_t max = std::wstring::npos;
 #endif
-	if (max != -1) {
-		name = TruncateFilename(m_localDir, name, max).ToStdWstring();
+	if (max != std::wstring::npos) {
+		name = TruncateFilename(m_localDir, name, max);
 		if (name.empty()) {
 			return std::wstring();
 		}
@@ -1008,16 +1012,16 @@ std::wstring CEditHandler::GetTemporaryFile(std::wstring name)
 		return file;
 	}
 
-	if (max != -1) {
-		max--;
+	if (max != std::wstring::npos) {
+		--max;
 	}
 	int cutoff = 1;
 	int n = 1;
 	while (++n < 10000) { // Just to give up eventually
 		// Further reduce length if needed
-		if (max != -1 && n >= cutoff) {
+		if (max != std::wstring::npos && n >= cutoff) {
 			cutoff *= 10;
-			max--;
+			--max;
 			name = TruncateFilename(m_localDir, name, max);
 			if (name.empty()) {
 				return std::wstring();
@@ -1040,23 +1044,22 @@ std::wstring CEditHandler::GetTemporaryFile(std::wstring name)
 	return std::wstring();
 }
 
-wxString CEditHandler::TruncateFilename(const wxString path, const wxString& name, int max)
+std::wstring CEditHandler::TruncateFilename(std::wstring const& path, std::wstring const& name, size_t max)
 {
-	const int pathlen = path.Len();
-	const int namelen = name.Len();
-	if (namelen + pathlen > max)
-	{
-		int pos = name.Find('.', true);
-		if (pos != -1)
-		{
-			int extlen = namelen - pos;
+	size_t const pathlen = path.size();
+	size_t const namelen = name.size();
+
+	if (namelen + pathlen > max) {
+		size_t pos = name.rfind('.');
+		if (pos != std::wstring::npos) {
+			size_t extlen = namelen - pos;
 			if (pathlen + extlen >= max)
 			{
 				// Cannot truncate extension
-				return wxString();
+				return std::wstring();
 			}
 
-			return name.Left(max - pathlen - extlen) + name.Mid(pos);
+			return name.substr(0, max - pathlen - extlen) + name.substr(pos);
 		}
 	}
 

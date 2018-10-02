@@ -65,7 +65,7 @@ public:
 	const std::vector<t_fileInfo>& GetFiles() const { return m_fileList; }
 
 	void Reserve(size_t count);
-	void AddFile(const wxString& name, bool dir, int64_t size, bool link);
+	void AddFile(std::wstring const& name, bool dir, int64_t size, bool link);
 
 protected:
 	ServerWithCredentials server_;

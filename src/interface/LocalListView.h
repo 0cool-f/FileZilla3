@@ -77,7 +77,7 @@ protected:
 
 	virtual std::unique_ptr<CFileListCtrlSortBase> GetSortComparisonObject() override;
 
-	void RefreshFile(const wxString& file);
+	void RefreshFile(std::wstring const& file);
 
 	virtual void OnNavigationEvent(bool forward);
 

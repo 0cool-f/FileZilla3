@@ -178,20 +178,24 @@ void wxAuiNotebookEx::SetTabColour(size_t page, wxColour const& c)
 	}
 }
 
-void wxAuiNotebookEx::Highlight(size_t page, bool highlight /*=true*/)
+void wxAuiNotebookEx::Highlight(size_t page, bool highlight)
 {
-	if (GetSelection() == (int)page)
+	if (GetSelection() == (int)page) {
 		return;
+	}
 
 	wxASSERT(page < m_tabs.GetPageCount());
-	if (page >= m_tabs.GetPageCount())
+	if (page >= m_tabs.GetPageCount()) {
 		return;
+	}
 
-	if (page >= m_highlighted.size())
+	if (page >= m_highlighted.size()) {
 		m_highlighted.resize(page + 1, false);
+	}
 
-	if (highlight == m_highlighted[page])
+	if (highlight == m_highlighted[page]) {
 		return;
+	}
 
 	m_highlighted[page] = highlight;
 
@@ -201,8 +205,9 @@ void wxAuiNotebookEx::Highlight(size_t page, bool highlight /*=true*/)
 bool wxAuiNotebookEx::Highlighted(size_t page) const
 {
 	wxASSERT(page < m_tabs.GetPageCount());
-	if (page >= m_highlighted.size())
+	if (page >= m_highlighted.size()) {
 		return false;
+	}
 
 	return m_highlighted[page];
 }

@@ -1114,14 +1114,14 @@ bool CSiteManagerDialog::UpdateItem()
 		if (!pServer || !pServer->m_site) {
 			return false;
 		}
-		data->m_bookmark->m_name = pTree->GetItemText(item);
+		data->m_bookmark->m_name = pTree->GetItemText(item).ToStdWstring();
 		return UpdateBookmark(*data->m_bookmark, pServer->m_site->server_);
 	}
 }
 
 bool CSiteManagerDialog::UpdateBookmark(Bookmark &bookmark, ServerWithCredentials const& server)
 {
-	bookmark.m_localDir = xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetValue);
+	bookmark.m_localDir = xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
 	bookmark.m_remoteDir = CServerPath();
 	bookmark.m_remoteDir.SetType(server.server.GetType());
 	bookmark.m_remoteDir.SetPath(xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
