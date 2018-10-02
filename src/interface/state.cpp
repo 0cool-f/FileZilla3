@@ -839,13 +839,13 @@ void DoHandleDroppedFiles(CState & state, CMainFrame & mainFrame, T const& files
 	wchar_t* from = new wchar_t[len];
 	wchar_t* p = from;
 	for (auto const& file : files) {
-		memcpy(p, file.c_str(), (file.size() + 1) * sizeof(wchar_t));
+		memcpy(p, static_cast<wchar_t const*>(file.c_str()), (file.size() + 1) * sizeof(wchar_t));
 		p += file.size() + 1;
 	}
 	*p = 0; // End of list
 
 	wchar_t* to = new wchar_t[path.GetPath().size() + 2];
-	memcpy(to, path.GetPath().c_str(), (path.GetPath().size() + 1) * sizeof(wchar_t));
+	memcpy(to, static_cast<wchar_t const*>(path.GetPath().c_str()), (path.GetPath().size() + 1) * sizeof(wchar_t));
 	to[path.GetPath().size() + 1] = 0; // End of list
 
 	SHFILEOPSTRUCT op = { 0 };
