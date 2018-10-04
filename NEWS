@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.37.4 (2018-09-04)
+
+- MSW: Fix regression introduced in 3.37.3 with moving files locally using drag&drop
+
 3.37.3 (2018-09-28)
 
 - Fix issues with directory creation when uploading many files in parallel
