@@ -35,7 +35,7 @@ uninstall-local:
 # ----------------------------------------------------------------------------
 
 # the programs we use (TODO: use configure to detect them)
-MSGFMT=@msgfmt@ -c --verbose
+MSGFMT=@msgfmt@ -c --verbose --no-hash
 MSGMERGE=@msgmerge@
 XGETTEXT=@xgettext@
 
