@@ -11,6 +11,8 @@
 #include "remote_recursive_operation.h"
 #include "state.h"
 
+#include <libfilezilla/file.hpp>
+
 BEGIN_EVENT_TABLE(CClearPrivateDataDialog, wxDialogEx)
 EVT_TIMER(wxID_ANY, CClearPrivateDataDialog::OnTimer)
 END_EVENT_TABLE()
@@ -101,7 +103,7 @@ void CClearPrivateDataDialog::Run()
 			}
 		}
 		CInterProcessMutex mutex(MUTEX_SITEMANAGER);
-		RemoveXmlFile(_T("sitemanager"));
+		RemoveXmlFile(L"sitemanager");
 	}
 
 	if (pQueueCheck->GetValue()) {
@@ -109,7 +111,7 @@ void CClearPrivateDataDialog::Run()
 		m_pMainFrame->GetQueue()->RemoveAll();
 
 		CInterProcessMutex mutex(MUTEX_QUEUE);
-		RemoveXmlFile(_T("queue"));
+		RemoveXmlFile(L"queue");
 	}
 }
 
@@ -164,18 +166,11 @@ bool CClearPrivateDataDialog::ClearReconnect()
 	return true;
 }
 
-void CClearPrivateDataDialog::RemoveXmlFile(const wxString& name)
+void CClearPrivateDataDialog::RemoveXmlFile(std::wstring const& name)
 {
-	{
-		wxFileName fn(COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR), name + _T(".xml"));
-		if (fn.FileExists()) {
-			wxRemoveFile(fn.GetFullPath());
-		}
-	}
-	{
-		wxFileName fn(COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR), name + _T(".xml~"));
-		if (fn.FileExists()) {
-			wxRemoveFile(fn.GetFullPath());
-		}
+	std::wstring const path = COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR);
+	if (!name.empty() && !path.empty()) {
+		fz::remove_file(fz::to_native(path + name + L".xml"));
+		fz::remove_file(fz::to_native(path + name + L".xml~"));
 	}
 }

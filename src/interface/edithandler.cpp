@@ -9,6 +9,7 @@
 #include "window_state_manager.h"
 #include "xrc_helper.h"
 
+#include <libfilezilla/file.hpp>
 #include <libfilezilla/local_filesys.hpp>
 
 class CChangedFileDialog : public wxDialogEx
@@ -92,16 +93,16 @@ void CEditHandler::RemoveTemporaryFiles(wxString const& temp)
 			continue;
 		}
 
-		RemoveTemporaryFilesInSpecificDir(temp + file + sep);
+		RemoveTemporaryFilesInSpecificDir((temp + file + sep).ToStdWstring());
 	} while (dir.GetNext(&file));
 }
 
-void CEditHandler::RemoveTemporaryFilesInSpecificDir(wxString const& temp)
+void CEditHandler::RemoveTemporaryFilesInSpecificDir(std::wstring const& temp)
 {
-	const wxString lockfile = temp + L"fz3temp-lockfile";
+	std::wstring const lockfile = temp + L"fz3temp-lockfile";
 	if (wxFileName::FileExists(lockfile)) {
 #ifndef __WXMSW__
-		int fd = open(lockfile.mb_str(), O_RDWR | O_CLOEXEC, 0);
+		int fd = open(fz::to_string(lockfile).c_str(), O_RDWR | O_CLOEXEC, 0);
 		if (fd >= 0) {
 			// Try to lock 1 byte region in the lockfile. m_type specifies the byte to lock.
 			struct flock f = {};
@@ -118,10 +119,8 @@ void CEditHandler::RemoveTemporaryFilesInSpecificDir(wxString const& temp)
 			close(fd);
 		}
 #endif
-		{
-			wxLogNull log;
-			wxRemoveFile(lockfile);
-		}
+		fz::remove_file(fz::to_native(lockfile));
+
 		if (wxFileName::FileExists(lockfile)) {
 			return;
 		}
@@ -153,11 +152,13 @@ std::wstring CEditHandler::GetLocalDirectory()
 	// which will cause problems when calculating maximum allowed file
 	// length
 	wxString dir = tmpdir.GetLongPath();
-	if (dir.empty() || !wxFileName::DirExists(dir))
+	if (dir.empty() || !wxFileName::DirExists(dir)) {
 		return std::wstring();
+	}
 
-	if (dir.Last() != wxFileName::GetPathSeparator())
+	if (dir.Last() != wxFileName::GetPathSeparator()) {
 		dir += wxFileName::GetPathSeparator();
+	}
 
 	// On POSIX, the permissions of the created directory (700) ensure
 	// that this is a safe operation.
@@ -1593,12 +1594,14 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 #endif
 		wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if (dlg.ShowModal() != wxID_OK)
+	if (dlg.ShowModal() != wxID_OK) {
 		return;
+	}
 
 	wxString editor = dlg.GetPath();
-	if (editor.empty())
+	if (editor.empty()) {
 		return;
+	}
 
 	if (!ProgramExists(editor)) {
 		XRCCTRL(*this, "ID_EDITOR", wxWindow)->SetFocus();
@@ -1606,8 +1609,9 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 		return;
 	}
 
-	if (editor.Find(' ') != -1)
+	if (editor.Find(' ') != -1) {
 		editor = _T("\"") + editor + _T("\"");
+	}
 
 	XRCCTRL(*this, "ID_CUSTOM", wxTextCtrl)->ChangeValue(editor);
 }
@@ -1641,8 +1645,9 @@ bool CEditHandler::Edit(CEditHandler::fileType type, std::vector<FileData> const
 		dlg.SetTitle(_("Confirmation needed"));
 		dlg.AddText(_("You have selected more than 10 files for editing, do you really want to continue?"));
 
-		if (!dlg.Run())
+		if (!dlg.Run()) {
 			return false;
+		}
 	}
 
 	bool success = true;
@@ -1686,10 +1691,12 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 	}
 
 	fileState state;
-	if (type == local)
+	if (type == local) {
 		state = GetFileState(file.name);
-	else
+	}
+	else {
 		state = GetFileState(file.name, path, server);
+	}
 	switch (state)
 	{
 	case CEditHandler::download:

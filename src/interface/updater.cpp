@@ -507,8 +507,7 @@ UpdaterState CUpdater::ProcessFinishedDownload()
 		s = UpdaterState::newversion;
 	}
 	else if (!VerifyChecksum(temp, version_information_.available_.size_, version_information_.available_.hash_)) {
-		wxLogNull log;
-		wxRemoveFile(temp);
+		fz::remove_file(fz::to_native(temp));
 		s = UpdaterState::newversion;
 	}
 	else {
@@ -519,7 +518,7 @@ UpdaterState CUpdater::ProcessFinishedDownload()
 		wxLogNull log;
 		if (local_file.empty() || !wxRenameFile(temp, local_file, false)) {
 			s = UpdaterState::newversion;
-			wxRemoveFile(temp);
+			fz::remove_file(fz::to_native(temp));
 			log_ += fz::sprintf(_("Could not create local file %s\n"), local_file);
 		}
 		else {

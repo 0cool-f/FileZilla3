@@ -21,7 +21,7 @@ protected:
 
 	bool ClearReconnect();
 
-	void RemoveXmlFile(const wxString& name);
+	void RemoveXmlFile(std::wstring const& name);
 
 	CMainFrame* const m_pMainFrame;
 

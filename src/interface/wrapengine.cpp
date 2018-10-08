@@ -6,6 +6,7 @@
 #include "buildinfo.h"
 #include "Options.h"
 
+#include <libfilezilla/file.hpp>
 #include <libfilezilla/local_filesys.hpp>
 
 #include <wx/statbox.h>
@@ -892,31 +893,35 @@ CWrapEngine::CWrapEngine()
 	CheckLanguage();
 }
 
-static wxString GetLocaleFile(const wxString& localesDir, wxString name)
+static wxString GetLocaleFile(wxString const& localesDir, wxString name)
 {
-	if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo")))
+	if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo"))) {
 		return name;
-	if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo")))
+	}
+	if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo"))) {
 		return name + _T("/LC_MESSAGES");
+	}
 
 	size_t pos = name.Find('@');
-	if (pos > 0)
-	{
+	if (pos > 0) {
 		name = name.Left(pos);
-		if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo")))
+		if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo"))) {
 			return name;
-		if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo")))
+		}
+		if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo"))) {
 			return name + _T("/LC_MESSAGES");
+		}
 	}
 
 	pos = name.Find('_');
-	if (pos > 0)
-	{
+	if (pos > 0) {
 		name = name.Left(pos);
-		if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo")))
+		if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo"))) {
 			return name;
-		if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo")))
+		}
+		if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo"))) {
 			return name + _T("/LC_MESSAGES");
+		}
 	}
 
 	return wxString();
@@ -1085,9 +1090,10 @@ void CWrapEngine::ClearCache()
 	// We have to synchronize access to layout.xml so that multiple processes don't write
 	// to the same file or one is reading while the other one writes.
 	CInterProcessMutex mutex(MUTEX_LAYOUT);
-	wxFileName file(COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR), _T("layout.xml"));
-	if (file.FileExists())
-		wxRemoveFile(file.GetFullPath());
+	std::wstring const path = COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR);
+	if (!path.empty()) {
+		fz::remove_file(fz::to_native(path + L"layout.xml"));
+	}
 }
 
 void CWrapEngine::CheckLanguage()

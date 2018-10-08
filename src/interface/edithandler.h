@@ -147,7 +147,7 @@ protected:
 	wxTimer m_busyTimer;
 
 	void RemoveTemporaryFiles(wxString const& temp);
-	void RemoveTemporaryFilesInSpecificDir(wxString const& temp);
+	void RemoveTemporaryFilesInSpecificDir(std::wstring const& temp);
 
 	std::wstring GetTemporaryFile(std::wstring name);
 	std::wstring TruncateFilename(std::wstring const& path, std::wstring const& name, size_t max);
