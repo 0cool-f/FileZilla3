@@ -251,7 +251,10 @@ std::wstring CBuildInfo::GetCPUCaps(char separator)
 
 	int const max = reg[0];
 
-	// function (aka leave), subfunction (subleave), register, bit, description
+	cpuid(0x80000000, 0, reg);
+	int const extmax = reg[0];
+
+	// function (aka leaf), subfunction (subleaf), register, bit, description
 	std::tuple<int, int, int, int, std::wstring> const caps[] = {
 		std::make_tuple(1, 0, 3, 25, L"sse"),
 		std::make_tuple(1, 0, 3, 26, L"sse2"),
@@ -266,18 +269,25 @@ std::wstring CBuildInfo::GetCPUCaps(char separator)
 		std::make_tuple(1, 0, 2, 30, L"rdrnd"),
 		std::make_tuple(7, 0, 1, 3,  L"bmi2"),
 		std::make_tuple(7, 0, 1, 8,  L"bmi2"),
-		std::make_tuple(7, 0, 1, 19, L"adx")
+		std::make_tuple(7, 0, 1, 19, L"adx"),
+		std::make_tuple(0x80000001, 0, 3, 29, L"lm")
 	};
 
 	for (auto const& cap : caps) {
-		if (max >= std::get<0>(cap)) {
-			cpuid(std::get<0>(cap), std::get<1>(cap), reg);
-			if (reg[std::get<2>(cap)] & (1 << std::get<3>(cap))) {
-				if (!ret.empty()) {
-					ret += separator;
-				}
-				ret += std::get<4>(cap);
+		int const leaf = std::get<0>(cap);
+		if (leaf > 0 && max < leaf) {
+			continue;
+		}
+		if (leaf < 0 && leaf > extmax) {
+			continue;
+		}
+
+		cpuid(leaf, std::get<1>(cap), reg);
+		if (reg[std::get<2>(cap)] & (1 << std::get<3>(cap))) {
+			if (!ret.empty()) {
+				ret += separator;
 			}
+			ret += std::get<4>(cap);
 		}
 	}
 #endif
