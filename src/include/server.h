@@ -84,7 +84,8 @@ enum class ProtocolFeature
 	DirectoryRename,
 	PostLoginCommands,
 	S3Lifecycle,
-	RecursiveDelete
+	RecursiveDelete,
+	ServerAssignedHome
 };
 
 class Credentials;

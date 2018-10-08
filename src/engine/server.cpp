@@ -605,6 +605,12 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 			return true;
 		}
 		break;
+	case ProtocolFeature::ServerAssignedHome:
+		if (protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP ||
+			protocol == SFTP) {
+			return true;
+		}
+		break;
 	}
 	return false;
 }
