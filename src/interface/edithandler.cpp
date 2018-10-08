@@ -98,12 +98,11 @@ void CEditHandler::RemoveTemporaryFiles(wxString const& temp)
 
 void CEditHandler::RemoveTemporaryFilesInSpecificDir(wxString const& temp)
 {
-	const wxString lockfile = temp + _("fz3temp-lockfile");
+	const wxString lockfile = temp + L"fz3temp-lockfile";
 	if (wxFileName::FileExists(lockfile)) {
 #ifndef __WXMSW__
 		int fd = open(lockfile.mb_str(), O_RDWR | O_CLOEXEC, 0);
-		if (fd >= 0)
-		{
+		if (fd >= 0) {
 			// Try to lock 1 byte region in the lockfile. m_type specifies the byte to lock.
 			struct flock f = {};
 			f.l_type = F_WRLCK;
@@ -123,8 +122,9 @@ void CEditHandler::RemoveTemporaryFilesInSpecificDir(wxString const& temp)
 			wxLogNull log;
 			wxRemoveFile(lockfile);
 		}
-		if (wxFileName::FileExists(lockfile))
+		if (wxFileName::FileExists(lockfile)) {
 			return;
+		}
 	}
 
 	wxLogNull log;
