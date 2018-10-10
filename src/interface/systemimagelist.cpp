@@ -1,6 +1,7 @@
 #include <filezilla.h>
 #include "systemimagelist.h"
 
+#include "file_utils.h"
 #include "themeprovider.h"
 #ifdef __WXMSW__
 #include "shlobj.h"
@@ -79,9 +80,9 @@ bool CSystemImageList::CreateSystemImageList(int size)
 #else
 	m_pImageList = new wxImageListEx(size, size);
 
-	wxBitmap file = CThemeProvider::Get()->CreateBitmap(_T("ART_FILE"),  wxART_OTHER, wxSize(size, size));
-	wxBitmap folderclosed = CThemeProvider::Get()->CreateBitmap(_T("ART_FOLDERCLOSED"),  wxART_OTHER, wxSize(size, size));
-	wxBitmap folder = CThemeProvider::Get()->CreateBitmap(_T("ART_FOLDER"),  wxART_OTHER, wxSize(size, size));
+	wxBitmap file = CThemeProvider::Get()->CreateBitmap(L"ART_FILE",  wxART_OTHER, wxSize(size, size));
+	wxBitmap folderclosed = CThemeProvider::Get()->CreateBitmap(L"ART_FOLDERCLOSED",  wxART_OTHER, wxSize(size, size));
+	wxBitmap folder = CThemeProvider::Get()->CreateBitmap(L"ART_FOLDER",  wxART_OTHER, wxSize(size, size));
 	m_pImageList->Add(file);
 	m_pImageList->Add(folderclosed);
 	m_pImageList->Add(folder);
@@ -124,7 +125,7 @@ wxBitmap PrepareIcon(wxIcon icon, wxSize size)
 }
 #endif
 
-int CSystemImageList::GetIconIndex(iconType type, const wxString& fileName /*=_T("")*/, bool physical /*=true*/, bool symlink /*=false*/)
+int CSystemImageList::GetIconIndex(iconType type, std::wstring const& fileName, bool physical, bool symlink)
 {
 	if (!m_pImageList) {
 		return -1;
@@ -137,7 +138,7 @@ int CSystemImageList::GetIconIndex(iconType type, const wxString& fileName /*=_T
 
 	SHFILEINFO shFinfo;
 	memset(&shFinfo, 0, sizeof(SHFILEINFO));
-	if (SHGetFileInfo(!fileName.empty() ? fileName.wc_str() : _T("{B97D3074-1830-4b4a-9D8A-17A38B074052}"),
+	if (SHGetFileInfo(!fileName.empty() ? fileName.c_str() : L"{B97D3074-1830-4b4a-9D8A-17A38B074052}",
 		(type != iconType::file) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL,
 		&shFinfo,
 		sizeof(SHFILEINFO),
@@ -164,21 +165,20 @@ int CSystemImageList::GetIconIndex(iconType type, const wxString& fileName /*=_T
 		return symlink ? 5 : 2;
 	}
 
-	wxFileName fn(fileName);
-	wxString ext = fn.GetExt();
+	std::wstring ext = GetExtension(fileName);
 	if (ext.empty()) {
 		return icon;
 	}
 
 	if (symlink) {
 		auto cacheIter = m_iconCache.find(ext);
-		if (cacheIter != m_iconCache.end()) {
+		if (cacheIter != m_iconCache.cend()) {
 			return cacheIter->second;
 		}
 	}
 	else {
 		auto cacheIter = m_iconSymlinkCache.find(ext);
-		if (cacheIter != m_iconSymlinkCache.end()) {
+		if (cacheIter != m_iconSymlinkCache.cend()) {
 			return cacheIter->second;
 		}
 	}

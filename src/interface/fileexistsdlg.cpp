@@ -1,5 +1,6 @@
 #include <filezilla.h>
 #include "fileexistsdlg.h"
+#include "file_utils.h"
 #include "Options.h"
 #include "sizeformatting.h"
 #include "timeformatting.h"
@@ -47,8 +48,9 @@ void CFileExistsDlg::DisplayFile(bool left, wxString name, int64_t size, fz::dat
 	}
 
 	wxString timeStr = _("Date/time unknown");
-	if (!time.empty())
+	if (!time.empty()) {
 		timeStr = CTimeFormat::Format(time);
+	}
 
 	xrc_call(*this, left ? "ID_FILE1_NAME" : "ID_FILE2_NAME", &wxStaticText::SetLabel, name);
 	xrc_call(*this, left ? "ID_FILE1_SIZE" : "ID_FILE2_SIZE", &wxStaticText::SetLabel, sizeStr);
@@ -118,10 +120,10 @@ void CFileExistsDlg::LoadIcon(int id, const wxString &file)
 
 #endif //__WXMSW__
 
-	wxFileName fn(file);
-	wxString ext = fn.GetExt();
-	if (ext.empty())
+	std::wstring ext = GetExtension(file.ToStdWstring());
+	if (ext.empty()) {
 		return;
+	}
 
 	wxFileType *pType = wxTheMimeTypesManager->GetFileTypeFromExtension(ext);
 	if (pType) {
@@ -166,22 +168,30 @@ void CFileExistsDlg::LoadIcon(int id, const wxString &file)
 
 void CFileExistsDlg::OnOK(wxCommandEvent&)
 {
-	if (xrc_call(*this, "ID_ACTION1", &wxRadioButton::GetValue))
+	if (xrc_call(*this, "ID_ACTION1", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::overwrite;
-	else if (xrc_call(*this, "ID_ACTION2", &wxRadioButton::GetValue))
+	}
+	else if (xrc_call(*this, "ID_ACTION2", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::overwriteNewer;
-	else if (xrc_call(*this, "ID_ACTION3", &wxRadioButton::GetValue))
+	}
+	else if (xrc_call(*this, "ID_ACTION3", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::resume;
-	else if (xrc_call(*this, "ID_ACTION4", &wxRadioButton::GetValue))
+	}
+	else if (xrc_call(*this, "ID_ACTION4", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::rename;
-	else if (xrc_call(*this, "ID_ACTION5", &wxRadioButton::GetValue))
+	}
+	else if (xrc_call(*this, "ID_ACTION5", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::skip;
-	else if (xrc_call(*this, "ID_ACTION6", &wxRadioButton::GetValue))
+	}
+	else if (xrc_call(*this, "ID_ACTION6", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::overwriteSizeOrNewer;
-	else if (xrc_call(*this, "ID_ACTION7", &wxRadioButton::GetValue))
+	}
+	else if (xrc_call(*this, "ID_ACTION7", &wxRadioButton::GetValue)) {
 		m_action = CFileExistsNotification::overwriteSize;
-	else
+	}
+	else {
 		m_action = CFileExistsNotification::overwrite;
+	}
 
 	m_always = xrc_call(*this, "ID_ALWAYS", &wxCheckBox::GetValue);
 	m_directionOnly = xrc_call(*this, "ID_UPDOWNONLY", &wxCheckBox::GetValue);
@@ -224,8 +234,9 @@ wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
 	const int maxWidth = (int)(DESKTOP_WIDTH * 0.75);
 
 	// If the path is already short enough, don't change it
-	if (string_width <= maxWidth || path.Length() < 20)
+	if (string_width <= maxWidth || path.Length() < 20) {
 		return path;
+	}
 
 	wxString fill = _T(" ");
 	fill += 0x2026; //unicode ellipsis character
@@ -250,8 +261,9 @@ wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
 			window->GetTextExtent(left, &leftWidth, &y);
 		}
 		else {
-			if (right.Len() <= 10)
+			if (right.Len() <= 10) {
 				break;
+			}
 
 			right = right.Mid(1);
 			window->GetTextExtent(right, &rightWidth, &y);
@@ -263,9 +275,11 @@ wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
 
 void CFileExistsDlg::OnCheck(wxCommandEvent& event)
 {
-	if (event.GetId() != XRCID("ID_UPDOWNONLY") && event.GetId() != XRCID("ID_QUEUEONLY"))
+	if (event.GetId() != XRCID("ID_UPDOWNONLY") && event.GetId() != XRCID("ID_QUEUEONLY")) {
 		return;
+	}
 
-	if (event.IsChecked())
+	if (event.IsChecked()) {
 		XRCCTRL(*this, "ID_ALWAYS", wxCheckBox)->SetValue(true);
+	}
 }

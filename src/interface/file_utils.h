@@ -10,14 +10,16 @@ bool PathExpand(wxString& cmd);
 wxString GetSystemOpenCommand(wxString file, bool &program_exists);
 
 // Returns a file:// URL
-wxString GetAsURL(wxString const& dir);
+std::wstring GetAsURL(std::wstring const& dir);
 
 // Opens specified directory in local file manager, e.g. Explorer on Windows
-bool OpenInFileManager(const wxString& dir);
+bool OpenInFileManager(std::wstring const& dir);
 
 bool RenameFile(wxWindow* pWnd, wxString dir, wxString from, wxString to);
 
 CLocalPath GetDownloadDir();
+
+std::wstring GetExtension(std::wstring const& file);
 
 class gui_recursive_remove final : public fz::recursive_remove
 {

@@ -11,18 +11,20 @@
 #include <wordexp.h>
 #endif
 
-wxString GetAsURL(wxString const& dir)
+std::wstring GetAsURL(std::wstring const& dir)
 {
 	// Cheap URL encode
-	wxString encoded;
-	std::string utf8 = fz::to_utf8(dir.ToStdWstring());
+	std::string utf8 = fz::to_utf8(dir);
+
+	std::wstring encoded;
+	encoded.reserve(utf8.size());
 
 	char const* p = utf8.c_str();
 	while (*p) {
 		// List of characters that don't need to be escaped taken
 		// from the BNF grammar in RFC 1738
 		// Again attention seeking Windows wants special treatment...
-		const unsigned char c = (unsigned char)*p++;
+		unsigned char const c = static_cast<unsigned char>(*p++);
 		if ((c >= 'a' && c <= 'z') ||
 			(c >= 'A' && c <= 'Z') ||
 			(c >= '0' && c <= '9') ||
@@ -46,48 +48,52 @@ wxString GetAsURL(wxString const& dir)
 			c == '=' ||
 			c == '/')
 		{
-			encoded += (wxChar)c;
+			encoded += c;
 		}
 #ifdef __WXMSW__
 		else if (c == '\\') {
 			encoded += '/';
 		}
 #endif
-		else
-			encoded += wxString::Format(_T("%%%x"), (unsigned int)c);
+		else {
+			encoded += fz::sprintf(L"%%%x", c);
+		}
 	}
 #ifdef __WXMSW__
-	if (encoded.Left(2) == _T("//")) {
+	if (fz::starts_with(encoded, std::wstring(L"//"))) {
 		// UNC path
-		encoded = encoded.Mid(2);
+		encoded = encoded.substr(2);
 	}
 	else {
-		encoded = _T("/") + encoded;
+		encoded = L"/" + encoded;
 	}
 #endif
-	return _T("file://") + encoded;
+	return L"file://" + encoded;
 }
 
-bool OpenInFileManager(const wxString& dir)
+bool OpenInFileManager(std::wstring const& dir)
 {
 	bool ret = false;
 #ifdef __WXMSW__
 	// Unfortunately under Windows, UTF-8 encoded file:// URLs don't work, so use native paths.
 	// Unfortunatelier, we cannot use this for UNC paths, have to use file:// here
 	// Unfortunateliest, we again have a problem with UTF-8 characters which we cannot fix...
-	if (dir.Left(2) != _T("\\\\") && dir != _T("/"))
+	if (dir.substr(0, 2) != L"\\\\" && dir != L"/") {
 		ret = wxLaunchDefaultBrowser(dir);
+	}
 	else
 #endif
 	{
-		wxString url = GetAsURL(dir);
-		if (!url.empty())
+		std::wstring url = GetAsURL(dir);
+		if (!url.empty()) {
 			ret = wxLaunchDefaultBrowser(url);
+		}
 	}
 
 
-	if (!ret)
+	if (!ret) {
 		wxBell();
+	}
 
 	return ret;
 }
@@ -97,41 +103,43 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 	wxFileName fn(file);
 
 	const wxString& ext = fn.GetExt();
-	if (ext.empty())
+	if (ext.empty()) {
 		return wxString();
+	}
 
 #ifdef __WXGTK__
 	for (;;)
 #endif
 	{
 		wxFileType* pType = wxTheMimeTypesManager->GetFileTypeFromExtension(ext);
-		if (!pType)
+		if (!pType) {
 			return wxString();
+		}
 
 		wxString cmd;
-		if (!pType->GetOpenCommand(&cmd, wxFileType::MessageParameters(file)))
-		{
+		if (!pType->GetOpenCommand(&cmd, wxFileType::MessageParameters(file))) {
 			delete pType;
 			return wxString();
 		}
 		delete pType;
 
-		if (cmd.empty())
+		if (cmd.empty()) {
 			return wxString();
+		}
 
 		program_exists = false;
 
 		wxString editor;
 		bool is_dde = false;
 #ifdef __WXMSW__
-		if (cmd.Left(7) == _T("WX_DDE#"))
-		{
+		if (cmd.Left(7) == _T("WX_DDE#")) {
 			// See wxWidget's wxExecute in src/msw/utilsexc.cpp
 			// WX_DDE#<command>#DDE_SERVER#DDE_TOPIC#DDE_COMMAND
 			editor = cmd.Mid(7);
 			int pos = editor.Find('#');
-			if (pos < 1)
+			if (pos < 1) {
 				return cmd;
+			}
 			editor = editor.Left(pos);
 			is_dde = true;
 		}
@@ -142,19 +150,21 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 		}
 
 		wxString args;
-		if (!UnquoteCommand(editor, args, is_dde) || editor.empty())
+		if (!UnquoteCommand(editor, args, is_dde) || editor.empty()) {
 			return cmd;
+		}
 
-		if (!PathExpand(editor))
+		if (!PathExpand(editor)) {
 			return cmd;
+		}
 
-		if (ProgramExists(editor))
+		if (ProgramExists(editor)) {
 			program_exists = true;
+		}
 
 #ifdef __WXGTK__
 		int pos = args.Find(file);
-		if (pos != -1 && file.Find(' ') != -1 && file[0] != '\'' && file[0] != '"')
-		{
+		if (pos != -1 && file.Find(' ') != -1 && file[0] != '\'' && file[0] != '"') {
 			// Might need to quote filename, wxWidgets doesn't do it
 			if ((!pos || (args[pos - 1] != '\'' && args[pos - 1] != '"')) &&
 				(pos + file.Length() >= args.Length() || (args[pos + file.Length()] != '\'' && args[pos + file.Length()] != '"')))
@@ -175,45 +185,46 @@ bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde)
 {
 	arguments.clear();
 
-	if (command.empty())
+	if (command.empty()) {
 		return true;
+	}
 
 	wxChar inQuotes = 0;
 	wxString file;
-	for (unsigned int i = 0; i < command.Len(); i++)
-	{
+	for (unsigned int i = 0; i < command.Len(); i++) {
 		const wxChar& c = command[i];
-		if (c == '"' || c == '\'')
-		{
-			if (!inQuotes)
+		if (c == '"' || c == '\'') {
+			if (!inQuotes) {
 				inQuotes = c;
-			else if (c != inQuotes)
+			}
+			else if (c != inQuotes) {
 				file += c;
-			else if (command[i + 1] == c)
-			{
+			}
+			else if (command[i + 1] == c) {
 				file += c;
 				i++;
 			}
-			else
+			else {
 				inQuotes = false;
+			}
 		}
-		else if (command[i] == ' ' && !inQuotes)
-		{
+		else if (command[i] == ' ' && !inQuotes) {
 			arguments = command.Mid(i + 1);
 			arguments.Trim(false);
 			break;
 		}
-		else if (is_dde && !inQuotes && (command[i] == ',' || command[i] == '#'))
-		{
+		else if (is_dde && !inQuotes && (command[i] == ',' || command[i] == '#')) {
 			arguments = command.Mid(i + 1);
 			arguments.Trim(false);
 			break;
 		}
-		else
+		else {
 			file += command[i];
+		}
 	}
-	if (inQuotes)
+	if (inQuotes) {
 		return false;
+	}
 
 	command = file;
 
@@ -222,12 +233,14 @@ bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde)
 
 bool ProgramExists(const wxString& editor)
 {
-	if (wxFileName::FileExists(editor))
+	if (wxFileName::FileExists(editor)) {
 		return true;
+	}
 
 #ifdef __WXMAC__
-	if (editor.Right(4) == _T(".app") && wxFileName::DirExists(editor))
+	if (editor.Right(4) == _T(".app") && wxFileName::DirExists(editor)) {
 		return true;
+	}
 #endif
 
 	return false;
@@ -236,34 +249,38 @@ bool ProgramExists(const wxString& editor)
 bool PathExpand(wxString& cmd)
 {
 #ifndef __WXMSW__
-	if (!cmd.empty() && cmd[0] == '/')
+	if (!cmd.empty() && cmd[0] == '/') {
 		return true;
+	}
 #else
-	if (!cmd.empty() && cmd[0] == '\\')
+	if (!cmd.empty() && cmd[0] == '\\') {
 		// UNC or root of current working dir, whatever that is
 		return true;
-	if (cmd.Len() > 2 && cmd[1] == ':')
+	}
+	if (cmd.Len() > 2 && cmd[1] == ':') {
 		// Absolute path
 		return true;
+	}
 #endif
 
 	// Need to search for program in $PATH
 	wxString path;
-	if (!wxGetEnv(_T("PATH"), &path))
+	if (!wxGetEnv(_T("PATH"), &path)) {
 		return false;
+	}
 
 	wxString full_cmd;
 	bool found = wxFindFileInPath(&full_cmd, path, cmd);
 #ifdef __WXMSW__
-	if (!found && cmd.Right(4).Lower() != _T(".exe"))
-	{
+	if (!found && cmd.Right(4).Lower() != _T(".exe")) {
 		cmd += _T(".exe");
 		found = wxFindFileInPath(&full_cmd, path, cmd);
 	}
 #endif
 
-	if (!found)
+	if (!found) {
 		return false;
+	}
 
 	cmd = full_cmd;
 	return true;
@@ -336,15 +353,15 @@ extern "C" typedef HRESULT (WINAPI *tSHGetKnownFolderPath)(const GUID& rfid, DWO
 #elif defined __WXMAC__
 extern "C" char const* GetDownloadDirImpl();
 #else
-wxString ShellUnescape( wxString const& path )
+wxString ShellUnescape(wxString const& path)
 {
 	wxString ret;
 
 	const wxWX2MBbuf buf = path.mb_str();
-	if( buf && *buf ) {
+	if (buf && *buf) {
 		wordexp_t p;
-		int res = wordexp( buf, &p, WRDE_NOCMD );
-		if( !res && p.we_wordc == 1 && p.we_wordv ) {
+		int res = wordexp(buf, &p, WRDE_NOCMD);
+		if (!res && p.we_wordc == 1 && p.we_wordv) {
 			ret = wxString(p.we_wordv[0], wxConvLocal);
 		}
 		wordfree(&p);
@@ -392,16 +409,18 @@ CLocalPath GetDownloadDir()
 			wxTextFile textFile;
 			if (textFile.Open(dirsFile)) {
 				size_t i;
-				for (i = 0; i < textFile.GetLineCount(); i++) {
+				for (i = 0; i < textFile.GetLineCount(); ++i) {
 					wxString line(textFile[i]);
 					int pos = line.Find(wxT("XDG_DOWNLOAD_DIR"));
 					if (pos != wxNOT_FOUND) {
 						wxString value = line.AfterFirst(wxT('='));
 						value = ShellUnescape(value);
-						if (!value.empty() && wxDirExists(value))
+						if (!value.empty() && wxDirExists(value)) {
 							return CLocalPath(value.ToStdWstring());
-						else
+						}
+						else {
 							break;
+						}
 					}
 				}
 			}
@@ -409,4 +428,18 @@ CLocalPath GetDownloadDir()
 	}
 #endif
 	return CLocalPath(wxStandardPaths::Get().GetDocumentsDir().ToStdWstring());
+}
+
+std::wstring GetExtension(std::wstring const& file)
+{
+#ifdef FZ_WINDOWS
+	size_t pos = file.find_last_of(L"./\\");
+#else
+	size_t pos = file.find_last_of(L"./");
+#endif
+	if (pos != std::wstring::npos && pos != 0 && file[pos] == '.') {
+		return file.substr(pos + 1);
+	}
+
+	return std::wstring();
 }

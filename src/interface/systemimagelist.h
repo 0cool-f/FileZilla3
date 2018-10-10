@@ -40,7 +40,7 @@ public:
 
 	wxImageList* GetSystemImageList() { return m_pImageList; }
 
-	int GetIconIndex(iconType type, wxString const& fileName = wxString(), bool physical = true, bool symlink = false);
+	int GetIconIndex(iconType type, std::wstring const& fileName = std::wstring(), bool physical = true, bool symlink = false);
 
 #ifdef __WXMSW__
 	int GetLinkOverlayIndex();
@@ -50,8 +50,8 @@ private:
 	wxImageListEx *m_pImageList{};
 
 #ifndef __WXMSW__
-	std::map<wxString, int> m_iconCache;
-	std::map<wxString, int> m_iconSymlinkCache;
+	std::map<std::wstring, int> m_iconCache;
+	std::map<std::wstring, int> m_iconSymlinkCache;
 #endif
 };
 

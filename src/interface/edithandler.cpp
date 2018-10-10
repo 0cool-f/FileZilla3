@@ -949,32 +949,35 @@ wxString CEditHandler::GetCustomOpenCommand(const wxString& file, bool& program_
 	wxString associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS) + _T("\n");
 	associations.Replace(_T("\r"), _T(""));
 	int pos;
-	while ((pos = associations.Find('\n')) != -1)
-	{
+	while ((pos = associations.Find('\n')) != -1) {
 		wxString assoc = associations.Left(pos);
 		associations = associations.Mid(pos + 1);
 
-		if (assoc.empty())
+		if (assoc.empty()) {
 			continue;
+		}
 
 		wxString command;
-		if (!UnquoteCommand(assoc, command))
+		if (!UnquoteCommand(assoc, command)) {
 			continue;
+		}
 
-		if (assoc != ext)
+		if (assoc != ext) {
 			continue;
+		}
 
 		wxString prog = command;
 
 		wxString args;
-		if (!UnquoteCommand(prog, args))
+		if (!UnquoteCommand(prog, args)) {
 			return wxString();
+		}
 
-		if (prog.empty())
+		if (prog.empty()) {
 			return wxString();
+		}
 
-		if (!ProgramExists(prog))
-		{
+		if (!ProgramExists(prog)) {
 			program_exists = false;
 			return prog;
 		}
