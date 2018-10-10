@@ -45,7 +45,7 @@ private:
 class OSXSandboxUserdirsDialog final : public wxDialogEx
 {
 public:
-	void Run(wxWindow* parent);
+	void Run(wxWindow* parent, bool initial = false);
 
 private:
 	void DisplayCurrentDirs();

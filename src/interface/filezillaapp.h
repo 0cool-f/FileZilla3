@@ -7,6 +7,8 @@
 
 class CWrapEngine;
 class CCommandLine;
+class CThemeProvider;
+
 class CFileZillaApp : public wxApp
 {
 public:
@@ -70,6 +72,8 @@ protected:
 
 	fz::monotonic_clock m_profile_start;
 	std::vector<std::pair<fz::monotonic_clock, std::string>> m_startupProfile;
+
+	std::unique_ptr<CThemeProvider> themeProvider_;
 };
 
 DECLARE_APP(CFileZillaApp)

@@ -260,7 +260,7 @@ void OSXSandboxUserdirs::Remove(std::wstring const& dir)
 	Save();
 }
 
-void OSXSandboxUserdirsDialog::Run(wxWindow* parent)
+void OSXSandboxUserdirsDialog::Run(wxWindow* parent, bool initial)
 {
 	if (!Load(parent, L"ID_OSX_SANDBOX_USERDIRS")) {
 		wxBell();
@@ -270,9 +270,17 @@ void OSXSandboxUserdirsDialog::Run(wxWindow* parent)
 	WrapRecursive(this, GetSizer(), ConvertDialogToPixels(wxSize(250, -1)).x);
 	GetSizer()->Fit(this);
 
-
 	XRCCTRL(*this, "ID_ADD", wxButton)->Bind(wxEVT_BUTTON, &OSXSandboxUserdirsDialog::OnAdd, this);
 	XRCCTRL(*this, "ID_REMOVE", wxButton)->Bind(wxEVT_BUTTON, &OSXSandboxUserdirsDialog::OnRemove, this);
+
+	XRCCTRL(*this, "wxID_OK", wxButton)->Bind(wxEVT_BUTTON, [initial](wxCommandEvent& evt) {
+		if (initial && OSXSandboxUserdirs::Get().GetDirs().empty()) {
+			wxMessageBox(_("Please add at least one directory you want to download files into or to upload files from."), _("No directory added"));
+		}
+		else {
+			evt.Skip();
+		}
+	});
 
 	DisplayCurrentDirs();
 

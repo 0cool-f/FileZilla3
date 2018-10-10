@@ -4,9 +4,6 @@
 #include "Options.h"
 #include "themeprovider.h"
 #include "xrc_helper.h"
-#if USE_MAC_SANDBOX
-#include "osx_sandbox_userdirs.h"
-#endif
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/statline.h>
@@ -94,7 +91,7 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 	auto helpHeading = new wxStaticText(this, -1, _("Getting help"));
 	helpHeading->SetFont(helpHeading->GetFont().Bold());
 	main->Add(helpHeading);
-	
+
 	main->Add(new wxHyperlinkCtrl(this, -1, _("Asking questions in the FileZilla Forums"), wxString::Format(url, _T("support_forum"))), 0, wxLEFT, leftIndent);
 	main->Add(new wxHyperlinkCtrl(this, -1, _("Reporting bugs and feature requests"), wxString::Format(url, _T("support_more"))), 0, wxLEFT, leftIndent);
 
@@ -135,13 +132,6 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 void CWelcomeDialog::OnTimer(wxTimerEvent&)
 {
 	Run(parent_, false);
-#if USE_MAC_SANDBOX
-        if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
-                OSXSandboxUserdirsDialog dlg;
-                dlg.Run(parent_);
-        }
-#endif
-
 	Destroy();
 }
 

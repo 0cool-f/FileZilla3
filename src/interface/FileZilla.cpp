@@ -10,6 +10,7 @@
 #include "cmdline.h"
 #include "welcome_dialog.h"
 #include "msgbox.h"
+#include "themeprovider.h"
 
 #include <libfilezilla/local_filesys.hpp>
 
@@ -288,19 +289,36 @@ USE AT OWN RISK"), _T("Important Information"));
 	CSessionManager::Init();
 #endif
 
+	themeProvider_ = std::make_unique<CThemeProvider>();
+
 	// Load the text wrapping engine
 	m_pWrapEngine = std::make_unique<CWrapEngine>();
 	m_pWrapEngine->LoadCache();
 
+	bool welcome_skip = false;
 #ifdef USE_MAC_SANDBOX
 	OSXSandboxUserdirs::Get().Load();
+
+    if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
+		CWelcomeDialog welcome;
+		welcome.Run(nullptr, false);
+		welcome_skip = true;
+
+        OSXSandboxUserdirsDialog dlg;
+        dlg.Run(nullptr, true);
+	    if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
+			return false;
+		}
+    }
 #endif
 
 	CMainFrame *frame = new CMainFrame();
 	frame->Show(true);
 	SetTopWindow(frame);
 
-	CWelcomeDialog::RunDelayed(frame);
+	if (!welcome_skip) {
+		CWelcomeDialog::RunDelayed(frame);
+	}
 
 	frame->ProcessCommandLine();
 	frame->PostInitialize();

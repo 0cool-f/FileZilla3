@@ -28,7 +28,6 @@ class Site;
 class CSplitterWindowEx;
 class CStatusView;
 class CState;
-class CThemeProvider;
 class CToolBar;
 class CWindowStateManager;
 
@@ -95,7 +94,6 @@ private:
 	CStatusView* m_pStatusView{};
 	CQueueView* m_pQueueView{};
 	CLed* m_pActivityLed[2];
-	CThemeProvider* m_pThemeProvider{};
 #if FZ_MANUALUPDATECHECK
 	CUpdater* m_pUpdater{};
 	virtual void UpdaterStateChanged( UpdaterState s, build const& v );

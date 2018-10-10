@@ -4033,6 +4033,12 @@
                   <default>1</default>
                 </object>
               </object>
+              <object class="button">
+                <object class="wxButton" name="wxID_CANCEL">
+                  <label>Cancel</label>
+                  <hidden>1</hidden>
+                </object>
+              </object>
             </object>
             <flag>wxGROW</flag>
           </object>

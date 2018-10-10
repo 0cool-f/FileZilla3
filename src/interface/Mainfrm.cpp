@@ -328,8 +328,6 @@ CMainFrame::CMainFrame()
 	SetIcons(CThemeProvider::GetIconBundle(_T("ART_FILEZILLA")));
 #endif
 
-	m_pThemeProvider = new CThemeProvider();
-
 	CPowerManagement::Create(this);
 
 	// It's important that the context control gets created before our own state handler

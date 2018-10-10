@@ -21,6 +21,10 @@
 #include "viewheader.h"
 #include "xmlfunctions.h"
 
+#ifdef USE_MAC_SANDBOX
+#include "osx_sandbox_userdirs.h"
+#endif
+
 #include <wx/wupdlock.h>
 
 DECLARE_EVENT_TYPE(fzEVT_TAB_CLOSING_DEFERRED, -1)
@@ -114,10 +118,17 @@ void CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, C
 		pState->GetRemoteRecursiveOperation()->SetQueue(m_mainFrame.GetQueue());
 
 		if (localPath.empty() || !pState->SetLocalDir(localPath)) {
+#ifdef USE_MAC_SANDBOX
+			auto const dirs = OSXSandboxUserdirs::Get().GetDirs();
+			if (dirs.empty() || !pState->SetLocalDir(dirs.front())) {
+				pState->SetLocalDir(L"/");
+			}
+#else
 			std::wstring const homeDir = wxGetHomeDir().ToStdWstring();
 			if (!pState->SetLocalDir(homeDir)) {
-				pState->SetLocalDir(_T("/"));
+				pState->SetLocalDir(L"/");
 			}
+#endif
 		}
 
 		CContextManager::Get()->SetCurrentContext(pState);
