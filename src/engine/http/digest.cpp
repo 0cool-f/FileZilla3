@@ -5,11 +5,9 @@
 
 #include <libfilezilla/encode.hpp>
 #include <libfilezilla/format.hpp>
+#include <libfilezilla/hash.hpp>
 #include <libfilezilla/uri.hpp>
 #include <libfilezilla/util.hpp>
-
-#include <nettle/md5.h>
-#include <nettle/sha2.h>
 
 namespace {
 void skipwscomma(char const*& p)
@@ -194,32 +192,6 @@ std::string quote(std::string const& in)
 	return "\"" + fz::replaced_substrings(fz::replaced_substrings(in, "\\", "\\\\"), "\"", "\\\"") + "\"";
 }
 
-std::string md5(std::string const& in)
-{
-	std::string md5;
-	md5.resize(16);
-
-	md5_ctx ctx_md5;
-	nettle_md5_init(&ctx_md5);
-	nettle_md5_update(&ctx_md5, in.size(), reinterpret_cast<uint8_t const*>(in.c_str()));
-	nettle_md5_digest(&ctx_md5, md5.size(), reinterpret_cast<uint8_t*>(&md5[0]));
-
-	return fz::hex_encode<std::string>(md5);
-}
-
-std::string sha256(std::string const& in)
-{
-	std::string sha256;
-	sha256.resize(32);
-
-	sha256_ctx ctx_sha256;
-	nettle_sha256_init(&ctx_sha256);
-	nettle_sha256_update(&ctx_sha256, in.size(), reinterpret_cast<uint8_t const*>(in.c_str()));
-	nettle_sha256_digest(&ctx_sha256, sha256.size(), reinterpret_cast<uint8_t*>(&sha256[0]));
-
-	return fz::hex_encode<std::string>(sha256);
-}
-
 template<typename T, typename K>
 typename T::mapped_type get(T const& t, K && key)
 {
@@ -268,12 +240,12 @@ std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int 
 		algo = algo.substr(0, algo.size() - 5);
 	}
 
-	std::string (*h)(std::string const&) = 0;
+	std::vector<uint8_t> (*h)(std::string const&) = 0;
 	if (algo == "MD5") {
-		h = &md5;
+		h = &fz::md5;
 	}
 	else if (algo == "SHA-256") {
-		h = &sha256;
+		h = &fz::sha256;
 	}
 	else {
 		logger.LogMessage(MessageType::Error, _("Server requested unsupported digest authentication algorithm: %s"), fullAlgorithm);
@@ -294,20 +266,20 @@ std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int 
 	std::string const cnonce = fz::base64_encode(std::string(bytes.cbegin(), bytes.cend()));
 	auth += ", cnonce=" + quote(cnonce);
 
-	std::string a1 = h(user + ":" + realm + ":" + fz::to_utf8(credentials.GetPass()));
-	std::string ha2 = h(verb + ":" + uri.to_string());
+	std::string a1 = fz::hex_encode<std::string>(h(user + ":" + realm + ":" + fz::to_utf8(credentials.GetPass())));
+	std::string ha2 = fz::hex_encode<std::string>(h(verb + ":" + uri.to_string()));
 
 	std::string response;
 	if (sess) {
-		a1 = h(a1 + ":" + nonce + ":" + cnonce);
+		a1 = fz::hex_encode<std::string>(h(a1 + ":" + nonce + ":" + cnonce));
 	}
 
 	if (qop) {
 		auth += ", qop=auth";
-		response = h(a1 + ":" + nonce + ":" + fz::sprintf("%x", nc) + ":" + cnonce + ":auth:" + ha2);
+		response = fz::hex_encode<std::string>(h(a1 + ":" + nonce + ":" + fz::sprintf("%x", nc) + ":" + cnonce + ":auth:" + ha2));
 	}
 	else {
-		response = h(a1 + ":" + nonce + ":" + ha2);
+		response = fz::hex_encode<std::string>(h(a1 + ":" + nonce + ":" + ha2));
 	}
 
 	auth += ", response=" + quote(response);
