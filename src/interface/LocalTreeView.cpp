@@ -371,7 +371,7 @@ wxTreeItemId CLocalTreeView::GetNearestParent(wxString& localDir)
 	if (localDir[0] == '/') {
 		localDir = localDir.Mid(1);
 	}
-		xTreeItemId root = GetRootItem();
+	wxTreeItemId root = GetRootItem();
 #endif
 
 	while (!localDir.empty()) {
@@ -833,7 +833,7 @@ void CLocalTreeView::RefreshListing()
 #ifdef __WXMSW__
 						-1
 #else
-						GetIconIndex(iconType::opened_dir, fullname)
+						GetIconIndex(iconType::opened_dir, fullname.ToStdWstring())
 #endif
 					);
 
