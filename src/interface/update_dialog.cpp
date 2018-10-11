@@ -296,7 +296,7 @@ void CUpdateDialog::OnInstall(wxCommandEvent&)
 	}
 
 	wxFileName fn(f);
-	OpenInFileManager(fn.GetPath());
+	OpenInFileManager(fn.GetPath().ToStdWstring());
 #endif
 }
 
