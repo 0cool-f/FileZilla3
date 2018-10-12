@@ -2,6 +2,7 @@
 
 #include "password_crypto.h"
 
+#include <libfilezilla/hash.hpp>
 #include <libfilezilla/util.hpp>
 
 #include <random>
@@ -100,48 +101,6 @@ std::vector<uint8_t> private_key::shared_secret(public_key const& pub) const
 	return ret;
 }
 
-namespace {
-class sha256 final
-{
-public:
-	sha256()
-	{
-		nettle_sha256_init(&ctx_);
-	}
-
-	sha256(sha256 const&) = delete;
-	sha256& operator=(sha256 const&) = delete;
-
-	operator std::vector<uint8_t>()
-	{
-		std::vector<uint8_t> ret;
-		ret.resize(32);
-
-		nettle_sha256_digest(&ctx_, 32, &ret[0]);
-
-		return ret;
-	}
-
-	sha256& operator<<(uint8_t in)
-	{
-		nettle_sha256_update(&ctx_, 1, &in);
-		return *this;
-	}
-
-	sha256& operator<<(std::vector<uint8_t> in)
-	{
-		if (!in.empty()) {
-			nettle_sha256_update(&ctx_, in.size(), &in[0]);
-		}
-		return *this;
-	}
-
-private:
-	sha256_ctx ctx_;
-};
-
-}
-
 std::vector<uint8_t> encrypt(std::vector<uint8_t> const& plain, public_key const& pub)
 {
 	std::vector<uint8_t> ret;
@@ -154,8 +113,8 @@ std::vector<uint8_t> encrypt(std::vector<uint8_t> const& plain, public_key const
 		std::vector<uint8_t> secret = ephemeral.shared_secret(pub);
 
 		// Derive AES2556 key and CTR nonce from shared secret
-		std::vector<uint8_t> aes_key = sha256() << ephemeral_pub.salt_ << 0 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
-		std::vector<uint8_t> ctr = sha256() << ephemeral_pub.salt_ << 1 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
+		std::vector<uint8_t> aes_key = fz::hash_accumulator(fz::hash_algorithm::sha256) << ephemeral_pub.salt_ << 0 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
+		std::vector<uint8_t> ctr = fz::hash_accumulator(fz::hash_algorithm::sha256) << ephemeral_pub.salt_ << 1 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
 
 		aes256_ctx ctx;
 		aes256_set_encrypt_key(&ctx, &aes_key[0]);
@@ -189,8 +148,8 @@ std::vector<uint8_t> decrypt(std::vector<uint8_t> const& cipher, private_key con
 
 		// Derive AES2556 key and CTR nonce from shared secret
 		public_key pub = priv.pubkey();
-		std::vector<uint8_t> aes_key = sha256() << ephemeral_pub.salt_ << 0 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
-		std::vector<uint8_t> ctr = sha256() << ephemeral_pub.salt_ << 1 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
+		std::vector<uint8_t> aes_key = fz::hash_accumulator(fz::hash_algorithm::sha256) << ephemeral_pub.salt_ << 0 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
+		std::vector<uint8_t> ctr = fz::hash_accumulator(fz::hash_algorithm::sha256) << ephemeral_pub.salt_ << 1 << secret << ephemeral_pub.key_ << pub.key_ << pub.salt_;
 
 		aes256_ctx ctx;
 		aes256_set_encrypt_key(&ctx, &aes_key[0]);

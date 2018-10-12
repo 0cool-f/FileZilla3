@@ -14,11 +14,10 @@
 #endif
 
 #include <libfilezilla/file.hpp>
+#include <libfilezilla/hash.hpp>
 #include <libfilezilla/local_filesys.hpp>
 
 #include <string>
-
-#include <nettle/sha2.h>
 
 BEGIN_EVENT_TABLE(CUpdater, wxEvtHandler)
 EVT_TIMER(wxID_ANY, CUpdater::OnTimer)
@@ -756,8 +755,7 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 		return false;
 	}
 
-	sha512_ctx state;
-	sha512_init(&state);
+	fz::hash_accumulator acc(fz::hash_algorithm::sha512);
 
 	{
 		fz::file f(fz::to_native(file), fz::file::reading);
@@ -768,7 +766,7 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 		unsigned char buffer[65536];
 		int64_t read;
 		while ((read = f.read(buffer, sizeof(buffer))) > 0) {
-			sha512_update(&state, static_cast<size_t>(read), buffer);
+			acc.update(buffer, static_cast<size_t>(read));
 		}
 		if (read < 0) {
 			log_ += fz::sprintf(_("Could not read from '%s'"), file) + L"\n";
@@ -776,11 +774,7 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 		}
 	}
 
-	std::string raw_digest;
-	raw_digest.resize(64);
-	sha512_digest(&state, 64, reinterpret_cast<uint8_t*>(&raw_digest[0]));
-
-	auto const digest = fz::hex_encode<std::wstring>(raw_digest);
+	auto const digest = fz::hex_encode<std::wstring>(acc.digest());
 
 	if (digest != checksum) {
 		log_ += fz::sprintf(_("Checksum mismatch on file %s\n"), file);
