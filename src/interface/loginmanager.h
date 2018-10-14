@@ -22,8 +22,8 @@ public:
 
 	void RememberPassword(ServerWithCredentials & server, std::wstring const& challenge = std::wstring());
 
-	bool AskDecryptor(public_key const& pub, bool allowForgotten, bool allowCancel);
-	private_key GetDecryptor(public_key const& pub);
+	bool AskDecryptor(fz::public_key const& pub, bool allowForgotten, bool allowCancel);
+	fz::private_key GetDecryptor(fz::public_key const& pub);
 
 protected:
 	bool DisplayDialogForEncrypted(ServerWithCredentials& server, std::wstring const& name);
@@ -45,7 +45,7 @@ protected:
 
 	std::list<t_passwordcache> m_passwordCache;
 
-	std::map<public_key, private_key> decryptors_;
+	std::map<fz::public_key, fz::private_key> decryptors_;
 };
 
 #endif

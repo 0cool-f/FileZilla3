@@ -2,9 +2,10 @@
 #define FILEZILLA_INTERFACE_SERVER_HEADER
 
 #include <server.h>
-#include <string>
 
-#include "password_crypto.h"
+#include <libfilezilla/encryption.hpp>
+
+#include <string>
 
 class ProtectedCredentials final : public Credentials
 {
@@ -19,10 +20,13 @@ public:
 	}
 
 	void Protect();
-	void Protect(public_key const& key);
-	bool Unprotect(private_key const& key, bool on_failure_set_to_ask = false);
+	void Protect(fz::public_key const& key);
+	bool Unprotect(fz::private_key const& key, bool on_failure_set_to_ask = false);
 
-	public_key encrypted_;
+	fz::public_key encrypted_;
+
+private:
+	bool DoUnprotect(fz::private_key const& key);
 };
 
 class ServerWithCredentials final

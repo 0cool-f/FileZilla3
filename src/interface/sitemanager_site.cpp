@@ -702,7 +702,7 @@ void CSiteManagerSite::UpdateSite(Site &site)
 
 	if (site.server_.credentials.encrypted_) {
 		if (!pw.empty()) {
-			site.server_.credentials.encrypted_ = public_key();
+			site.server_.credentials.encrypted_ = fz::public_key();
 			site.server_.credentials.SetPass(pw);
 		}
 	}

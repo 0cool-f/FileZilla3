@@ -210,12 +210,12 @@ void ProtectedCredentials::Protect()
 		}
 	}
 	else {
-		auto key = public_key::from_base64(fz::to_utf8(COptions::Get()->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+		auto key = fz::public_key::from_base64(fz::to_utf8(COptions::Get()->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
 		Protect(key);
 	}
 }
 
-void ProtectedCredentials::Protect(public_key const& key)
+void ProtectedCredentials::Protect(fz::public_key const& key)
 {
 	if (logonType_ != LogonType::normal && logonType_ != LogonType::account) {
 		password_.clear();
@@ -257,30 +257,21 @@ void ProtectedCredentials::Protect(public_key const& key)
 	}
 }
 
-bool ProtectedCredentials::Unprotect(private_key const& key, bool on_failure_set_to_ask)
+bool ProtectedCredentials::DoUnprotect(fz::private_key const& key)
 {
-	if (!encrypted_) {
-		return true;
-	}
-
 	if (!key || key.pubkey() != encrypted_) {
-		if (on_failure_set_to_ask) {
-			encrypted_ = public_key();
-			password_.clear();
-			logonType_ = LogonType::ask;
-		}
 		return false;
 	}
 
-	auto cipher = fz::base64_decode(fz::to_utf8(password_));
+	auto const cipher = fz::base64_decode(fz::to_utf8(password_));
 
-	auto plain = decrypt(cipher, key);
+	auto plain = fz::decrypt(cipher, key);
+	if (plain.empty()) {
+		// Compatibility with unauthenticated encryption, remove eventually.
+		plain = decrypt(cipher, key, false);
+	}
+
 	if (plain.size() < 16) {
-		if (on_failure_set_to_ask) {
-			encrypted_ = public_key();
-			password_.clear();
-			logonType_ = LogonType::ask;
-		}
 		return false;
 	}
 
@@ -289,10 +280,32 @@ bool ProtectedCredentials::Unprotect(private_key const& key, bool on_failure_set
 	char const c = 0;
 	auto pos = pw.find(c);
 	if (pos != std::string::npos) {
+		if (pw.find_first_not_of(c, pos + 1) != std::string::npos) {
+			return false;
+		}
 		pw = pw.substr(0, pos);
 	}
 	password_ = fz::to_wstring_from_utf8(pw);
-	encrypted_ = public_key();
-
+	if (password_.empty() && !pw.empty()) {
+		return false;
+	}
+	encrypted_ = fz::public_key();
 	return true;
+
+}
+
+bool ProtectedCredentials::Unprotect(fz::private_key const& key, bool on_failure_set_to_ask)
+{
+	if (!encrypted_) {
+		return true;
+	}
+
+	bool const ret = DoUnprotect(key);
+	if (!ret && on_failure_set_to_ask) {
+		encrypted_ = fz::public_key();
+		password_.clear();
+		logonType_ = LogonType::ask;
+	}
+
+	return ret;
 }

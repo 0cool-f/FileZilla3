@@ -345,7 +345,7 @@ bool GetServer(pugi::xml_node node, ServerWithCredentials & server)
 				}
 				else if (encoding == _T("crypt")) {
 					pass = fz::to_wstring_from_utf8(passElement.child_value());
-					server.credentials.encrypted_ = public_key::from_base64(passElement.attribute("pubkey").value());
+					server.credentials.encrypted_ = fz::public_key::from_base64(passElement.attribute("pubkey").value());
 					if (!server.credentials.encrypted_) {
 						pass.clear();
 						server.SetLogonType(LogonType::ask);

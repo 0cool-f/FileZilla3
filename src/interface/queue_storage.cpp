@@ -971,7 +971,7 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(ServerWithCredentials& server)
 				return INVALID_DATA;
 			}
 			else {
-				server.credentials.encrypted_ = public_key::from_base64(fz::to_utf8(pass.substr(0, pos)));
+				server.credentials.encrypted_ = fz::public_key::from_base64(fz::to_utf8(pass.substr(0, pos)));
 				pass = pass.substr(pos + 1);
 			}
 		}

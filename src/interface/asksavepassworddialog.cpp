@@ -47,7 +47,7 @@ void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 			return;
 		}
 
-		auto priv = private_key::from_password(fz::to_utf8(pw), fz::random_bytes(private_key::salt_size));
+		auto priv = fz::private_key::from_password(fz::to_utf8(pw), fz::random_bytes(fz::private_key::salt_size));
 		auto pub = priv.pubkey();
 		if (!pub) {
 			wxMessageBox(_("Could not generate key"), _("Error"));

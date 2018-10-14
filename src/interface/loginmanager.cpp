@@ -104,7 +104,7 @@ bool CLoginManager::DisplayDialogForEncrypted(ServerWithCredentials &server, std
 		}
 
 		auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue));
-		auto key = private_key::from_password(pass, server.credentials.encrypted_.salt_);
+		auto key = fz::private_key::from_password(pass, server.credentials.encrypted_.salt_);
 
 		if (key.pubkey() != server.credentials.encrypted_) {
 			wxMessageBoxEx(_("Wrong master password entered, it cannot be used to decrypt this item."), _("Invalid input"), wxICON_EXCLAMATION);
@@ -266,7 +266,7 @@ void CLoginManager::RememberPassword(ServerWithCredentials & server, std::wstrin
 	}
 }
 
-bool CLoginManager::AskDecryptor(public_key const& pub, bool allowForgotten, bool allowCancel)
+bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten, bool allowCancel)
 {
 	if (this == &CLoginManager::Get()) {
 		return false;
@@ -305,7 +305,7 @@ bool CLoginManager::AskDecryptor(public_key const& pub, bool allowForgotten, boo
 		bool const forgot = xrc_call(pwdDlg, "ID_FORGOT", &wxCheckBox::GetValue);
 		if (!forgot) {
 			auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue));
-			auto key = private_key::from_password(pass, pub.salt_);
+			auto key = fz::private_key::from_password(pass, pub.salt_);
 
 			if (key.pubkey() != pub) {
 				wxMessageBoxEx(_("Wrong master password entered, it cannot be used to decrypt the stored passwords."), _("Invalid input"), wxICON_EXCLAMATION);
@@ -314,7 +314,7 @@ bool CLoginManager::AskDecryptor(public_key const& pub, bool allowForgotten, boo
 			decryptors_[pub] = key;
 		}
 		else {
-			decryptors_[pub] = private_key();
+			decryptors_[pub] = fz::private_key();
 		}
 		break;
 	}
@@ -322,12 +322,12 @@ bool CLoginManager::AskDecryptor(public_key const& pub, bool allowForgotten, boo
 	return true;
 }
 
-private_key CLoginManager::GetDecryptor(public_key const& pub)
+fz::private_key CLoginManager::GetDecryptor(fz::public_key const& pub)
 {
 	auto it = decryptors_.find(pub);
 	if (it != decryptors_.cend()) {
 		return it->second;
 	}
 
-	return private_key();
+	return fz::private_key();
 }

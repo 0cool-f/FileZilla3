@@ -36,7 +36,7 @@ bool COptionsPagePasswords::LoadPage()
 			xrc_call(*this, "ID_PASSWORDS_NOSAVE", &wxRadioButton::SetValue, true);
 		}
 		else {
-			auto key = public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+			auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
 			if (key) {
 				xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::SetValue, true);
 
@@ -60,7 +60,7 @@ bool COptionsPagePasswords::SavePage()
 		return true;
 	}
 
-	auto oldPub = public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+	auto oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
 	wxString const newPw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
 
 	bool useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
@@ -77,7 +77,7 @@ bool COptionsPagePasswords::SavePage()
 	}
 
 	if (useMaster) {
-		auto priv = private_key::from_password(fz::to_utf8(newPw), fz::random_bytes(private_key::salt_size));
+		auto priv = fz::private_key::from_password(fz::to_utf8(newPw), fz::random_bytes(fz::private_key::salt_size));
 		auto pub = priv.pubkey();
 		if (!pub) {
 			wxMessageBox(_("Could not generate key"), _("Error"));
@@ -130,7 +130,7 @@ bool COptionsPagePasswords::Validate()
 			return DisplayError(_T("ID_MASTERPASSWORD"), _("The entered passwords are not the same."));
 		}
 
-		auto key = public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+		auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
 		if (!key && pw.empty()) {
 			return DisplayError(_T("ID_MASTERPASSWORD"), _("You need to enter a master password."));
 		}
