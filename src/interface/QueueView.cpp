@@ -65,7 +65,7 @@ public:
 		}
 
 		auto const format = m_pDataObject->GetReceivedFormat();
-		if (format == m_pFileDataObject->GetFormat() || format == m_pRemoteDataObject->GetFormat()) {
+		if (format == m_pFileDataObject->GetFormat() || format == m_pLocalDataObject->GetFormat()) {
 			CState* const pState = CContextManager::Get()->GetCurrentContext();
 			if (!pState) {
 				return wxDragNone;
