@@ -594,11 +594,13 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 		res = response.on_header_(srr);
 
 		if (res != FZ_REPLY_CONTINUE) {
-			response.flags_ |= HttpResponse::flag_ignore_body;
 			if (res == FZ_REPLY_OK) {
 				// Clear the pointer, we no longer need the request to finish, all needed information is in read_state_
 				srr.reset();
 				res = FZ_REPLY_CONTINUE;
+			}
+			else {
+				response.flags_ |= HttpResponse::flag_ignore_body;
 			}
 		}
 	}
