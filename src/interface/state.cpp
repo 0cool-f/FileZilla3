@@ -1284,7 +1284,7 @@ CServerPath CState::GetSynchronizedDirectory(CLocalPath local_path)
 	return remote_path;
 }
 
-bool CState::RefreshRemote()
+bool CState::RefreshRemote(bool clear_cache)
 {
 	if (!m_pCommandQueue) {
 		return false;
@@ -1294,7 +1294,12 @@ bool CState::RefreshRemote()
 		return false;
 	}
 
-	return ChangeRemoteDir(GetRemotePath(), _T(""), LIST_FLAG_REFRESH);
+	int flags = LIST_FLAG_REFRESH;
+	if (clear_cache) {
+		flags |= LIST_FLAG_CLEARCACHE;
+	}
+
+	return ChangeRemoteDir(GetRemotePath(), std::wstring(), flags);
 }
 
 bool CState::GetSecurityInfo(CCertificateNotification *& pInfo)

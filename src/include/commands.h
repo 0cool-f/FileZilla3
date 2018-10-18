@@ -113,6 +113,7 @@ typedef CBasicCommand<Command::disconnect> CDisconnectCommand;
 #define LIST_FLAG_AVOID 2
 #define LIST_FLAG_FALLBACK_CURRENT 4
 #define LIST_FLAG_LINK 8
+#define LIST_FLAG_CLEARCACHE 16
 class CListCommand final : public CCommandHelper<CListCommand, Command::list>
 {
 	// Without a given directory, the current directory will be listed.

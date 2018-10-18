@@ -1408,7 +1408,11 @@ void CMainFrame::OnRefresh(wxCommandEvent &)
 		return;
 	}
 
-	pState->RefreshRemote();
+	bool clear_cache = false;
+	if (wxGetKeyState(WXK_CONTROL)) {
+		clear_cache = true;
+	}
+	pState->RefreshRemote(clear_cache);
 	pState->RefreshLocal();
 }
 
@@ -2836,6 +2840,7 @@ void CMainFrame::SetupKeyboardAccelerators()
 	}
 	entries.emplace_back(wxACCEL_CMD | wxACCEL_SHIFT, 'O', m_comparisonToggleAcceleratorId);
 	entries.emplace_back(wxACCEL_CMD | wxACCEL_SHIFT, 'I', XRCID("ID_MENU_VIEW_FILTERS"));
+	entries.emplace_back(wxACCEL_CMD, WXK_F5, XRCID("ID_REFRESH"));
 #ifdef __WXMAC__
 	entries.emplace_back(wxACCEL_CMD, ',', XRCID("wxID_PREFERENCES"));
 

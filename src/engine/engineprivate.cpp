@@ -341,6 +341,11 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 	bool const refresh = (command.GetFlags() & LIST_FLAG_REFRESH) != 0;
 	bool const avoid = (command.GetFlags() & LIST_FLAG_AVOID) != 0;
 
+	if (flags & LIST_FLAG_CLEARCACHE) {
+		GetDirectoryCache().InvalidateServer(controlSocket_->GetCurrentServer());
+		GetPathCache().InvalidateServer(controlSocket_->GetCurrentServer());
+	}
+
 	if (!refresh && !command.GetPath().empty()) {
 		CServer const& server = controlSocket_->GetCurrentServer();
 		if (server) {

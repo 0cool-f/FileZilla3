@@ -155,7 +155,7 @@ public:
 	void RefreshLocalFile(std::wstring const& file);
 	void LocalDirCreated(CLocalPath const& path);
 
-	bool RefreshRemote();
+	bool RefreshRemote(bool clear_cache = false);
 
 	void RegisterHandler(CStateEventHandler* pHandler, t_statechange_notifications notification, CStateEventHandler* insertBefore = 0);
 	void UnregisterHandler(CStateEventHandler* pHandler, t_statechange_notifications notification);
