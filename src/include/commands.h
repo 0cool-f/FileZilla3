@@ -23,7 +23,10 @@ enum class Command
 	cwd,
 	private1,
 	private2,
-	private3
+	private3,
+	private4,
+	private5,
+	private6,
 };
 
 // Reply codes

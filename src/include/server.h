@@ -30,7 +30,9 @@ enum ServerProtocol
 
 	DROPBOX,
 
-	MAX_VALUE = DROPBOX
+	ONEDRIVE,
+
+	MAX_VALUE = ONEDRIVE
 };
 
 enum ServerType
