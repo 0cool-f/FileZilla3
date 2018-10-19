@@ -14,7 +14,7 @@
 #include <wx/tokenzr.h>
 
 CertStore::CertStore()
-	: m_xmlFile(wxGetApp().GetSettingsFile(_T("trustedcerts")))
+	: m_xmlFile(wxGetApp().GetSettingsFile(L"trustedcerts"))
 {
 }
 
@@ -407,7 +407,7 @@ bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
 	pDlg->SetChildLabel(XRCID("ID_SIGNALGO"), cert.GetSignatureAlgorithm());
 
 	wxString const& sha256 = cert.GetFingerPrintSHA256();
-	pDlg->SetChildLabel(XRCID("ID_FINGERPRINT_SHA256"), sha256.Left(sha256.size() / 2 + 1) + _T("\n") + sha256.Mid(sha256.size() / 2 + 1));
+	pDlg->SetChildLabel(XRCID("ID_FINGERPRINT_SHA256"), sha256.Left(sha256.size() / 2 + 1) + L"\n" + sha256.Mid(sha256.size() / 2 + 1));
 	pDlg->SetChildLabel(XRCID("ID_FINGERPRINT_SHA1"), cert.GetFingerPrintSHA1());
 
 	ParseDN(XRCCTRL(*pDlg, "ID_ISSUER_BOX", wxStaticBox), cert.GetIssuer(), m_pIssuerSizer);
@@ -421,7 +421,7 @@ bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
 	if (!altNames.empty()) {
 		wxString str;
 		for (auto const& altName : altNames) {
-			str += altName.name + _T("\n");
+			str += altName.name + L"\n";
 		}
 		str.RemoveLast();
 		m_pSubjectSizer->Add(new wxStaticText(subjectPanel, wxID_ANY, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
@@ -450,7 +450,7 @@ bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
 bool CVerifyCertDialog::DisplayAlgorithm(int controlId, wxString name, bool insecure)
 {
 	if (insecure) {
-		name += _T(" - ");
+		name += L" - ";
 		name += _("Insecure algorithm!");
 
 		auto wnd = m_pDlg->FindWindow(controlId);
@@ -467,7 +467,7 @@ bool CVerifyCertDialog::DisplayAlgorithm(int controlId, wxString name, bool inse
 void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notification, bool displayOnly)
 {
 	m_pDlg = new wxDialogEx;
-	if (!m_pDlg->Load(0, _T("ID_VERIFYCERT"))) {
+	if (!m_pDlg->Load(0, L"ID_VERIFYCERT")) {
 		wxBell();
 		delete m_pDlg;
 		m_pDlg = 0;
@@ -480,7 +480,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 		xrc_call(*m_pDlg, "ID_ALWAYS", &wxWindow::Hide);
 		xrc_call(*m_pDlg, "ID_TRUST_SANS", &wxWindow::Hide);
 		xrc_call(*m_pDlg, "wxID_CANCEL", &wxWindow::Hide);
-		m_pDlg->SetTitle(_T("Certificate details"));
+		m_pDlg->SetTitle(L"Certificate details");
 	}
 	else {
 		m_pDlg->WrapText(m_pDlg, XRCID("ID_DESC"), 420);
@@ -498,7 +498,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 	else {
 		wxChoice* pChoice = XRCCTRL(*m_pDlg, "ID_CHAIN", wxChoice);
 		for (unsigned int i = 0; i < m_certificates.size(); ++i) {
-			pChoice->Append(wxString::Format(_T("%d"), i));
+			pChoice->Append(wxString::Format(L"%d", i));
 		}
 		pChoice->SetSelection(0);
 
@@ -510,7 +510,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(_("%s:%d - Hostname does not match certificate"), notification.GetHost(), notification.GetPort()));
 	}
 	else {
-		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(_T("%s:%d"), notification.GetHost(), notification.GetPort()));
+		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(L"%s:%d", notification.GetHost(), notification.GetPort()));
 	}
 
 	line_height_ = XRCCTRL(*m_pDlg, "ID_SUBJECT_DUMMY", wxStaticText)->GetSize().y;
@@ -583,34 +583,34 @@ void CVerifyCertDialog::ParseDN(wxWindow* parent, const wxString& dn, wxSizer* p
 {
 	pSizer->Clear(true);
 
-	wxStringTokenizer tokens(dn, _T(","));
+	wxStringTokenizer tokens(dn, L",");
 
 	std::list<wxString> tokenlist;
 	while (tokens.HasMoreTokens()) {
 		tokenlist.push_back(tokens.GetNextToken());
 	}
 
-	ParseDN_by_prefix(parent, tokenlist, _T("CN"), _("Common name:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("O"), _("Organization:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("2.5.4.15"), _("Business category:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, _T("OU"), _("Unit:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("T"), _("Title:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("C"), _("Country:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("ST"), _("State or province:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("L"), _("Locality:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("2.5.4.17"), _("Postal code:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, _T("postalCode"), _("Postal code:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, _T("STREET"), _("Street:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("EMAIL"), _("E-Mail:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("serialNumber"), _("Serial number:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, _T("1.3.6.1.4.1.311.60.2.1.3"), _("Jurisdiction country:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, _T("1.3.6.1.4.1.311.60.2.1.2"), _("Jurisdiction state or province:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, _T("1.3.6.1.4.1.311.60.2.1.1"), _("Jurisdiction locality:"), pSizer, true);
+	ParseDN_by_prefix(parent, tokenlist, L"CN", _("Common name:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"O", _("Organization:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"2.5.4.15", _("Business category:"), pSizer, true);
+	ParseDN_by_prefix(parent, tokenlist, L"OU", _("Unit:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"T", _("Title:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"C", _("Country:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"ST", _("State or province:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"L", _("Locality:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"2.5.4.17", _("Postal code:"), pSizer, true);
+	ParseDN_by_prefix(parent, tokenlist, L"postalCode", _("Postal code:"), pSizer, true);
+	ParseDN_by_prefix(parent, tokenlist, L"STREET", _("Street:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"EMAIL", _("E-Mail:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"serialNumber", _("Serial number:"), pSizer);
+	ParseDN_by_prefix(parent, tokenlist, L"1.3.6.1.4.1.311.60.2.1.3", _("Jurisdiction country:"), pSizer, true);
+	ParseDN_by_prefix(parent, tokenlist, L"1.3.6.1.4.1.311.60.2.1.2", _("Jurisdiction state or province:"), pSizer, true);
+	ParseDN_by_prefix(parent, tokenlist, L"1.3.6.1.4.1.311.60.2.1.1", _("Jurisdiction locality:"), pSizer, true);
 
 	if (!tokenlist.empty()) {
 		wxString value = tokenlist.front();
 		for (auto iter = ++tokenlist.cbegin(); iter != tokenlist.cend(); ++iter) {
-			value += _T(",") + *iter;
+			value += L"," + *iter;
 		}
 
 		pSizer->Add(new wxStaticText(parent, wxID_ANY, _("Other:")));
@@ -620,7 +620,7 @@ void CVerifyCertDialog::ParseDN(wxWindow* parent, const wxString& dn, wxSizer* p
 
 void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::list<wxString>& tokens, wxString prefix, const wxString& name, wxSizer* pSizer, bool decode)
 {
-	prefix += _T("=");
+	prefix += L"=";
 	int len = prefix.Length();
 
 	wxString value;
@@ -636,12 +636,12 @@ void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::list<wxString>&
 			}
 
 			if (!value.empty()) {
-				value += _T("\n");
+				value += L"\n";
 			}
 		}
 		else {
 			append = false;
-			value += _T(",");
+			value += L",";
 		}
 
 		value += iter->Mid(len);
@@ -747,13 +747,13 @@ void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & 
 	bool const warning = certStore.HasCertificate(notification.server_.GetHost(), notification.server_.GetPort());
 
 	if (warning) {
-		main->Add(new wxStaticText(&dlg, -1, _T("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
-		main->Add(new wxStaticText(&dlg, -1, _T("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
+		main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
+		main->Add(new wxStaticText(&dlg, -1, _("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
 	}
 	else {
-		main->Add(new wxStaticText(&dlg, -1, _T("This server does not support FTP over TLS.")));
+		main->Add(new wxStaticText(&dlg, -1, _("This server does not support FTP over TLS.")));
 	}
-	main->Add(new wxStaticText(&dlg, -1, _T("If you continue, your password and files will be sent in clear over the internet.")));
+	main->Add(new wxStaticText(&dlg, -1, _("If you continue, your password and files will be sent in clear over the internet.")));
 
 
 	auto flex = lay.createFlex(2);
