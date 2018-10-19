@@ -1233,14 +1233,15 @@ void CSiteManagerDialog::SetCtrlState()
 		data = static_cast<CSiteManagerItemData*>(pTree->GetItemData(item));
 	}
 	if (!data) {
+		// Set the control states according if it's possible to use the control
+		const bool root_or_predefined = (item == pTree->GetRootItem() || item == m_ownSites || predefined);
+
 		m_pNotebook_Site->Show();
 		m_pNotebook_Bookmark->Hide();
-		m_pNotebook_Site->SetSite(Site(), predefined);
+		m_pNotebook_Site->SetSite(Site(), root_or_predefined);
 		m_pNotebook_Site->Enable(false);
 		m_pNotebook_Site->GetContainingSizer()->Layout();
 
-		// Set the control states according if it's possible to use the control
-		const bool root_or_predefined = (item == pTree->GetRootItem() || item == m_ownSites || predefined);
 
 		xrc_call(*this, "ID_RENAME", &wxWindow::Enable, !root_or_predefined);
 		xrc_call(*this, "ID_DELETE", &wxWindow::Enable, !root_or_predefined);

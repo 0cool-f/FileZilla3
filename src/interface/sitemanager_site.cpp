@@ -457,13 +457,19 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 void CSiteManagerSite::SetLogonTypeCtrlState()
 {
 	LogonType const t = GetLogonType();
-	xrc_call(*this, "ID_USER", &wxTextCtrl::Enable, t != LogonType::anonymous);
-	xrc_call(*this, "ID_PASS", &wxTextCtrl::Enable, t == LogonType::normal || t == LogonType::account);
-	xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::Enable, t == LogonType::account);
-	xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::Enable, t == LogonType::key);
-	xrc_call(*this, "ID_KEYFILE_BROWSE", &wxButton::Enable, t == LogonType::key);
-	xrc_call(*this, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, t == LogonType::normal);
-	xrc_call(*this, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, t == LogonType::normal);
+	xrc_call(*this, "ID_USER", &wxTextCtrl::Enable, !predefined_ && t != LogonType::anonymous);
+	xrc_call(*this, "ID_PASS", &wxTextCtrl::Enable, !predefined_ && t == LogonType::normal || t == LogonType::account);
+	xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined_ && t == LogonType::account);
+	xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined_ && t == LogonType::key);
+	xrc_call(*this, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined_ && t == LogonType::key);
+	xrc_call(*this, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, !predefined_ && t == LogonType::normal);
+	xrc_call(*this, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, !predefined_ && t == LogonType::normal);
+
+	for (int i = 0; i < ParameterSection::section_count; ++i) {
+		for (auto & pair : extraParameters_[i]) {
+			pair.second->Enable(!predefined_);
+		}
+	}
 }
 
 LogonType CSiteManagerSite::GetLogonType() const
@@ -819,7 +825,9 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
 		SetProtocol(FTP);
 		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, false);
-		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, _("Anonymous"));
+		bool const kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+		auto const logonType = kiosk_mode ? LogonType::ask : LogonType::normal;
+		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
 		xrc_call(*this, "ID_USER", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(*this, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(*this, "ID_PASS", &wxTextCtrl::SetHint, wxString());
@@ -829,8 +837,8 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, 0);
 
+		SetControlVisibility(FTP, logonType);
 		SetLogonTypeCtrlState();
-		SetControlVisibility(FTP, LogonType::anonymous);
 
 		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, 0);
 		xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, wxString());
@@ -866,8 +874,8 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		LogonType const logonType = site.server_.credentials.logonType_;
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
 
-		SetLogonTypeCtrlState();
 		SetControlVisibility(protocol, logonType);
+		SetLogonTypeCtrlState();
 
 		xrc_call(*this, "ID_USER", &wxTextCtrl::ChangeValue, site.server_.server.GetUser());
 		xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.server_.credentials.account_);
@@ -1007,7 +1015,6 @@ void CSiteManagerSite::OnLogontypeSelChanged(wxCommandEvent&)
 {
 	LogonType const t = GetLogonType();
 	SetControlVisibility(GetProtocol(), t);
-
 	SetLogonTypeCtrlState();
 }
 
