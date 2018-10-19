@@ -342,12 +342,12 @@ $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla$(EXEEXT): filezilla
 	cp -f $(top_srcdir)/docs/*.man $(top_builddir)/FileZilla.app/Contents/docs
 
 CLEANFILES = filezilla.h.gch
-
+MAINTAINERCLEANFILES = ./$(DEPDIR)/filezilla.Po
 if ENABLE_PRECOMP
 
 BUILT_SOURCES = filezilla.h.gch
 
-include ./$(DEPDIR)/filezilla.Po
+-include ./$(DEPDIR)/filezilla.Po
 
 filezilla.h.gch: filezilla.h
 	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(filezilla_CPPFLAGS) $(CPPFLAGS) $(filezilla_CXXFLAGS) $(CXXFLAGS) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o "$@" $<; \

@@ -146,12 +146,13 @@ endif
 dist_noinst_DATA = engine.vcxproj
 
 CLEANFILES = filezilla.h.gch
+MAINTAINERCLEANFILES = ./$(DEPDIR)/filezilla.Po
 
 if ENABLE_PRECOMP
 
 BUILT_SOURCES = filezilla.h.gch
 
-include ./$(DEPDIR)/filezilla.Po
+-include ./$(DEPDIR)/filezilla.Po
 
 filezilla.h.gch: filezilla.h
 	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libengine_a_CPPFLAGS) $(CPPFLAGS) $(libengine_a_CXXFLAGS) $(CXXFLAGS) -MT $@ -MD -MP -MF "$(DEPDIR)/filezilla.Tpo" -c -o $@ $<; \
