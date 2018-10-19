@@ -789,6 +789,30 @@ void CSiteManagerSite::UpdateExtraParameters(CServer & server)
 
 void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 {
+	predefined_ = predefined;
+
+	xrc_call(*this, "ID_HOST", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_PORT", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_PROTOCOL", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_ENCRYPTION", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_SYNC", &wxCheckBox::Enable, !predefined);
+	xrc_call(*this, "ID_REMOTEDIR", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_LOCALDIR", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_SERVERTYPE", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_LOGONTYPE", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_COMMENTS", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_COLOR", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_COMPARISON", &wxCheckBox::Enable, !predefined);
+	xrc_call(*this, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_CHARSET_AUTO", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_CHARSET_UTF8", &wxWindow::Enable, !predefined);
+	xrc_call(*this, "ID_CHARSET_CUSTOM", &wxWindow::Enable, !predefined);
+
 	if (!site) {
 		// Empty all site information
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, wxString());
@@ -805,6 +829,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, 0);
 
+		SetLogonTypeCtrlState();
 		SetControlVisibility(FTP, LogonType::anonymous);
 
 		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, 0);
@@ -816,13 +841,14 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 
 		xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
 		xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, false);
+		xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
 
 		xrc_call(*this, "ID_CHARSET_AUTO", &wxRadioButton::SetValue, true);
 		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::Enable, false);
 	}
 	else {
-		xrc_call(*this, "ID_HOST", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.server_.Format(ServerFormat::host_only));
 		unsigned int port = site.server_.server.GetPort();
 
@@ -832,27 +858,16 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		else {
 			xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
 		}
-		xrc_call(*this, "ID_PORT", &wxWindow::Enable, !predefined);
 
 		ServerProtocol protocol = site.server_.server.GetProtocol();
 		SetProtocol(protocol);
-		xrc_call(*this, "ID_PROTOCOL", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_ENCRYPTION", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, site.server_.server.GetBypassProxy());
 
-		LogonType logonType = site.server_.credentials.logonType_;
-		xrc_call(*this, "ID_USER", &wxTextCtrl::Enable, !predefined && logonType != LogonType::anonymous);
-		xrc_call(*this, "ID_PASS", &wxTextCtrl::Enable, !predefined && (logonType == LogonType::normal || logonType == LogonType::account));
-		xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined && logonType == LogonType::account);
-		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined && logonType == LogonType::key);
-		xrc_call(*this, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined && logonType == LogonType::key);
-		xrc_call(*this, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, !predefined && logonType == LogonType::normal);
-		xrc_call(*this, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, !predefined && logonType == LogonType::normal);
-
-		SetControlVisibility(protocol, logonType);
-
+		LogonType const logonType = site.server_.credentials.logonType_;
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
-		xrc_call(*this, "ID_LOGONTYPE", &wxWindow::Enable, !predefined);
+
+		SetLogonTypeCtrlState();
+		SetControlVisibility(protocol, logonType);
 
 		xrc_call(*this, "ID_USER", &wxTextCtrl::ChangeValue, site.server_.server.GetUser());
 		xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.server_.credentials.account_);
@@ -899,24 +914,15 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 
 		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.server_.credentials.keyFile_);
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.m_comments);
-		xrc_call(*this, "ID_COMMENTS", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site.m_colour));
-		xrc_call(*this, "ID_COLOR", &wxWindow::Enable, !predefined);
 
 		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server_.server.GetType());
-		xrc_call(*this, "ID_SERVERTYPE", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_localDir);
-		xrc_call(*this, "ID_LOCALDIR", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_remoteDir.GetPath());
-		xrc_call(*this, "ID_REMOTEDIR", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_SYNC", &wxCheckBox::Enable, !predefined);
 		xrc_call(*this, "ID_SYNC", &wxCheckBox::SetValue, site.m_default_bookmark.m_sync);
-		xrc_call(*this, "ID_COMPARISON", &wxCheckBox::Enable, !predefined);
 		xrc_call(*this, "ID_COMPARISON", &wxCheckBox::SetValue, site.m_default_bookmark.m_comparison);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server_.server.GetTimezoneOffset() / 60);
-		xrc_call(*this, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server_.server.GetTimezoneOffset() % 60);
-		xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
 
 		if (CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::TransferMode)) {
 			PasvMode pasvMode = site.server_.server.GetPasvMode();
@@ -929,14 +935,10 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			else {
 				xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
 			}
-			xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined);
-			xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined);
-			xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined);
 		}
 
-		int maxMultiple = site.server_.server.MaximumMultipleConnections();
+		int const maxMultiple = site.server_.server.MaximumMultipleConnections();
 		xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, maxMultiple != 0);
-		xrc_call(*this, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined);
 		if (maxMultiple != 0) {
 			xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined);
 			xrc_call<wxSpinCtrl, int>(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, maxMultiple);
@@ -958,9 +960,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			xrc_call(*this, "ID_CHARSET_CUSTOM", &wxRadioButton::SetValue, true);
 			break;
 		}
-		xrc_call(*this, "ID_CHARSET_AUTO", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_CHARSET_UTF8", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_CHARSET_CUSTOM", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::Enable, !predefined && site.server_.server.GetEncodingType() == ENCODING_CUSTOM);
 		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::ChangeValue, site.server_.server.GetCustomEncoding());
 	}

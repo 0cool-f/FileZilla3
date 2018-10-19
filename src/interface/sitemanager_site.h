@@ -53,6 +53,8 @@ private:
 	ServerProtocol previousProtocol_{UNKNOWN};
 
 	std::vector<std::pair<wxStaticText*, wxTextCtrl*>> extraParameters_[ParameterSection::section_count];
+
+	bool predefined_{};
 };
 
 #endif
