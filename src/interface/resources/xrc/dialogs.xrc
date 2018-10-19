@@ -1658,7 +1658,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>If using 'overwrite if newer', your system time has to be synchronized with the server. If the time differs (e.g. different timezone), specify a timezone offset in the site manager.</label>
+              <label>If using 'overwrite if newer', your system time has to be synchronized with the server. If the time differs (e.g. different timezone), specify a time offset in the site manager.</label>
             </object>
           </object>
           <object class="spacer">
