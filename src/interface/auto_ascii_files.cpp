@@ -4,11 +4,11 @@
 
 #include <libfilezilla/local_filesys.hpp>
 
-std::vector<wxString> CAutoAsciiFiles::m_ascii_extensions;
+std::vector<std::wstring> CAutoAsciiFiles::ascii_extensions_;
 
 void CAutoAsciiFiles::SettingsChanged()
 {
-	m_ascii_extensions.clear();
+	ascii_extensions_.clear();
 	std::wstring extensions = COptions::Get()->GetOption(OPTION_ASCIIFILES);
 	std::wstring ext;
 	size_t pos = extensions.find('|');
@@ -16,14 +16,14 @@ void CAutoAsciiFiles::SettingsChanged()
 		if (!pos) {
 			if (!ext.empty()) {
 				fz::replace_substrings(ext, L"\\\\", L"\\");
-				m_ascii_extensions.push_back(ext);
+				ascii_extensions_.push_back(ext);
 				ext.clear();
 			}
 		}
 		else if (extensions[pos - 1] != '\\') {
 			ext += extensions.substr(0, pos);
 			fz::replace_substrings(ext, L"\\\\", L"\\");
-			m_ascii_extensions.push_back(ext);
+			ascii_extensions_.push_back(ext);
 			ext.clear();
 		}
 		else {
@@ -34,24 +34,26 @@ void CAutoAsciiFiles::SettingsChanged()
 	}
 	ext += extensions;
 	fz::replace_substrings(ext, L"\\\\", L"\\");
-	m_ascii_extensions.push_back(ext);
+	if (!ext.empty()) {
+		ascii_extensions_.push_back(ext);
+	}
 }
 
 // Defined in RemoteListView.cpp
 std::wstring StripVMSRevision(std::wstring const& name);
 
-bool CAutoAsciiFiles::TransferLocalAsAscii(wxString const& local_file, ServerType server_type)
+bool CAutoAsciiFiles::TransferLocalAsAscii(std::wstring const& local_file, ServerType server_type)
 {
-	int pos = local_file.Find(fz::local_filesys::path_separator, true);
+	size_t pos = local_file.rfind(fz::local_filesys::path_separator);
 
 	// Identical implementation, only difference is for the local one to strip path.
 	return TransferRemoteAsAscii(
-		(pos != -1) ? local_file.Mid(pos + 1) : local_file,
+		(pos != std::wstring::npos) ? local_file.substr(pos + 1) : local_file,
 		server_type
 	);
 }
 
-bool CAutoAsciiFiles::TransferRemoteAsAscii(wxString const& remote_file, ServerType server_type)
+bool CAutoAsciiFiles::TransferRemoteAsAscii(std::wstring const& remote_file, ServerType server_type)
 {
 	int mode = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
 	if (mode == 1) {
@@ -62,21 +64,21 @@ bool CAutoAsciiFiles::TransferRemoteAsAscii(wxString const& remote_file, ServerT
 	}
 
 	if (server_type == VMS) {
-		return TransferRemoteAsAscii(StripVMSRevision(remote_file.ToStdWstring()), DEFAULT);
+		return TransferRemoteAsAscii(StripVMSRevision(remote_file), DEFAULT);
 	}
 
 	if (!remote_file.empty() && remote_file[0] == '.') {
 		return COptions::Get()->GetOptionVal(OPTION_ASCIIDOTFILE) != 0;
 	}
 
-	int pos = remote_file.Find('.', true);
-	if (pos < 0 || static_cast<unsigned int>(pos) + 1 == remote_file.size()) {
+	size_t pos = remote_file.rfind('.');
+	if (pos == std::wstring::npos || pos + 1 == remote_file.size()) {
 		return COptions::Get()->GetOptionVal(OPTION_ASCIINOEXT) != 0;
 	}
-	wxString ext = remote_file.Mid(pos + 1);
+	std::wstring ext = remote_file.substr(pos + 1);
 
-	for (auto const& ascii_ext : m_ascii_extensions) {
-		if (!ext.CmpNoCase(ascii_ext)) {
+	for (auto const& ascii_ext : ascii_extensions_) {
+		if (fz::equal_insensitive_ascii(ext, ascii_ext)) {
 			return true;
 		}
 	}

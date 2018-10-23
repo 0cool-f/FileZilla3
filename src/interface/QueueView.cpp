@@ -272,11 +272,13 @@ bool CQueueView::QueueFile(const bool queueOnly, const bool download,
 	}
 	else {
 		fileItem = new CFileItem(pServerItem, queueOnly, download, sourceFile, targetFile, localPath, remotePath, size);
-		if (download) {
-			fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(sourceFile, remotePath.GetType()));
-		}
-		else {
-			fileItem->SetAscii(CAutoAsciiFiles::TransferLocalAsAscii(sourceFile, remotePath.GetType()));
+		if (server.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
+			if (download) {
+				fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(sourceFile, remotePath.GetType()));
+			}
+			else {
+				fileItem->SetAscii(CAutoAsciiFiles::TransferLocalAsAscii(sourceFile, remotePath.GetType()));
+			}
 		}
 		fileItem->m_edit = edit;
 		if (edit != CEditHandler::none) {
@@ -325,6 +327,8 @@ bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, c
 
 	std::vector<CRemoteDataObject::t_fileInfo> const& files = dataObject.GetFiles();
 
+	bool const hasDataTypeConcept = dataObject.GetServer().server.HasFeature(ProtocolFeature::DataTypeConcept);
+
 	for (auto const& fileInfo : files) {
 		if (fileInfo.dir) {
 			continue;
@@ -338,7 +342,9 @@ bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, c
 		CFileItem* fileItem = new CFileItem(pServerItem, queueOnly, true,
 			fileInfo.name, (fileInfo.name != localFile) ? localFile : std::wstring(),
 			localPath, dataObject.GetServerPath(), fileInfo.size);
-		fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(fileInfo.name, dataObject.GetServerPath().GetType()));
+		if (hasDataTypeConcept) {
+			fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(fileInfo.name, dataObject.GetServerPath().GetType()));
+		}
 
 		InsertItem(pServerItem, fileItem);
 	}
@@ -359,11 +365,15 @@ bool CQueueView::QueueFiles(const bool queueOnly, ServerWithCredentials const& s
 		InsertItem(pServerItem, fileItem);
 	}
 	else {
+		bool const hasDataTypeConcept = server.server.HasFeature(ProtocolFeature::DataTypeConcept);
+
 		for (auto const& file : files) {
 			CFileItem* fileItem = new CFileItem(pServerItem, queueOnly, false,
 				file.name, std::wstring(),
 				listing.localPath, listing.remotePath, file.size);
-			fileItem->SetAscii(CAutoAsciiFiles::TransferLocalAsAscii(file.name, listing.remotePath.GetType()));
+			if (hasDataTypeConcept) {
+				fileItem->SetAscii(CAutoAsciiFiles::TransferLocalAsAscii(file.name, listing.remotePath.GetType()));
+			}
 
 			InsertItem(pServerItem, fileItem);
 		}

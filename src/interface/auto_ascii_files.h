@@ -4,13 +4,13 @@
 class CAutoAsciiFiles final
 {
 public:
-	static bool TransferLocalAsAscii(wxString const& local_file, ServerType server_type);
-	static bool TransferRemoteAsAscii(wxString const& remote_file, ServerType server_type);
+	static bool TransferLocalAsAscii(std::wstring const& local_file, ServerType server_type);
+	static bool TransferRemoteAsAscii(std::wstring const& remote_file, ServerType server_type);
 
 	static void SettingsChanged();
 protected:
-	static bool IsAsciiExtension(wxString const& ext);
-	static std::vector<wxString> m_ascii_extensions;
+	static bool IsAsciiExtension(std::wstring const& ext);
+	static std::vector<std::wstring> ascii_extensions_;
 };
 
 #endif

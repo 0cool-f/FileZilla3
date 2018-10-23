@@ -146,6 +146,7 @@ public:
 	static std::wstring GetPrefixFromProtocol(ServerProtocol const protocol);
 	static std::vector<ServerProtocol> const& GetDefaultProtocols();
 
+	bool HasFeature(ProtocolFeature const feature) const;
 	static bool ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature const feature);
 
 	// These commands will be executed after a successful login.

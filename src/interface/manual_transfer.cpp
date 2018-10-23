@@ -103,7 +103,7 @@ void CManualTransfer::SetControlState()
 void CManualTransfer::SetAutoAsciiState()
 {
 	if (XRCCTRL(*this, "ID_DOWNLOAD", wxRadioButton)->GetValue()) {
-		wxString remote_file = XRCCTRL(*this, "ID_REMOTEFILE", wxTextCtrl)->GetValue();
+		std::wstring remote_file = XRCCTRL(*this, "ID_REMOTEFILE", wxTextCtrl)->GetValue().ToStdWstring();
 		if (remote_file.empty()) {
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Hide();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
@@ -118,7 +118,7 @@ void CManualTransfer::SetAutoAsciiState()
 		}
 	}
 	else {
-		wxString local_file = XRCCTRL(*this, "ID_LOCALFILE", wxTextCtrl)->GetValue();
+		std::wstring local_file = XRCCTRL(*this, "ID_LOCALFILE", wxTextCtrl)->GetValue().ToStdWstring();
 		if (!m_local_file_exists) {
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Hide();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
@@ -324,7 +324,15 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		return;
 	}
 
-	int old_data_type = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
+	std::wstring name;
+	CLocalPath localPath(local_file, &name);
+
+	if (name.empty()) {
+		wxMessageBoxEx(_("Local file is not a valid filename."), _("Manual transfer"), wxICON_EXCLAMATION);
+		return;
+	}
+
+	int const old_data_type = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
 
 	// Set data type for the file to add
 	if (xrc_call(*this, "ID_TYPE_ASCII", &wxRadioButton::GetValue)) {
@@ -335,14 +343,6 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 	}
 	else {
 		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 0);
-	}
-
-	std::wstring name;
-	CLocalPath localPath(local_file, &name);
-
-	if (name.empty()) {
-		wxMessageBoxEx(_("Local file is not a valid filename."), _("Manual transfer"), wxICON_EXCLAMATION);
-		return;
 	}
 
 	m_pQueueView->QueueFile(!start, download,

@@ -567,6 +567,11 @@ bool CServer::GetBypassProxy() const
 	return m_bypassProxy;
 }
 
+bool CServer::HasFeature(ProtocolFeature const feature) const
+{
+	return ProtocolHasFeature(m_protocol, feature);
+}
+
 bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature const feature)
 {
 	switch (feature) {
