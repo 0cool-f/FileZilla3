@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.38.0 (2018-10-26)
+
+- Updated translations
+
 3.38.0-rc1 (2018-10-19)
 
 + Refreshing remote file list while holding Ctrl now clears the remote directory cache for the current server
@@ -19,7 +23,6 @@ Legend:
 - Building and running FileZilla now depends on libfilezilla >= 0.15.0 (https://lib.filezilla-project.org/)
 - Improve compatibility with GnuTLS 3.6.x
 - Fix building with automake >= 1.16.0
-
 
 3.37.4 (2018-09-04)
 
