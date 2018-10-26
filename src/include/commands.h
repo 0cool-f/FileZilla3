@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_COMMANDS_HEADER
 #define FILEZILLA_ENGINE_COMMANDS_HEADER
 
+#include <libfilezilla/uri.hpp>
+
 // See below for actual commands and their parameters
 
 // Command IDs
@@ -18,6 +20,7 @@ enum class Command
 	rename,
 	chmod,
 	raw,
+	httrequest, // Only used by HTTP protocol
 
 	// Only used internally
 	cwd,
@@ -181,6 +184,21 @@ protected:
 	std::wstring const m_remoteFile;
 	bool const m_download;
 	t_transferSettings const m_transferSettings;
+};
+
+class CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httrequest>
+{
+public:
+	// Reply body is delivered through nId_data notifications
+	CHttpRequestCommand(fz::uri const& uri, std::string const& verb = std::string("GET"), std::string const& body = std::string())
+		: uri_(uri)
+		, verb_(verb)
+		, body_(body)
+	{}
+
+	fz::uri const uri_;
+	std::string const verb_;
+	std::string const body_;
 };
 
 class CRawCommand final : public CCommandHelper<CRawCommand, Command::raw>

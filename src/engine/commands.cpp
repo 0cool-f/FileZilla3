@@ -37,16 +37,19 @@ std::wstring CListCommand::GetSubDir() const
 
 bool CListCommand::valid() const
 {
-	if (GetPath().empty() && !GetSubDir().empty())
+	if (GetPath().empty() && !GetSubDir().empty()) {
 		return false;
+	}
 
-	if (GetFlags() & LIST_FLAG_LINK && GetSubDir().empty())
+	if (GetFlags() & LIST_FLAG_LINK && GetSubDir().empty()) {
 		return false;
+	}
 
 	bool const refresh = (m_flags & LIST_FLAG_REFRESH) != 0;
 	bool const avoid = (m_flags & LIST_FLAG_AVOID) != 0;
-	if (refresh && avoid)
+	if (refresh && avoid) {
 		return false;
+	}
 
 	return true;
 }

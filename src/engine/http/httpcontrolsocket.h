@@ -227,6 +227,9 @@ public:
 	virtual ~CHttpControlSocket();
 
 	virtual bool Connected() const override { return static_cast<bool>(currentServer_); }
+
+	void FileTransfer(CHttpRequestCommand const& command);
+
 protected:
 	virtual void Connect(CServer const& server, Credentials const& credentials) override;
 	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,

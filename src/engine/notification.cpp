@@ -60,7 +60,7 @@ int CHostKeyNotification::GetPort() const
 	return m_port;
 }
 
-CDataNotification::CDataNotification(char* pData, int len)
+CDataNotification::CDataNotification(char* pData, size_t len)
 	: m_pData(pData), m_len(len)
 {
 }
@@ -70,7 +70,7 @@ CDataNotification::~CDataNotification()
 	delete [] m_pData;
 }
 
-char* CDataNotification::Detach(int& len)
+char* CDataNotification::Detach(size_t& len)
 {
 	len = m_len;
 	char* pData = m_pData;

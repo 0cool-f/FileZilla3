@@ -318,14 +318,20 @@ protected:
 class CDataNotification final : public CNotificationHelper<nId_data>
 {
 public:
-	CDataNotification(char* pData, int len);
+	CDataNotification(char* pData, size_t len);
 	virtual ~CDataNotification();
 
-	char* Detach(int& len);
+	CDataNotification(CDataNotification const&) = delete;
+	CDataNotification& operator=(CDataNotification const&) = delete;
+
+	char* Detach(size_t& len);
+
+	char const* data() const { return m_pData; }
+	size_t size() const { return m_len; }
 
 protected:
 	char* m_pData;
-	unsigned int m_len;
+	size_t m_len;
 };
 
 class CCertificate final

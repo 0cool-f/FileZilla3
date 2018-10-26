@@ -6,7 +6,6 @@
 #include "updater.h"
 #include "Options.h"
 #include "file_utils.h"
-#include <wx/tokenzr.h>
 #include <string>
 
 #ifdef __WXMSW__
@@ -78,7 +77,7 @@ static CUpdater* instance = 0;
 
 CUpdater::CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_context, std::function<void(CActiveNotification const&)> const& activityNotificationHandler)
 	: state_(UpdaterState::idle)
-	, engine_(new CFileZillaEngine(engine_context, *this))
+	, engine_context_(engine_context)
 	, activityNotificationHandler_(activityNotificationHandler)
 {
 	AddHandler(parent);
@@ -171,28 +170,29 @@ bool CUpdater::LongTimeSinceLastCheck() const
 	return span.get_days() >= days;
 }
 
-std::wstring CUpdater::GetUrl()
+fz::uri CUpdater::GetUrl()
 {
-	std::wstring host = CBuildInfo::GetHostname();
+	fz::uri uri("https://update.filezilla-project.org/update.php");
+	fz::query_string qs;
+	
+	std::string host = fz::to_utf8(CBuildInfo::GetHostname());
 	if (host.empty()) {
-		host = L"unknown";
+		host = "unknown";
 	}
+	qs["platform"] = host;
+	qs["version"] = fz::to_utf8(CBuildInfo::GetVersion());
 
-	std::wstring version = CBuildInfo::GetVersion();
-	fz::replace_substrings(version, L" ", L"%20");
-
-	std::wstring url = fz::sprintf(L"https://update.filezilla-project.org/update.php?platform=%s&version=%s", host, version);
 #if defined(__WXMSW__) || defined(__WXMAC__)
 	// Makes not much sense to submit OS version on Linux, *BSD and the likes, too many flavours.
-	url += fz::sprintf(L"&osversion=%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
+	qs["osversion"] = fz::sprintf("%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
 #endif
 
 #ifdef __WXMSW__
 	if (wxIsPlatform64Bit()) {
-		url += L"&osarch=64";
+		qs["osarch"] = "64";
 	}
 	else {
-		url += L"&osarch=32";
+		qs["osarch"] = "32";
 	}
 
 	// Add information about package
@@ -208,43 +208,44 @@ std::wstring CUpdater::GetUrl()
 
 		long updated{};
 		if (key->GetValueType(_T("Updated")) == wxRegKey::Type_Dword && key->QueryValue(_T("Updated"), &updated)) {
-			url += fz::sprintf(L"&updated=%d", updated);
+			qs["updated"] = fz::to_string(updated);
 		}
 
 		long package{};
 		if (key->GetValueType(_T("Package")) == wxRegKey::Type_Dword && key->QueryValue(_T("Package"), &package)) {
-			url += fz::sprintf(L"&package=%d", package);
+			qs["package"] = fz::to_string(package);
 		}
 
 		wxString channel;
 		if (key->GetValueType(_T("Channel")) == wxRegKey::Type_String && key->QueryValue(_T("Channel"), channel)) {
-			url += fz::sprintf(L"&channel=%s", channel.ToStdWstring());
+			qs["channel"] = fz::to_utf8(channel);
 		}
 	}
 #endif
 
-	std::wstring const cpuCaps = CBuildInfo::GetCPUCaps(',');
+	std::string const cpuCaps = fz::to_utf8(CBuildInfo::GetCPUCaps(','));
 	if (!cpuCaps.empty()) {
-		url += L"&cpuid=" + cpuCaps;
+		qs["cpuid"] = cpuCaps;
 	}
 
 	std::wstring const lastVersion = COptions::Get()->GetOption(OPTION_UPDATECHECK_LASTVERSION);
 	if (lastVersion != CBuildInfo::GetVersion()) {
-		url += L"&initial=1";
+		qs["initial"] = "1";
 	}
 	else {
-		url += L"&initial=0";
+		qs["initial"] = "0";
 	}
 
 	if (manual_) {
-		url += L"&manual=1";
+		qs["manual"] = "1";
 	}
 
 	wxString v;
 	if (wxGetEnv(_T("FZUPDATETEST"), &v) && v == _T("1")) {
-		url += L"&test=1";
+		qs["test"] = "1";
 	}
-	return url;
+	uri.query_ = qs.to_string(true);
+	return uri;
 }
 
 bool CUpdater::Run(bool manual)
@@ -271,7 +272,7 @@ bool CUpdater::Run(bool manual)
 	SetState(UpdaterState::checking);
 
 	m_use_internal_rootcert = true;
-	int res = Download(GetUrl(), std::wstring());
+	int res = Request(GetUrl());
 
 	if (res != FZ_REPLY_WOULDBLOCK) {
 		SetState(UpdaterState::failed);
@@ -293,10 +294,27 @@ int CUpdater::Download(std::wstring const& url, std::wstring const& local_file)
 	return ContinueDownload();
 }
 
+int CUpdater::Request(fz::uri const& uri)
+{
+	wxASSERT(pending_commands_.empty());
+	pending_commands_.clear();
+	pending_commands_.emplace_back(new CDisconnectCommand);
+
+	CServer server(fz::equal_insensitive_ascii(uri.scheme_, std::string("http")) ? HTTP : HTTPS, DEFAULT, fz::to_wstring_from_utf8(uri.host_), uri.port_);
+	pending_commands_.emplace_back(new CConnectCommand(server, Credentials()));
+	pending_commands_.emplace_back(new CHttpRequestCommand(uri));
+
+	return ContinueDownload();
+}
+
 int CUpdater::ContinueDownload()
 {
 	if (pending_commands_.empty()) {
 		return FZ_REPLY_OK;
+	}
+
+	if (!engine_) {
+		engine_ = new CFileZillaEngine(engine_context_, *this);
 	}
 
 	int res = engine_->Execute(*pending_commands_.front());
@@ -566,24 +584,28 @@ void CUpdater::ProcessData(CDataNotification& dataNotification)
 		return;
 	}
 
-	int len;
+	size_t len;
 	char* data = dataNotification.Detach(len);
 
 	if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-		log_ += fz::sprintf(_T("ProcessData %d\n"), len);
+		log_ += fz::sprintf(_T("ProcessData %u\n"), len);
 	}
 
 	if (raw_version_information_.size() + len > 0x40000) {
-		log_ += _("Received version information is too large").ToStdWstring() + L"\n";
-		engine_->Cancel();
+		log_ += fztranslate("Received version information is too large") + L"\n";
+		if (engine_) {
+			engine_->Cancel();
+		}
 		SetState(UpdaterState::failed);
 	}
 	else {
-		for (int i = 0; i < len; ++i) {
-			if (data[i] < 10 || (unsigned char)data[i] > 127) {
-				log_ += _("Received invalid character in version information").ToStdWstring() + L"\n";
+		for (size_t i = 0; i < len; ++i) {
+			if (data[i] < 10 || static_cast<unsigned char>(data[i]) > 127) {
+				log_ += fztranslate("Received invalid character in version information") + L"\n";
 				SetState(UpdaterState::failed);
-				engine_->Cancel();
+				if (engine_) {
+					engine_->Cancel();
+				}
 				break;
 			}
 		}
@@ -605,7 +627,7 @@ void CUpdater::ParseData()
 	log_ += fz::sprintf(_("Parsing %d bytes of version information.\n"), static_cast<int>(raw_version_information.size()));
 
 	while (!raw_version_information.empty()) {
-		wxString line;
+		std::wstring line;
 		size_t pos = raw_version_information.find('\n');
 		if (pos != std::wstring::npos) {
 			line = raw_version_information.substr(0, pos);
@@ -616,8 +638,8 @@ void CUpdater::ParseData()
 			raw_version_information.clear();
 		}
 
-		wxStringTokenizer tokens(line, _T(" \t\n"), wxTOKEN_STRTOK);
-		if (!tokens.CountTokens()) {
+		auto const tokens = fz::strtok(line, L" \t\r\n");
+		if (tokens.empty()) {
 			// After empty line, changelog follows
 			version_information_.changelog_ = raw_version_information;
 			fz::trim(version_information_.changelog_);
@@ -628,30 +650,29 @@ void CUpdater::ParseData()
 			break;
 		}
 
-		std::wstring const type = tokens.GetNextToken().ToStdWstring();
-		if (type == _T("resources")) {
-			if (tokens.HasMoreTokens()) {
-				if (UpdatableBuild()) {
-					version_information_.resources_ = tokens.GetNextToken();
-				}
-			}
-			continue;
-		}
-
-		if (tokens.CountTokens() != 1 && tokens.CountTokens() != 5) {
+		if (tokens.size() < 2) {
 			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-				log_ += fz::sprintf(L"Skipping line with %d tokens\n", static_cast<int>(tokens.CountTokens() + 1));
+				log_ += fz::sprintf(L"Skipping line with one token of type %s\n", type);
 			}
 			continue;
 		}
 
-		wxString versionOrDate = tokens.GetNextToken();
+		std::wstring const& type = tokens[0];
+		if (type == L"resources") {
+			if (UpdatableBuild()) {
+				version_information_.resources_ = tokens[1];
+			}
+			continue;
+		}
 
-		if (type == _T("nightly")) {
-			fz::datetime nightlyDate(versionOrDate.ToStdWstring(), fz::datetime::utc);
+
+		std::wstring const& versionOrDate = tokens[1];
+
+		if (type == L"nightly") {
+			fz::datetime nightlyDate(versionOrDate, fz::datetime::utc);
 			if (nightlyDate.empty()) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-					log_ += _T("Could not parse nightly date\n");
+					log_ += L"Could not parse nightly date\n";
 				}
 				continue;
 			}
@@ -659,26 +680,37 @@ void CUpdater::ParseData()
 			fz::datetime buildDate = CBuildInfo::GetBuildDate();
 			if (buildDate.empty() || nightlyDate.empty() || nightlyDate <= buildDate) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-					log_ += _T("Nightly isn't newer\n");
+					log_ += L"Nightly isn't newer\n";
 				}
 				continue;
 			}
 		}
-		else {
+		else if (type == L"release" || type == L"beta") {
 			int64_t v = CBuildInfo::ConvertToVersionNumber(versionOrDate.c_str());
 			if (v <= ownVersionNumber) {
 				continue;
 			}
 		}
+		else {
+			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				log_ += fz::sprintf(L"Skipping line with unknown type %s\n", type);
+			}
+			continue;
+		}
 
 		build b;
 		b.version_ = versionOrDate;
 
-		if (UpdatableBuild() && tokens.CountTokens() == 4) {
-			std::wstring const url = tokens.GetNextToken().ToStdWstring();
-			wxString const sizestr = tokens.GetNextToken();
-			wxString const hash_algo = tokens.GetNextToken();
-			std::wstring const hash = tokens.GetNextToken().ToStdWstring();
+		if (tokens.size() < 6) {
+			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				log_ += fz::sprintf(L"Not parsing build line with only %d tokens", tokens.size());
+			}
+		}
+		else if (UpdatableBuild()) {
+			std::wstring const& url = tokens[2];
+			std::wstring const& sizestr = tokens[3];
+			std::wstring const& hash_algo = tokens[4];
+			std::wstring const& hash = tokens[5];
 
 			if (GetFilename(url).empty()) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
@@ -687,20 +719,20 @@ void CUpdater::ParseData()
 				continue;
 			}
 
-			if (hash_algo.CmpNoCase(_T("sha512"))) {
+			if (!fz::equal_insensitive_ascii(hash_algo, std::wstring(L"sha512"))) {
 				continue;
 			}
 
-			unsigned long long l = 0;
-			if (!sizestr.ToULongLong(&l)) {
+			auto const size = fz::to_integral<uint64_t>(sizestr);
+			if (!size) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-					log_ += fz::sprintf(L"Could not parse size: %s", sizestr.ToStdWstring()) + L"\n";
+					log_ += fz::sprintf(L"Could not parse size: %s", sizestr) + L"\n";
 				}
 				continue;
 			}
 
 			b.url_ = url;
-			b.size_ = l;
+			b.size_ = size;
 			b.hash_ = fz::str_tolower_ascii(hash);
 			bool valid_hash = true;
 			for (auto const& c : b.hash_) {

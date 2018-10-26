@@ -240,6 +240,15 @@ void CHttpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath
 	Push(std::make_unique<CHttpFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, settings));
 }
 
+void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)
+{
+	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::FileTransfer()");
+
+	LogMessage(MessageType::Status, _("Requesting %s"), command.uri_.to_string());
+
+	Push(std::make_unique<CHttpFileTransferOpData>(*this, command.uri_, command.verb_, command.body_));
+}
+
 void CHttpControlSocket::Request(std::shared_ptr<HttpRequestResponseInterface> const& request)
 {
 	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::Request()");

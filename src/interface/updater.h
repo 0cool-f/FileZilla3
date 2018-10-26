@@ -9,6 +9,8 @@
 
 #include <functional>
 
+#include <libfilezilla/uri.hpp>
+
 struct build
 {
 	std::wstring url_;
@@ -86,6 +88,7 @@ public:
 
 protected:
 	int Download(std::wstring const& url, std::wstring const& local_file = std::wstring());
+	int Request(fz::uri const& uri);
 	int ContinueDownload();
 
 	void AutoRunIfNeeded();
@@ -94,7 +97,7 @@ protected:
 	bool CreateConnectCommand(std::wstring const& url);
 	bool CreateTransferCommand(std::wstring const& url, std::wstring const& local_file);
 
-	std::wstring GetUrl();
+	fz::uri GetUrl();
 	void ProcessNotification(std::unique_ptr<CNotification> && notification);
 	void ProcessOperation(COperationNotification const& operation);
 	void ProcessData(CDataNotification& dataNotification);
@@ -118,7 +121,10 @@ protected:
 
 	UpdaterState state_;
 	std::wstring local_file_;
-	CFileZillaEngine* engine_;
+	
+	CFileZillaEngineContext& engine_context_;
+	CFileZillaEngine* engine_{};
+	
 	bool m_use_internal_rootcert{};
 
 	std::wstring raw_version_information_;

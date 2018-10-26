@@ -14,6 +14,25 @@ enum filetransferStates
 	filetransfer_waittransfer
 };
 
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
+	: CFileTransferOpData(L"CHttpFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
+	, CHttpOpData(controlSocket)
+{
+	rr_.request_.uri_ = fz::uri(fz::to_utf8(currentServer_.Format(ServerFormat::url)) + fz::percent_encode(fz::to_utf8(remotePath_.FormatFilename(remoteFile_)), true));
+	rr_.request_.verb_ = "GET";
+
+}
+
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body)
+	: CFileTransferOpData(L"CHttpFileTransferOpData", true, std::wstring(), std::wstring(), CServerPath(), CFileTransferCommand::t_transferSettings())
+	, CHttpOpData(controlSocket)
+{
+	rr_.request_.uri_ = uri;
+	rr_.request_.body_ = std::make_unique<simple_body>(body);
+	rr_.request_.verb_ = verb;
+}
+
+
 int CHttpFileTransferOpData::Send()
 {
 	switch (opState) {
@@ -22,14 +41,10 @@ int CHttpFileTransferOpData::Send()
 			return FZ_REPLY_NOTSUPPORTED;
 		}
 
-		// TODO: Ordinarily we need to percent-encode the filename. With the current API we then however would not be able to pass the query part of the URL
-		rr_.request_.uri_ = fz::uri(fz::to_utf8(currentServer_.Format(ServerFormat::url)) + fz::to_utf8(remotePath_.FormatFilename(remoteFile_)));
 		if (rr_.request_.uri_.empty()) {
 			LogMessage(MessageType::Error, _("Could not create URI for this transfer."));
 			return FZ_REPLY_ERROR;
 		}
-
-		rr_.request_.verb_ = "GET";
 
 		opState = filetransfer_waitfileexists;
 		if (!localFile_.empty()) {

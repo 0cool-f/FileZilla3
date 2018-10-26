@@ -667,6 +667,19 @@ void CFileZillaEnginePrivate::OnCommandEvent()
 			case Command::chmod:
 				res = Chmod(static_cast<CChmodCommand const&>(command));
 				break;
+			case Command::httrequest:
+				{
+					auto * http_socket = dynamic_cast<CHttpControlSocket*>(controlSocket_.get());
+					if (http_socket) {
+						http_socket->FileTransfer(static_cast<CHttpRequestCommand const&>(command));
+						res = FZ_REPLY_CONTINUE;
+					}
+					else {
+						m_pLogging->LogMessage(MessageType::Error, _("Command not supported by this protocol"));
+						res = FZ_REPLY_NOTSUPPORTED;
+					}
+				}
+				break;
 			default:
 				res = FZ_REPLY_SYNTAXERROR;
 			}
