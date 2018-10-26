@@ -34,6 +34,7 @@ static const t_protocolInfo protocolInfos[] = {
 	{ GOOGLE_DRIVE, L"gdrive",   true, 443, false, "Google Drive",                                                            L"https" },
 	{ DROPBOX,      L"dropbox",  true, 443, false, "Dropbox",                                                                 L"https" },
 	{ ONEDRIVE,     L"onedrive", true, 443, false, "Microsoft OneDrive",                                                      L"https" },
+	{ B2,           L"b2",       true, 443, false, "Backblaze B2",                                                            L"https" },
 	{ UNKNOWN,      L"",         false, 21, false, "", L"" }
 };
 
@@ -797,6 +798,7 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 	case AZURE_FILE:
 	case AZURE_BLOB:
 	case SWIFT:
+	case B2:
 		return {LogonType::normal, LogonType::ask};
 	case WEBDAV:
 		return {LogonType::anonymous, LogonType::normal, LogonType::ask};
@@ -861,6 +863,8 @@ std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol)
 		return std::tuple<std::wstring, std::wstring>{L"api.dropboxapi.com", L""};
 	case ONEDRIVE:
 		return std::tuple<std::wstring, std::wstring>{L"graph.microsoft.com", L""};
+	case B2:
+		return std::tuple<std::wstring, std::wstring>{L"api.backblazeb2.com", L""};
 	default:
 		break;
 	}

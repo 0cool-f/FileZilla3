@@ -32,7 +32,9 @@ enum ServerProtocol
 
 	ONEDRIVE,
 
-	MAX_VALUE = ONEDRIVE
+	B2,
+
+	MAX_VALUE = B2
 };
 
 enum ServerType

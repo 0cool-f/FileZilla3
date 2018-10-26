@@ -297,6 +297,12 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		// @translator: Keep short
 		userHint = _("Project (or tenant) name or ID");
 		break;
+	case B2:
+		// @translator: Keep short
+		userLabel = _("&Account ID:");
+		// @translator: Keep short
+		passLabel = _("Application &Key:");
+		break;
 	default:
 		break;
 	}
