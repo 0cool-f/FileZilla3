@@ -261,7 +261,12 @@ CServer::CServer(ServerProtocol protocol, ServerType type, std::wstring const& h
 	m_protocol = protocol;
 	m_type = type;
 	m_host = host;
-	m_port = port;
+	if (port) {
+		m_port = port;
+	}
+	else {
+		port = GetDefaultPort(protocol);
+	}
 }
 
 void CServer::SetType(ServerType type)
