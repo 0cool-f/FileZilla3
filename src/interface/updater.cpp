@@ -650,6 +650,7 @@ void CUpdater::ParseData()
 			break;
 		}
 
+		std::wstring const& type = tokens[0];
 		if (tokens.size() < 2) {
 			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Skipping line with one token of type %s\n", type);
@@ -657,7 +658,6 @@ void CUpdater::ParseData()
 			continue;
 		}
 
-		std::wstring const& type = tokens[0];
 		if (type == L"resources") {
 			if (UpdatableBuild()) {
 				version_information_.resources_ = tokens[1];
