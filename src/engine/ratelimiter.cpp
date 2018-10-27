@@ -195,14 +195,17 @@ void CRateLimiter::OnTimer(fz::timer_id)
 			}
 			tokens = 0;
 
-			for (size_t i = 0; i < unsaturated; ++i) {
-				auto * object = scratchBuf_[i];
+			for (size_t j = 0; j < unsaturated; ) {
+				auto * object = scratchBuf_[j];
 				object->bytesAvailable_[i] += tokensPerObject;
 				if (object->bytesAvailable_[i] > maxTokens) {
 					tokens += object->bytesAvailable_[i] - maxTokens;
 					object->bytesAvailable_[i] = maxTokens;
 
-					scratchBuf_[i] = scratchBuf_[--unsaturated];
+					scratchBuf_[j] = scratchBuf_[--unsaturated];
+				}
+				else {
+					++j;
 				}
 			}
 		}
@@ -276,6 +279,7 @@ void CRateLimiter::OnOptionsChanged(changed_options_t const&)
 
 void CRateLimiterObject::UpdateUsage(CRateLimiter::rate_direction direction, int usedBytes)
 {
+	assert(0 <= direction && direction <= 1);
 	assert(usedBytes <= bytesAvailable_[direction]);
 	if (usedBytes > bytesAvailable_[direction]) {
 		bytesAvailable_[direction] = 0;
@@ -287,11 +291,13 @@ void CRateLimiterObject::UpdateUsage(CRateLimiter::rate_direction direction, int
 
 void CRateLimiterObject::Wait(CRateLimiter::rate_direction direction)
 {
+	assert(0 <= direction && direction <= 1);
 	assert(bytesAvailable_[direction] == 0);
 	waiting_[direction] = true;
 }
 
 bool CRateLimiterObject::IsWaiting(CRateLimiter::rate_direction direction) const
 {
+	assert(0 <= direction && direction <= 1);
 	return waiting_[direction];
 }
