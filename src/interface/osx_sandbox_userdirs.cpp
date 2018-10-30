@@ -155,7 +155,9 @@ bool OSXSandboxUserdirs::Save()
 
 bool OSXSandboxUserdirs::Add()
 {
-	wxDirDialog dlg(0, (L"Select local data directory"), L"TEST", wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
+	wxString home;
+	wxGetEnv(L"HOME", &home);
+	wxDirDialog dlg(0, (L"Select local data directory"), home, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 	if (dlg.ShowModal() != wxID_OK) {
 		return false;
 	}
