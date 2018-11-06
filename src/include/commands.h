@@ -20,7 +20,7 @@ enum class Command
 	rename,
 	chmod,
 	raw,
-	httrequest, // Only used by HTTP protocol
+	httprequest, // Only used by HTTP protocol
 
 	// Only used internally
 	cwd,
@@ -186,7 +186,7 @@ protected:
 	t_transferSettings const m_transferSettings;
 };
 
-class CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httrequest>
+class CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>
 {
 public:
 	// Reply body is delivered through nId_data notifications

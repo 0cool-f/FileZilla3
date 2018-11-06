@@ -667,7 +667,7 @@ void CFileZillaEnginePrivate::OnCommandEvent()
 			case Command::chmod:
 				res = Chmod(static_cast<CChmodCommand const&>(command));
 				break;
-			case Command::httrequest:
+			case Command::httprequest:
 				{
 					auto * http_socket = dynamic_cast<CHttpControlSocket*>(controlSocket_.get());
 					if (http_socket) {
