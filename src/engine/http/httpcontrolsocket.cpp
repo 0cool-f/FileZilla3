@@ -295,7 +295,7 @@ int CHttpControlSocket::InternalConnect(std::wstring const& host, unsigned short
 	return FZ_REPLY_CONTINUE;
 }
 
-void CHttpControlSocket::OnClose(int error)
+void CHttpControlSocket::OnSocketError(int error)
 {
 	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::OnClose(%d)", error);
 
@@ -305,25 +305,8 @@ void CHttpControlSocket::OnClose(int error)
 		return;
 	}
 
-	if (error) {
-		LogMessage(MessageType::Error, _("Disconnected from server: %s"), fz::socket_error_description(error));
-		ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
-		return;
-	}
-
-	if (!operations_.empty() && operations_.back()->opId == PrivCommand::http_request) {
-		auto & data = static_cast<CHttpRequestOpData&>(*operations_.back());
-		int res = data.OnClose();
-		if (res == FZ_REPLY_CONTINUE) {
-			SendNextCommand();
-		}
-		else {
-			ResetOperation(res);
-		}
-	}
-	else {
-		ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
-	}
+	LogMessage(MessageType::Error, _("Disconnected from server: %s"), fz::socket_error_description(error));
+	ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
 }
 
 void CHttpControlSocket::ResetSocket()

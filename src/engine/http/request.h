@@ -34,7 +34,6 @@ public:
 	void AddRequest(std::shared_ptr<HttpRequestResponseInterface> const& rr);
 
 	int OnReceive();
-	int OnClose();
 
 private:
 	int ParseReceiveBuffer(bool eof);

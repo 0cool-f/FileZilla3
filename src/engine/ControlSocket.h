@@ -287,7 +287,7 @@ protected:
 	virtual void OnConnect();
 	virtual void OnReceive();
 	virtual int OnSend();
-	virtual void OnClose(int error);
+	virtual void OnSocketError(int error);
 
 	int Send(unsigned char const* buffer, unsigned int len);
 	int Send(char const* buffer, unsigned int len) {

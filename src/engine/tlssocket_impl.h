@@ -103,12 +103,9 @@ protected:
 
 	bool m_canReadFromSocket{true};
 	bool m_canWriteToSocket{true};
-	bool m_canCheckCloseSocket{false};
 
 	bool m_canTriggerRead{false};
 	bool m_canTriggerWrite{true};
-
-	bool m_socketClosed{};
 
 	fz::socket& m_socket;
 	std::unique_ptr<CSocketBackend> socketBackend_;

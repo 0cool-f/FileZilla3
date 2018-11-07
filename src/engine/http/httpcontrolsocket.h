@@ -260,7 +260,7 @@ protected:
 	CTlsSocket* m_pTlsSocket{};
 
 	virtual void OnConnect() override;
-	virtual void OnClose(int error) override;
+	virtual void OnSocketError(int error) override;
 	virtual void OnReceive() override;
 	virtual int OnSend() override;
 	

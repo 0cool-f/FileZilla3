@@ -55,7 +55,7 @@ protected:
 	void OnAccept(int error);
 	void OnReceive();
 	void OnSend();
-	void OnClose(int error);
+	void OnSocketError(int error);
 	void OnTimer(fz::timer_id);
 
 	// Create a socket server
@@ -83,11 +83,6 @@ protected:
 	char *m_pTransferBuffer{};
 	int m_transferBufferLen{};
 
-	// Set to true if OnClose got called
-	// We now have to read all available data in the socket, ignoring any
-	// speed limits
-	bool m_onCloseCalled{};
-
 	bool m_postponedReceive{};
 	bool m_postponedSend{};
 	void TriggerPostponedEvents();
@@ -97,7 +92,6 @@ protected:
 	CProxySocket* m_pProxyBackend{};
 
 	CTlsSocket* m_pTlsSocket{};
-	bool m_shutdown{};
 
 	// Needed for the madeProgress field in CTransferStatus
 	// Initially 0, 2 if made progress

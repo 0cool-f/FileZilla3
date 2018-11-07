@@ -260,9 +260,6 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 		case fz::socket_event_flag::write:
 			OnSend();
 			break;
-		case fz::socket_event_flag::close:
-			OnClose();
-			break;
 		case fz::socket_event_flag::connection:
 			OnConnect();
 			break;
@@ -277,10 +274,6 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 			return;
 		}
 		switch (t) {
-		case fz::socket_event_flag::close:
-			PrintMessage(_("Listen socket closed"), 1);
-			CloseSocket();
-			break;
 		case fz::socket_event_flag::connection:
 			OnAccept();
 			break;
@@ -295,9 +288,6 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 		}
 		switch (t)
 		{
-		case fz::socket_event_flag::close:
-			OnDataClose();
-			break;
 		case fz::socket_event_flag::read:
 			OnDataReceive();
 			break;

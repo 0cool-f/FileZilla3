@@ -764,7 +764,7 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 	case fz::socket_event_flag::connection:
 		if (error) {
 			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\"."), fz::socket_error_description(error));
-			OnClose(error);
+			OnSocketError(error);
 		}
 		else {
 			if (m_pProxyBackend && !m_pProxyBackend->Detached()) {
@@ -775,13 +775,20 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 		}
 		break;
 	case fz::socket_event_flag::read:
-		OnReceive();
+		if (error) {
+			OnSocketError(error);
+		}
+		else {
+			OnReceive();
+		}
 		break;
 	case fz::socket_event_flag::write:
-		OnSend();
-		break;
-	case fz::socket_event_flag::close:
-		OnClose(error);
+		if (error) {
+			OnSocketError(error);
+		}
+		else {
+			OnSend();
+		}
 		break;
 	default:
 		LogMessage(MessageType::Debug_Warning, L"Unhandled socket event %d", t);
@@ -833,19 +840,14 @@ int CRealControlSocket::OnSend()
 	return FZ_REPLY_CONTINUE;
 }
 
-void CRealControlSocket::OnClose(int error)
+void CRealControlSocket::OnSocketError(int error)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CRealControlSocket::OnClose(%d)", error);
+	LogMessage(MessageType::Debug_Verbose, L"CRealControlSocket::OnSocketError(%d)", error);
 
 	auto cmd = GetCurrentCommandId();
 	if (cmd != Command::connect) {
 		auto messageType = (cmd == Command::none) ? MessageType::Status : MessageType::Error;
-		if (!error) {
-			LogMessage(messageType, _("Connection closed by server"));
-		}
-		else {
-			LogMessage(messageType, _("Disconnected from server: %s"), fz::socket_error_description(error));
-		}
+		LogMessage(messageType, _("Disconnected from server: %s"), fz::socket_error_description(error));
 	}
 	DoClose();
 }

@@ -383,9 +383,6 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 #if TLSDEBUG
 	m_pOwner->LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::PullFunction(%d)",  (int)len);
 #endif
-	if (m_socketClosed) {
-		return 0;
-	}
 
 	if (!m_canReadFromSocket) {
 		gnutls_transport_set_errno(m_session, EAGAIN);
@@ -396,12 +393,7 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 	int read = socketBackend_->Read(data, static_cast<unsigned int>(len), error);
 	if (read < 0) {
 		m_canReadFromSocket = false;
-		if (error == EAGAIN) {
-			if (m_canCheckCloseSocket && !socketBackend_->IsWaiting(CRateLimiter::inbound)) {
-				tlsSocket_.send_event<fz::socket_event>(socketBackend_.get(), fz::socket_event_flag::close, 0);
-			}
-		}
-		else {
+		if (error != EAGAIN) {
 			m_socket_error = error;
 		}
 		gnutls_transport_set_errno(m_session, error);
@@ -409,10 +401,6 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 		m_pOwner->LogMessage(MessageType::Debug_Debug, L"  returning -1 due to %d", error);
 #endif
 		return -1;
-	}
-
-	if (m_canCheckCloseSocket) {
-		tlsSocket_.send_event<fz::socket_event>(socketBackend_.get(), fz::socket_event_flag::close, 0);
 	}
 
 	if (!read) {
@@ -437,6 +425,12 @@ void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source*, fz::socket_event_fl
 		return;
 	}
 
+	if (error) {
+		m_socket_error = error;
+		Failure(0, true);
+		return;
+	}
+
 	switch (t)
 	{
 	case fz::socket_event_flag::read:
@@ -444,31 +438,6 @@ void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source*, fz::socket_event_fl
 		break;
 	case fz::socket_event_flag::write:
 		OnSend();
-		break;
-	case fz::socket_event_flag::close:
-		{
-			m_canCheckCloseSocket = true;
-			char tmp[100];
-			int peeked = socketBackend_->Peek(&tmp, 100, error);
-			if (peeked >= 0) {
-				if (peeked > 0) {
-					m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::OnSocketEvent(): pending data, postponing close event");
-				}
-				else {
-					m_socket_eof = true;
-					m_socketClosed = true;
-				}
-				OnRead();
-
-				if (peeked) {
-					return;
-				}
-			}
-
-			m_pOwner->LogMessage(MessageType::Debug_Info, L"CTlsSocketImpl::OnSocketEvent(): close event received");
-
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::close, 0);
-		}
 		break;
 	default:
 		break;
@@ -664,7 +633,7 @@ int CTlsSocketImpl::ContinueHandshake()
 		if (m_shutdown_requested) {
 			int error = Shutdown();
 			if (!error || error != EAGAIN) {
-				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::close, 0);
+				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, error);
 			}
 		}
 
@@ -741,6 +710,13 @@ int CTlsSocketImpl::Write(const void *buffer, unsigned int len, int& error)
 		error = EAGAIN;
 		return -1;
 	}
+	else if (m_tlsState == CTlsSocket::TlsState::closing) {
+		error = EAGAIN;
+		return -1;
+	}
+	else if (m_tlsState == CTlsSocket::TlsState::closed) {
+		return 0;
+	}
 	else if (m_tlsState != CTlsSocket::TlsState::conn) {
 		error = ENOTCONN;
 		return -1;
@@ -761,8 +737,9 @@ int CTlsSocketImpl::Write(const void *buffer, unsigned int len, int& error)
 
 	ssize_t res = gnutls_record_send(m_session, buffer, len);
 
-	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket)
+	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
 		res = gnutls_record_send(m_session, nullptr, 0);
+	}
 
 	if (res >= 0) {
 		error = 0;
@@ -863,10 +840,22 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 			}
 		}
 	}
+
+	auto const oldState = m_tlsState;
+
 	Uninit();
 
 	if (send_close) {
-		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::close, m_socket_error);
+		int error = m_socket_error;
+		if (!error) {
+			error = WSAECONNABORTED;
+		}
+		if (oldState == CTlsSocket::TlsState::handshake) {
+			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, error);
+		}
+		else {
+			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, error);
+		}
 	}
 }
 
@@ -943,7 +932,7 @@ void CTlsSocketImpl::ContinueShutdown()
 	if (!res) {
 		m_tlsState = CTlsSocket::TlsState::closed;
 
-		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::close, 0);
+		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
 
 		return;
 	}
@@ -963,8 +952,9 @@ void CTlsSocketImpl::TrustCurrentCert(bool trusted)
 	if (trusted) {
 		m_tlsState = CTlsSocket::TlsState::conn;
 
-		if (m_lastWriteFailed)
+		if (m_lastWriteFailed) {
 			m_lastWriteFailed = false;
+		}
 		CheckResumeFailedReadWrite();
 
 		if (m_tlsState == CTlsSocket::TlsState::conn) {

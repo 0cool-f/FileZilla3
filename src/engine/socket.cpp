@@ -41,8 +41,7 @@
 #define WAIT_READ	 0x02
 #define WAIT_WRITE	 0x04
 #define WAIT_ACCEPT  0x08
-#define WAIT_CLOSE	 0x10
-#define WAIT_EVENTCOUNT 5
+#define WAIT_EVENTCOUNT 4
 
 namespace fz {
 
@@ -649,21 +648,18 @@ protected:
 
 		for (;;) {
 #ifdef FZ_WINDOWS
-			int wait_events = FD_CLOSE;
+			int wait_events{};
 			if (waiting_ & WAIT_CONNECT) {
 				wait_events |= FD_CONNECT;
 			}
 			if (waiting_ & WAIT_READ) {
-				wait_events |= FD_READ;
+				wait_events |= FD_READ | FD_CLOSE;
 			}
 			if (waiting_ & WAIT_WRITE) {
 				wait_events |= FD_WRITE;
 			}
 			if (waiting_ & WAIT_ACCEPT) {
 				wait_events |= FD_ACCEPT;
-			}
-			if (waiting_ & WAIT_CLOSE) {
-				wait_events |= FD_CLOSE;
 			}
 			WSAEventSelect(socket_->fd_, sync_event_, wait_events);
 			l.unlock();
@@ -681,6 +677,11 @@ protected:
 				return false;
 			}
 
+			thread_local static int foo{};
+			if (++foo == 1000) {
+				return false;
+			}
+
 			if (waiting_ & WAIT_CONNECT) {
 				if (events.lNetworkEvents & FD_CONNECT) {
 					triggered_ |= WAIT_CONNECT;
@@ -692,6 +693,14 @@ protected:
 				if (events.lNetworkEvents & FD_READ) {
 					triggered_ |= WAIT_READ;
 					triggered_errors_[1] = convert_msw_error_code(events.iErrorCode[FD_READ_BIT]);
+					waiting_ &= ~WAIT_READ;
+				}
+				if (events.lNetworkEvents & FD_CLOSE) {
+					triggered_ |= WAIT_READ;
+					int err = convert_msw_error_code(events.iErrorCode[FD_CLOSE_BIT]);
+					if (err) {
+						triggered_errors_[1] = err;
+					}
 					waiting_ &= ~WAIT_READ;
 				}
 			}
@@ -707,13 +716,6 @@ protected:
 					triggered_ |= WAIT_ACCEPT;
 					triggered_errors_[3] = convert_msw_error_code(events.iErrorCode[FD_ACCEPT_BIT]);
 					waiting_ &= ~WAIT_ACCEPT;
-				}
-			}
-			if (waiting_ & WAIT_CLOSE) {
-				if (events.lNetworkEvents & FD_CLOSE) {
-					triggered_ |= WAIT_CLOSE;
-					triggered_errors_[4] = convert_msw_error_code(events.iErrorCode[FD_CLOSE_BIT]);
-					waiting_ &= ~WAIT_CLOSE;
 				}
 			}
 
@@ -822,36 +824,6 @@ protected:
 			socket_->evt_handler_->send_event<socket_event>(socket_, socket_event_flag::connection, triggered_errors_[3]);
 			triggered_ &= ~WAIT_ACCEPT;
 		}
-		if (triggered_ & WAIT_CLOSE) {
-			send_close_event();
-		}
-	}
-
-	void send_close_event()
-	{
-		if (!socket_ || !socket_->evt_handler_) {
-			return;
-		}
-
-#ifdef FZ_WINDOWS
-		// MSDN says this:
-		//   FD_CLOSE being posted after all data is read from a socket.
-		//   An application should check for remaining data upon receipt
-		//   of FD_CLOSE to avoid any possibility of losing data.
-		// First half is actually plain wrong.
-		char buf;
-		if (!triggered_errors_[4] && recv( socket_->fd_, &buf, 1, MSG_PEEK ) > 0) {
-			if (!(waiting_ & WAIT_READ)) {
-				return;
-			}
-			socket_->evt_handler_->send_event<socket_event>(socket_, socket_event_flag::read, 0);
-		}
-		else
-#endif
-		{
-			socket_->evt_handler_->send_event<socket_event>(socket_, socket_event_flag::close, triggered_errors_[4]);
-			triggered_ &= ~WAIT_CLOSE;
-		}
 	}
 
 	// Call only while locked
@@ -899,10 +871,6 @@ protected:
 					}
 				}
 
-#ifdef FZ_WINDOWS
-				waiting_ |= WAIT_CLOSE;
-				int wait_close = WAIT_CLOSE;
-#endif
 				while (idle_loop(l)) {
 					if (socket_->fd_ == -1) {
 						waiting_ = 0;
@@ -910,21 +878,11 @@ protected:
 					}
 					bool res = do_wait(0, l);
 
-					if (triggered_ & WAIT_CLOSE && socket_) {
-						socket_->state_ = socket::closing;
-#ifdef FZ_WINDOWS
-						wait_close = 0;
-#endif
-					}
-
 					if (!res) {
 						break;
 					}
 
 					send_events();
-#ifdef FZ_WINDOWS
-					waiting_ |= wait_close;
-#endif
 				}
 			}
 		}
@@ -1027,30 +985,12 @@ void socket_base::set_event_handler(event_handler* pEvtHandler)
 		evt_handler_ = pEvtHandler;
 
 		if (pEvtHandler && dynamic_cast<socket*>(this) && state_ == socket::connected) {
-#ifdef FZ_WINDOWS
-			// If a graceful shutdown is going on in background already,
-			// no further events are recorded. Send out events we're not
-			// waiting for (i.e. they got triggered already) manually.
-
-			if (!(socket_thread_->waiting_ & WAIT_WRITE)) {
+			if (!(socket_thread_->waiting_ & WAIT_WRITE) && !has_pending_event(evt_handler_, this, socket_event_flag::write)) {
 				pEvtHandler->send_event<socket_event>(this, socket_event_flag::write, 0);
 			}
-
-			pEvtHandler->send_event<socket_event>(this, socket_event_flag::read, 0);
-			if (socket_thread_->waiting_ & WAIT_READ) {
-				socket_thread_->waiting_ &= ~WAIT_READ;
-				socket_thread_->wakeup_thread(l);
+			if (!(socket_thread_->waiting_ & WAIT_READ) && !has_pending_event(evt_handler_, this, socket_event_flag::read)) {
+				pEvtHandler->send_event<socket_event>(this, socket_event_flag::read, 0);
 			}
-#else
-			socket_thread_->waiting_ |= WAIT_READ | WAIT_WRITE;
-			socket_thread_->wakeup_thread(l);
-#endif
-		}
-		else if (pEvtHandler && dynamic_cast<socket*>(this) && state_ == socket::closing) {
-			if (!(socket_thread_->triggered_ & WAIT_READ)) {
-				socket_thread_->waiting_ |= WAIT_READ;
-			}
-			socket_thread_->send_events();
 		}
 	}
 	else {
@@ -1648,7 +1588,7 @@ int socket::ideal_send_buffer_size()
 	if (fd_ != -1) {
 		// MSDN says this:
 		// "Dynamic send buffering for TCP was added on Windows 7 and Windows
-		// Server 2008 R2.By default, dynamic send buffering for TCP is
+		// Server 2008 R2. By default, dynamic send buffering for TCP is
 		// enabled unless an application sets the SO_SNDBUF socket option on
 		// the stream socket"
 		//
@@ -1690,15 +1630,28 @@ void socket::retrigger(socket_event_flag event)
 	
 	fz::scoped_lock l(socket_thread_->mutex_);
 
-	if (has_pending_event(evt_handler_, this, event)) {
+	if (state_ != socket::connected) {
+		return;
+	}
+
+	if (!evt_handler_ || has_pending_event(evt_handler_, this, event)) {
 		return;
 	}
 
 	int const wait_flag = (event == socket_event_flag::read) ? WAIT_READ : WAIT_WRITE;
 	if (!(socket_thread_->waiting_ & wait_flag)) {
-		socket_thread_->waiting_ |= wait_flag;
-		socket_thread_->wakeup_thread(l);
+		evt_handler_->send_event<socket_event>(this, event, 0);
 	}
+}
+
+int socket::shutdown()
+{
+	int res = ::shutdown(fd_, FD_WRITE);
+	if (res != 0) {
+		return last_socket_error();
+	}
+
+	return 0;
 }
 
 }

@@ -20,8 +20,7 @@ enum class socket_event_flag
 
 	connection,
 	read,
-	write,
-	close
+	write
 };
 
 /**
@@ -45,6 +44,16 @@ struct socket_event_type;
  * All socket events are sent through this.
  *
  * \sa \ref fz::socket_event_flag
+ *
+ * If the error value is non-zero for the connection, read and write events,
+ * the socket has failed and needs to be closed. Doing anything else with
+ * failed sockets is undefined behavior. 
+ * Failure events can be received at any time.
+ *
+ * Read and write events are edge-triggered:
+ * - After receiving a read event for a socket, it will not be sent again unless
+ * a subsequent call to socket::read has returned EAGAIN.
+ * - The same holds for the write event and socket::write
  */
 typedef simple_event<socket_event_type, socket_event_source*, socket_event_flag, int> socket_event;
 
@@ -218,8 +227,6 @@ public:
 		// Only in this state you can get send or receive events
 		connected,
 
-		// Graceful shutdown, you get close event once done
-		closing,
 		closed
 	};
 	socket_state get_state();
@@ -228,9 +235,11 @@ public:
 	// Returns 0 on success, else an error code. Note: EINPROGRESS is
 	// not really an error. On success, you should still wait for the
 	// connection event.
-	// If host is a name that can be resolved, a hostaddress socket event gets sent.
-	// Once connections got established, a connection event gets sent. If
-	// connection could not be established, a close event gets sent.
+	// If host is a name that can be resolved, a hostaddress socket event gets
+	// sent.
+	// Once connections got established or establishment fails, a connection
+	// event gets sent, with the error parameter indicating success or failur.
+	// connection could not be established, a connection event with an error event gets sent.
 	int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown, std::string const& bind = std::string());
 
 	// After receiving a send or receive event, you can call these functions
@@ -269,6 +278,13 @@ public:
 	 * Slow and cumbersome, use sparingly.
 	 */
 	void retrigger(socket_event_flag event);
+
+	/**
+	 * \brief Signals peers that we want to close the connections.
+	 *
+	 * Implicitly done through close.
+	 */
+	int shutdown();
 
 private:
 	friend class listen_socket;

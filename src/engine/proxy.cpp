@@ -203,22 +203,26 @@ void CProxySocket::operator()(fz::event_base const& ev)
 
 void CProxySocket::OnSocketEvent(socket_event_source*, fz::socket_event_flag t, int error)
 {
-	switch (t) {
-	case fz::socket_event_flag::connection_next:
+	if (m_proxyState != handshake) {
+		return;
+	}
+
+	if (t == fz::socket_event_flag::connection_next) {
 		if (error) {
 			m_pOwner->LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket_error_description(error));
 		}
-		break;
+		return;
+	}
+
+	if (error) {
+		m_proxyState = noconn;
+		m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
+		return;
+	}
+
+	switch (t) {
 	case fz::socket_event_flag::connection:
-		if (error) {
-			if (m_proxyState == handshake) {
-				m_proxyState = noconn;
-			}
-			m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
-		}
-		else {
-			m_pOwner->LogMessage(MessageType::Status, _("Connection with proxy established, performing handshake..."));
-		}
+		m_pOwner->LogMessage(MessageType::Status, _("Connection with proxy established, performing handshake..."));
 		break;
 	case fz::socket_event_flag::read:
 		OnReceive();
@@ -226,8 +230,7 @@ void CProxySocket::OnSocketEvent(socket_event_source*, fz::socket_event_flag t, 
 	case fz::socket_event_flag::write:
 		OnSend();
 		break;
-	case fz::socket_event_flag::close:
-		OnReceive();
+	default:
 		break;
 	}
 }
@@ -273,7 +276,7 @@ void CProxySocket::OnReceive()
 				if (read == -1) {
 					if (error != EAGAIN) {
 						m_proxyState = noconn;
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, error);
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 					}
 					else {
 						m_can_read = false;
@@ -282,13 +285,13 @@ void CProxySocket::OnReceive()
 				}
 				if (!read) {
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 				if (sendBuffer_) {
 					m_proxyState = noconn;
 					m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming data before request fully sent");
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 
@@ -300,7 +303,7 @@ void CProxySocket::OnReceive()
 						if (m_recvBufferPos + read + 1 == m_recvBufferLen) {
 							m_proxyState = noconn;
 							m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming header too large");
-							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ENOMEM);
+							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
 							return;
 						}
 						do_read = read;
@@ -313,7 +316,7 @@ void CProxySocket::OnReceive()
 					if (read != do_read) {
 						m_proxyState = noconn;
 						m_pOwner->LogMessage(MessageType::Debug_Warning, "Could not read what got peeked");
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 						return;
 					}
 					m_recvBufferPos += read;
@@ -331,7 +334,7 @@ void CProxySocket::OnReceive()
 
 			if (reply.substr(0, 10) != L"HTTP/1.1 2" && reply.substr(0, 10) != L"HTTP/1.0 2") {
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNRESET);
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNRESET);
 				return;
 			}
 
@@ -346,7 +349,7 @@ void CProxySocket::OnReceive()
 			if (read == -1) {
 				if (read_error != EAGAIN) {
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, read_error);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, read_error);
 				}
 				else {
 					m_can_read = false;
@@ -356,7 +359,7 @@ void CProxySocket::OnReceive()
 
 			if (!read) {
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 				return;
 			}
 			m_recvBufferPos += read;
@@ -386,7 +389,7 @@ void CProxySocket::OnReceive()
 				}
 				m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: %s"), error);
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 				return;
 			}
 			m_proxyState = conn;
@@ -407,7 +410,7 @@ void CProxySocket::OnReceive()
 			if (read == -1) {
 				if (error != EAGAIN) {
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, error);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 				}
 				else {
 					m_can_read = false;
@@ -416,7 +419,7 @@ void CProxySocket::OnReceive()
 			}
 			if (!read) {
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 				return;
 			}
 			m_recvBufferPos += read;
@@ -434,7 +437,7 @@ void CProxySocket::OnReceive()
 				if (m_pRecvBuffer[0] != 5) {
 					m_pOwner->LogMessage(MessageType::Error, _("Unknown SOCKS protocol version: %d"), (int)m_pRecvBuffer[0]);
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 				break;
@@ -442,7 +445,7 @@ void CProxySocket::OnReceive()
 				if (m_pRecvBuffer[0] != 1) {
 					m_pOwner->LogMessage(MessageType::Error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), (int)m_pRecvBuffer[0]);
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 				break;
@@ -466,7 +469,7 @@ void CProxySocket::OnReceive()
 					default:
 						m_pOwner->LogMessage(MessageType::Error, _("No supported SOCKS5 auth method"));
 						m_proxyState = noconn;
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 						return;
 					}
 				}
@@ -475,7 +478,7 @@ void CProxySocket::OnReceive()
 				if (m_pRecvBuffer[1] != 0) {
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy authentication failed"));
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 				m_handshakeState = socks5_request;
@@ -516,7 +519,7 @@ void CProxySocket::OnReceive()
 
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed. Reply from proxy: %s"), errorMsg);
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 				m_handshakeState = socks5_request_addrtype;
@@ -540,7 +543,7 @@ void CProxySocket::OnReceive()
 				default:
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: Unknown address type in CONNECT reply"));
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					return;
 				}
 				m_handshakeState = socks5_request_address;
@@ -642,7 +645,7 @@ void CProxySocket::OnReceive()
 	default:
 		m_proxyState = noconn;
 		m_pOwner->LogMessage(MessageType::Debug_Warning, L"Unhandled handshake state %d", m_handshakeState);
-		m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, ECONNABORTED);
+		m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 		return;
 	}
 }
@@ -660,7 +663,7 @@ void CProxySocket::OnSend()
 		if (written == -1) {
 			if (error != EAGAIN) {
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::close, error);
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 			}
 			else {
 				m_can_write = false;

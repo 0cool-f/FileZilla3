@@ -38,8 +38,9 @@ void CExternalIPResolver::GetExternalIP(std::wstring const& address, fz::address
 	{
 		fz::scoped_lock l(s_sync);
 		if (checked) {
-			if (force)
+			if (force) {
 				checked = false;
+			}
 			else {
 				m_done = true;
 				return;
@@ -105,6 +106,10 @@ void CExternalIPResolver::OnSocketEvent(fz::socket_event_source*, fz::socket_eve
 		return;
 	}
 
+	if (error) {
+		Close(false);
+	}
+
 	switch (t)
 	{
 	case fz::socket_event_flag::read:
@@ -112,9 +117,6 @@ void CExternalIPResolver::OnSocketEvent(fz::socket_event_source*, fz::socket_eve
 		break;
 	case fz::socket_event_flag::connection:
 		OnConnect(error);
-		break;
-	case fz::socket_event_flag::close:
-		OnClose();
 		break;
 	case fz::socket_event_flag::write:
 		OnSend();
@@ -127,14 +129,16 @@ void CExternalIPResolver::OnSocketEvent(fz::socket_event_source*, fz::socket_eve
 
 void CExternalIPResolver::OnConnect(int error)
 {
-	if (error)
+	if (error) {
 		Close(false);
+	}
 }
 
 void CExternalIPResolver::OnClose()
 {
-	if (m_data.empty())
+	if (m_data.empty()) {
 		Close(false);
+	}
 	else {
 		OnData(nullptr, 0);
 	}
@@ -156,8 +160,9 @@ void CExternalIPResolver::OnReceive()
 		int error;
 		int read = socket_->read(m_pRecvBuffer + m_recvBufferPos, len, error);
 		if (read == -1) {
-			if (error != EAGAIN)
+			if (error != EAGAIN) {
 				Close(false);
+			}
 			return;
 		}
 
@@ -174,13 +179,16 @@ void CExternalIPResolver::OnReceive()
 
 		m_recvBufferPos += read;
 
-		if (!m_gotHeader)
+		if (!m_gotHeader) {
 			OnHeader();
+		}
 		else {
-			if (m_transferEncoding == chunked)
+			if (m_transferEncoding == chunked) {
 				OnChunkedData();
-			else
+			}
+			else {
 				OnData(m_pRecvBuffer, m_recvBufferPos);
+			}
 		}
 	}
 }
@@ -324,10 +332,12 @@ void CExternalIPResolver::OnHeader()
 				memmove(m_pRecvBuffer, m_pRecvBuffer + 2, m_recvBufferPos - 2);
 				m_recvBufferPos -= 2;
 				if (m_recvBufferPos) {
-					if (m_transferEncoding == chunked)
+					if (m_transferEncoding == chunked) {
 						OnChunkedData();
-					else
+					}
+					else {
 						OnData(m_pRecvBuffer, m_recvBufferPos);
+					}
 				}
 				return;
 			}
@@ -360,8 +370,9 @@ void CExternalIPResolver::OnData(char* buffer, unsigned int len)
 	if (buffer) {
 		unsigned int i;
 		for (i = 0; i < len; ++i) {
-			if (buffer[i] == '\r' || buffer[i] == '\n')
+			if (buffer[i] == '\r' || buffer[i] == '\n') {
 				break;
+			}
 			if (buffer[i] & 0x80) {
 				Close(false);
 				return;
@@ -439,21 +450,25 @@ void CExternalIPResolver::OnChunkedData()
 	for (;;) {
 		if (m_chunkData.size != 0) {
 			unsigned int dataLen = len;
-			if (m_chunkData.size < len)
+			if (m_chunkData.size < len) {
 				dataLen = static_cast<unsigned int>(m_chunkData.size);
+			}
 			OnData(p, dataLen);
-			if (!m_pRecvBuffer)
+			if (!m_pRecvBuffer) {
 				return;
+			}
 
 			m_chunkData.size -= dataLen;
 			p += dataLen;
 			len -= dataLen;
 
-			if (m_chunkData.size == 0)
+			if (m_chunkData.size == 0) {
 				m_chunkData.terminateChunk = true;
+			}
 
-			if (!len)
+			if (!len) {
 				break;
+			}
 		}
 
 		// Find line ending
@@ -520,15 +535,17 @@ void CExternalIPResolver::OnChunkedData()
 				}
 				q++;
 			}
-			if (m_chunkData.size == 0)
+			if (m_chunkData.size == 0) {
 				m_chunkData.getTrailer = true;
+			}
 		}
 
 		p += i + 2;
 		len -= i + 2;
 
-		if (!len)
+		if (!len) {
 			break;
+		}
 	}
 
 	if (p != m_pRecvBuffer) {

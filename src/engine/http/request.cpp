@@ -363,11 +363,6 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 int CHttpRequestOpData::OnReceive()
 {
 	while (controlSocket_.socket_) {
-		const fz::socket::socket_state state = controlSocket_.socket_->get_state();
-		if (state != fz::socket::connected && state != fz::socket::closing) {
-			return FZ_REPLY_WOULDBLOCK;
-		}
-
 		int error;
 		size_t const recv_size = 1024 * 64;
 		int read = controlSocket_.m_pBackend->Read(recv_buffer_.get(recv_size), recv_size, error);
@@ -382,9 +377,12 @@ int CHttpRequestOpData::OnReceive()
 
 		controlSocket_.SetActive(CFileZillaEngine::recv);
 
+		bool const eof = read == 0;
+
 		while (!requests_.empty()) {
 			assert(!requests_.empty());
-			int res = ParseReceiveBuffer(read == 0);
+
+			int res = ParseReceiveBuffer(eof);
 			if (res == FZ_REPLY_WOULDBLOCK) {
 				break;
 			}
@@ -395,7 +393,7 @@ int CHttpRequestOpData::OnReceive()
 				--send_pos_;
 
 				bool keep_alive = read_state_.keep_alive_;
-				if (!keep_alive) {
+				if (!keep_alive || eof) {
 					if (!recv_buffer_.empty()) {
 						LogMessage(MessageType::Error, _("Malformed response: %s"), _("Server sent too much data."));
 						return FZ_REPLY_ERROR;
@@ -417,7 +415,7 @@ int CHttpRequestOpData::OnReceive()
 					return FZ_REPLY_OK;
 				}
 
-				if (!keep_alive) {
+				if (!keep_alive || eof) {
 					send_pos_ = 0;
 					opState = request_init | request_reading;
 					return FZ_REPLY_CONTINUE;
@@ -735,61 +733,6 @@ int CHttpRequestOpData::ProcessData(unsigned char* data, unsigned int len)
 	}
 
 	return res;
-}
-
-int CHttpRequestOpData::OnClose()
-{
-	LogMessage(MessageType::Debug_Verbose, L"CHttpRequestOpData::OnClose()");
-
-	if (send_pos_ < requests_.size()) {
-		LogMessage(MessageType::Debug_Verbose, L"Socket closed before all data got sent");
-		return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-	}
-
-	if (!requests_.empty()) {
-
-		auto & response = requests_.front();
-		if (response && !response->response().got_header()) {
-			LogMessage(MessageType::Debug_Verbose, L"Socket closed before headers got received");
-			return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-		}
-
-		if (read_state_.transfer_encoding_ == chunked) {
-			if (!read_state_.chunk_data_.getTrailer) {
-				LogMessage(MessageType::Debug_Verbose, L"Socket closed, chunk incomplete");
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-			}
-		}
-		else {
-			if (read_state_.responseContentLength_ != -1 && read_state_.receivedData_ != read_state_.responseContentLength_) {
-				LogMessage(MessageType::Debug_Verbose, L"Socket closed, content length not reached");
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-			}
-		}
-
-		if (response) {
-			response->response().flags_ |= HttpResponse::flag_got_body;
-		}
-		requests_.pop_front();
-		--send_pos_;
-		read_state_ = read_state();
-
-		if (!requests_.empty()) {
-			if (!recv_buffer_.empty()) {
-				LogMessage(MessageType::Error, _("Malformed response: %s"), _("Server sent too much data."));
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-			}
-
-			LogMessage(MessageType::Debug_Verbose, L"Socket closed before responses got fully received. Re-issuing");
-			send_pos_ = 0;
-			opState = request_init | request_reading;
-			controlSocket_.ResetSocket();
-			sendLogLevel_ = MessageType::Debug_Verbose;
-			return FZ_REPLY_CONTINUE;
-		}
-	}
-
-	return FZ_REPLY_OK;
 }
 
 int CHttpRequestOpData::Reset(int result)

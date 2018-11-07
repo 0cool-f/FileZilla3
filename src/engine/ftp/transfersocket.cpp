@@ -95,6 +95,10 @@ std::wstring CTransferSocket::SetupActiveTransfer(std::string const& ip)
 
 void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_flag t, int error)
 {
+	if (m_transferEndReason != TransferEndReason::none) {
+		return;
+	}
+
 	if (m_pProxyBackend) {
 		switch (t)
 		{
@@ -109,12 +113,6 @@ void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_f
 					m_pProxyBackend = nullptr;
 					OnConnect();
 				}
-			}
-			return;
-		case fz::socket_event_flag::close:
-			{
-				controlSocket_.LogMessage(MessageType::Error, _("Proxy handshake failed: %s"), fz::socket_error_description(error));
-				TransferEnd(TransferEndReason::failure);
 			}
 			return;
 		default:
@@ -138,22 +136,28 @@ void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_f
 	{
 	case fz::socket_event_flag::connection:
 		if (error) {
-			if (m_transferEndReason == TransferEndReason::none) {
-				controlSocket_.LogMessage(MessageType::Error, _("The data connection could not be established: %s"), fz::socket_error_description(error));
-				TransferEnd(TransferEndReason::transfer_failure);
-			}
+			controlSocket_.LogMessage(MessageType::Error, _("The data connection could not be established: %s"), fz::socket_error_description(error));
+			TransferEnd(TransferEndReason::transfer_failure);
 		}
-		else
+		else {
 			OnConnect();
+		}
 		break;
 	case fz::socket_event_flag::read:
-		OnReceive();
+		if (error) {
+			OnSocketError(error);
+		}
+		else {
+			OnReceive();
+		}
 		break;
 	case fz::socket_event_flag::write:
-		OnSend();
-		break;
-	case fz::socket_event_flag::close:
-		OnClose(error);
+		if (error) {
+			OnSocketError(error);
+		}
+		else {
+			OnSend();
+		}
 		break;
 	default:
 		// Uninteresting
@@ -243,9 +247,6 @@ void CTransferSocket::OnReceive()
 					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 					TransferEnd(TransferEndReason::transfer_failure);
 				}
-				else if (m_onCloseCalled && !m_pBackend->IsWaiting(CRateLimiter::inbound)) {
-					TransferEnd(TransferEndReason::successful);
-				}
 				return;
 			}
 
@@ -302,9 +303,6 @@ void CTransferSocket::OnReceive()
 				controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 				TransferEnd(TransferEndReason::transfer_failure);
 			}
-			else if (m_onCloseCalled && !m_pBackend->IsWaiting(CRateLimiter::inbound)) {
-				FinalizeWrite();
-			}
 		}
 		else if (!numread) {
 			FinalizeWrite();
@@ -322,15 +320,6 @@ void CTransferSocket::OnReceive()
 				if (error != EAGAIN) {
 					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 					TransferEnd(TransferEndReason::transfer_failure);
-				}
-				else if (m_onCloseCalled && !m_pBackend->IsWaiting(CRateLimiter::inbound)) {
-					if (m_transferBufferLen == 1) {
-						TransferEnd(TransferEndReason::successful);
-					}
-					else {
-						controlSocket_.LogMessage(MessageType::Debug_Warning, L"Server incorrectly sent %d bytes", m_transferBufferLen);
-						TransferEnd(TransferEndReason::failed_resumetest);
-					}
 				}
 				return;
 			}
@@ -419,77 +408,16 @@ void CTransferSocket::OnSend()
 	}
 }
 
-void CTransferSocket::OnClose(int error)
+void CTransferSocket::OnSocketError(int error)
 {
 	controlSocket_.LogMessage(MessageType::Debug_Verbose, L"CTransferSocket::OnClose(%d)", error);
-	m_onCloseCalled = true;
 
 	if (m_transferEndReason != TransferEndReason::none) {
 		return;
 	}
 
-	if (!m_pBackend) {
-		if (!InitBackend()) {
-			TransferEnd(TransferEndReason::transfer_failure);
-			return;
-		}
-	}
-
-	if (m_transferMode == TransferMode::upload) {
-		if (m_shutdown && m_pTlsSocket) {
-			if (m_pTlsSocket->Shutdown() != 0) {
-				TransferEnd(TransferEndReason::transfer_failure);
-			}
-			else {
-				TransferEnd(TransferEndReason::successful);
-			}
-		}
-		else {
-			TransferEnd(TransferEndReason::transfer_failure);
-		}
-		return;
-	}
-
-	if (error) {
-		controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket_error_description(error));
-		TransferEnd(TransferEndReason::transfer_failure);
-		return;
-	}
-
-	char buffer[100];
-	int numread = m_pBackend->Peek(&buffer, 100, error);
-	if (numread > 0) {
-#ifndef FZ_WINDOWS
-		controlSocket_.LogMessage(MessageType::Debug_Warning, L"Peek isn't supposed to return data after close notification");
-#endif
-
-		// MSDN says this:
-		//   FD_CLOSE being posted after all data is read from a socket.
-		//   An application should check for remaining data upon receipt
-		//   of FD_CLOSE to avoid any possibility of losing data.
-		// First half is actually plain wrong.
-		OnReceive();
-
-		return;
-	}
-	else if (numread < 0 && error != EAGAIN) {
-		controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket_error_description(error));
-		TransferEnd(TransferEndReason::transfer_failure);
-		return;
-	}
-
-	if (m_transferMode == TransferMode::resumetest) {
-		if (m_transferBufferLen != 1) {
-			TransferEnd(TransferEndReason::failed_resumetest);
-			return;
-		}
-	}
-	if (m_transferMode == TransferMode::download) {
-		FinalizeWrite();
-	}
-	else {
-		TransferEnd(TransferEndReason::successful);
-	}
+	controlSocket_.LogMessage(MessageType::Error, _("Transfer connection interrupted: %s"), fz::socket_error_description(error));
+	TransferEnd(TransferEndReason::transfer_failure);
 }
 
 bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
@@ -574,7 +502,7 @@ void CTransferSocket::SetActive()
 		return;
 	}
 
-	if (socket_->get_state() == fz::socket::connected || socket_->get_state() == fz::socket::closing) {
+	if (socket_->get_state() == fz::socket::connected) {
 		TriggerPostponedEvents();
 	}
 }
@@ -694,8 +622,6 @@ bool CTransferSocket::CheckGetNextReadBuffer()
 		}
 		else if (res == IO_Success) {
 			if (m_pTlsSocket) {
-				m_shutdown = true;
-
 				int error = m_pTlsSocket->Shutdown();
 				if (error != 0) {
 					if (error != EAGAIN) {
@@ -798,9 +724,6 @@ void CTransferSocket::TriggerPostponedEvents()
 		if (m_transferEndReason != TransferEndReason::none) {
 			return;
 		}
-	}
-	if (m_onCloseCalled) {
-		OnClose(0);
 	}
 }
 
