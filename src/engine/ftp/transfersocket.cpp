@@ -410,7 +410,7 @@ void CTransferSocket::OnSend()
 
 void CTransferSocket::OnSocketError(int error)
 {
-	controlSocket_.LogMessage(MessageType::Debug_Verbose, L"CTransferSocket::OnClose(%d)", error);
+	controlSocket_.LogMessage(MessageType::Debug_Verbose, L"CTransferSocket::OnSocketError(%d)", error);
 
 	if (m_transferEndReason != TransferEndReason::none) {
 		return;
