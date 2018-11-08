@@ -1646,7 +1646,11 @@ void socket::retrigger(socket_event_flag event)
 
 int socket::shutdown()
 {
-	int res = ::shutdown(fd_, FD_WRITE);
+#ifdef FZ_WINDOWS
+	int res = ::shutdown(fd_, SD_SEND);
+#else
+	int res = ::shutdown(fd_, SHUT_WR);
+#endif
 	if (res != 0) {
 		return last_socket_error();
 	}

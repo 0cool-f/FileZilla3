@@ -848,7 +848,7 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 	if (send_close) {
 		int error = m_socket_error;
 		if (!error) {
-			error = WSAECONNABORTED;
+			error = ECONNABORTED;
 		}
 		if (oldState == CTlsSocket::TlsState::handshake) {
 			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, error);
