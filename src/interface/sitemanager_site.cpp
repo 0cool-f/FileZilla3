@@ -464,7 +464,7 @@ void CSiteManagerSite::SetLogonTypeCtrlState()
 {
 	LogonType const t = GetLogonType();
 	xrc_call(*this, "ID_USER", &wxTextCtrl::Enable, !predefined_ && t != LogonType::anonymous);
-	xrc_call(*this, "ID_PASS", &wxTextCtrl::Enable, !predefined_ && t == LogonType::normal || t == LogonType::account);
+	xrc_call(*this, "ID_PASS", &wxTextCtrl::Enable, !predefined_ && (t == LogonType::normal || t == LogonType::account));
 	xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined_ && t == LogonType::account);
 	xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined_ && t == LogonType::key);
 	xrc_call(*this, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined_ && t == LogonType::key);
