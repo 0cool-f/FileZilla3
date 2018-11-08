@@ -677,11 +677,6 @@ protected:
 				return false;
 			}
 
-			thread_local static int foo{};
-			if (++foo == 1000) {
-				return false;
-			}
-
 			if (waiting_ & WAIT_CONNECT) {
 				if (events.lNetworkEvents & FD_CONNECT) {
 					triggered_ |= WAIT_CONNECT;
