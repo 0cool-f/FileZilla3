@@ -855,7 +855,7 @@ void CLocalTreeView::RefreshListing()
 #ifdef __WXMSW__
 						-1
 #else
-						GetIconIndex(iconType::opened_dir, fullname.ToStdWstring())
+						GetIconIndex(iconType::opened_dir, fullname)
 #endif
 					);
 
