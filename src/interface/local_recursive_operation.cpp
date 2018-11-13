@@ -167,8 +167,6 @@ void CLocalRecursiveOperation::entry()
 		auto filters = m_filters.first;
 
 		CFilterManager filterManager;
-		filterManager.CompileRegexes(filters);
-
 		while (!recursion_roots_.empty()) {
 			listing d;
 

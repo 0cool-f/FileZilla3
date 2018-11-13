@@ -512,7 +512,7 @@ bool CRemoteTreeView::HasSubdirs(const CDirectoryListing& listing, const CFilter
 		return true;
 	}
 
-	const wxString path = listing.path.GetPath();
+	std::wstring const path = listing.path.GetPath();
 	for (unsigned int i = 0; i < listing.GetCount(); ++i) {
 		if (!listing[i].is_dir()) {
 			continue;
@@ -532,7 +532,7 @@ void CRemoteTreeView::DisplayItem(wxTreeItemId parent, const CDirectoryListing& 
 {
 	DeleteChildren(parent);
 
-	const wxString path = listing.path.GetPath();
+	std::wstring const path = listing.path.GetPath();
 
 	CFilterDialog filter;
 	for (unsigned int i = 0; i < listing.GetCount(); ++i) {
@@ -579,7 +579,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 
 	CFilterManager filter;
 
-	wxString const path = listing.path.GetPath();
+	std::wstring const path = listing.path.GetPath();
 
 	std::vector<std::wstring> dirs;
 	for (unsigned int i = 0; i < listing.GetCount(); ++i) {

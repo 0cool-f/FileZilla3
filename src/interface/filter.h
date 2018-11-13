@@ -27,18 +27,16 @@ enum t_filterType
 class CFilterCondition
 {
 public:
-	CFilterCondition();
+	bool set(t_filterType t, std::wstring const& v, int c, bool matchCase);
 
-	bool CompileRegex();
-
-	t_filterType type;
-	int condition;
-
-	wxString strValue; // All other types
-	int64_t value; // If type is size
+	std::wstring strValue; 
+	std::wstring lowerValue; // Name and path matches
 	fz::datetime date; // If type is date
-	bool matchCase;
+	int64_t value{}; // If type is size
 	std::shared_ptr<std::wregex> pRegEx;
+
+	t_filterType type{filter_name};
+	int condition{};
 };
 
 class CFilter
@@ -56,20 +54,21 @@ public:
 
 	explicit operator bool() const { return !filters.empty(); }
 
-	wxString name;
+	std::vector<CFilterCondition> filters;
 
-	bool filterFiles{true};
-	bool filterDirs{true};
-	t_matchType matchType{all};
+	std::wstring name;
+
+	t_matchType matchType{ all };
+
+	bool filterFiles{ true };
+	bool filterDirs{ true };
 
 	// Filenames on Windows ignore case
 #ifdef __WXMSW__
 	bool matchCase{};
 #else
-	bool matchCase{true};
+	bool matchCase{ true };
 #endif
-
-	std::vector<CFilterCondition> filters;
 
 	bool HasConditionOfType(t_filterType type) const;
 	bool IsLocalFilter() const;
@@ -78,7 +77,7 @@ public:
 class CFilterSet
 {
 public:
-	wxString name;
+	std::wstring name;
 	std::vector<bool> local;
 	std::vector<bool> remote;
 };
@@ -93,9 +92,9 @@ public:
 	virtual ~CFilterManager() = default;
 
 	// Note: Under non-windows, attributes are permissions
-	virtual bool FilenameFiltered(std::wstring const& name, const wxString& path, bool dir, int64_t size, bool local, int attributes, fz::datetime const& date) const;
-	bool FilenameFiltered(std::vector<CFilter> const& filters, std::wstring const& name, const wxString& path, bool dir, int64_t size, int attributes, fz::datetime const& date) const;
-	static bool FilenameFilteredByFilter(CFilter const& filter, std::wstring const& name, const wxString& path, bool dir, int64_t size, int attributes, fz::datetime const& date);
+	virtual bool FilenameFiltered(std::wstring const& name, std::wstring const& path, bool dir, int64_t size, bool local, int attributes, fz::datetime const& date) const;
+	bool FilenameFiltered(std::vector<CFilter> const& filters, std::wstring const& name, std::wstring const& path, bool dir, int64_t size, int attributes, fz::datetime const& date) const;
+	static bool FilenameFilteredByFilter(CFilter const& filter, std::wstring const& name, std::wstring const& path, bool dir, int64_t size, int attributes, fz::datetime const& date);
 	static bool HasActiveFilters(bool ignore_disabled = false);
 
 	bool HasSameLocalAndRemoteFilters() const;
@@ -107,16 +106,11 @@ public:
 	bool HasActiveLocalFilters() const;
 	bool HasActiveRemoteFilters() const;
 
-	static bool CompileRegexes(std::vector<CFilter>& filters);
-	static bool CompileRegexes(CFilter& filter);
-
 	static void Import(pugi::xml_node& element);
 	static bool LoadFilter(pugi::xml_node& element, CFilter& filter);
 	static void SaveFilter(pugi::xml_node& element, const CFilter& filter);
 
 protected:
-	static bool CompileRegexes();
-
 	static void LoadFilters();
 	static void LoadFilters(pugi::xml_node& element);
 	static void SaveFilters();

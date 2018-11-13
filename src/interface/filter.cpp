@@ -41,29 +41,51 @@ std::array<std::wstring, 4> matchTypeXmlNames =
 	{ L"All", L"Any", L"None", L"Not all" };
 }
 
-CFilterCondition::CFilterCondition()
+bool CFilterCondition::set(t_filterType t, std::wstring const& v, int c, bool matchCase)
 {
-	type = filter_name;
-	condition = 0;
-	matchCase = true;
-	value = 0;
-}
+	if (v.empty()) {
+		return false;
+	}
 
-bool CFilterCondition::CompileRegex()
-{
+	type = t;
+	condition = c;
+	strValue = v;
+
 	pRegEx.reset();
-	if ((type == filter_name || type == filter_path) && condition == 4) {
-		try {
-			auto flags = std::regex_constants::ECMAScript;
-			if (!matchCase) {
-				flags |= std::regex_constants::icase;
+
+	switch (t) {
+	case filter_name:
+	case filter_path:
+		if (condition == 4) {
+			try {
+				auto flags = std::regex_constants::ECMAScript;
+				if (!matchCase) {
+					flags |= std::regex_constants::icase;
+				}
+				pRegEx = std::make_shared<std::wregex>(strValue, flags);
 			}
-			pRegEx = std::make_shared<std::wregex>(strValue.ToStdWstring(), flags);
+			catch (std::regex_error const&) {
+				return false;
+			}
 		}
-		catch (std::regex_error const&) {
+		else {
+			if (!matchCase) {
+				lowerValue = fz::str_tolower(v);
+			}
+		}
+	case filter_size:
+	case filter_attributes:
+	case filter_permissions:
+		value = fz::to_integral<int64_t>(v);
+		break;
+	case filter_date:
+		date = fz::datetime(v, fz::datetime::local);
+		if (date.empty()) {
 			return false;
 		}
+		break;
 	}
+
 	return true;
 }
 
@@ -122,7 +144,6 @@ bool CFilterDialog::Create(CMainFrame* parent)
 void CFilterDialog::OnOkOrApply(wxCommandEvent& event)
 {
 	m_globalFilters = m_filters;
-	CompileRegexes();
 	m_globalFilterSets = m_filterSets;
 	m_globalCurrentFilterSet = m_currentFilterSet;
 
@@ -154,8 +175,7 @@ void CFilterDialog::OnEdit(wxCommandEvent&)
 
 	m_filters = dlg.GetFilters();
 	m_filterSets = dlg.GetFilterSets();
-	CompileRegexes();
-
+	
 	DisplayFilters();
 }
 
@@ -240,7 +260,7 @@ void CFilterDialog::OnSaveAs(wxCommandEvent&)
 		return;
 	}
 
-	wxString name = dlg.GetValue();
+	std::wstring name = dlg.GetValue().ToStdWstring();
 	if (name.empty()) {
 		wxMessageBoxEx(_("No name for the filterset given."), _("Cannot save filterset"), wxICON_INFORMATION);
 		return;
@@ -304,7 +324,7 @@ void CFilterDialog::OnRename(wxCommandEvent&)
 		return;
 	}
 
-	wxString name = dlg.GetValue();
+	std::wstring name = dlg.GetValue().ToStdWstring();
 
 	if (name == pChoice->GetStringSelection()) {
 		// Nothing changed
@@ -470,7 +490,7 @@ bool CFilterManager::HasSameLocalAndRemoteFilters() const
 	return true;
 }
 
-bool CFilterManager::FilenameFiltered(std::wstring const& name, const wxString& path, bool dir, int64_t size, bool local, int attributes, fz::datetime const& date) const
+bool CFilterManager::FilenameFiltered(std::wstring const& name, std::wstring const& path, bool dir, int64_t size, bool local, int attributes, fz::datetime const& date) const
 {
 	if (m_filters_disabled) {
 		return false;
@@ -493,7 +513,7 @@ bool CFilterManager::FilenameFiltered(std::wstring const& name, const wxString& 
 	return false;
 }
 
-bool CFilterManager::FilenameFiltered(std::vector<CFilter> const& filters, std::wstring const& name, const wxString& path, bool dir, int64_t size, int attributes, fz::datetime const& date) const
+bool CFilterManager::FilenameFiltered(std::vector<CFilter> const& filters, std::wstring const& name, std::wstring const& path, bool dir, int64_t size, int attributes, fz::datetime const& date) const
 {
 	for (auto const& filter : filters) {
 		if (FilenameFilteredByFilter(filter, name, path, dir, size, attributes, date)) {
@@ -504,80 +524,69 @@ bool CFilterManager::FilenameFiltered(std::vector<CFilter> const& filters, std::
 	return false;
 }
 
-static bool StringMatch(const wxString& subject, const wxString& filter, int condition, bool matchCase, std::shared_ptr<const std::wregex> const& pRegEx)
+static bool StringMatch(std::wstring const& subject, CFilterCondition const& condition, bool matchCase)
 {
 	bool match = false;
 
-	switch (condition)
+	switch (condition.condition)
 	{
 	case 0:
 		if (matchCase) {
-			if (subject.Contains(filter)) {
+			if (subject.find(condition.strValue) != std::wstring::npos) {
 				match = true;
 			}
 		}
 		else {
-			if (subject.Lower().Contains(filter.Lower())) {
+			if (fz::str_tolower(subject).find(condition.lowerValue) != std::wstring::npos) {
 				match = true;
 			}
 		}
 		break;
 	case 1:
 		if (matchCase) {
-			if (subject == filter) {
+			if (subject == condition.strValue) {
 				match = true;
 			}
 		}
 		else {
-			if (!subject.CmpNoCase(filter)) {
+			if (fz::str_tolower(subject) == condition.lowerValue) {
 				match = true;
 			}
 		}
 		break;
 	case 2:
 		{
-			const wxString& left = subject.Left(filter.Len());
 			if (matchCase) {
-				if (left == filter) {
-					match = true;
-				}
+				match = fz::starts_with(subject, condition.strValue);
 			}
 			else {
-				if (!left.CmpNoCase(filter)) {
-					match = true;
-				}
+				match = fz::starts_with(fz::str_tolower(subject), condition.lowerValue);
 			}
 		}
 		break;
 	case 3:
 		{
-			const wxString& right = subject.Right(filter.Len());
 			if (matchCase) {
-				if (right == filter) {
-					match = true;
-				}
+				match = fz::ends_with(subject, condition.strValue);
 			}
 			else {
-				if (!right.CmpNoCase(filter)) {
-					match = true;
-				}
+				match = fz::ends_with(fz::str_tolower(subject), condition.lowerValue);
 			}
 		}
 		break;
 	case 4:
-		wxASSERT(pRegEx);
-		if (pRegEx && std::regex_search(subject.ToStdWstring(), *pRegEx)) {
+		if (condition.pRegEx && std::regex_search(subject, *condition.pRegEx)) {
 			match = true;
 		}
 		break;
 	case 5:
 		if (matchCase) {
-			if (!subject.Contains(filter)) {
+			if (subject.find(condition.strValue) == std::wstring::npos) {
 				match = true;
 			}
 		}
 		else {
-			if (!subject.Lower().Contains(filter.Lower())) {
+			if (fz::str_tolower(subject).find(condition.lowerValue) == std::wstring::npos) {
 				match = true;
 			}
 		}
@@ -587,7 +596,7 @@ static bool StringMatch(const wxString& subject, const wxString& filter, int con
 	return match;
 }
 
-bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstring const& name, const wxString& path, bool dir, int64_t size, int attributes, fz::datetime const& date)
+bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstring const& name, std::wstring const& path, bool dir, int64_t size, int attributes, fz::datetime const& date)
 {
 	if (dir && !filter.filterDirs) {
 		return false;
@@ -602,10 +611,10 @@ bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstrin
 		switch (condition.type)
 		{
 		case filter_name:
-			match = StringMatch(name, condition.strValue, condition.condition, filter.matchCase, condition.pRegEx);
+			match = StringMatch(name, condition, filter.matchCase);
 			break;
 		case filter_path:
-			match = StringMatch(path, condition.strValue, condition.condition, filter.matchCase, condition.pRegEx);
+			match = StringMatch(path, condition, filter.matchCase);
 			break;
 		case filter_size:
 			if (size == -1) {
@@ -668,8 +677,9 @@ bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstrin
 				}
 
 				int set = (flag & attributes) ? 1 : 0;
-				if (set == condition.value)
+				if (set == condition.value) {
 					match = true;
+				}
 			}
 #endif //__WXMSW__
 			break;
@@ -723,7 +733,7 @@ bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstrin
 			break;
 		case filter_date:
 			if (!date.empty()) {
-				int cmp = date.compare( condition.date );
+				int cmp = date.compare(condition.date);
 				switch (condition.condition)
 				{
 				case 0: // Before
@@ -774,49 +784,20 @@ bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstrin
 	return false;
 }
 
-bool CFilterManager::CompileRegexes(std::vector<CFilter>& filters)
-{
-	bool ret = true;
-	for (auto & filter : filters) {
-		ret &= CompileRegexes(filter);
-	}
-	return ret;
-}
-
-bool CFilterManager::CompileRegexes(CFilter& filter)
-{
-	bool ret = true;
-	for (auto & condition : filter.filters) {
-		if (!condition.CompileRegex()) {
-			ret = false;
-		}
-	}
-
-	return ret;
-}
-
-bool CFilterManager::CompileRegexes()
-{
-	for (auto & filter : m_globalFilters) {
-		CompileRegexes(filter);
-	}
-	return true;
-}
-
 bool CFilterManager::LoadFilter(pugi::xml_node& element, CFilter& filter)
 {
 	filter.name = GetTextElement(element, "Name");
-	filter.filterFiles = GetTextElement(element, "ApplyToFiles") == _T("1");
-	filter.filterDirs = GetTextElement(element, "ApplyToDirs") == _T("1");
+	filter.filterFiles = GetTextElement(element, "ApplyToFiles") == L"1";
+	filter.filterDirs = GetTextElement(element, "ApplyToDirs") == L"1";
 
-	wxString const matchType = GetTextElement(element, "MatchType");
+	std::wstring const matchType = GetTextElement(element, "MatchType");
 	filter.matchType = CFilter::all;
 	for (size_t i = 0; i < matchTypeXmlNames.size(); ++i) {
 		if (matchType == matchTypeXmlNames[i]) {
 			filter.matchType = static_cast<CFilter::t_matchType>(i);
 		}
 	}
-	filter.matchCase = GetTextElement(element, "MatchCase") == _T("1");
+	filter.matchCase = GetTextElement(element, "MatchCase") == L"1";
 
 	auto xConditions = element.child("Conditions");
 	if (!xConditions) {
@@ -824,68 +805,45 @@ bool CFilterManager::LoadFilter(pugi::xml_node& element, CFilter& filter)
 	}
 
 	for (auto xCondition = xConditions.child("Condition"); xCondition; xCondition = xCondition.next_sibling("Condition")) {
-		CFilterCondition condition;
-		int const type = GetTextElementInt(xCondition, "Type", 0);
-		switch (type) {
+		t_filterType type;
+		int const t = GetTextElementInt(xCondition, "Type", 0);
+		switch (t) {
 		case 0:
-			condition.type = filter_name;
+			type = filter_name;
 			break;
 		case 1:
-			condition.type = filter_size;
+			type = filter_size;
 			break;
 		case 2:
-			condition.type = filter_attributes;
+			type = filter_attributes;
 			break;
 		case 3:
-			condition.type = filter_permissions;
+			type = filter_permissions;
 			break;
 		case 4:
-			condition.type = filter_path;
+			type = filter_path;
 			break;
 		case 5:
-			condition.type = filter_date;
+			type = filter_date;
 			break;
 		default:
 			continue;
 		}
-		condition.condition = GetTextElementInt(xCondition, "Condition", 0);
-		if (condition.type == filter_size) {
-			if (condition.value == 3) {
-				condition.value = 2;
-			}
-			else if (condition.value >= 2) {
-				++condition.value;
-			}
-		}
-		condition.strValue = GetTextElement(xCondition, "Value");
-		condition.matchCase = filter.matchCase;
-		if (condition.strValue.empty()) {
-			continue;
-		}
 
-		if (condition.type == filter_size) {
-			unsigned long long tmp;
-			condition.strValue.ToULongLong(&tmp);
-			condition.value = tmp;
-		}
-		else if (condition.type == filter_attributes || condition.type == filter_permissions) {
-			if (condition.strValue == _T("0")) {
-				condition.value = 0;
-			}
-			else {
-				condition.value = 1;
-			}
-		}
-		else if (condition.type == filter_date) {
-			condition.date = fz::datetime(condition.strValue.ToStdWstring(), fz::datetime::local);
-			if (condition.date.empty()) {
-				continue;
-			}
+		std::wstring value = GetTextElement(xCondition, "Value");
+		int cond = GetTextElementInt(xCondition, "Condition", 0);
+
+		CFilterCondition condition;
+		if (!condition.set(type, value, cond, filter.matchCase)) {
+			continue;
 		}
 
 		filter.filters.push_back(condition);
 	}
 
+	if (filter.filters.empty()) {
+		return false;
+	}
 	return true;
 }
 
@@ -899,9 +857,9 @@ void CFilterManager::LoadFilters()
 
 	CReentrantInterProcessMutexLocker mutex(MUTEX_FILTERS);
 
-	std::wstring file(wxGetApp().GetSettingsFile(_T("filters")));
+	std::wstring file(wxGetApp().GetSettingsFile(L"filters"));
 	if (fz::local_filesys::get_size(fz::to_native(file)) < 1) {
-		file = wxGetApp().GetResourceDir().GetPath() + _T("defaultfilters.xml");
+		file = wxGetApp().GetResourceDir().GetPath() + L"defaultfilters.xml";
 	}
 
 	CXmlFile xml(file);
@@ -951,17 +909,16 @@ void CFilterManager::LoadFilters(pugi::xml_node& element)
 			xFilter = xFilter.next_sibling("Filter");
 		}
 
-		CompileRegexes();
 		auto xSets = element.child("Sets");
 		if (xSets) {
 			for (auto xSet = xSets.child("Set"); xSet; xSet = xSet.next_sibling("Set")) {
 				CFilterSet set;
 				auto xItem = xSet.child("Item");
 				while (xItem) {
-					wxString local = GetTextElement(xItem, "Local");
-					wxString remote = GetTextElement(xItem, "Remote");
-					set.local.push_back(local == _T("1") ? true : false);
-					set.remote.push_back(remote == _T("1") ? true : false);
+					std::wstring local = GetTextElement(xItem, "Local");
+					std::wstring remote = GetTextElement(xItem, "Remote");
+					set.local.push_back(local == L"1" ? true : false);
+					set.remote.push_back(remote == L"1" ? true : false);
 
 					xItem = xItem.next_sibling("Item");
 				}
@@ -1033,13 +990,13 @@ void CFilterManager::SaveFilters()
 		auto xSet = xSets.append_child("Set");
 
 		if (!set.name.empty()) {
-			AddTextElement(xSet, "Name", set.name.ToStdWstring());
+			AddTextElement(xSet, "Name", set.name);
 		}
 
 		for (unsigned int i = 0; i < set.local.size(); ++i) {
 			auto xItem = xSet.append_child("Item");
-			AddTextElement(xItem, "Local", set.local[i] ? _T("1") : _T("0"));
-			AddTextElement(xItem, "Remote", set.remote[i] ? _T("1") : _T("0"));
+			AddTextElement(xItem, "Local", set.local[i] ? "1" : "0");
+			AddTextElement(xItem, "Remote", set.remote[i] ? "1" : "0");
 		}
 	}
 
@@ -1048,11 +1005,11 @@ void CFilterManager::SaveFilters()
 
 void CFilterManager::SaveFilter(pugi::xml_node& element, const CFilter& filter)
 {
-	AddTextElement(element, "Name", filter.name.ToStdWstring());
-	AddTextElement(element, "ApplyToFiles", filter.filterFiles ? _T("1") : _T("0"));
-	AddTextElement(element, "ApplyToDirs", filter.filterDirs ? _T("1") : _T("0"));
+	AddTextElement(element, "Name", filter.name);
+	AddTextElement(element, "ApplyToFiles", filter.filterFiles ? "1" : "0");
+	AddTextElement(element, "ApplyToDirs", filter.filterDirs ? "1" : "0");
 	AddTextElement(element, "MatchType", matchTypeXmlNames[filter.matchType]);
-	AddTextElement(element, "MatchCase", filter.matchCase ? _T("1") : _T("0"));
+	AddTextElement(element, "MatchCase", filter.matchCase ? "1" : "0");
 
 	auto xConditions = element.append_child("Conditions");
 	for (std::vector<CFilterCondition>::const_iterator conditionIter = filter.filters.begin(); conditionIter != filter.filters.end(); ++conditionIter) {
@@ -1086,22 +1043,8 @@ void CFilterManager::SaveFilter(pugi::xml_node& element, const CFilter& filter)
 
 		auto xCondition = xConditions.append_child("Condition");
 		AddTextElement(xCondition, "Type", type);
-
-		if (condition.type == filter_size) {
-			// Backwards compatibility sucks
-			int v = condition.condition;
-			if (v == 2) {
-				v = 3;
-			}
-			else if (v > 2) {
-				--v;
-			}
-			AddTextElement(xCondition, "Condition", v);
-		}
-		else {
-			AddTextElement(xCondition, "Condition", condition.condition);
-		}
-		AddTextElement(xCondition, "Value", condition.strValue.ToStdWstring());
+		AddTextElement(xCondition, "Condition", condition.condition);
+		AddTextElement(xCondition, "Value", condition.strValue);
 	}
 }
 

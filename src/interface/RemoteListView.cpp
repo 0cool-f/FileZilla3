@@ -474,7 +474,7 @@ void CRemoteListView::UpdateDirectoryListing_Added(std::shared_ptr<CDirectoryLis
 	m_indexMapping[0] = pDirectoryListing->GetCount();
 
 	CFilterManager const& filter = m_state.GetStateFilterManager();
-	const wxString path = m_pDirectoryListing->path.GetPath();
+	std::wstring const path = m_pDirectoryListing->path.GetPath();
 
 	CGenericFileData last = m_fileData.back();
 	m_fileData.pop_back();
@@ -786,7 +786,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 
 		m_indexMapping.push_back(m_pDirectoryListing->GetCount());
 
-		const wxString path = m_pDirectoryListing->path.GetPath();
+		std::wstring const path = m_pDirectoryListing->path.GetPath();
 
 		CFilterManager const& filter = m_state.GetStateFilterManager();
 		
@@ -1912,7 +1912,7 @@ void CRemoteListView::ApplyCurrentFilter()
 	int totalDirCount = 0;
 	int hidden = 0;
 
-	const wxString path = m_pDirectoryListing->path.GetPath();
+	std::wstring const path = m_pDirectoryListing->path.GetPath();
 
 	m_indexMapping.clear();
 	const unsigned int count = m_pDirectoryListing->GetCount();

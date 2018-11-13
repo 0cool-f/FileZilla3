@@ -16,7 +16,7 @@
 
 #include <algorithm>
 
-bool CStateFilterManager::FilenameFiltered(std::wstring const& name, const wxString& path, bool dir, int64_t size, bool local, int attributes, fz::datetime const& date) const
+bool CStateFilterManager::FilenameFiltered(std::wstring const& name, std::wstring const& path, bool dir, int64_t size, bool local, int attributes, fz::datetime const& date) const
 {
 	if (local) {
 		if (m_localFilter && FilenameFilteredByFilter(m_localFilter, name, path, dir, size, attributes, date)) {

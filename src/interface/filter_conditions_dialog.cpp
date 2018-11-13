@@ -375,7 +375,7 @@ void CFilterConditionsDialog::EditFilter(CFilter const& filter)
 	SetFilterCtrlState(false);
 }
 
-CFilter CFilterConditionsDialog::GetFilter()
+CFilter CFilterConditionsDialog::GetFilter(bool matchCase)
 {
 	wxASSERT(m_filterControls.size() >= m_currentFilter.filters.size());
 
@@ -387,61 +387,23 @@ CFilter CFilterConditionsDialog::GetFilter()
 		}
 		CFilterCondition condition = m_currentFilter.filters[i];
 
-		condition.type = GetTypeFromTypeSelection(controls.pType->GetSelection());
-		condition.condition = controls.pCondition->GetSelection();
-
-		switch (condition.type)
-		{
-		case filter_name:
-		case filter_path:
-			if (!controls.pValue || controls.pValue->GetValue().empty()) {
-				continue;
-			}
-			condition.strValue = controls.pValue->GetValue();
-			break;
-		case filter_size:
-			{
-				if (!controls.pValue || controls.pValue->GetValue().empty()) {
-					continue;
-				}
-				condition.strValue = controls.pValue->GetValue();
-				unsigned long long tmp;
-				condition.strValue.ToULongLong(&tmp);
-				condition.value = tmp;
-			}
-			break;
+		std::wstring value;
+		switch (condition.type) {
 		case filter_attributes:
 		case filter_permissions:
-			if (!controls.pSet) {
-				continue;
-			}
-			else if (controls.pSet->GetSelection()) {
-				condition.strValue = _T("0");
-				condition.value = 0;
-			}
-			else {
-				condition.strValue = _T("1");
-				condition.value = 1;
-			}
-			break;
-		case filter_date:
-			if (!controls.pValue || controls.pValue->GetValue().empty()) {
-				continue;
-			}
-			else {
-				condition.strValue = controls.pValue->GetValue();
-				condition.date = fz::datetime(condition.strValue.ToStdWstring(), fz::datetime::local);
-				if (condition.date.empty()) {
-					continue;
-				}
-			}
+			value = controls.pSet ? fz::to_wstring(controls.pSet->GetSelection()) : std::wstring();
 			break;
 		default:
-			wxFAIL_MSG(_T("Unhandled condition"));
+			value = controls.pValue ? controls.pValue->GetValue().ToStdWstring() : std::wstring();
 			break;
 		}
+		
+		t_filterType const type = GetTypeFromTypeSelection(controls.pType->GetSelection());
+		int const cond = controls.pCondition->GetSelection();
 
-		condition.matchCase = filter.matchCase;
+		if (!condition.set(type, value, cond, matchCase)) {
+			continue;
+		}
 
 		filter.filters.push_back(condition);
 	}

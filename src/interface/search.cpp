@@ -567,7 +567,7 @@ void CSearchDialog::ProcessDirectoryListing(std::shared_ptr<CDirectoryListing> c
 	int old_count = m_results->m_fileData.size();
 	int added_count = 0;
 
-	wxString const path = listing->path.GetPath();
+	std::wstring const path = listing->path.GetPath();
 
 	bool const has_selections = m_results->GetSelectedItemCount() != 0;
 
@@ -626,7 +626,7 @@ void CSearchDialog::ProcessDirectoryListing(CLocalRecursiveOperation::listing co
 	int old_count = m_results->m_fileData.size();
 	int added_count = 0;
 
-	wxString const path = listing.localPath.GetPath();
+	std::wstring const path = listing.localPath.GetPath();
 
 	bool const has_selections = m_results->GetSelectedItemCount() != 0;
 
@@ -739,12 +739,9 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 		wxMessageBoxEx(wxString::Format(_("Invalid search conditions: %s"), error), _("File search"), wxICON_EXCLAMATION);
 		return;
 	}
-	m_search_filter = GetFilter();
-	if (!CFilterManager::CompileRegexes(m_search_filter)) {
-		wxMessageBoxEx(_("Invalid regular expression in search conditions."), _("File search"), wxICON_EXCLAMATION);
-		return;
-	}
-	m_search_filter.matchCase = xrc_call(*this, "ID_CASE", &wxCheckBox::GetValue);
+	bool const matchCase = xrc_call(*this, "ID_CASE", &wxCheckBox::GetValue);
+	m_search_filter = GetFilter(matchCase);
+	m_search_filter.matchCase = matchCase;
 	m_search_filter.filterFiles = xrc_call(*this, "ID_FIND_FILES", &wxCheckBox::GetValue);
 	m_search_filter.filterDirs = xrc_call(*this, "ID_FIND_DIRS", &wxCheckBox::GetValue);
 

@@ -134,6 +134,7 @@ std::wstring translate(char const * const singular, char const * const plural, i
 std::wstring str_tolower(std::wstring const& source)
 {
 	std::wstring ret;
+	ret.reserve(source.size());
 	for (auto const& c : source) {
 		ret.push_back(std::towlower(c));
 	}

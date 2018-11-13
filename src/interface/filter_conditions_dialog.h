@@ -30,7 +30,7 @@ public:
 	bool CreateListControl(int conditions);
 
 	void EditFilter(CFilter const& filter);
-	CFilter GetFilter();
+	CFilter GetFilter(bool matchCase);
 	void ClearFilter();
 	bool ValidateFilter(wxString& error, bool allow_empty = false);
 

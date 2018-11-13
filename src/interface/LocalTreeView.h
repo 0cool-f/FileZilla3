@@ -49,11 +49,11 @@ protected:
 	wxTreeItemId GetNearestParent(wxString& localDir);
 	wxTreeItemId GetSubdir(wxTreeItemId parent, const wxString& subDir);
 	void DisplayDir(wxTreeItemId parent, std::wstring const& dirname, std::wstring const& knownSubdir = std::wstring());
-	wxString HasSubdir(const wxString& dirname);
+	std::wstring HasSubdir(std::wstring const& dirname);
 	wxTreeItemId MakeSubdirs(wxTreeItemId parent, std::wstring dirname, wxString subDir);
 	wxString m_currentDir;
 
-	bool CheckSubdirStatus(wxTreeItemId& item, const wxString& path);
+	bool CheckSubdirStatus(wxTreeItemId& item, std::wstring const& path);
 
 	wxString MenuMkdir();
 
@@ -85,7 +85,7 @@ protected:
 	void RemoveDrive(wxChar letter);
 #endif
 
-	wxString GetDirFromItem(wxTreeItemId item);
+	std::wstring GetDirFromItem(wxTreeItemId item);
 
 	CQueueView* m_pQueueView;
 
