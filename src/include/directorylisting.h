@@ -73,18 +73,18 @@ public:
 	CDirectoryListing& operator=(CDirectoryListing const&) = default;
 	CDirectoryListing& operator=(CDirectoryListing &&) noexcept = default;
 
-	CDirentry const& operator[](unsigned int index) const;
+	CDirentry const& operator[](size_t index) const;
 
 	// Word of caution: You MUST NOT change the name of the returned
 	// entry if you do not call ClearFindMap afterwards
-	CDirentry& get(unsigned int index);
+	CDirentry& get(size_t index);
 
-	unsigned int GetCount() const { return m_entries ? m_entries->size() : 0; }
+	size_t size() const { return m_entries ? m_entries->size() : 0; }
 
 	void Append(CDirentry&& entry);
 
-	int FindFile_CmpCase(std::wstring const& name) const;
-	int FindFile_CmpNoCase(std::wstring const& name) const;
+	size_t FindFile_CmpCase(std::wstring const& name) const;
+	size_t FindFile_CmpNoCase(std::wstring const& name) const;
 
 	void ClearFindMap();
 
@@ -128,16 +128,16 @@ public:
 
 	void Assign(std::vector<fz::shared_value<CDirentry>> && entries);
 
-	bool RemoveEntry(unsigned int index);
+	bool RemoveEntry(size_t index);
 
 	void GetFilenames(std::vector<std::wstring> &names) const;
 
 protected:
 
-	fz::shared_optional<std::vector<fz::shared_value<CDirentry> > > m_entries;
+	fz::shared_optional<std::vector<fz::shared_value<CDirentry>>> m_entries;
 
-	mutable fz::shared_optional<std::unordered_multimap<std::wstring, unsigned int> > m_searchmap_case;
-	mutable fz::shared_optional<std::unordered_multimap<std::wstring, unsigned int> > m_searchmap_nocase;
+	mutable fz::shared_optional<std::unordered_multimap<std::wstring, size_t>> m_searchmap_case;
+	mutable fz::shared_optional<std::unordered_multimap<std::wstring, size_t>> m_searchmap_nocase;
 };
 
 // Checks if listing2 is a subset of listing1. Compares only filenames.

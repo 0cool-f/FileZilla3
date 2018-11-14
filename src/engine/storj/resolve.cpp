@@ -57,8 +57,8 @@ int CStorjResolveOpData::Send()
 			bool outdated{};
 			bool found = engine_.GetDirectoryCache().Lookup(buckets, currentServer_, CServerPath(L"/"), false, outdated);
 			if (found && !outdated) {
-				int pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
-				if (pos != -1) {
+				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
+				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
 					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
@@ -89,8 +89,8 @@ int CStorjResolveOpData::Send()
 			bool outdated{};
 			bool found = engine_.GetDirectoryCache().Lookup(listing, currentServer_, path_, ignore_missing_file_, outdated);
 			if (found && !outdated) {
-				int pos = listing.FindFile_CmpCase(file_);
-				if (pos != -1) {
+				size_t pos = listing.FindFile_CmpCase(file_);
+				if (pos != std::string::npos) {
 					*fileId_ = ExtractId(*listing[pos].ownerGroup);
 					if (!fileId_->empty()) {
 						LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file_), *fileId_);
@@ -136,8 +136,8 @@ int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 			bool outdated{};
 			bool found = engine_.GetDirectoryCache().Lookup(buckets, currentServer_, CServerPath(L"/"), false, outdated);
 			if (found && !outdated) {
-				int pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
-				if (pos != -1) {
+				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
+				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
 					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
@@ -160,8 +160,8 @@ int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 			bool outdated{};
 			bool found = engine_.GetDirectoryCache().Lookup(listing, currentServer_, path_, false, outdated);
 			if (found && !outdated) {
-				int pos = listing.FindFile_CmpCase(file_);
-				if (pos != -1) {
+				size_t pos = listing.FindFile_CmpCase(file_);
+				if (pos != std::string::npos) {
 					*fileId_ = ExtractId(*listing[pos].ownerGroup);
 					LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file_), *fileId_);
 					return FZ_REPLY_OK;
@@ -203,8 +203,8 @@ int CStorjResolveManyOpData::Send()
 			bool outdated{};
 			bool found = engine_.GetDirectoryCache().Lookup(buckets, currentServer_, CServerPath(L"/"), false, outdated);
 			if (found && !outdated) {
-				int pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
-				if (pos != -1) {
+				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
+				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
 					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
@@ -230,8 +230,8 @@ int CStorjResolveManyOpData::Send()
 			bool found = engine_.GetDirectoryCache().Lookup(listing, currentServer_, path_, false, outdated);
 			if (found && !outdated) {
 				for (auto const& file : files_ ) {
-					int pos = listing.FindFile_CmpCase(file);
-					if (pos != -1) {
+					size_t pos = listing.FindFile_CmpCase(file);
+					if (pos != std::string::npos) {
 						LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file), *listing[pos].ownerGroup);
 						fileIds_.emplace_back(ExtractId(*listing[pos].ownerGroup));
 					}
@@ -267,8 +267,8 @@ int CStorjResolveManyOpData::SubcommandResult(int prevResult, COpData const&)
 			bool outdated{};
 			bool found = engine_.GetDirectoryCache().Lookup(buckets, currentServer_, CServerPath(L"/"), false, outdated);
 			if (found && !outdated) {
-				int pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
-				if (pos != -1) {
+				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
+				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
 					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
@@ -286,8 +286,8 @@ int CStorjResolveManyOpData::SubcommandResult(int prevResult, COpData const&)
 			bool found = engine_.GetDirectoryCache().Lookup(listing, currentServer_, path_, false, outdated);
 			if (found && !outdated) {
 				for (auto const& file : files_ ) {
-					int pos = listing.FindFile_CmpCase(file);
-					if (pos != -1) {
+					size_t pos = listing.FindFile_CmpCase(file);
+					if (pos != std::string::npos) {
 						LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file), *listing[pos].ownerGroup);
 						fileIds_.emplace_back(ExtractId(*listing[pos].ownerGroup));
 					}

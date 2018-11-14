@@ -45,7 +45,7 @@ private:
 	bool viewHidden_{}; // Uses LIST -a command
 
 	// Listing index for list_mdtm
-	int mdtm_index_{};
+	size_t mdtm_index_{};
 
 	fz::monotonic_clock time_before_locking_;
 };

@@ -238,7 +238,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 			}
 		}
 	}
-	DWORD len = out.size();
+	DWORD len = static_cast<DWORD>(out.size());
 	DWORD written;
 	BOOL res = WriteFile(m_log_fd, out.c_str(), len, &written, nullptr);
 	if (!res || written != len) {

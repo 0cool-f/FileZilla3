@@ -1478,11 +1478,11 @@ void CDirectoryListingParserTest::testIndividual()
 
 	CDirectoryListing listing = parser.Parse(CServerPath());
 
-	std::string msg = fz::sprintf("Data: %s, count: %d", entry.data, listing.GetCount());
+	std::string msg = fz::sprintf("Data: %s, count: %u", entry.data, listing.size());
 	fz::replace_substrings(msg, "\r", std::string());
 	fz::replace_substrings(msg, "\n", std::string());
 
-	CPPUNIT_ASSERT_MESSAGE(msg, listing.GetCount() == 1);
+	CPPUNIT_ASSERT_MESSAGE(msg, listing.size() == 1);
 
 	msg = fz::sprintf("Data: %s  Expected:\n%s\n  Got:\n%s", entry.data, entry.reference.dump(), listing[0].dump());
 	CPPUNIT_ASSERT_MESSAGE(msg, listing[0] == entry.reference);
@@ -1502,7 +1502,7 @@ void CDirectoryListingParserTest::testAll()
 	}
 	CDirectoryListing listing = parser.Parse(CServerPath());
 
-	CPPUNIT_ASSERT(listing.GetCount() == m_entries.size());
+	CPPUNIT_ASSERT(listing.size() == m_entries.size());
 
 	unsigned int i = 0;
 	for (auto iter = m_entries.begin(); iter != m_entries.end(); iter++, i++) {

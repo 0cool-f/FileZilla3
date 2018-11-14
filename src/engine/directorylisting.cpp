@@ -50,12 +50,12 @@ bool CDirentry::operator==(const CDirentry &op) const
 	return true;
 }
 
-const CDirentry& CDirectoryListing::operator[](unsigned int index) const
+const CDirentry& CDirectoryListing::operator[](size_t index) const
 {
 	return *(*m_entries)[index];
 }
 
-CDirentry& CDirectoryListing::get(unsigned int index)
+CDirentry& CDirectoryListing::get(size_t index)
 {
 	// Commented out, too heavy speed penalty
 	// assert(index < m_entryCount);
@@ -85,9 +85,9 @@ void CDirectoryListing::Assign(std::vector<fz::shared_value<CDirentry>> && entri
 	m_searchmap_nocase.clear();
 }
 
-bool CDirectoryListing::RemoveEntry(unsigned int index)
+bool CDirectoryListing::RemoveEntry(size_t index)
 {
-	if (index >= GetCount()) {
+	if (index >= size()) {
 		return false;
 	}
 
@@ -109,16 +109,16 @@ bool CDirectoryListing::RemoveEntry(unsigned int index)
 
 void CDirectoryListing::GetFilenames(std::vector<std::wstring> &names) const
 {
-	names.reserve(GetCount());
-	for (unsigned int i = 0; i < GetCount(); ++i) {
+	names.reserve(size());
+	for (size_t i = 0; i < size(); ++i) {
 		names.push_back((*m_entries)[i]->name);
 	}
 }
 
-int CDirectoryListing::FindFile_CmpCase(std::wstring const& name) const
+size_t CDirectoryListing::FindFile_CmpCase(std::wstring const& name) const
 {
 	if (!m_entries || m_entries->empty()) {
-		return -1;
+		return std::string::npos;
 	}
 
 	if (!m_searchmap_case) {
@@ -131,9 +131,9 @@ int CDirectoryListing::FindFile_CmpCase(std::wstring const& name) const
 		return iter->second;
 	}
 
-	unsigned int i = m_searchmap_case->size();
+	size_t i = m_searchmap_case->size();
 	if (i == m_entries->size()) {
-		return -1;
+		return std::string::npos;
 	}
 
 	auto & searchmap_case = m_searchmap_case.get();
@@ -142,7 +142,7 @@ int CDirectoryListing::FindFile_CmpCase(std::wstring const& name) const
 	std::vector<fz::shared_value<CDirentry> >::const_iterator entry_iter = m_entries->begin() + i;
 	for (; entry_iter != m_entries->end(); ++entry_iter, ++i) {
 		std::wstring const& entry_name = (*entry_iter)->name;
-		searchmap_case.insert(std::pair<std::wstring const, unsigned int>(entry_name, i));
+		searchmap_case.emplace(entry_name, i);
 
 		if (entry_name == name) {
 			return i;
@@ -150,13 +150,13 @@ int CDirectoryListing::FindFile_CmpCase(std::wstring const& name) const
 	}
 
 	// Map is complete, item not in it
-	return -1;
+	return std::string::npos;
 }
 
-int CDirectoryListing::FindFile_CmpNoCase(std::wstring const& name) const
+size_t CDirectoryListing::FindFile_CmpNoCase(std::wstring const& name) const
 {
 	if (!m_entries || m_entries->empty()) {
-		return -1;
+		return std::string::npos;
 	}
 
 	if (!m_searchmap_nocase) {
@@ -171,9 +171,9 @@ int CDirectoryListing::FindFile_CmpNoCase(std::wstring const& name) const
 		return iter->second;
 	}
 
-	unsigned int i = m_searchmap_nocase->size();
+	size_t i = m_searchmap_nocase->size();
 	if (i == m_entries->size()) {
-		return -1;
+		return std::string::npos;
 	}
 
 	auto& searchmap_nocase = m_searchmap_nocase.get();
@@ -182,7 +182,7 @@ int CDirectoryListing::FindFile_CmpNoCase(std::wstring const& name) const
 	std::vector<fz::shared_value<CDirentry> >::const_iterator entry_iter = m_entries->begin() + i;
 	for (; entry_iter != m_entries->end(); ++entry_iter, ++i) {
 		std::wstring entry_lrw = fz::str_tolower((*entry_iter)->name);
-		searchmap_nocase.insert(std::pair<std::wstring const, unsigned int>(entry_lrw, i));
+		searchmap_nocase.emplace(entry_lrw, i);
 
 		if (entry_lrw == lwr) {
 			return i;
@@ -190,7 +190,7 @@ int CDirectoryListing::FindFile_CmpNoCase(std::wstring const& name) const
 	}
 
 	// Map is complete, item not in it
-	return -1;
+	return std::string::npos;
 }
 
 void CDirectoryListing::ClearFindMap()
@@ -212,7 +212,7 @@ bool CheckInclusion(const CDirectoryListing& listing1, const CDirectoryListing& 
 {
 	// Check if listing2 is contained within listing1
 
-	if (listing2.GetCount() > listing1.GetCount()) {
+	if (listing2.size() > listing1.size()) {
 		return false;
 	}
 

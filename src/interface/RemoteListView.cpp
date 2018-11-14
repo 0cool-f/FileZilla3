@@ -84,14 +84,14 @@ public:
 
 		auto const format = m_pDataObject->GetReceivedFormat();
 		if (format == m_pFileDataObject->GetFormat() || format == m_pLocalDataObject->GetFormat()) {
-			wxString subdir;
+			std::wstring subdir;
 			int flags = 0;
 			int hit = m_pRemoteListView->HitTest(wxPoint(x, y), flags, 0);
 			if (hit != -1 && (flags & wxLIST_HITTEST_ONITEM)) {
 				int index = m_pRemoteListView->GetItemIndex(hit);
 				if (index != -1 && m_pRemoteListView->m_fileData[index].comparison_flags != CComparableListing::fill) {
-					if (index == (int)m_pRemoteListView->m_pDirectoryListing->GetCount()) {
-						subdir = _T("..");
+					if (index == static_cast<int>(m_pRemoteListView->m_pDirectoryListing->size())) {
+						subdir = L"..";
 					}
 					else if ((*m_pRemoteListView->m_pDirectoryListing)[index].is_dir()) {
 						subdir = (*m_pRemoteListView->m_pDirectoryListing)[index].name;
@@ -127,8 +127,8 @@ public:
 		if (hit != -1 && (flags & wxLIST_HITTEST_ONITEM)) {
 			int index = m_pRemoteListView->GetItemIndex(hit);
 			if (index != -1 && m_pRemoteListView->m_fileData[index].comparison_flags != CComparableListing::fill) {
-				if (index == (int)m_pRemoteListView->m_pDirectoryListing->GetCount()) {
-					subdir = _T("..");
+				if (index == static_cast<int>(m_pRemoteListView->m_pDirectoryListing->size())) {
+					subdir = L"..";
 				}
 				else if ((*m_pRemoteListView->m_pDirectoryListing)[index].is_dir()) {
 					subdir = (*m_pRemoteListView->m_pDirectoryListing)[index].name;
@@ -138,7 +138,7 @@ public:
 
 		// Get target path
 		CServerPath target = m_pRemoteListView->m_pDirectoryListing->path;
-		if (subdir == _T("..")) {
+		if (subdir == L"..") {
 			if (target.HasParent()) {
 				target = target.GetParent();
 			}
@@ -211,7 +211,7 @@ public:
 			if (index == -1 || m_pRemoteListView->m_fileData[index].comparison_flags == CComparableListing::fill) {
 				hit = -1;
 			}
-			else if (index != (int)m_pRemoteListView->m_pDirectoryListing->GetCount()) {
+			else if (index != static_cast<int>(m_pRemoteListView->m_pDirectoryListing->size())) {
 				if (!(*m_pRemoteListView->m_pDirectoryListing)[index].is_dir()) {
 					hit = -1;
 				}
@@ -468,10 +468,10 @@ bool CRemoteListView::IsItemValid(unsigned int item) const
 
 void CRemoteListView::UpdateDirectoryListing_Added(std::shared_ptr<CDirectoryListing> const& pDirectoryListing)
 {
-	const unsigned int to_add = pDirectoryListing->GetCount() - m_pDirectoryListing->GetCount();
+	size_t const to_add = pDirectoryListing->size() - m_pDirectoryListing->size();
 	m_pDirectoryListing = pDirectoryListing;
 
-	m_indexMapping[0] = pDirectoryListing->GetCount();
+	m_indexMapping[0] = pDirectoryListing->size();
 
 	CFilterManager const& filter = m_state.GetStateFilterManager();
 	std::wstring const path = m_pDirectoryListing->path.GetPath();
@@ -487,8 +487,8 @@ void CRemoteListView::UpdateDirectoryListing_Added(std::shared_ptr<CDirectoryLis
 	}
 
 	std::unique_ptr<CFileListCtrlSortBase> compare = GetSortComparisonObject();
-	for (unsigned int i = pDirectoryListing->GetCount() - to_add; i < pDirectoryListing->GetCount(); ++i) {
-		const CDirentry& entry = (*pDirectoryListing)[i];
+	for (size_t i = pDirectoryListing->size() - to_add; i < pDirectoryListing->size(); ++i) {
+		CDirentry const& entry = (*pDirectoryListing)[i];
 		CGenericFileData data;
 		if (entry.is_dir()) {
 			data.icon = m_dirIcon;
@@ -538,27 +538,28 @@ void CRemoteListView::UpdateDirectoryListing_Added(std::shared_ptr<CDirectoryLis
 	SetItemCount(m_indexMapping.size());
 	UpdateSelections_ItemsAdded(added_indexes);
 
-	if (m_pFilelistStatusBar)
-		m_pFilelistStatusBar->SetHidden(m_pDirectoryListing->GetCount() + 1 - m_indexMapping.size());
+	if (m_pFilelistStatusBar) {
+		m_pFilelistStatusBar->SetHidden(m_pDirectoryListing->size() + 1 - m_indexMapping.size());
+	}
 
-	wxASSERT(m_indexMapping.size() <= pDirectoryListing->GetCount() + 1);
+	wxASSERT(m_indexMapping.size() <= pDirectoryListing->size() + 1);
 }
 
 void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryListing> const& pDirectoryListing)
 {
-	unsigned int const countRemoved = m_pDirectoryListing->GetCount() - pDirectoryListing->GetCount();
+	size_t const countRemoved = m_pDirectoryListing->size() - pDirectoryListing->size();
 	if (!countRemoved) {
 		m_pDirectoryListing = pDirectoryListing;
 		return;
 	}
 	wxASSERT(!IsComparing());
 
-	std::list<unsigned int> removedItems;
+	std::vector<size_t> removedItems;
 	{
 		// Get indexes of the removed items in the listing
-		unsigned int j = 0;
-		unsigned int i = 0;
-		while (i < pDirectoryListing->GetCount() && j < m_pDirectoryListing->GetCount()) {
+		size_t j = 0;
+		size_t i = 0;
+		while (i < pDirectoryListing->size() && j < m_pDirectoryListing->size()) {
 			const CDirentry& oldEntry = (*m_pDirectoryListing)[j];
 			const wxString& oldName = oldEntry.name;
 			const wxString& newName = (*pDirectoryListing)[i].name;
@@ -570,8 +571,9 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 
 			removedItems.push_back(j++);
 		}
-		for (; j < m_pDirectoryListing->GetCount(); ++j)
+		for (; j < m_pDirectoryListing->size(); ++j) {
 			removedItems.push_back(j);
+		}
 
 		wxASSERT(removedItems.size() == countRemoved);
 	}
@@ -591,9 +593,10 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 
 		// j is the offset the index has to be adjusted
 		int j = 0;
-		for (std::list<unsigned int>::const_iterator iter = removedItems.begin(); iter != removedItems.end(); ++iter, ++j) {
-			if (*iter > index)
+		for (auto iter = removedItems.cbegin(); iter != removedItems.cend(); ++iter, ++j) {
+			if (*iter > index) {
 				break;
+			}
 
 			if (*iter == index) {
 				removedIndexes.push_back(i);
@@ -610,15 +613,19 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 		if (removed && m_pFilelistStatusBar) {
 			const CDirentry& oldEntry = (*m_pDirectoryListing)[index];
 			if (isSelected) {
-				if (oldEntry.is_dir())
+				if (oldEntry.is_dir()) {
 					m_pFilelistStatusBar->UnselectDirectory();
-				else
+				}
+				else {
 					m_pFilelistStatusBar->UnselectFile(oldEntry.size);
+				}
 			}
-			if (oldEntry.is_dir())
+			if (oldEntry.is_dir()) {
 				m_pFilelistStatusBar->RemoveDirectory();
-			else
+			}
+			else {
 				m_pFilelistStatusBar->RemoveFile(oldEntry.size);
+			}
 		}
 
 		// Update index
@@ -626,28 +633,33 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 
 		// Update selections
 		bool needSelection;
-		if (selectedItems.empty())
+		if (selectedItems.empty()) {
 			needSelection = false;
+		}
 		else if (selectedItems.front() == i) {
 			needSelection = true;
 			selectedItems.pop_front();
 		}
-		else
+		else {
 			needSelection = false;
+		}
 
 		if (isSelected) {
-			if (!needSelection && (toRemove || removed))
+			if (!needSelection && (toRemove || removed)) {
 				SetSelection(i, false);
+			}
 
-			if (!removed)
+			if (!removed) {
 				selectedItems.push_back(i - toRemove);
+			}
 		}
-		else if (needSelection)
+		else if (needSelection) {
 			SetSelection(i, true);
+		}
 	}
 
 	// Erase file data
-	for (std::list<unsigned int>::reverse_iterator iter = removedItems.rbegin(); iter != removedItems.rend(); ++iter) {
+	for (auto iter = removedItems.crbegin(); iter != removedItems.crend(); ++iter) {
 		m_fileData.erase(m_fileData.begin() + *iter);
 	}
 
@@ -658,27 +670,30 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 		m_indexMapping.erase(m_indexMapping.begin() + removedIndex);
 	}
 
-	wxASSERT(m_indexMapping.size() == pDirectoryListing->GetCount() + 1);
+	wxASSERT(m_indexMapping.size() == pDirectoryListing->size() + 1);
 
 	m_pDirectoryListing = pDirectoryListing;
 
-	if (m_pFilelistStatusBar)
-		m_pFilelistStatusBar->SetHidden(m_pDirectoryListing->GetCount() + 1 - m_indexMapping.size());
+	if (m_pFilelistStatusBar) {
+		m_pFilelistStatusBar->SetHidden(m_pDirectoryListing->size() + 1 - m_indexMapping.size());
+	}
 
 	SaveSetItemCount(m_indexMapping.size());
 }
 
 bool CRemoteListView::UpdateDirectoryListing(std::shared_ptr<CDirectoryListing> const& pDirectoryListing)
 {
-	wxASSERT(!IsComparing());
+	assert(!IsComparing());
 
 	const int unsure = pDirectoryListing->get_unsure_flags() & ~(CDirectoryListing::unsure_unknown);
 
-	if (!unsure)
+	if (!unsure) {
 		return false;
+	}
 
-	if (unsure & CDirectoryListing::unsure_invalid)
+	if (unsure & CDirectoryListing::unsure_invalid) {
 		return false;
+	}
 
 	if (!(unsure & ~(CDirectoryListing::unsure_dir_changed | CDirectoryListing::unsure_file_changed))) {
 		if (m_sortColumn != 0 && m_sortColumn != 2) {
@@ -687,12 +702,14 @@ bool CRemoteListView::UpdateDirectoryListing(std::shared_ptr<CDirectoryListing> 
 			return false;
 		}
 
-		if (CFilterManager::HasActiveFilters())
+		if (CFilterManager::HasActiveFilters()) {
 			return false;
+		}
 
-		wxASSERT(pDirectoryListing->GetCount() == m_pDirectoryListing->GetCount());
-		if (pDirectoryListing->GetCount() != m_pDirectoryListing->GetCount())
+		assert(pDirectoryListing->size() == m_pDirectoryListing->size());
+		if (pDirectoryListing->size() != m_pDirectoryListing->size()) {
 			return false;
+		}
 
 		m_pDirectoryListing = pDirectoryListing;
 
@@ -702,13 +719,14 @@ bool CRemoteListView::UpdateDirectoryListing(std::shared_ptr<CDirectoryListing> 
 
 	if (unsure & (CDirectoryListing::unsure_dir_added | CDirectoryListing::unsure_file_added))
 	{
-		if (unsure & (CDirectoryListing::unsure_dir_removed | CDirectoryListing::unsure_file_removed))
+		if (unsure & (CDirectoryListing::unsure_dir_removed | CDirectoryListing::unsure_file_removed)) {
 			return false; // Cannot handle both at the same time unfortunately
+		}
 		UpdateDirectoryListing_Added(pDirectoryListing);
 		return true;
 	}
 
-	wxASSERT(pDirectoryListing->GetCount() <= m_pDirectoryListing->GetCount());
+	assert(pDirectoryListing->size() <= m_pDirectoryListing->size());
 	UpdateDirectoryListing_Removed(pDirectoryListing);
 	return true;
 }
@@ -725,7 +743,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 		reset = true;
 	}
 	else if (m_pDirectoryListing->m_firstListTime == pDirectoryListing->m_firstListTime && !IsComparing()
-		&& m_pDirectoryListing->GetCount() > 200)
+		&& m_pDirectoryListing->size() > 200)
 	{
 		// Updated directory listing. Check if we can use process it in a different,
 		// more efficient way.
@@ -734,8 +752,8 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 			wxASSERT(GetItemCount() == (int)m_indexMapping.size());
 			wxASSERT(GetItemCount() <= (int)m_fileData.size());
 			wxASSERT(GetItemCount() == (int)m_fileData.size() || CFilterManager::HasActiveFilters());
-			wxASSERT(m_pDirectoryListing->GetCount() + 1 >= (unsigned int)GetItemCount());
-			wxASSERT(m_indexMapping[0] == m_pDirectoryListing->GetCount());
+			wxASSERT(m_pDirectoryListing->size() + 1 >= (size_t)GetItemCount());
+			wxASSERT(m_indexMapping[0] == m_pDirectoryListing->size());
 
 			RefreshListOnly();
 
@@ -784,13 +802,13 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 	if (m_pDirectoryListing) {
 		SetInfoText();
 
-		m_indexMapping.push_back(m_pDirectoryListing->GetCount());
+		m_indexMapping.push_back(m_pDirectoryListing->size());
 
 		std::wstring const path = m_pDirectoryListing->path.GetPath();
 
 		CFilterManager const& filter = m_state.GetStateFilterManager();
 		
-		for (unsigned int i = 0; i < m_pDirectoryListing->GetCount(); ++i) {
+		for (unsigned int i = 0; i < m_pDirectoryListing->size(); ++i) {
 			const CDirentry& entry = (*m_pDirectoryListing)[i];
 			CGenericFileData data;
 			if (entry.is_dir()) {
@@ -843,7 +861,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 		if (index == -1) {
 			resetDropTarget = true;
 		}
-		else if (index != (int)m_pDirectoryListing->GetCount()) {
+		else if (index != (int)m_pDirectoryListing->size()) {
 			if (!(*m_pDirectoryListing)[index].is_dir()) {
 				resetDropTarget = true;
 			}
@@ -925,17 +943,20 @@ void CRemoteListView::OnItemActivated(wxListEvent &event)
 	int item = -1;
 	for (;;) {
 		item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-		if (item == -1)
+		if (item == -1) {
 			break;
+		}
 
 		int index = GetItemIndex(item);
-		if (index == -1 || m_fileData[index].comparison_flags == fill)
+		if (index == -1 || m_fileData[index].comparison_flags == fill) {
 			continue;
+		}
 
 		count++;
 
-		if (!item)
+		if (!item) {
 			back = true;
+		}
 	}
 	if (!count) {
 		wxBell();
@@ -1712,7 +1733,7 @@ bool CRemoteListView::OnAcceptRename(const wxListEvent& event)
 		}
 
 		// Check if target file already exists
-		for (unsigned int i = 0; i < m_pDirectoryListing->GetCount(); ++i) {
+		for (size_t i = 0; i < m_pDirectoryListing->size(); ++i) {
 			if (newFile == (*m_pDirectoryListing)[i].name) {
 				if (wxMessageBoxEx(_("Target filename already exists, really continue?"), _("File exists"), wxICON_QUESTION | wxYES_NO) != wxYES) {
 					return false;
@@ -1746,33 +1767,41 @@ void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 	long item = -1;
 	for (;;) {
 		item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-		if (item == -1)
+		if (item == -1) {
 			break;
+		}
 
-		if (!item)
+		if (!item) {
 			return;
+		}
 
 		int index = GetItemIndex(item);
-		if (index == -1)
+		if (index == -1) {
 			return;
-		if (m_fileData[index].comparison_flags == fill)
+		}
+		if (m_fileData[index].comparison_flags == fill) {
 			continue;
+		}
 
 		const CDirentry& entry = (*m_pDirectoryListing)[index];
 
-		if (entry.is_dir())
+		if (entry.is_dir()) {
 			dirCount++;
-		else
+		}
+		else {
 			fileCount++;
+		}
 		name = entry.name;
 
 		char file_perms[9];
 		if (CChmodDialog::ConvertPermissions(*entry.permissions, file_perms)) {
 			for (int i = 0; i < 9; i++) {
-				if (!permissions[i] || permissions[i] == file_perms[i])
+				if (!permissions[i] || permissions[i] == file_perms[i]) {
 					permissions[i] = file_perms[i];
-				else
+				}
+				else {
 					permissions[i] = -1;
+				}
 			}
 		}
 	}
@@ -1832,8 +1861,9 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 	long item = -1;
 	for (;;) {
 		item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-		if (item == -1)
+		if (item == -1) {
 			break;
+		}
 
 		if (!item) {
 			pChmodDlg->Destroy();
@@ -1847,8 +1877,9 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 			pChmodDlg = 0;
 			return;
 		}
-		if (m_fileData[index].comparison_flags == fill)
+		if (m_fileData[index].comparison_flags == fill) {
 			continue;
+		}
 
 		const CDirentry& entry = (*m_pDirectoryListing)[index];
 
@@ -1863,8 +1894,9 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 			m_state.m_pCommandQueue->ProcessCommand(new CChmodCommand(m_pDirectoryListing->path, entry.name, newPerms));
 		}
 
-		if (pChmodDlg->Recursive() && entry.is_dir())
+		if (pChmodDlg->Recursive() && entry.is_dir()) {
 			root.add_dir_to_visit(m_pDirectoryListing->path, entry.name);
+		}
 	}
 
 	if (pChmodDlg->Recursive()) {
@@ -1876,8 +1908,9 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 
 		// Refresh listing. This gets done implicitely by the recursive operation, so
 		// only it if not recursing.
-		if (pRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_chmod)
+		if (pRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_chmod) {
 			m_state.ChangeRemoteDir(m_pDirectoryListing->path);
+		}
 	}
 	else {
 		pChmodDlg->Destroy();
@@ -1915,9 +1948,9 @@ void CRemoteListView::ApplyCurrentFilter()
 	std::wstring const path = m_pDirectoryListing->path.GetPath();
 
 	m_indexMapping.clear();
-	const unsigned int count = m_pDirectoryListing->GetCount();
+	size_t const count = m_pDirectoryListing->size();
 	m_indexMapping.push_back(count);
-	for (unsigned int i = 0; i < count; ++i) {
+	for (size_t i = 0; i < count; ++i) {
 		const CDirentry& entry = (*m_pDirectoryListing)[i];
 		if (filter.FilenameFiltered(entry.name, path, entry.is_dir(), entry.size, false, 0, entry.time)) {
 			++hidden;
@@ -2190,12 +2223,15 @@ void CRemoteListView::SetInfoText()
 {
 	wxString text;
 	if (!IsComparing()) {
-		if (!m_pDirectoryListing)
+		if (!m_pDirectoryListing) {
 			text = _("Not connected to any server");
-		else if (m_pDirectoryListing->failed())
+		}
+		else if (m_pDirectoryListing->failed()) {
 			text = _("Directory listing failed");
-		else if (!m_pDirectoryListing->GetCount())
+		}
+		else if (!m_pDirectoryListing->size()) {
 			text = _("Empty directory listing");
+		}
 	}
 
 
@@ -2422,12 +2458,12 @@ void CRemoteListView::ValidateIndexMapping()
 	// - NO filter may be used!
 	// - Doesn't work in comparison mode
 
-	char* buffer = new char[m_pDirectoryListing->GetCount() + 1];
-	memset(buffer, 0, m_pDirectoryListing->GetCount() + 1);
+	char* buffer = new char[m_pDirectoryListing->size() + 1];
+	memset(buffer, 0, m_pDirectoryListing->size() + 1);
 
 	// Injectivity
 	for (auto const& item : m_indexMapping) {
-		if (item > m_pDirectoryListing->GetCount()) {
+		if (item > m_pDirectoryListing->size()) {
 			abort();
 		}
 		else if (buffer[item]) {
@@ -2438,7 +2474,7 @@ void CRemoteListView::ValidateIndexMapping()
 	}
 
 	// Surjectivity
-	for (unsigned int i = 0; i < m_pDirectoryListing->GetCount() + 1; i++) {
+	for (size_t i = 0; i < m_pDirectoryListing->size() + 1; ++i) {
 		wxASSERT(buffer[i] != 0);
 	}
 
@@ -2460,16 +2496,17 @@ void CRemoteListView::StartComparison()
 
 	ComparisonRememberSelections();
 
-	if (m_originalIndexMapping.empty())
+	if (m_originalIndexMapping.empty()) {
 		m_originalIndexMapping.swap(m_indexMapping);
-	else
+	}
+	else {
 		m_indexMapping.clear();
+	}
 
 	m_comparisonIndex = -1;
 
 	const CGenericFileData& last = m_fileData[m_fileData.size() - 1];
-	if (last.comparison_flags != fill)
-	{
+	if (last.comparison_flags != fill) {
 		CGenericFileData data;
 		data.icon = -1;
 		data.comparison_flags = fill;
@@ -2488,7 +2525,7 @@ bool CRemoteListView::get_next_file(wxString& name, bool& dir, int64_t& size, fz
 		return false;
 	}
 
-	if (index == m_pDirectoryListing->GetCount()) {
+	if (index == m_pDirectoryListing->size()) {
 		name = _T("..");
 		dir = true;
 		size = -1;
@@ -2521,12 +2558,14 @@ wxListItemAttr* CRemoteListView::OnGetItemAttr(long item) const
 	CRemoteListView *pThis = const_cast<CRemoteListView *>(this);
 	int index = GetItemIndex(item);
 
-	if (index == -1)
+	if (index == -1) {
 		return 0;
+	}
 
 #ifndef __WXMSW__
-	if (item == m_dropTarget)
+	if (item == m_dropTarget) {
 		return &pThis->m_dropHighlightAttribute;
+	}
 #endif
 
 	const CGenericFileData& data = m_fileData[index];
@@ -2552,10 +2591,10 @@ wxString CRemoteListView::GetItemText(int item, unsigned int column)
 	}
 
 	if (!column) {
-		if ((unsigned int)index == m_pDirectoryListing->GetCount()) {
+		if ((size_t)index == m_pDirectoryListing->size()) {
 			return _T("..");
 		}
-		else if ((unsigned int)index < m_pDirectoryListing->GetCount()) {
+		else if ((size_t)index < m_pDirectoryListing->size()) {
 			return (*m_pDirectoryListing)[index].name;
 		}
 		else {
@@ -2566,7 +2605,7 @@ wxString CRemoteListView::GetItemText(int item, unsigned int column)
 		return wxString(); //.. has no attributes
 	}
 
-	if ((unsigned int)index >= m_pDirectoryListing->GetCount()) {
+	if ((size_t)index >= m_pDirectoryListing->size()) {
 		return wxString();
 	}
 
@@ -2768,7 +2807,7 @@ int CRemoteListView::GetOverlayIndex(int item)
 	if (index == -1) {
 		return 0;
 	}
-	if ((unsigned int)index >= m_pDirectoryListing->GetCount()) {
+	if ((size_t)index >= m_pDirectoryListing->size()) {
 		return 0;
 	}
 
@@ -2826,7 +2865,7 @@ void CRemoteListView::OnMenuNewfile(wxCommandEvent&)
 	std::wstring newFileName = dlg.GetValue().ToStdWstring();
 
 	// Check if target file already exists
-	for (unsigned int i = 0; i < m_pDirectoryListing->GetCount(); ++i) {
+	for (size_t i = 0; i < m_pDirectoryListing->size(); ++i) {
 		if (newFileName == (*m_pDirectoryListing)[i].name) {
 			wxMessageBoxEx(_("Target filename already exists!"));
 			return;

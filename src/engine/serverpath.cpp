@@ -282,7 +282,7 @@ std::wstring CServerPath::GetSafePath() const
 
 	#define INTLENGTH 20 // 2^64 - 1
 
-	int len = 5 // Type and 2x' ' and terminating 0
+	size_t len = 5 // Type and 2x' ' and terminating 0
 		+ INTLENGTH; // Max length of prefix
 
 	len += m_data->m_prefix ? m_data->m_prefix->size() : 0;

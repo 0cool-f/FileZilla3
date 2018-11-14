@@ -188,8 +188,9 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 		return;
 	}
 
-	if (m_operationMode == recursive_none || recursion_roots_.empty())
+	if (m_operationMode == recursive_none || recursion_roots_.empty()) {
 		return;
+	}
 
 	if (pDirectoryListing->failed()) {
 		// Ignore this.
@@ -237,7 +238,7 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 	ServerWithCredentials const& server = m_state.GetServer();
 	wxASSERT(server);
 
-	if (!pDirectoryListing->GetCount() && m_operationMode == recursive_transfer) {
+	if (!pDirectoryListing->size() && m_operationMode == recursive_transfer) {
 		if (m_immediate) {
 			wxFileName::Mkdir(dir.localDir.GetPath(), 0777, wxPATH_MKDIR_FULL);
 			m_state.RefreshLocalFile(dir.localDir.GetPath());
@@ -280,8 +281,8 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 
 				// Local item isn't filtered
 
-				int remoteIndex = pDirectoryListing->FindFile_CmpCase(fz::to_wstring(name));
-				if (remoteIndex != -1) {
+				size_t remoteIndex = pDirectoryListing->FindFile_CmpCase(fz::to_wstring(name));
+				if (remoteIndex != std::string::npos) {
 					CDirentry const& entry = (*pDirectoryListing)[remoteIndex];
 					if (!filter.FilenameFiltered(m_filters.second, entry.name, remotePath, entry.is_dir(), entry.size, 0, entry.time)) {
 						// Both local and remote items exist
@@ -304,15 +305,17 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 
 	bool added = false;
 
-	for (int i = pDirectoryListing->GetCount() - 1; i >= 0; --i) {
-		const CDirentry& entry = (*pDirectoryListing)[i];
+	for (size_t i = pDirectoryListing->size(); i > 0; --i) {
+		const CDirentry& entry = (*pDirectoryListing)[i - 1];
 
 		if (restrict) {
-			if (entry.name != *dir.restrict)
+			if (entry.name != *dir.restrict) {
 				continue;
+			}
 		}
-		else if (filter.FilenameFiltered(m_filters.second, entry.name, remotePath, entry.is_dir(), entry.size, 0, entry.time))
+		else if (filter.FilenameFiltered(m_filters.second, entry.name, remotePath, entry.is_dir(), entry.size, 0, entry.time)) {
 			continue;
+		}
 
 		if (!entry.is_dir()) {
 			++m_processedFiles;

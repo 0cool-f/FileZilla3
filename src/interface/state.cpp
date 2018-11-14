@@ -720,35 +720,35 @@ CGlobalStateEventHandler::~CGlobalStateEventHandler()
 	CContextManager::Get()->UnregisterHandler(this, STATECHANGE_NONE);
 }
 
-void CState::UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, const wxString& subdir, bool queueOnly)
+void CState::UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, std::wstring const& subdir, bool queueOnly)
 {
 	if (!m_site.server_ || !m_pDirectoryListing) {
 		return;
 	}
 
 	CServerPath path = m_pDirectoryListing->path;
-	if (subdir == _T("..") && path.HasParent()) {
+	if (subdir == L".." && path.HasParent()) {
 		path = path.GetParent();
 	}
 	else if (!subdir.empty()) {
-		path.AddSegment(subdir.ToStdWstring());
+		path.AddSegment(subdir);
 	}
 
 	UploadDroppedFiles(pLocalDataObject, path, queueOnly);
 }
 
-void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, const wxString& subdir, bool queueOnly)
+void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, std::wstring const& subdir, bool queueOnly)
 {
 	if (!m_site.server_ || !m_pDirectoryListing) {
 		return;
 	}
 
 	CServerPath path = m_pDirectoryListing->path;
-	if (subdir == _T("..") && path.HasParent()) {
+	if (subdir == L".." && path.HasParent()) {
 		path = path.GetParent();
 	}
 	else if (!subdir.empty()) {
-		path.AddSegment(subdir.ToStdWstring());
+		path.AddSegment(subdir);
 	}
 
 	UploadDroppedFiles(pFileDataObject, path, queueOnly);

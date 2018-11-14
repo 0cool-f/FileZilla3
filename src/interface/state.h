@@ -164,8 +164,8 @@ public:
 	CCommandQueue* m_pCommandQueue{};
 	CComparisonManager* GetComparisonManager() { return m_pComparisonManager; }
 
-	void UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, wxString const& subdir, bool queueOnly);
-	void UploadDroppedFiles(wxFileDataObject const* pFileDataObject, wxString const& subdir, bool queueOnly);
+	void UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, std::wstring const& subdir, bool queueOnly);
+	void UploadDroppedFiles(wxFileDataObject const* pFileDataObject, std::wstring const& subdir, bool queueOnly);
 	void UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, CServerPath const& path, bool queueOnly);
 	void UploadDroppedFiles(wxFileDataObject const* pFileDataObject, CServerPath const& path, bool queueOnly);
 	void HandleDroppedFiles(CLocalDataObject const* pLocalDataObject, CLocalPath const& path, bool copy);

@@ -573,12 +573,12 @@ void CSearchDialog::ProcessDirectoryListing(std::shared_ptr<CDirectoryListing> c
 
 	std::vector<int> added_indexes;
 	if (has_selections) {
-		added_indexes.reserve(listing->GetCount());
+		added_indexes.reserve(listing->size());
 	}
 
 	std::unique_ptr<CFileListCtrlSortBase> compare = m_results->GetSortComparisonObject();
-	for (unsigned int i = 0; i < listing->GetCount(); ++i) {
-		const CDirentry& entry = (*listing)[i];
+	for (size_t i = 0; i < listing->size(); ++i) {
+		CDirentry const& entry = (*listing)[i];
 
 		if (!CFilterManager::FilenameFilteredByFilter(m_search_filter, entry.name, path, entry.is_dir(), entry.size, 0, entry.time)) {
 			continue;

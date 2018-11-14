@@ -159,8 +159,8 @@ int CFtpListOpData::ParseResponse()
 			LogMessage(MessageType::Status, L"Timezone offset of server is %d seconds.", -serveroffset);
 
 			fz::duration span = fz::duration::from_seconds(serveroffset);
-			const int count = directoryListing_.GetCount();
-			for (int i = 0; i < count; ++i) {
+			size_t const count = directoryListing_.size();
+			for (size_t i = 0; i < count; ++i) {
 				CDirentry& entry = directoryListing_.get(i);
 				entry.time += span;
 			}
@@ -266,7 +266,7 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 
 				if (viewHiddenCheck_) {
 					if (viewHidden_) {
-						if (directoryListing_.GetCount()) {
+						if (directoryListing_.size()) {
 							// Less files with LIST -a
 							// Not supported
 							LogMessage(MessageType::Debug_Info, L"Server does not seem to support LIST -a");
@@ -350,8 +350,8 @@ int CFtpListOpData::CheckTimezoneDetection(CDirectoryListing& listing)
 			CServerCapabilities::SetCapability(currentServer_, timezone_offset, no);
 		}
 		else {
-			const int count = listing.GetCount();
-			for (int i = 0; i < count; ++i) {
+			size_t const count = listing.size();
+			for (size_t i = 0; i < count; ++i) {
 				if (!listing[i].is_dir() && listing[i].has_time()) {
 					opState = list_mdtm;
 					directoryListing_ = listing;
