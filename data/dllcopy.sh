@@ -11,6 +11,7 @@ objdump="$3"
 cxx="$4"
 searchpath="$5"
 
+searchpath=`echo $searchpath | sed "s/\\(^\\|:\\)\\/c\\/windows[/a-z0-9]*//gi"`
 searchpath="$searchpath:`\"$cxx\" -print-search-dirs | grep libraries | sed 's/libraries: =//'`"
 
 #echo $searchpath
