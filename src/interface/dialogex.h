@@ -3,6 +3,7 @@
 
 #include "wrapengine.h"
 
+class wxGridBagSizer;
 struct DialogLayout final
 {
 public:
@@ -15,9 +16,14 @@ public:
 	static wxSizerFlags const valigng;
 
 	wxFlexGridSizer* createFlex(int cols, int rows = 0) const;
+	wxGridBagSizer* createGridBag(int cols, int rows = 0) const;
 	wxStdDialogButtonSizer* createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const;
 
 	DialogLayout(wxTopLevelWindow * parent);
+
+	void gbNewRow(wxGridBagSizer * gb);
+	wxSizerItem* gbAddRow(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags = wxSizerFlags());
+	wxSizerItem* gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags = wxSizerFlags());
 
 protected:
 	wxTopLevelWindow * parent_;

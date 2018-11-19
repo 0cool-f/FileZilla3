@@ -3,6 +3,7 @@
 #include "msgbox.h"
 
 #include <wx/statline.h>
+#include <wx/gbsizer.h>
 
 #ifdef __WXMAC__
 #include "filezillaapp.h"
@@ -211,6 +212,15 @@ wxFlexGridSizer* DialogLayout::createFlex(int cols, int rows) const
 	return new wxFlexGridSizer(rows, cols, g, g);
 }
 
+wxGridBagSizer* DialogLayout::createGridBag(int cols, int rows) const
+{
+	int const g = gap;
+	auto bag = new wxGridBagSizer(g, g);
+	bag->SetCols(cols);
+	bag->SetRows(rows);
+	return bag;
+}
+
 wxStdDialogButtonSizer * DialogLayout::createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const
 {
 	if (hline) {
@@ -221,3 +231,30 @@ wxStdDialogButtonSizer * DialogLayout::createButtonSizer(wxWindow* parent, wxSiz
 
 	return btns;
 }
+
+wxSizerItem* DialogLayout::gbAddRow(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags)
+{
+	int row = gb->GetRows();
+	gb->SetRows(row + 1);
+
+	return gb->Add(wnd, wxGBPosition(row, 0), wxGBSpan(1, gb->GetCols()), flags.GetFlags(), flags.GetBorderInPixels());
+}
+
+void DialogLayout::gbNewRow(wxGridBagSizer * gb)
+{
+	gb->SetRows(gb->GetRows() + 1);
+}
+
+wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags)
+{
+	int const row = gb->GetRows() - 1;
+	int col;
+	for (col = 0; col < gb->GetCols(); ++col) {
+		if (!gb->FindItemAtPosition(wxGBPosition(row, col))) {
+			break;
+		}
+	}
+
+	auto item = gb->Add(wnd, wxGBPosition(row, col), wxGBSpan(), flags.GetFlags(), flags.GetBorderInPixels());
+	return item;
+};
