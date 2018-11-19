@@ -232,7 +232,7 @@ wxStdDialogButtonSizer * DialogLayout::createButtonSizer(wxWindow* parent, wxSiz
 	return btns;
 }
 
-wxSizerItem* DialogLayout::gbAddRow(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags)
+wxSizerItem* DialogLayout::gbAddRow(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags) const
 {
 	int row = gb->GetRows();
 	gb->SetRows(row + 1);
@@ -240,12 +240,12 @@ wxSizerItem* DialogLayout::gbAddRow(wxGridBagSizer * gb, wxWindow* wnd, wxSizerF
 	return gb->Add(wnd, wxGBPosition(row, 0), wxGBSpan(1, gb->GetCols()), flags.GetFlags(), flags.GetBorderInPixels());
 }
 
-void DialogLayout::gbNewRow(wxGridBagSizer * gb)
+void DialogLayout::gbNewRow(wxGridBagSizer * gb) const
 {
 	gb->SetRows(gb->GetRows() + 1);
 }
 
-wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags)
+wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags) const
 {
 	int const row = gb->GetRows() - 1;
 	int col;
