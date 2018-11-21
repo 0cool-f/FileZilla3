@@ -92,6 +92,15 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 	}
 #endif
 
+	Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent& event) {
+		if (event.GetKeyCode() == WXK_DOWN) {
+			wxCommandEvent evt(wxEVT_CHAR_HOOK);
+			OnQuickconnectDropdown(evt);
+		}
+		else {
+			event.Skip();
+		}
+	});
 	return true;
 }
 
@@ -188,7 +197,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	CRecentServerList::SetMostRecentServer(server);
 }
 
-void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent&)
+void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 {
 	wxMenu* pMenu = new wxMenu;
 
@@ -217,7 +226,9 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent&)
 		pMenu->Enable(3, false);
 	}
 
-	XRCCTRL(*this, "ID_QUICKCONNECT_DROPDOWN", wxButton)->PopupMenu(pMenu);
+	auto * btn = XRCCTRL(*this, "ID_QUICKCONNECT_DROPDOWN", wxButton);
+	auto size = btn->GetSize() / 2;
+	btn->PopupMenu(pMenu, (event.GetEventType() == wxEVT_CHAR_HOOK) ? wxPoint(size.x, size.y) : wxDefaultPosition);
 	delete pMenu;
 	m_recentServers.clear();
 }
