@@ -27,11 +27,11 @@ EVT_MENU(ID_INVERT_FILTER, CListSearchPanel::OnInvertFilter)
 END_EVENT_TABLE()
 
 CListSearchPanel::CListSearchPanel(wxWindow* parent, wxWindow* pListView, CState* pState, bool local)
-	: wxWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
-	, m_listView(pListView)
+	: m_listView(pListView)
 	, m_pState(pState)
 	, m_local(local)
 {
+	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	Hide();
 	SetBackgroundStyle(wxBG_STYLE_SYSTEM);
 
@@ -43,8 +43,7 @@ CListSearchPanel::CListSearchPanel(wxWindow* parent, wxWindow* pListView, CState
 	sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 5);
 
 	// edit
-	m_textCtrl = new wxTextCtrl(this, ID_SEARCH_TEXT);
-	m_textCtrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(CListSearchPanel::OnTextKeyDown), 0, this);
+	m_textCtrl = new wxTextCtrl(this, ID_SEARCH_TEXT, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	sizer->Add(m_textCtrl, 1, wxEXPAND | wxALL, 5);
 	int const editHeight = m_textCtrl->GetSize().GetHeight();
 
@@ -62,6 +61,8 @@ CListSearchPanel::CListSearchPanel(wxWindow* parent, wxWindow* pListView, CState
 	sizer->Add(closeButton, 0, wxTOP | wxBOTTOM | wxRIGHT, 5);
 
 	SetSizerAndFit(sizer);
+
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CListSearchPanel::OnKeyDown), 0, this);
 }
 
 bool CListSearchPanel::Show(bool show)
@@ -196,12 +197,19 @@ void CListSearchPanel::OnInvertFilter(wxCommandEvent&)
 	ApplyFilter();
 }
 
-void CListSearchPanel::OnTextKeyDown(wxKeyEvent& event)
+void CListSearchPanel::OnKeyDown(wxKeyEvent& event)
 {
 	if (event.GetKeyCode() == WXK_ESCAPE) {
 		Close();
-		return;
 	}
-
-	event.Skip();
+	else if (event.GetKeyCode() == 'F' && event.GetModifiers() == wxMOD_CMD) {
+		Show(true);
+	}
+	if (event.GetKeyCode() == WXK_DOWN) {
+		wxCommandEvent evt;
+		OnOptions(evt);
+	}
+	else {
+		event.Skip();
+	}
 }

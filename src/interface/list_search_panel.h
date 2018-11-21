@@ -5,7 +5,7 @@
 
 class wxBitmapButton;
 
-class CListSearchPanel final : public wxWindow
+class CListSearchPanel final : public wxNavigationEnabled<wxWindow>
 {
 public:
 	CListSearchPanel(wxWindow* pParent, wxWindow* pListView, CState* pState, bool local);
@@ -23,7 +23,7 @@ private:
 	void OnCaseInsensitive(wxCommandEvent& ev);
 	void OnUseRegex(wxCommandEvent& ev);
 	void OnInvertFilter(wxCommandEvent& ev);
-	void OnTextKeyDown(wxKeyEvent& event);
+	void OnKeyDown(wxKeyEvent& event);
 
 	void ApplyFilter();
 	void ResetFilter();
