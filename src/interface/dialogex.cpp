@@ -1,6 +1,7 @@
 #include <filezilla.h>
 #include "dialogex.h"
 #include "msgbox.h"
+#include "xrc_helper.h"
 
 #include <wx/statline.h>
 #include <wx/gbsizer.h>
@@ -28,11 +29,11 @@ bool wxDialogEx::ProcessEvent(wxEvent& event)
 	}
 
 	wxTextEntry* e = GetSpecialTextEntry(FindFocus(), 'V');
-	if( e && event.GetId() == pasteId ) {
+	if (e && event.GetId() == pasteId) {
 		e->Paste();
 		return true;
 	}
-	else if( e && event.GetId() == selectAllId ) {
+	else if (e && event.GetId() == selectAllId) {
 		e->SelectAll();
 		return true;
 	}
@@ -48,18 +49,19 @@ void wxDialogEx::OnChar(wxKeyEvent& event)
 		wxCommandEvent cmdEvent(wxEVT_COMMAND_BUTTON_CLICKED, wxID_CANCEL);
 		ProcessEvent(cmdEvent);
 	}
-	else
+	else {
 		event.Skip();
+	}
 }
 
 bool wxDialogEx::Load(wxWindow* pParent, const wxString& name)
 {
 	SetParent(pParent);
-	if (!wxXmlResource::Get()->LoadDialog(this, pParent, name))
-		return false;
 
-	//GetSizer()->Fit(this);
-	//GetSizer()->SetSizeHints(this);
+	InitXrc();
+	if (!wxXmlResource::Get()->LoadDialog(this, pParent, name)) {
+		return false;
+	}
 
 #ifdef __WXMAC__
 	wxAcceleratorEntry entries[2];
@@ -75,11 +77,13 @@ bool wxDialogEx::Load(wxWindow* pParent, const wxString& name)
 bool wxDialogEx::SetChildLabel(int id, const wxString& label, unsigned long maxLength)
 {
 	wxWindow* pText = FindWindow(id);
-	if (!pText)
+	if (!pText) {
 		return false;
+	}
 
-	if (!maxLength)
+	if (!maxLength) {
 		pText->SetLabel(label);
+	}
 	else {
 		wxString wrapped = label;
 		WrapText(this, wrapped, maxLength);
@@ -97,8 +101,9 @@ bool wxDialogEx::SetChildLabel(char const* id, const wxString& label, unsigned l
 wxString wxDialogEx::GetChildLabel(int id)
 {
 	auto pText = dynamic_cast<wxStaticText*>(FindWindow(id));
-	if (!pText)
+	if (!pText) {
 		return wxString();
+	}
 
 	return pText->GetLabel();
 }
@@ -116,18 +121,18 @@ int wxDialogEx::ShowModal()
 	::ReleaseCapture();
 #endif
 
-	m_shown_dialogs++;
+	++m_shown_dialogs;
 
 	int ret = wxDialog::ShowModal();
 
-	m_shown_dialogs--;
+	--m_shown_dialogs;
 
 	return ret;
 }
 
 bool wxDialogEx::ReplaceControl(wxWindow* old, wxWindow* wnd)
 {
-	if( !GetSizer()->Replace(old, wnd, true) ) {
+	if (!GetSizer()->Replace(old, wnd, true)) {
 		return false;
 	}
 	old->Destroy();
@@ -171,7 +176,7 @@ void wxDialogEx::InitDialog()
 	// wxStaticBox::GetBordersForSizer is affected by this.
 	// Re-fit window to compensate.
 	wxSizer* s = GetSizer();
-	if( s ) {
+	if (s) {
 		wxSize min = GetMinClientSize();
 		wxSize smin = s->GetMinSize();
 		if( min.x < smin.x || min.y < smin.y ) {

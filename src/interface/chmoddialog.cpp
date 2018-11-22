@@ -32,19 +32,22 @@ bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
 		if (fileCount == 1) {
 			title = wxString::Format(_("Please select the new attributes for the file \"%s\"."), name);
 		}
-		else
+		else {
 			title = _("Please select the new attributes for the selected files.");
+		}
 	}
 	else {
 		if (!fileCount) {
 			if (dirCount == 1) {
 				title = wxString::Format(_("Please select the new attributes for the directory \"%s\"."), name);
 			}
-			else
+			else {
 				title = _("Please select the new attributes for the selected directories.");
+			}
 		}
-		else
+		else {
 			title = _("Please select the new attributes for the selected files and directories.");
+		}
 	}
 
 	if (!Load(parent, _T("ID_CHMODDIALOG"))) {
@@ -55,14 +58,17 @@ bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
 		wxFAIL_MSG(_T("Could not set ID_DESC"));
 	}
 
-	if (!XRCCTRL(*this, "wxID_OK", wxButton))
+	if (!XRCCTRL(*this, "wxID_OK", wxButton)) {
 		return false;
+	}
 
-	if (!XRCCTRL(*this, "wxID_CANCEL", wxButton))
+	if (!XRCCTRL(*this, "wxID_CANCEL", wxButton)) {
 		return false;
+	}
 
-	if (!XRCCTRL(*this, "ID_NUMERIC", wxTextCtrl))
+	if (!XRCCTRL(*this, "ID_NUMERIC", wxTextCtrl)) {
 		return false;
+	}
 
 	if (!WrapText(this, XRCID("ID_NUMERICTEXT"), 300)) {
 		wxFAIL_MSG(_T("Wrapping of ID_NUMERICTEXT failed"));
@@ -72,8 +78,9 @@ bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
 	wxRadioButton* pApplyAll = XRCCTRL(*this, "ID_APPLYALL", wxRadioButton);
 	wxRadioButton* pApplyFiles = XRCCTRL(*this, "ID_APPLYFILES", wxRadioButton);
 	wxRadioButton* pApplyDirs = XRCCTRL(*this, "ID_APPLYDIRS", wxRadioButton);
-	if (!pRecurse || !pApplyAll || !pApplyFiles || !pApplyDirs)
+	if (!pRecurse || !pApplyAll || !pApplyFiles || !pApplyDirs) {
 		return false;
+	}
 
 	if (!dirCount) {
 		pRecurse->Hide();
@@ -95,8 +102,9 @@ bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
 		int id = wxXmlResource::GetXRCID(IDs[i]);
 		m_checkBoxes[i] = dynamic_cast<wxCheckBox*>(FindWindow(id));
 
-		if (!m_checkBoxes[i])
+		if (!m_checkBoxes[i]) {
 			return false;
+		}
 
 		Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(CChmodDialog::OnCheckboxClick));
 
@@ -130,12 +138,15 @@ void CChmodDialog::OnOK(wxCommandEvent&)
 	m_recursive = pRecurse->GetValue();
 	wxRadioButton* pApplyFiles = XRCCTRL(*this, "ID_APPLYFILES", wxRadioButton);
 	wxRadioButton* pApplyDirs = XRCCTRL(*this, "ID_APPLYDIRS", wxRadioButton);
-	if (pApplyFiles->GetValue())
+	if (pApplyFiles->GetValue()) {
 		m_applyType = 1;
-	else if (pApplyDirs->GetValue())
+	}
+	else if (pApplyDirs->GetValue()) {
 		m_applyType = 2;
-	else
+	}
+	else {
 		m_applyType = 0;
+	}
 	EndModal(wxID_OK);
 }
 

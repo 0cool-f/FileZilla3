@@ -1,6 +1,8 @@
 #include "filezilla.h"
-
+#include "FileZillaapp.h"
 #include "xrc_helper.h"
+
+#include <libfilezilla/local_filesys.hpp>
 
 #include <wx/xrc/xh_animatctrl.h>
 #include <wx/xrc/xh_bmpbt.h>
@@ -52,4 +54,32 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxScrolledWindowXmlHandler);
 	res.AddHandler(new wxHyperlinkCtrlXmlHandler);
 	res.AddHandler(new wxAnimationCtrlXmlHandler);
+}
+
+void InitXrc()
+{
+	static bool initialized = false;
+	if (initialized) {
+		return;
+	}
+	initialized = true;
+
+	wxXmlResource *pResource = wxXmlResource::Get();
+
+#ifndef __WXDEBUG__
+	pResource->SetFlags(pResource->GetFlags() | wxXRC_NO_RELOADING);
+#endif
+
+	InitHandlers(*pResource);
+
+	fz::local_filesys fs;	
+	std::wstring dir = wxGetApp().GetResourceDir().GetPath() + L"xrc/";
+	pResource->LoadFile(wxString(dir + L"certificate.xrc"));
+	pResource->LoadFile(wxString(dir + L"dialogs.xrc"));
+	pResource->LoadFile(wxString(dir + L"inputdialog.xrc"));
+	pResource->LoadFile(wxString(dir + L"netconfwizard.xrc"));
+	pResource->LoadFile(wxString(dir + L"settings.xrc"));
+	pResource->LoadFile(wxString(dir + L"sitemanager.xrc"));
+	pResource->LoadFile(wxString(dir + L"update.xrc"));
+	pResource->LoadFile(wxString(dir + L"storj.xrc"));
 }

@@ -10,6 +10,7 @@
 #include "dialogex.h"
 #include "filezillaapp.h"
 #include "externalipresolver.h"
+#include "xrc_helper.h"
 
 DECLARE_EVENT_TYPE(fzEVT_ON_EXTERNAL_IP_ADDRESS, -1)
 DEFINE_EVENT_TYPE(fzEVT_ON_EXTERNAL_IP_ADDRESS)
@@ -52,22 +53,26 @@ CNetConfWizard::~CNetConfWizard()
 
 bool CNetConfWizard::Load()
 {
-	if (!Create(m_parent, wxID_ANY, _("Firewall and router configuration wizard"), wxNullBitmap, wxPoint(0, 0)))
+	if (!Create(m_parent, wxID_ANY, _("Firewall and router configuration wizard"), wxNullBitmap, wxPoint(0, 0))) {
 		return false;
+	}
 
 	wxSize minPageSize = GetPageAreaSizer()->GetMinSize();
 
+	InitXrc();
 	for (int i = 1; i <= 7; ++i) {
 		wxWizardPageSimple* page = new wxWizardPageSimple();
 		bool res = wxXmlResource::Get()->LoadPanel(page, this, wxString::Format(_T("NETCONF_PANEL%d"), i));
-		if (!res)
+		if (!res) {
 			return false;
+		}
 		page->Show(false);
 
 		m_pages.push_back(page);
 	}
-	for (unsigned int i = 0; i < (m_pages.size() - 1); i++)
+	for (unsigned int i = 0; i < (m_pages.size() - 1); ++i) {
 		m_pages[i]->Chain(m_pages[i], m_pages[i + 1]);
+	}
 
 	GetPageAreaSizer()->Add(m_pages[0]);
 

@@ -11,13 +11,12 @@
 #include "welcome_dialog.h"
 #include "msgbox.h"
 #include "themeprovider.h"
+#include "wxfilesystem_blob_handler.h"
 
 #include <libfilezilla/local_filesys.hpp>
 
 #include <wx/evtloop.h>
 
-#include "wxfilesystem_blob_handler.h"
-#include "xrc_helper.h"
 #ifdef __WXMSW__
 #include <wx/dynlib.h>
 #endif
@@ -473,25 +472,6 @@ bool CFileZillaApp::LoadResourceFiles()
 	}
 
 	m_resourceDir.AddSegment(_T("resources"));
-
-	wxXmlResource *pResource = wxXmlResource::Get();
-
-#ifndef __WXDEBUG__
-	pResource->SetFlags(pResource->GetFlags() | wxXRC_NO_RELOADING);
-#endif
-
-	InitHandlers(*pResource);
-
-	fz::local_filesys fs;
-	std::wstring dir = m_resourceDir.GetPath() + L"xrc/";
-	pResource->LoadFile(wxString(dir + L"certificate.xrc"));
-	pResource->LoadFile(wxString(dir + L"dialogs.xrc"));
-	pResource->LoadFile(wxString(dir + L"inputdialog.xrc"));
-	pResource->LoadFile(wxString(dir + L"netconfwizard.xrc"));
-	pResource->LoadFile(wxString(dir + L"settings.xrc"));
-	pResource->LoadFile(wxString(dir + L"sitemanager.xrc"));
-	pResource->LoadFile(wxString(dir + L"update.xrc"));
-	pResource->LoadFile(wxString(dir + L"storj.xrc"));
 
 	// Useful for XRC files with embedded image data.
 	wxFileSystem::AddHandler(new wxFileSystemBlobHandler);
