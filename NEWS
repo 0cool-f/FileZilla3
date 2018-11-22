@@ -10,6 +10,15 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.39.0-rc1 (2018-11-22)
+
++ The down button on the keyboard now opens the quickconnect history dropdown menu if the quickconnect bar has the input focus
++ The down button on the keyboard now opens the search options if the quick search dialog has the input focus
+- Refactored how close notifications were handled in the network code
+- Fixed saving of the 'not equal' and 'less than' conditions for size filters
+- Fixed regular expression filters not respecting the case-sensitivity checkbox in all situations
+- Restore context menu item to delete file in local file search
+
 3.38.1 (2018-10-27)
 
 - Fixed crash if transferring three or more files in parallel when speed limits are enabled
