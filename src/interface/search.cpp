@@ -825,6 +825,7 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 		menu.Append(XRCID("ID_MENU_SEARCH_UPLOAD"), _("&Upload..."));
 		menu.Append(XRCID("ID_MENU_SEARCH_OPEN"), _("O&pen"));
 		menu.Append(XRCID("ID_MENU_SEARCH_FILEMANAGER"), _("Show in file &manager"));
+		menu.Append(XRCID("ID_MENU_SEARCH_DELETE"), _("D&elete"));
 
 		menu.Enable(XRCID("ID_MENU_SEARCH_UPLOAD"), connected);
 	}
