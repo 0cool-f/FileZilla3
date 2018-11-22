@@ -85,7 +85,7 @@ CUpdater::CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_conte
 
 void CUpdater::Init()
 {
-	if (state_ == UpdaterState::checking || state_ == UpdaterState::newversion_downloading) {
+	if (Busy()) {
 		return;
 	}
 
@@ -925,4 +925,8 @@ bool CUpdater::UpdatableBuild() const
 	return CBuildInfo::GetBuildType() == _T("nightly") || CBuildInfo::GetBuildType() == _T("official");
 }
 
+bool CUpdater::Busy() const
+{
+	return state_ == UpdaterState::checking || state_ == UpdaterState::newversion_downloading;
+}
 #endif

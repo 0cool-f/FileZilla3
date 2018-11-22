@@ -86,6 +86,8 @@ public:
 
 	void RunIfNeeded();
 
+	bool Busy() const;
+
 protected:
 	int Download(std::wstring const& url, std::wstring const& local_file = std::wstring());
 	int Request(fz::uri const& uri);
