@@ -861,17 +861,17 @@ public:
 			return false;
 		}
 
-		wxString desc;
+		std::wstring desc;
 		if (!count_dirs) {
-			desc.Printf(wxPLURAL("Selected %d file for transfer.", "Selected %d files for transfer.", count_files), count_files);
+			desc = fz::sprintf(fztranslate("Selected %d file for transfer.", "Selected %d files for transfer.", count_files), count_files);
 		}
 		else if (!count_files) {
-			desc.Printf(wxPLURAL("Selected %d directory with its contents for transfer.", "Selected %d directories with their contents for transfer.", count_dirs), count_dirs);
+			desc = fz::sprintf(fztranslate("Selected %d directory with its contents for transfer.", "Selected %d directories with their contents for transfer.", count_dirs), count_dirs);
 		}
 		else {
-			wxString files = wxString::Format(wxPLURAL("%d file", "%d files", count_files), count_files);
-			wxString dirs = wxString::Format(wxPLURAL("%d directory with its contents", "%d directories with their contents", count_dirs), count_dirs);
-			desc.Printf(_("Selected %s and %s for transfer."), files, dirs);
+			std::wstring files = fz::sprintf(fztranslate("%d file", "%d files", count_files), count_files);
+			std::wstring dirs = fz::sprintf(fztranslate("%d directory with its contents", "%d directories with their contents", count_dirs), count_dirs);
+			desc = fz::sprintf(fztranslate("Selected %s and %s for transfer."), files, dirs);
 		}
 		XRCCTRL(*this, "ID_DESC", wxStaticText)->SetLabel(desc);
 
@@ -1248,17 +1248,18 @@ void CSearchDialog::OnDelete(wxCommandEvent&)
 			return;
 		}
 
-		wxString question;
+		
+		std::wstring question;
 		if (selected_dirs.empty()) {
-			question.Printf(wxPLURAL("Really delete %d file from the server?", "Really delete %d files from the server?", selected_files.size()), selected_files.size());
+			question = fz::sprintf(fztranslate("Really delete %d file from the server?", "Really delete %d files from the server?", selected_files.size()), selected_files.size());
 		}
 		else if (selected_files.empty()) {
-			question.Printf(wxPLURAL("Really delete %d directory with its contents from the server?", "Really delete %d directories with their contents from the server?", selected_dirs.size()), selected_dirs.size());
+			question = fz::sprintf(fztranslate("Really delete %d directory with its contents from the server?", "Really delete %d directories with their contents from the server?", selected_dirs.size()), selected_dirs.size());
 		}
 		else {
-			wxString files = wxString::Format(wxPLURAL("%d file", "%d files", selected_files.size()), selected_files.size());
-			wxString dirs = wxString::Format(wxPLURAL("%d directory with its contents", "%d directories with their contents", selected_dirs.size()), selected_dirs.size());
-			question.Printf(_("Really delete %s and %s from the server?"), files, dirs);
+			std::wstring files = fz::sprintf(fztranslate("%d file", "%d files", selected_files.size()), selected_files.size());
+			std::wstring dirs = fz::sprintf(fztranslate("%d directory with its contents", "%d directories with their contents", selected_dirs.size()), selected_dirs.size());
+			question = fz::sprintf(fztranslate("Really delete %s and %s from the server?"), files, dirs);
 		}
 
 		if (wxMessageBoxEx(question, _("Confirm deletion"), wxICON_QUESTION | wxYES_NO) != wxYES) {

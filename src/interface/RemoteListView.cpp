@@ -1475,17 +1475,17 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 		}
 	}
 
-	wxString question;
+	std::wstring question;
 	if (!count_dirs) {
-		question.Printf(wxPLURAL("Really delete %d file from the server?", "Really delete %d files from the server?", count_files), count_files);
+		question = fz::sprintf(fztranslate("Really delete %d file from the server?", "Really delete %d files from the server?", count_files), count_files);
 	}
 	else if (!count_files) {
-		question.Printf(wxPLURAL("Really delete %d directory with its contents from the server?", "Really delete %d directories with their contents from the server?", count_dirs), count_dirs);
+		question = fz::sprintf(fztranslate("Really delete %d directory with its contents from the server?", "Really delete %d directories with their contents from the server?", count_dirs), count_dirs);
 	}
 	else {
-		wxString files = wxString::Format(wxPLURAL("%d file", "%d files", count_files), count_files);
-		wxString dirs = wxString::Format(wxPLURAL("%d directory with its contents", "%d directories with their contents", count_dirs), count_dirs);
-		question.Printf(_("Really delete %s and %s from the server?"), files, dirs);
+		std::wstring files = fz::sprintf(fztranslate("%d file", "%d files", count_files), count_files);
+		std::wstring dirs = fz::sprintf(fztranslate("%d directory with its contents", "%d directories with their contents", count_dirs), count_dirs);
+		question = fz::sprintf(fztranslate("Really delete %s and %s from the server?"), files, dirs);
 	}
 
 	if (wxMessageBoxEx(question, _("Confirmation needed"), wxICON_QUESTION | wxYES_NO, this) != wxYES) {
