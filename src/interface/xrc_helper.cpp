@@ -1,5 +1,5 @@
 #include "filezilla.h"
-#include "FileZillaapp.h"
+#include "filezillaapp.h"
 #include "xrc_helper.h"
 
 #include <libfilezilla/local_filesys.hpp>

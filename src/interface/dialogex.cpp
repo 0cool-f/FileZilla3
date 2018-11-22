@@ -262,4 +262,4 @@ wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlag
 
 	auto item = gb->Add(wnd, wxGBPosition(row, col), wxGBSpan(), flags.GetFlags(), flags.GetBorderInPixels());
 	return item;
-};
+}

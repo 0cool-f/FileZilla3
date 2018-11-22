@@ -73,6 +73,7 @@ bool CFilterCondition::set(t_filterType t, std::wstring const& v, int c, bool ma
 				lowerValue = fz::str_tolower(v);
 			}
 		}
+		break;
 	case filter_size:
 	case filter_attributes:
 	case filter_permissions:

@@ -858,6 +858,8 @@ void DoHandleDroppedFiles(CState & state, CMainFrame & mainFrame, T const& files
 	delete[] to;
 	delete[] from;
 #else
+	(void)mainFrame;
+
 	wxString error;
 	for (auto const& file : files) {
 		int64_t size;

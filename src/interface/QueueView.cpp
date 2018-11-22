@@ -1135,7 +1135,7 @@ bool CQueueView::RemoveItem(CQueueItem* item, bool destroy, bool updateItemCount
 
 	if (item->GetType() == QueueItemType::File) {
 		// Update size information
-		const CFileItem* const pFileItem = (const CFileItem* const)item;
+		const CFileItem* const pFileItem = static_cast<CFileItem const*>(item);
 		int64_t size = pFileItem->GetSize();
 		if (size < 0) {
 			--m_filesWithUnknownSize;

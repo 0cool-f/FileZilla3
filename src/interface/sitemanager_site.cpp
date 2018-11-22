@@ -344,7 +344,7 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		return rows.end() - 1;
 	};
 
-	auto SetLabel = [](wxStaticText & label, ServerProtocol const protocol, std::string const& name) {
+	auto SetLabel = [](wxStaticText & label, ServerProtocol const, std::string const& name) {
 		if (name == "email") {
 			label.SetLabel(_("E-&mail account:"));
 		}
