@@ -13,8 +13,6 @@
 enum t_ipcMutexType
 {
 	// Important: Never ever change a value.
-	// If adding a new mutex type, give it the value of MUTEX_LASTFREE and
-	// increase MUTEX_LASTFREE by one.
 	// Otherwise this will cause interesting effects between different
 	// versions of FileZilla
 	MUTEX_OPTIONS = 1,
@@ -28,11 +26,10 @@ enum t_ipcMutexType
 	MUTEX_GLOBALBOOKMARKS = 9,
 	MUTEX_SEARCHCONDITIONS = 10,
 	MUTEX_MAC_SANDBOX_USERDIRS = 11, // Only used if configured with --enable-mac-sandbox
-
-	MUTEX_LASTFREE = 12
+	MUTEX_RESERVED = 12
 };
 
-class CInterProcessMutex
+class CInterProcessMutex final
 {
 public:
 	CInterProcessMutex(t_ipcMutexType mutexType, bool initialLock = true);
@@ -61,19 +58,19 @@ private:
 	bool m_locked;
 };
 
-class CReentrantInterProcessMutexLocker
+class CReentrantInterProcessMutexLocker final
 {
 public:
 	CReentrantInterProcessMutexLocker(t_ipcMutexType mutexType);
 	~CReentrantInterProcessMutexLocker();
 
 protected:
-	struct t_data
+	struct t_data final
 	{
 		CInterProcessMutex* pMutex;
 		unsigned int lockCount;
 	};
-	static std::list<t_data> m_mutexes;
+	static std::vector<t_data> m_mutexes;
 
 	t_ipcMutexType m_type;
 };
