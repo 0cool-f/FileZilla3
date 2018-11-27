@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include <libfilezilla/file.hpp>
+#include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/uri.hpp>
 
 #ifdef __WXMSW__
@@ -2877,10 +2878,12 @@ void CRemoteListView::OnMenuNewfile(wxCommandEvent&)
 	std::wstring const emptyfile_name = L"empty_file_yq744zm";
 	std::wstring emptyfile = edithandler->GetLocalDirectory() + emptyfile_name;
 
-	// Create the empty temporary file
+	// Create the empty temporary file and update its modification time
 	{
-		fz::file f(fz::to_native(emptyfile), fz::file::writing, fz::file::existing);
-		(void)f;
+		auto const fn = fz::to_native(emptyfile);
+		fz::file f(fn, fz::file::writing, fz::file::existing);
+		f.close();
+		fz::local_filesys::set_modification_time(fn, fz::datetime::now());
 	}
 
 	ServerWithCredentials const& server = m_state.GetServer();
