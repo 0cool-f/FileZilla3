@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.39.0 (2018-11-30)
+
+- Fix timestamps of newly created empty files on the server if the option to preserve timestamps is set
+
 3.39.0-rc1 (2018-11-23)
 
 + The down button on the keyboard now opens the quickconnect history dropdown menu if the quickconnect bar has the input focus
