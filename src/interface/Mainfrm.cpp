@@ -1191,7 +1191,7 @@ bool CMainFrame::CloseDialogsAndQuit(wxCloseEvent &event)
 			}
 
 			wxDialog* pDialog = dynamic_cast<wxDialog*>(pTop);
-			if (pDialog) {
+			if (pDialog && pDialog->IsModal()) {
 				pDialog->EndModal(wxID_CANCEL);
 			}
 			else {
