@@ -562,6 +562,7 @@ int CFileZillaEnginePrivate::ContinueConnect()
 		return FZ_REPLY_SYNTAXERROR|FZ_REPLY_DISCONNECTED;
 	}
 
+	controlSocket_->SetHandle(pConnectCommand->GetHandle());
 	controlSocket_->Connect(server, pConnectCommand->GetCredentials());
 	return FZ_REPLY_CONTINUE;
 }

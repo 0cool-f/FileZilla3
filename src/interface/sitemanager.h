@@ -20,6 +20,20 @@ public:
 	std::wstring m_name;
 };
 
+struct SiteHandleData final : public ServerHandleDataBase
+{
+public:
+	std::wstring sitePath_;
+
+	bool operator==(SiteHandleData& rhs) const {
+		return sitePath_ == rhs.sitePath_;
+	}
+
+	bool operator!=(SiteHandleData& rhs) const {
+		return !(*this == rhs);
+	}
+};
+
 class Site final
 {
 public:
@@ -36,10 +50,21 @@ public:
 
 	std::vector<Bookmark> m_bookmarks;
 
-	std::wstring m_path;
-
 	wxColour m_colour;
+
+	void SetSitePath(std::wstring const& sitePath);
+	std::wstring const& SitePath() const;
+
+	ServerHandle Handle() const;
+
+	// Almost like operator= but does not invalidate exiting handles.
+	void Update(Site const& rhs);
+
+private:
+	std::shared_ptr<SiteHandleData> data_;
 };
+
+SiteHandleData toSiteHandle(ServerHandle const& handle);
 
 class CSiteManagerXmlHandler
 {

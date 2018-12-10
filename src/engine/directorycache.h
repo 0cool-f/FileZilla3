@@ -40,7 +40,7 @@ public:
 	bool DoesExist(CServer const& server, CServerPath const& path, int &hasUnsureEntries, bool &is_outdated);
 	bool LookupFile(CDirentry &entry, CServer const& server, CServerPath const& path, std::wstring const& filename, bool &dirDidExist, bool &matchedCase);
 	bool InvalidateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool *wasDir = nullptr);
-	bool UpdateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool mayCreate, Filetype type = file, int64_t size = -1);
+	bool UpdateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool mayCreate, Filetype type = file, int64_t size = -1, std::wstring const& ownerGroup = std::wstring{});
 	bool RemoveFile(CServer const& server, CServerPath const& path, std::wstring const& filename);
 	void InvalidateServer(CServer const& server);
 	void RemoveDir(CServer const& server, CServerPath const& path, std::wstring const& filename, CServerPath const& target);

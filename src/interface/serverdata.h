@@ -34,13 +34,15 @@ class ServerWithCredentials final
 public:
 	ServerWithCredentials() = default;
 
-	explicit ServerWithCredentials(CServer const& s, Credentials const& c)
+	explicit ServerWithCredentials(CServer const& s, ServerHandle const& handle, Credentials const& c)
 		: server(s)
+		, handle_(handle)
 		, credentials(c)
 	{}
 
-	explicit ServerWithCredentials(CServer const& s, ProtectedCredentials const& c)
+	explicit ServerWithCredentials(CServer const& s, ServerHandle const& handle, ProtectedCredentials const& c)
 		: server(s)
+		, handle_(handle)
 		, credentials(c)
 	{}
 
@@ -69,6 +71,7 @@ public:
 	}
 
 	CServer server;
+	ServerHandle handle_;
 	ProtectedCredentials credentials;
 };
 

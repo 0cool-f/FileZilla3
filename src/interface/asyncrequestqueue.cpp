@@ -165,7 +165,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 		}
 		bool canRemember = notification.GetType() == CInteractiveLoginNotification::keyfile;
 
-		ServerWithCredentials server(notification.server, notification.credentials);
+		ServerWithCredentials server(notification.server, notification.handle_, notification.credentials);
 		if (CLoginManager::Get().GetPassword(server, true, std::wstring(), notification.GetChallenge(), canRemember)) {
 			notification.credentials = server.credentials;
 			notification.passwordSet = true;

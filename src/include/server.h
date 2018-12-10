@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_SERVER_HEADER
 #define FILEZILLA_ENGINE_SERVER_HEADER
 
+#include <memory>
+
 enum ServerProtocol
 {
 	// Never change any existing values or user's saved sites will become
@@ -271,5 +273,10 @@ protected:
 	std::wstring password_;
 	std::map<std::string, std::wstring> extraParameters_;
 };
+
+struct ServerHandleDataBase {
+	virtual ~ServerHandleDataBase() = default;
+};
+typedef std::weak_ptr<ServerHandleDataBase> ServerHandle;
 
 #endif

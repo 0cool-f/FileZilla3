@@ -24,6 +24,7 @@ public:
 
 	bool AskDecryptor(fz::public_key const& pub, bool allowForgotten, bool allowCancel);
 	fz::private_key GetDecryptor(fz::public_key const& pub);
+	void Remember(fz::private_key const& key);
 
 protected:
 	bool DisplayDialogForEncrypted(ServerWithCredentials& server, std::wstring const& name);

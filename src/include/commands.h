@@ -100,15 +100,17 @@ class CBasicCommand final : public CCommandHelper<CBasicCommand<id>, id>
 class CConnectCommand final : public CCommandHelper<CConnectCommand, Command::connect>
 {
 public:
-	explicit CConnectCommand(CServer const& server, Credentials const& credentials, bool retry_conncting = true);
+	explicit CConnectCommand(CServer const& server, ServerHandle const& handle, Credentials const& credentials, bool retry_conncting = true);
 
 	CServer const& GetServer() const { return server_; }
+	ServerHandle const& GetHandle() const { return handle_; }
 	Credentials const& GetCredentials() const { return credentials_; }
 	bool RetryConnecting() const { return retry_connecting_; }
 
 	virtual bool valid() const override;
 protected:
 	CServer const server_;
+	ServerHandle const handle_;
 	Credentials const credentials_;
 	bool const retry_connecting_;
 };

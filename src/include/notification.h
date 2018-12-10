@@ -20,6 +20,8 @@
 // CFileZillaEngine::SetAsyncRequestReply to continue the current operation.
 
 #include "local_path.h"
+#include "server.h"
+
 #include <libfilezilla/time.hpp>
 
 class CFileZillaEngine;
@@ -202,6 +204,7 @@ public:
 	bool passwordSet{};
 
 	CServer server;
+	ServerHandle handle_;
 	Credentials credentials;
 
 	std::wstring const& GetChallenge() const { return m_challenge; }

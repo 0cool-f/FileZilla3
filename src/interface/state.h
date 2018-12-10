@@ -3,6 +3,7 @@
 
 #include "local_path.h"
 #include "sitemanager.h"
+#include "sitemanager_dialog.h"
 #include "filter.h"
 
 #include <memory>
@@ -209,6 +210,7 @@ public:
 	void ClearPreviouslyVisitedLocalSubdir() { m_previouslyVisitedLocalSubdir.clear(); }
 	void ClearPreviouslyVisitedRemoteSubdir() { m_previouslyVisitedRemoteSubdir.clear(); }
 
+	void UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> const& active_sites);
 	void UpdateSite(wxString const& oldPath, Site const& newSite);
 
 	CStateFilterManager& GetStateFilterManager() { return m_stateFilterManager; }

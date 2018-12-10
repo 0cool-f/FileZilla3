@@ -651,7 +651,7 @@ void CContextControl::SaveTabs()
 
 		auto tab = tabs.append_child("Tab");
 		SetServer(tab, site.server_);
-		tab.append_child("Site").text().set(fz::to_utf8(site.m_path).c_str());
+		tab.append_child("Site").text().set(fz::to_utf8(site.SitePath()).c_str());
 		tab.append_child("RemotePath").text().set(fz::to_utf8(controls->pState->GetLastServerPath().GetSafePath()).c_str());
 		tab.append_child("LocalPath").text().set(fz::to_utf8(controls->pState->GetLocalDir().GetPath()).c_str());
 

@@ -132,6 +132,7 @@ int CFtpLogonOpData::Send()
 				if (!challenge.empty()) {
 					CInteractiveLoginNotification *pNotification = new CInteractiveLoginNotification(CInteractiveLoginNotification::interactive, challenge, false);
 					pNotification->server = currentServer_;
+					pNotification->handle_ = controlSocket_.handle_;
 					pNotification->credentials = credentials_;
 					challenge.clear();
 

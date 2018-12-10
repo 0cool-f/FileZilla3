@@ -182,6 +182,9 @@ public:
 	// Callback must return FZ_REPLY_CONTINUE or FZ_REPLY_ERROR
 	std::function<int(unsigned char const* data, unsigned int len)> on_data_;
 
+	// Called if !success && got_body
+	std::function<int(unsigned char const* data, unsigned int len)> on_error_data_;
+
 	bool success() const {
 		return code_ >= 200 && code_ < 300;
 	}

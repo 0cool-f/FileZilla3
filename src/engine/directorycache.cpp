@@ -183,7 +183,7 @@ bool CDirectoryCache::InvalidateFile(CServer const& server, CServerPath const& p
 	return true;
 }
 
-bool CDirectoryCache::UpdateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool mayCreate, Filetype type, int64_t size)
+bool CDirectoryCache::UpdateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool mayCreate, Filetype type, int64_t size, std::wstring const& ownerGroup)
 {
 	fz::scoped_lock lock(mutex_);
 
@@ -236,6 +236,9 @@ bool CDirectoryCache::UpdateFile(CServer const& server, CServerPath const& path,
 				direntry.flags = CDirentry::flag_unsure;
 			}
 			direntry.size = size;
+			if (!ownerGroup.empty()) {
+				direntry.ownerGroup.get() = ownerGroup;
+			}
 			switch (type) {
 			case dir:
 				entry.listing.m_flags |= CDirectoryListing::unsure_dir_added | CDirectoryListing::listing_has_dirs;

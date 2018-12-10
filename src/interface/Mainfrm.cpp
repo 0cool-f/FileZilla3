@@ -850,7 +850,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		}
 
 		Site const old_site = pState->GetSite();
-		std::wstring sitePath = old_site.m_path;
+		std::wstring sitePath = old_site.SitePath();
 
 		CContextControl::_context_controls* controls = m_pContextControl->GetCurrentControls();
 		if (!controls) {
@@ -874,7 +874,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 					for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
 						CContextControl::_context_controls *tab_controls = m_pContextControl->GetControlsFromTabIndex(i);
 						if (tab_controls) {
-							tab_controls->pState->UpdateSite(old_site.m_path, *site);
+							tab_controls->pState->UpdateSite(old_site.SitePath(), *site);
 						}
 					}
 				}
@@ -1445,7 +1445,6 @@ void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
 
 	CSiteManagerDialog dlg;
 
-	std::set<std::wstring> handled_paths;
 	std::vector<CSiteManagerDialog::_connected_site> connected_sites;
 
 	if (pServer) {
@@ -1456,16 +1455,22 @@ void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
 
 	for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
 		CContextControl::_context_controls *controls =  m_pContextControl->GetControlsFromTabIndex(i);
-		if (!controls) {
+		if (!controls || !controls->pState) {
 			continue;
 		}
 
-		Site const& site = controls->pState->GetSite();
-		std::wstring const& path = site.m_path;
+		Site site = controls->pState->GetSite();
+		if (!site.server_) {
+			site = controls->pState->GetLastSite();
+		}
+
+		std::wstring const& path = site.SitePath();
 		if (path.empty()) {
 			continue;
 		}
-		if (handled_paths.find(path) != handled_paths.end()) {
+
+		auto it = std::find_if(connected_sites.cbegin(), connected_sites.cend(), [&](auto const& v) { return v.old_path == path; });
+		if (it != connected_sites.cend()) {
 			continue;
 		}
 
@@ -1473,7 +1478,6 @@ void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
 		connected_site.old_path = path;
 		connected_site.server = site.server_;
 		connected_sites.push_back(connected_site);
-		handled_paths.insert(path);
 	}
 
 	if (!dlg.Create(this, &connected_sites, pServer)) {
@@ -1483,17 +1487,13 @@ void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
 	int res = dlg.ShowModal();
 	if (res == wxID_YES || res == wxID_OK) {
 		// Update bookmark paths
-		for (auto const& connected_site : connected_sites) {
-			std::unique_ptr<Site> site = CSiteManager::GetSiteByPath(connected_site.new_path, false).first;
-			if (site) {
-				for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
-					CContextControl::_context_controls *controls = m_pContextControl->GetControlsFromTabIndex(i);
-					if (!controls) {
-						continue;
-					}
-					controls->pState->UpdateSite(connected_site.old_path, *site);
-				}
+		for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
+			CContextControl::_context_controls *controls = m_pContextControl->GetControlsFromTabIndex(i);
+			if (!controls || !controls->pState) {
+				continue;
 			}
+
+			controls->pState->UpdateKnownSites(connected_sites);
 		}
 	}
 

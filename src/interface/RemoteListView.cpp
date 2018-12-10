@@ -1118,24 +1118,24 @@ void CRemoteListView::OnContextMenu(wxContextMenuEvent& event)
 	auto item = new wxMenuItem(&menu, XRCID("ID_DOWNLOAD"), _("&Download"), _("Download selected files and directories"));
 	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_DOWNLOAD"), wxART_MENU));
 	menu.Append(item);
-    item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add files to queue"), _("Add selected files and folders to the transfer queue"));
+	item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add files to queue"), _("Add selected files and folders to the transfer queue"));
 	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_DOWNLOADADD"), wxART_MENU));
 	menu.Append(item);
-    menu.Append(XRCID("ID_ENTER"), _("E&nter directory"), _("Enter selected directory"));
+	menu.Append(XRCID("ID_ENTER"), _("E&nter directory"), _("Enter selected directory"));
 	menu.Append(XRCID("ID_EDIT"), _("&View/Edit"));
 
-    menu.AppendSeparator();
-    menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
-    menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
-    menu.Append(XRCID("ID_NEW_FILE"), _("Crea&te new file"), _("Create a new, empty file in the current directory"));
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
+	menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
+	menu.Append(XRCID("ID_NEW_FILE"), _("Crea&te new file"), _("Create a new, empty file in the current directory"));
 	menu.Append(XRCID("ID_CONTEXT_REFRESH"), _("Re&fresh"));
 
-    menu.AppendSeparator();
-    menu.Append(XRCID("ID_DELETE"), _("D&elete"), _("Delete selected files and directories"));
-    menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected files and directories"));
-    menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
-    menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
-    menu.Append(XRCID("ID_CHMOD"), _("&File permissions..."), _("Change the file permissions."));
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_DELETE"), _("D&elete"), _("Delete selected files and directories"));
+	menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected files and directories"));
+	menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
+	menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
+	menu.Append(XRCID("ID_CHMOD"), _("&File permissions..."), _("Change the file permissions."));
 
 
 	bool const idle = m_state.IsRemoteIdle();

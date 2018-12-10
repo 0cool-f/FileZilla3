@@ -391,7 +391,8 @@ void CSiteManagerDialog::MarkConnectedSites()
 
 void CSiteManagerDialog::MarkConnectedSite(int connected_site)
 {
-	std::wstring const& connected_site_path = (*m_connected_sites)[connected_site].old_path;
+	auto & site = (*m_connected_sites)[connected_site];
+	std::wstring const& connected_site_path = site.old_path;
 	if (connected_site_path.empty()) {
 		return;
 	}
@@ -403,11 +404,11 @@ void CSiteManagerDialog::MarkConnectedSite(int connected_site)
 
 	if (connected_site_path[0] == '1') {
 		// Default sites never change
-		(*m_connected_sites)[connected_site].new_path = (*m_connected_sites)[connected_site].old_path;
 		return;
 	}
 
 	if (connected_site_path[0] != '0') {
+		// Unknown type, from a future version perhaps?
 		return;
 	}
 
@@ -1184,7 +1185,7 @@ bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)
 		bookmark = data.m_default_bookmark;
 	}
 
-	data.m_path = GetSitePath(item);
+	data.SetSitePath(GetSitePath(item));
 
 	return true;
 }

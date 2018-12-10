@@ -117,7 +117,7 @@ bool CLoginManager::DisplayDialogForEncrypted(ServerWithCredentials &server, std
 		}
 
 		if (xrc_call(pwdDlg, "ID_REMEMBER", &wxCheckBox::IsChecked)) {
-			decryptors_[key.pubkey()] = key;
+			Remember(key);
 		}
 		break;
 	}
@@ -330,4 +330,9 @@ fz::private_key CLoginManager::GetDecryptor(fz::public_key const& pub)
 	}
 
 	return fz::private_key();
+}
+
+void CLoginManager::Remember(const fz::private_key &key)
+{
+	decryptors_[key.pubkey()] = key;
 }

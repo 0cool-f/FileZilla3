@@ -1,7 +1,8 @@
 #include <filezilla.h>
 
-CConnectCommand::CConnectCommand(CServer const& server, Credentials const& credentials, bool retry_connecting)
+CConnectCommand::CConnectCommand(CServer const& server, ServerHandle const& handle, Credentials const& credentials, bool retry_connecting)
 	: server_(server)
+	, handle_(handle)
 	, credentials_(credentials)
 	, retry_connecting_(retry_connecting)
 {

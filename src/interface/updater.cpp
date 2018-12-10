@@ -301,7 +301,7 @@ int CUpdater::Request(fz::uri const& uri)
 	pending_commands_.emplace_back(new CDisconnectCommand);
 
 	CServer server(fz::equal_insensitive_ascii(uri.scheme_, std::string("http")) ? HTTP : HTTPS, DEFAULT, fz::to_wstring_from_utf8(uri.host_), uri.port_);
-	pending_commands_.emplace_back(new CConnectCommand(server, Credentials()));
+	pending_commands_.emplace_back(new CConnectCommand(server, ServerHandle(), Credentials()));
 	pending_commands_.emplace_back(new CHttpRequestCommand(uri));
 
 	return ContinueDownload();
@@ -335,7 +335,7 @@ bool CUpdater::CreateConnectCommand(std::wstring const& url)
 		return false;
 	}
 
-	pending_commands_.emplace_back(new CConnectCommand(s.server, s.credentials));
+	pending_commands_.emplace_back(new CConnectCommand(s.server, ServerHandle(), s.credentials));
 	return true;
 }
 

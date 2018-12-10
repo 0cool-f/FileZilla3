@@ -197,6 +197,9 @@ public:
 
 	void SetActive(CFileZillaEngine::_direction direction);
 
+	void SetHandle(ServerHandle const& handle) { handle_ = handle; }
+	ServerHandle const& GetHandle() const { return handle_; }
+
 	// ---
 	// The following two functions control the timeout behaviour:
 	// ---
@@ -258,6 +261,7 @@ protected:
 	OpLockManager & opLockManager_;
 
 	bool m_invalidateCurrentPath{};
+	ServerHandle handle_;
 
 	virtual void operator()(fz::event_base const& ev);
 

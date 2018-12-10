@@ -69,7 +69,11 @@ bool Site::operator==(Site const& s) const
 		return false;
 	}
 
-	if (m_path != s.m_path) {
+	if (data_ != s.data_) {
+		return false;
+	}
+
+	if (data_ && *data_ != *s.data_) {
 		return false;
 	}
 
@@ -80,6 +84,51 @@ bool Site::operator==(Site const& s) const
 	return true;
 }
 
+void Site::SetSitePath(std::wstring const& sitePath) {
+	if (!data_) {
+		data_ = std::make_shared<SiteHandleData>();
+	}
+	data_->sitePath_ = sitePath;
+}
+
+std::wstring const& Site::SitePath() const
+{
+	if (data_) {
+		return data_->sitePath_;
+	}
+	else {
+		static std::wstring empty;
+		return empty;
+	}
+}
+
+ServerHandle Site::Handle() const
+{
+	return data_;
+}
+
+void Site::Update(Site const& rhs)
+{
+	std::shared_ptr<SiteHandleData> data = data_;
+	*this = rhs;
+	if (data && rhs.data_) {
+		*data = *rhs.data_;
+		data_ = data;
+	}
+}
+
+SiteHandleData toSiteHandle(ServerHandle const& handle)
+{
+	auto l = handle.lock();
+	if (l) {
+		auto d = dynamic_cast<SiteHandleData const*>(l.get());
+		if (d) {
+			return *d;
+		}
+	}
+
+	return SiteHandleData();
+}
 
 std::map<int, std::unique_ptr<Site>> CSiteManager::m_idMap;
 
@@ -242,7 +291,7 @@ public:
 		newName.Replace(_T("&"), _T("&&"));
 		wxMenuItem* pItem = m_pMenu->Insert(i, wxID_ANY, newName);
 
-		data->m_path = path + _T("/") + CSiteManager::EscapeSegment(data->server_.server.GetName());
+		data->SetSitePath(path + _T("/") + CSiteManager::EscapeSegment(data->server_.server.GetName()));
 
 		(*m_idMap)[pItem->GetId()] = std::move(data);
 
@@ -566,7 +615,7 @@ std::pair<std::unique_ptr<Site>, Bookmark> CSiteManager::DoGetSiteByPath(std::ws
 			ret.second = ret.first->m_default_bookmark;
 		}
 
-		ret.first->m_path = BuildPath(c, segments);
+		ret.first->SetSitePath(BuildPath(c, segments));
 	}
 
 	return ret;

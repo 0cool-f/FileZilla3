@@ -1224,7 +1224,7 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			engineData.pItem->SetStatusMessage(CFileItem::Status::connecting);
 			RefreshItem(engineData.pItem);
 
-			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastServer.server, engineData.lastServer.credentials, false));
+			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastServer.server, engineData.lastServer.handle_, engineData.lastServer.credentials, false));
 
 			wxASSERT((res & FZ_REPLY_BUSY) != FZ_REPLY_BUSY);
 			if (res == FZ_REPLY_WOULDBLOCK)

@@ -178,7 +178,7 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 			// Try automatic reconnect
 			ServerWithCredentials const& server = m_state.GetServer();
 			if (server) {
-				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(server.server, server.credentials));
+				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(server.server, server.handle_, server.credentials));
 				ProcessNextCommand();
 				return;
 			}

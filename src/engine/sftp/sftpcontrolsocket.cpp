@@ -198,6 +198,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 				}
 				CInteractiveLoginNotification *pNotification = new CInteractiveLoginNotification(t, challenge, data.lastChallenge == challengeIdentifier);
 				pNotification->server = currentServer_;
+				pNotification->handle_ = handle_;
 				pNotification->credentials = data.credentials_;
 
 				SendAsyncRequest(pNotification);

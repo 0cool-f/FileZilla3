@@ -905,20 +905,26 @@ void CRemoteTreeView::OnContextMenu(wxTreeEvent& event)
 	auto item = new wxMenuItem(&menu, XRCID("ID_DOWNLOAD"), _("&Download"), _("Download selected directory"));
 	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_DOWNLOAD"), wxART_MENU));
 	menu.Append(item);
-    item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add to queue"), _("Add selected directory to the transfer queue"));
+	item = new wxMenuItem(&menu, XRCID("ID_ADDTOQUEUE"), _("&Add to queue"), _("Add selected directory to the transfer queue"));
 	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_DOWNLOADADD"), wxART_MENU));
 	menu.Append(item);
 
-    menu.AppendSeparator();
-    menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
-    menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
+	menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
 
-    menu.AppendSeparator();
-    menu.Append(XRCID("ID_DELETE"), _("D&elete"), _("Delete selected directory"));
-    menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected directory"));
-    menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
-    menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
-    menu.Append(XRCID("ID_CHMOD"), _("&File Attributes..."), _("Change the file permissions."));
+	menu.AppendSeparator();
+	menu.Append(XRCID("ID_DELETE"), _("D&elete"), _("Delete selected directory"));
+	menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected directory"));
+	menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
+	menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
+
+	auto const protocol = m_state.GetServer().server.GetProtocol();
+	bool const hasChmod = protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP || protocol == SFTP;
+
+	if (hasChmod) {
+	    menu.Append(XRCID("ID_CHMOD"), _("&File Attributes..."), _("Change the file permissions."));
+	}
 
 	const CServerPath& path = m_contextMenuItem ? GetPathFromItem(m_contextMenuItem) : CServerPath();
 	if (!m_state.IsRemoteIdle() || path.empty()) {
@@ -927,7 +933,9 @@ void CRemoteTreeView::OnContextMenu(wxTreeEvent& event)
 		menu.Enable(XRCID("ID_MKDIR"), false);
 		menu.Enable(XRCID("ID_MKDIR_CHGDIR"), false);
 		menu.Enable(XRCID("ID_DELETE"), false);
-		menu.Enable(XRCID("ID_CHMOD"), false);
+		if (hasChmod) {
+			menu.Enable(XRCID("ID_CHMOD"), false);
+		}
 		menu.Enable(XRCID("ID_RENAME"), false);
 		menu.Enable(XRCID("ID_GETURL"), false);
 	}

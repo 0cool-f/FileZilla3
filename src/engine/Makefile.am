@@ -47,8 +47,8 @@ libengine_a_SOURCES = \
 		ratelimiter.cpp \
 		rtt.cpp \
 		server.cpp \
-		serverpath.cpp\
 		servercapabilities.cpp \
+		serverpath.cpp\
 		sftp/chmod.cpp \
 		sftp/connect.cpp \
 		sftp/cwd.cpp \

@@ -558,7 +558,7 @@ bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 	m_pRemoteRecursiveOperation->StopRecursiveOperation();
 	SetSyncBrowse(false);
 
-	m_pCommandQueue->ProcessCommand(new CConnectCommand(site.server_.server, site.server_.credentials));
+	m_pCommandQueue->ProcessCommand(new CConnectCommand(site.server_.server, site.Handle(), site.server_.credentials));
 	m_pCommandQueue->ProcessCommand(new CListCommand(path, std::wstring(), LIST_FLAG_FALLBACK_CURRENT));
 
 	SetSite(site, path);
@@ -1332,26 +1332,75 @@ void CState::SetSecurityInfo(CSftpEncryptionNotification const& info)
 
 void CState::UpdateSite(wxString const& oldPath, Site const& newSite)
 {
-	if (newSite.m_path.empty() || !newSite.server_) {
+	if (newSite.SitePath().empty() || !newSite.server_) {
 		return;
 	}
 
 	bool changed = false;
 	if (m_site.server_ && m_site != newSite) {
-		if (m_site.m_path == oldPath && m_site.server_ == newSite.server_) {
-			m_site = newSite;
+		if (m_site.SitePath() == oldPath && m_site.server_ == newSite.server_) {
+			// Update handles
+			m_site.Update(newSite);
 			changed = true;
 		}
 	}
 	if (m_last_site.server_ && m_last_site != newSite) {
-		if (m_last_site.m_path == oldPath && m_last_site.server_ == newSite.server_) {
-			m_last_site = newSite;
+		if (m_last_site.SitePath() == oldPath && m_last_site.server_ == newSite.server_) {
+			m_last_site.Update(newSite);
 			if (!m_site.server_) {
 				// Active site has precedence over historic data
 				changed = true;
 			}
 		}
 	}
+	if (changed) {
+		UpdateTitle();
+		NotifyHandlers(STATECHANGE_SERVER);
+	}
+}
+
+void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> const& active_sites)
+{
+	bool changed{};
+	if (m_site.server_) {
+		for (auto const& active_site : active_sites) {
+			if (active_site.old_path == m_site.SitePath()) {
+				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
+
+				if (active_site.old_path == m_site.SitePath() && newSite && m_site.server_ == newSite->server_) {
+					if (m_site != *newSite) {
+						changed = true;
+						m_site.Update(*newSite);
+					}
+				}
+				else {
+					changed = true;
+					m_site.SetSitePath(std::wstring());
+				}
+				m_last_site = m_site;
+				break;
+			}
+		}
+	}
+	else if (m_last_site.server_) {
+		for (auto const& active_site : active_sites) {
+			if (active_site.old_path == m_last_site.SitePath()) {
+				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
+				if (active_site.old_path == m_last_site.SitePath() && newSite && m_last_site.server_ == newSite->server_) {
+					if (m_last_site != *newSite) {
+						changed = true;
+						m_last_site.Update(*newSite);
+					}
+				}
+				else {
+					changed = true;
+					m_last_site.SetSitePath(std::wstring());
+				}
+			}
+			break;
+		}
+	}
+
 	if (changed) {
 		UpdateTitle();
 		NotifyHandlers(STATECHANGE_SERVER);

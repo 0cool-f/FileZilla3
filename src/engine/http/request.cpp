@@ -720,8 +720,19 @@ int CHttpRequestOpData::ProcessData(unsigned char* data, unsigned int len)
 	auto & shared_response = requests_.front();
 	if (shared_response) {
 		auto & response = shared_response->response();
+
+		decltype(response.on_data_) *on_data = nullptr;
+
 		if (response.on_data_ && !(response.flags_ & HttpResponse::flag_ignore_body)) {
-			res = response.on_data_(data, len);
+			on_data = &response.on_data_;
+		}
+
+		if (response.on_error_data_ && !response.success() && !(response.flags_ & HttpResponse::flag_ignore_body)) {
+			on_data = &response.on_error_data_;
+		}
+
+		if (on_data) {
+			res = (*on_data)(data, len);
 		}
 	}
 
