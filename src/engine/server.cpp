@@ -876,3 +876,14 @@ bool ProtocolHasUser(ServerProtocol protocol)
 {
 	return protocol != DROPBOX && protocol != ONEDRIVE;
 }
+
+bool CServer::SameResource(CServer const& other) const
+{
+	// We include post-login commands as it may be used for things like the HOST command.
+	// We include proxy parameters as a hostname may resolve to different servers depending on whether a proxy is used.
+
+	auto l = std::tie(m_protocol, m_host, m_port, m_user, m_postLoginCommands, m_bypassProxy, extraParameters_);
+	auto r = std::tie(other.m_protocol, other.m_host, other.m_port, other.m_user, other.m_postLoginCommands, other.m_bypassProxy, other.extraParameters_);
+
+	return l == r;
+}

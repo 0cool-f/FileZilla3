@@ -1367,7 +1367,7 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 			if (active_site.old_path == m_site.SitePath()) {
 				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
 
-				if (active_site.old_path == m_site.SitePath() && newSite && m_site.server_ == newSite->server_) {
+				if (active_site.old_path == m_site.SitePath() && newSite && m_site.server_.SameResource(newSite->server_)) {
 					if (m_site != *newSite) {
 						changed = true;
 						m_site.Update(*newSite);
@@ -1386,7 +1386,7 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 		for (auto const& active_site : active_sites) {
 			if (active_site.old_path == m_last_site.SitePath()) {
 				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
-				if (active_site.old_path == m_last_site.SitePath() && newSite && m_last_site.server_ == newSite->server_) {
+				if (active_site.old_path == m_last_site.SitePath() && newSite && m_last_site.server_.SameResource(newSite->server_)) {
 					if (m_last_site != *newSite) {
 						changed = true;
 						m_last_site.Update(*newSite);

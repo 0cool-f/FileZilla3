@@ -128,6 +128,10 @@ public:
 	bool operator<(const CServer &op) const;
 	bool operator!=(const CServer &op) const;
 
+	// Returns whether the argument refers to the same resource.
+	// Compares things like protocol and hostname, but excludes things like the name or the timezone offset.
+	bool SameResource(CServer const& other) const;
+
 	bool SetTimezoneOffset(int minutes);
 	void SetPasvMode(PasvMode pasvMode);
 	void MaximumMultipleConnections(int maximum);

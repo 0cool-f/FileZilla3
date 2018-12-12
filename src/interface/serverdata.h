@@ -70,6 +70,10 @@ public:
 		return !(*this == rhs);
 	}
 
+	bool SameResource(ServerWithCredentials const& other) const {
+		return server.SameResource(other.server);
+	}
+
 	CServer server;
 	ServerHandle handle_;
 	ProtectedCredentials credentials;
