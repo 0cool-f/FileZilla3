@@ -625,7 +625,7 @@ void CLocalListView::DisplayDrives()
 {
 	int count = m_fileData.size();
 
-	std::list<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
+	std::vector<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
 	for (auto it = drives.begin(); it != drives.end(); ++it) {
 		std::wstring drive = *it;
 		if (!drive.empty() && drive.back() == '\\') {
@@ -1907,8 +1907,7 @@ void CLocalListView::OnVolumesEnumerated(wxCommandEvent& event)
 		return;
 	}
 
-	std::list<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> volumeInfo;
-	volumeInfo = volumeEnumeratorThread_->GetVolumes();
+	std::vector<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> volumeInfo = volumeEnumeratorThread_->GetVolumes();
 
 	if (event.GetEventType() == fzEVT_VOLUMESENUMERATED) {
 		volumeEnumeratorThread_.reset();
@@ -1918,8 +1917,8 @@ void CLocalListView::OnVolumesEnumerated(wxCommandEvent& event)
 		return;
 	}
 
-	for (std::list<CVolumeDescriptionEnumeratorThread::t_VolumeInfo>::const_iterator iter = volumeInfo.begin(); iter != volumeInfo.end(); ++iter) {
-		std::wstring drive = iter->volume;
+	for (auto const& info : volumeInfo) {
+		std::wstring const& drive = info.volume;
 
 		unsigned int item, index;
 		for (item = m_hasParent ? 1 : 0; item < m_indexMapping.size(); ++item) {
@@ -1932,11 +1931,11 @@ void CLocalListView::OnVolumesEnumerated(wxCommandEvent& event)
 			continue;
 		}
 
-		if (!iter->volumeName.empty()) {
-			m_fileData[index].label = fz::sparse_optional<std::wstring>(drive + _T(" (") + iter->volumeName + _T(")"));
+		if (!info.volumeName.empty()) {
+			m_fileData[index].label = fz::sparse_optional<std::wstring>(drive + _T(" (") + info.volumeName + _T(")"));
 		}
-		if (iter->icon != -1) {
-			m_fileData[index].icon = iter->icon;
+		if (info.icon != -1) {
+			m_fileData[index].icon = info.icon;
 		}
 
 		RefreshItem(item);

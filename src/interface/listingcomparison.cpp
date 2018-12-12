@@ -11,15 +11,13 @@ CComparableListing::CComparableListing(wxWindow* pParent)
 
 	// Init backgrounds for directory comparison
 	wxColour background = m_pParent->GetBackgroundColour();
-	if (background.Red() + background.Green() + background.Blue() >= 384)
-	{
+	if (background.Red() + background.Green() + background.Blue() >= 384) {
 		// Light background
 		m_comparisonBackgrounds[0].SetBackgroundColour(wxColour(255, 128, 128));
 		m_comparisonBackgrounds[1].SetBackgroundColour(wxColour(255, 255, 128));
 		m_comparisonBackgrounds[2].SetBackgroundColour(wxColour(128, 255, 128));
 	}
-	else
-	{
+	else {
 		// Light background
 		m_comparisonBackgrounds[0].SetBackgroundColour(wxColour(192, 64, 64));
 		m_comparisonBackgrounds[1].SetBackgroundColour(wxColour(192, 192, 64));
@@ -31,16 +29,18 @@ CComparableListing::CComparableListing(wxWindow* pParent)
 
 bool CComparableListing::IsComparing() const
 {
-	if (!m_pComparisonManager)
+	if (!m_pComparisonManager) {
 		return false;
+	}
 
 	return m_pComparisonManager->IsComparing();
 }
 
 void CComparableListing::ExitComparisonMode()
 {
-	if (!m_pComparisonManager)
+	if (!m_pComparisonManager) {
 		return;
+	}
 
 	m_pComparisonManager->ExitComparisonMode();
 }
@@ -174,8 +174,7 @@ bool CComparisonManager::CompareListings()
 		m_pRight->CompareAddFile(CComparableListing::fill);
 		gotLocal = m_pLeft->get_next_file(localFile, localDir, localSize, localDate);
 	}
-	while (gotRemote)
-	{
+	while (gotRemote) {
 		m_pLeft->CompareAddFile(CComparableListing::fill);
 		m_pRight->CompareAddFile(CComparableListing::lonely);
 		gotRemote = m_pRight->get_next_file(remoteFile, remoteDir, remoteSize, remoteDate);
@@ -192,13 +191,14 @@ int CComparisonManager::CompareFiles(const int dirSortMode, const wxString& loca
 	switch (dirSortMode)
 	{
 	default:
-		if (localDir)
-		{
-			if (!remoteDir)
+		if (localDir) {
+			if (!remoteDir) {
 				return -1;
+			}
 		}
-		else if (remoteDir)
+		else if (remoteDir) {
 			return 1;
+		}
 		break;
 	case 2:
 		// Inline
@@ -223,33 +223,41 @@ void CComparisonManager::SetListings(CComparableListing* pLeft, CComparableListi
 {
 	wxASSERT((pLeft && pRight) || (!pLeft && !pRight));
 
-	if (IsComparing())
+	if (IsComparing()) {
 		ExitComparisonMode();
+	}
 
-	if (m_pLeft)
+	if (m_pLeft) {
 		m_pLeft->SetOther(0);
-	if (m_pRight)
+	}
+	if (m_pRight) {
 		m_pRight->SetOther(0);
+	}
 
 	m_pLeft = pLeft;
 	m_pRight = pRight;
 
-	if (m_pLeft)
+	if (m_pLeft) {
 		m_pLeft->SetOther(m_pRight);
-	if (m_pRight)
+	}
+	if (m_pRight) {
 		m_pRight->SetOther(m_pLeft);
+	}
 }
 
 void CComparisonManager::ExitComparisonMode()
 {
-	if (!IsComparing())
+	if (!IsComparing()) {
 		return;
+	}
 
 	m_isComparing = false;
-	if (m_pLeft)
+	if (m_pLeft) {
 		m_pLeft->OnExitComparisonMode();
-	if (m_pRight)
+	}
+	if (m_pRight) {
 		m_pRight->OnExitComparisonMode();
+	}
 
 	m_state.NotifyHandlers(STATECHANGE_COMPARISON);
 }

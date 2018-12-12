@@ -460,6 +460,7 @@ CMainFrame::CMainFrame()
 		m_pBottomSplitter->Initialize(m_pContextControl);
 	}
 
+	wxGetApp().AddStartupProfileRecord("CMainFrame::CMainFrame pre layout");
 	m_pWindowStateManager = new CWindowStateManager(this);
 	m_pWindowStateManager->Restore(OPTION_MAINWINDOW_POSITION);
 
@@ -1363,8 +1364,12 @@ void CMainFrame::OnClose(wxCloseEvent &event)
 	if (m_pContextControl) {
 		CContextControl::_context_controls* controls = m_pContextControl->GetCurrentControls();
 		if (controls) {
-			controls->pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
-			controls->pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
+			if (controls->pLocalListView) {
+				controls->pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
+			}
+			if (controls->pRemoteListView) {
+				controls->pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
+			}
 		}
 
 		m_pContextControl->SaveTabs();
@@ -2353,7 +2358,7 @@ void CMainFrame::OnToolbarComparison(wxCommandEvent&)
 			return;
 		}
 
-		if (controls->pLocalListSearchPanel->IsShown() || controls->pRemoteListSearchPanel->IsShown()) {
+		if ((controls->pLocalListSearchPanel && controls->pLocalListSearchPanel->IsShown()) || (controls->pRemoteListSearchPanel && controls->pRemoteListSearchPanel->IsShown())) {
 			CConditionalDialog dlg(this, CConditionalDialog::quick_search, CConditionalDialog::yesno);
 			dlg.SetTitle(_("Directory comparison"));
 			dlg.AddText(_("To compare directories quick search must be closed."));

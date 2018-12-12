@@ -426,7 +426,7 @@ bool CLocalTreeView::DisplayDrives(wxTreeItemId parent)
 {
 	wxGetApp().AddStartupProfileRecord("CLocalTreeView::DisplayDrives");
 
-	std::list<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
+	std::vector<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
 
 	m_pVolumeEnumeratorThread = new CVolumeDescriptionEnumeratorThread(this);
 	if (m_pVolumeEnumeratorThread->Failed()) {
@@ -1051,16 +1051,15 @@ void CLocalTreeView::OnVolumesEnumerated(wxCommandEvent& event)
 		return;
 	}
 
-	std::list<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> volumeInfo;
-	volumeInfo = m_pVolumeEnumeratorThread->GetVolumes();
+	std::vector<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> volumeInfo = m_pVolumeEnumeratorThread->GetVolumes();
 
 	if (event.GetEventType() == fzEVT_VOLUMESENUMERATED) {
 		delete m_pVolumeEnumeratorThread;
 		m_pVolumeEnumeratorThread = 0;
 	}
 
-	for (std::list<CVolumeDescriptionEnumeratorThread::t_VolumeInfo>::const_iterator iter = volumeInfo.begin(); iter != volumeInfo.end(); ++iter) {
-		wxString drive = iter->volume;
+	for (auto const& info : volumeInfo) {
+		wxString const& drive = info.volume;
 
 		wxTreeItemIdValue tmp;
 		wxTreeItemId item = GetFirstChild(m_drives, tmp);
@@ -1068,11 +1067,11 @@ void CLocalTreeView::OnVolumesEnumerated(wxCommandEvent& event)
 			wxString name = GetItemText(item);
 			if (name == drive || name.Left(drive.Len() + 1) == drive + _T(" ")) {
 
-				if (!iter->volumeName.empty()) {
-					SetItemText(item, drive + _T(" (") + iter->volumeName + _T(")"));
+				if (!info.volumeName.empty()) {
+					SetItemText(item, drive + _T(" (") + info.volumeName + _T(")"));
 				}
-				if (iter->icon != -1) {
-					SetItemImage(item, iter->icon);
+				if (info.icon != -1) {
+					SetItemImage(item, info.icon);
 				}
 				break;
 			}

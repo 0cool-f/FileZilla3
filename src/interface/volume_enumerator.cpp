@@ -132,14 +132,14 @@ bool CVolumeDescriptionEnumeratorThread::GetDriveIcon(std::wstring const& drive)
 
 bool CVolumeDescriptionEnumeratorThread::GetDriveLabels()
 {
-	std::list<std::wstring> drives = GetDrives();
+	std::vector<std::wstring> drives = GetDrives();
 
 	if (drives.empty()) {
 		return true;
 	}
 
-	std::list<std::wstring>::const_iterator drive_a = drives.end();
-	for (std::list<std::wstring>::const_iterator it = drives.begin(); it != drives.end() && !m_stop; ++it) {
+	std::vector<std::wstring>::const_iterator drive_a = drives.end();
+	for (std::vector<std::wstring>::const_iterator it = drives.begin(); it != drives.end() && !m_stop; ++it) {
 		if (m_stop) {
 			return false;
 		}
@@ -180,18 +180,20 @@ bool CVolumeDescriptionEnumeratorThread::IsHidden(wchar_t const* drive, long noD
 	int bit = 0;
 	if (drive && drive[0] != 0 && drive[1] == ':') {
 		wchar_t letter = drive[0];
-		if (letter >= 'A' && letter <= 'Z')
+		if (letter >= 'A' && letter <= 'Z') {
 			bit = 1 << (letter - 'A');
-		else if (letter >= 'a' && letter <= 'z')
+		}
+		else if (letter >= 'a' && letter <= 'z') {
 			bit = 1 << (letter - 'a');
+		}
 	}
 
 	return (noDrives & bit) != 0;
 }
 
-std::list<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives()
+std::vector<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives()
 {
-	std::list<std::wstring> ret;
+	std::vector<std::wstring> ret;
 
 	long drivesToHide = GetDrivesToHide();
 
@@ -215,7 +217,7 @@ std::list<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives()
 		const int drivelen = fz::strlen(pDrive);
 
 		if (!IsHidden(pDrive, drivesToHide)) {
-			ret.push_back(pDrive);
+			ret.emplace_back(pDrive);
 		}
 
 		pDrive += drivelen + 1;
@@ -227,9 +229,9 @@ std::list<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives()
 }
 
 
-std::list<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> CVolumeDescriptionEnumeratorThread::GetVolumes()
+std::vector<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> CVolumeDescriptionEnumeratorThread::GetVolumes()
 {
-	std::list<t_VolumeInfo> volumeInfo;
+	std::vector<t_VolumeInfo> volumeInfo;
 
 	{
 		fz::scoped_lock l(sync_);

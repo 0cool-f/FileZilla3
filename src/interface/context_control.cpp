@@ -224,7 +224,9 @@ void CContextControl::CreateContextControls(CState& state)
 		pLocalFilelistStatusBar->Hide();
 	}
 	context_controls.pLocalListViewPanel->SetStatusBar(pLocalFilelistStatusBar);
-	context_controls.pLocalListView->SetFilelistStatusBar(pLocalFilelistStatusBar);
+	if (context_controls.pLocalListView) {
+		context_controls.pLocalListView->SetFilelistStatusBar(pLocalFilelistStatusBar);
+	}
 	pLocalFilelistStatusBar->SetConnected(true);
 
 	CFilelistStatusBar* pRemoteFilelistStatusBar = new CFilelistStatusBar(context_controls.pRemoteListViewPanel);
@@ -232,7 +234,9 @@ void CContextControl::CreateContextControls(CState& state)
 		pRemoteFilelistStatusBar->Hide();
 	}
 	context_controls.pRemoteListViewPanel->SetStatusBar(pRemoteFilelistStatusBar);
-	context_controls.pRemoteListView->SetFilelistStatusBar(pRemoteFilelistStatusBar);
+	if (context_controls.pRemoteListView) {
+		context_controls.pRemoteListView->SetFilelistStatusBar(pRemoteFilelistStatusBar);
+	}
 
 	auto localRecursiveStatus = new CRecursiveOperationStatus(context_controls.pLocalListViewPanel, state, true);
 	context_controls.pLocalListViewPanel->SetFooter(localRecursiveStatus);
@@ -322,7 +326,9 @@ void CContextControl::CreateContextControls(CState& state)
 	m_mainFrame.ConnectNavigationHandler(context_controls.pLocalViewHeader);
 	m_mainFrame.ConnectNavigationHandler(context_controls.pRemoteViewHeader);
 
-	state.GetComparisonManager()->SetListings(context_controls.pLocalListView, context_controls.pRemoteListView);
+	if (context_controls.pLocalListView && context_controls.pRemoteListView) {
+		state.GetComparisonManager()->SetListings(context_controls.pLocalListView, context_controls.pRemoteListView);
+	}
 
 	if (m_tabs) {
 		m_tabs->AddPage(context_controls.pViewSplitter, state.GetTitle());

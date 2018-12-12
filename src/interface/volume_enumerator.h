@@ -3,8 +3,6 @@
 
 #include <libfilezilla/thread.hpp>
 
-#include <list>
-
 // Class to enumerate volume labels of volumes assigned
 // a drive letter under MSW.
 // Also gets the full UNC path for drive-mapped network
@@ -40,9 +38,9 @@ public:
 		int icon{-1};
 	};
 
-	std::list<t_VolumeInfo> GetVolumes();
+	std::vector<t_VolumeInfo> GetVolumes();
 
-	static std::list<std::wstring> GetDrives();
+	static std::vector<std::wstring> GetDrives();
 
 	static long GetDrivesToHide();
 	static bool IsHidden(wchar_t const* drive, long noDrives);
@@ -59,7 +57,7 @@ protected:
 	bool m_failure{};
 	bool m_stop{};
 
-	std::list<t_VolumeInfo> m_volumeInfo;
+	std::vector<t_VolumeInfo> m_volumeInfo;
 
 	fz::mutex sync_{false};
 };
