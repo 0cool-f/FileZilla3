@@ -92,7 +92,7 @@ void CListSearchPanel::ApplyFilter()
 	filter.matchCase = !m_caseInsensitive;
 
 	CFilterCondition condition;
-	if (!condition.set(filter_name, m_text.ToStdWstring(), 0, !m_caseInsensitive)) {
+	if (!condition.set(filter_name, m_text.ToStdWstring(), m_useRegex ? 4 : 0, !m_caseInsensitive)) {
 		return;
 	}
 	filter.filters.push_back(condition);
