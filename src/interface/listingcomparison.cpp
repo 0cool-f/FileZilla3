@@ -81,7 +81,6 @@ bool CComparisonManager::CompareListings()
 
 	m_state.NotifyHandlers(STATECHANGE_COMPARISON);
 
-	wxString error;
 	if (!m_pLeft->CanStartComparison() || !m_pRight->CanStartComparison()) {
 		return true;
 	}
