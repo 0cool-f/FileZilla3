@@ -11,8 +11,11 @@ DEFINE_EVENT_TYPE(fzEVT_VOLUMESENUMERATED)
 CVolumeDescriptionEnumeratorThread::CVolumeDescriptionEnumeratorThread(wxEvtHandler* pEvtHandler)
 	: m_pEvtHandler(pEvtHandler)
 {
-	if (!run()) {
-		m_failure = true;
+	if (pEvtHandler) {
+		drivesToHide_ = GetDrivesToHide();
+		if (!run()) {
+			m_failure = true;
+		}
 	}
 }
 
@@ -132,7 +135,7 @@ bool CVolumeDescriptionEnumeratorThread::GetDriveIcon(std::wstring const& drive)
 
 bool CVolumeDescriptionEnumeratorThread::GetDriveLabels()
 {
-	std::vector<std::wstring> drives = GetDrives();
+	std::vector<std::wstring> drives = GetDrives(drivesToHide_);
 
 	if (drives.empty()) {
 		return true;
@@ -193,9 +196,12 @@ bool CVolumeDescriptionEnumeratorThread::IsHidden(wchar_t const* drive, long noD
 
 std::vector<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives()
 {
-	std::vector<std::wstring> ret;
+	return GetDrives(GetDrivesToHide());
+}
 
-	long drivesToHide = GetDrivesToHide();
+std::vector<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives(long drivesToHide)
+{
+	std::vector<std::wstring> ret;
 
 	DWORD bufferLen{};
 	wchar_t* drives{};
@@ -223,11 +229,10 @@ std::vector<std::wstring> CVolumeDescriptionEnumeratorThread::GetDrives()
 		pDrive += drivelen + 1;
 	}
 
-	delete [] drives;
+	delete[] drives;
 
 	return ret;
 }
-
 
 std::vector<CVolumeDescriptionEnumeratorThread::t_VolumeInfo> CVolumeDescriptionEnumeratorThread::GetVolumes()
 {

@@ -46,6 +46,8 @@ public:
 	static bool IsHidden(wchar_t const* drive, long noDrives);
 
 protected:
+	static std::vector<std::wstring> GetDrives(long drivesToHide);
+
 	bool GetDriveLabels();
 	void ProcessDrive(std::wstring const& drive);
 	bool GetDriveLabel(std::wstring const& drive);
@@ -60,6 +62,8 @@ protected:
 	std::vector<t_VolumeInfo> m_volumeInfo;
 
 	fz::mutex sync_{false};
+
+	long drivesToHide_{};
 };
 
 #endif
