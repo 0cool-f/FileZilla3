@@ -152,7 +152,7 @@ void CManualTransfer::SetServerState()
 void CManualTransfer::DisplayServer()
 {
 	if (site_) {
-		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site_.server_.Format(ServerFormat::host_only));
+		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site_.Format(ServerFormat::host_only));
 		unsigned int port = site_.server_.server.GetPort();
 
 		if (port != CServer::GetDefaultPort(site_.server_.server.GetProtocol())) {
@@ -391,8 +391,8 @@ bool CManualTransfer::UpdateServer()
 		site_.server_.server.SetProtocol(FTP);
 	}
 
-	site_.server_.SetLogonType(GetLogonTypeFromName(xrc_call(*this, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring()));
-	site_.server_.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
+	site_.SetLogonType(GetLogonTypeFromName(xrc_call(*this, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring()));
+	site_.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
 	site_.server_.credentials.SetPass(xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring());
 	site_.server_.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
 
@@ -442,7 +442,7 @@ bool CManualTransfer::VerifyServer()
 	Site site;
 
 	// Set selected type
-	site.server_.SetLogonType(logon_type);
+	site.SetLogonType(logon_type);
 
 	if (protocol != UNKNOWN) {
 		site.server_.server.SetProtocol(protocol);
@@ -450,14 +450,14 @@ bool CManualTransfer::VerifyServer()
 
 	CServerPath path;
 	std::wstring error;
-	if (!site.server_.ParseUrl(host, xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring(), std::wstring(), std::wstring(), error, path, protocol)) {
+	if (!site.ParseUrl(host, xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring(), std::wstring(), std::wstring(), error, path, protocol)) {
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::SetFocus);
 		wxMessageBoxEx(error);
 		return false;
 	}
 
-	xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.server_.Format(ServerFormat::host_only));
-	xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString::Format(_T("%d"), site.server_.server.GetPort()));
+	xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
+	xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, fz::to_wstring(site.server_.server.GetPort()));
 
 	protocolName = CServer::GetProtocolName(site.server_.server.GetProtocol());
 	if (protocolName.empty()) {

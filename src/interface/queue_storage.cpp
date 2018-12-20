@@ -958,13 +958,13 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 		return INVALID_DATA;
 	}
 
-	site.server_.SetLogonType(static_cast<LogonType>(logonType));
+	site.SetLogonType(static_cast<LogonType>(logonType));
 
 	if (site.server_.credentials.logonType_ != LogonType::anonymous) {
 		std::wstring user = GetColumnText(selectServersQuery_, server_table_column_names::user);
 		std::wstring pass = GetColumnText(selectServersQuery_, server_table_column_names::password);
 
-		site.server_.SetUser(user);
+		site.SetUser(user);
 		if (encrypted) {
 			size_t pos = pass.find(' ');
 			if (pos == std::string::npos) {

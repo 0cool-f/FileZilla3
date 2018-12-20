@@ -253,7 +253,7 @@ void CStatusLineCtrl::ClearTransferStatus()
 		m_statusText = _("Waiting for transfer to be cancelled");
 		break;
 	case t_EngineData::connect:
-		m_statusText = wxString::Format(_("Connecting to %s"), m_pEngineData->lastSite.server_.Format(ServerFormat::with_user_and_optional_port));
+		m_statusText = wxString::Format(_("Connecting to %s"), m_pEngineData->lastSite.Format(ServerFormat::with_user_and_optional_port));
 		break;
 	default:
 		m_statusText = _("Transferring");

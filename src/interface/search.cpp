@@ -1420,10 +1420,10 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 		return;
 	}
 
-	wxString const url = site.server_.Format((event.GetId() == XRCID("ID_MENU_SEARCH_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
+	std::wstring const url = site.Format((event.GetId() == XRCID("ID_MENU_SEARCH_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
 
-	auto getUrl = [](wxString const& serverPart, CServerPath const& path, std::wstring const& name) {
-		wxString url = serverPart;
+	auto getUrl = [](std::wstring const& serverPart, CServerPath const& path, std::wstring const& name) {
+		std::wstring url = serverPart;
 
 		auto const pathPart = fz::percent_encode_w(path.FormatFilename(name, false), true);
 		if (!pathPart.empty() && pathPart[0] != '/') {
@@ -1434,7 +1434,7 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 		return url;
 	};
 
-	wxString urls;
+	std::wstring urls;
 
 	int sel = -1;
 	while ((sel = m_results->GetNextItem(sel, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) >= 0) {
@@ -1446,9 +1446,9 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 		auto const& entry = m_results->remoteFileData_[index];
 		urls += getUrl(url, entry.path, entry.name);
 #ifdef __WXMSW__
-		urls += _T("\r\n");
+		urls += L"\r\n";
 #else
-		urls += _T("\n");
+		urls += L"\n";
 #endif
 	}
 

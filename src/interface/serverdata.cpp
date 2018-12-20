@@ -4,7 +4,7 @@
 #include "serverdata.h"
 #include "Options.h"
 
-bool ServerWithCredentials::ParseUrl(std::wstring const& host, std::wstring const& port, std::wstring const& user, std::wstring const& pass, std::wstring &error, CServerPath &path, ServerProtocol const hint)
+bool Site::ParseUrl(std::wstring const& host, std::wstring const& port, std::wstring const& user, std::wstring const& pass, std::wstring &error, CServerPath &path, ServerProtocol const hint)
 {
 	unsigned int nPort = 0;
 	if (!port.empty()) {
@@ -19,9 +19,9 @@ bool ServerWithCredentials::ParseUrl(std::wstring const& host, std::wstring cons
 	return ParseUrl(host, nPort, user, pass, error, path, hint);
 }
 
-bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std::wstring pass, std::wstring &error, CServerPath &path, ServerProtocol const hint)
+bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std::wstring pass, std::wstring &error, CServerPath &path, ServerProtocol const hint)
 {
-	server.SetType(DEFAULT);
+	server_.server.SetType(DEFAULT);
 
 	if (host.empty()) {
 		error = fztranslate("No host given, please enter a host.");
@@ -40,7 +40,7 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 			error = fztranslate("Invalid protocol specified. Valid protocols are:\nftp:// for normal FTP with optional encryption,\nsftp:// for SSH file transfer protocol,\nftps:// for FTP over TLS (implicit) and\nftpes:// for FTP over TLS (explicit).");
 			return false;
 		}
-		server.SetProtocol(p);
+		server_.server.SetProtocol(p);
 	}
 
 	pos = host.find('@');
@@ -123,7 +123,7 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 	}
 	else {
 		if (!port) {
-			port = CServer::GetDefaultPort(server.GetProtocol());
+			port = CServer::GetDefaultPort(server_.server.GetProtocol());
 		}
 	}
 
@@ -143,55 +143,55 @@ bool ServerWithCredentials::ParseUrl(std::wstring host, unsigned int port, std::
 		host = host.substr(1, host.size() - 2);
 	}
 
-	server.SetHost(host, port);
+	server_.server.SetHost(host, port);
 
-	credentials.account_.clear();
+	server_.credentials.account_.clear();
 
-	if (credentials.logonType_ != LogonType::ask && credentials.logonType_ != LogonType::interactive) {
+	if (server_.credentials.logonType_ != LogonType::ask && server_.credentials.logonType_ != LogonType::interactive) {
 		if (user.empty()) {
-			credentials.logonType_ = LogonType::anonymous;
+			server_.credentials.logonType_ = LogonType::anonymous;
 		}
 		else if (user == L"anonymous") {
 			if (pass.empty() || pass == L"anonymous@example.com") {
-				credentials.logonType_ = LogonType::anonymous;
+				server_.credentials.logonType_ = LogonType::anonymous;
 			}
 			else {
-				credentials.logonType_ = LogonType::normal;
+				server_.credentials.logonType_ = LogonType::normal;
 			}
 		}
 		else {
-			credentials.logonType_ = LogonType::normal;
+			server_.credentials.logonType_ = LogonType::normal;
 		}
 	}
-	if (credentials.logonType_ == LogonType::anonymous) {
+	if (server_.credentials.logonType_ == LogonType::anonymous) {
 		user.clear();
 		pass.clear();
 	}
-	server.SetUser(user);
-	credentials.SetPass(pass);
+	server_.server.SetUser(user);
+	server_.credentials.SetPass(pass);
 
-	if (server.GetProtocol() == UNKNOWN) {
-		server.SetProtocol(CServer::GetProtocolFromPort(port));
+	if (server_.server.GetProtocol() == UNKNOWN) {
+		server_.server.SetProtocol(CServer::GetProtocolFromPort(port));
 	}
 
 	return true;
 }
 
-void ServerWithCredentials::SetLogonType(LogonType logonType)
+void Site::SetLogonType(LogonType logonType)
 {
-	credentials.logonType_ = logonType;
+	server_.credentials.logonType_ = logonType;
 	if (logonType == LogonType::anonymous) {
-		server.SetUser(L"");
+		server_.server.SetUser(L"");
 	}
 }
 
-void ServerWithCredentials::SetUser(std::wstring const& user)
+void Site::SetUser(std::wstring const& user)
 {
-	if (credentials.logonType_ == LogonType::anonymous) {
-		server.SetUser(L"");
+	if (server_.credentials.logonType_ == LogonType::anonymous) {
+		server_.server.SetUser(L"");
 	}
 	else {
-		server.SetUser(user);
+		server_.server.SetUser(user);
 	}
 }
 

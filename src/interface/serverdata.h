@@ -46,23 +46,6 @@ public:
 		, credentials(c)
 	{}
 
-	// Return true if URL could be parsed correctly, false otherwise.
-	// If parsing fails, pError is filled with the reason and the CServer instance may be left an undefined state.
-	bool ParseUrl(std::wstring host, unsigned int port, std::wstring user, std::wstring pass, std::wstring &error, CServerPath &path, ServerProtocol const hint = UNKNOWN);
-	bool ParseUrl(std::wstring const& host, std::wstring const& port, std::wstring const& user, std::wstring const& pass, std::wstring &error, CServerPath &path, ServerProtocol const hint = UNKNOWN);
-
-	std::wstring Format(ServerFormat formatType) const {
-		return server.Format(formatType, credentials);
-	}
-
-	void SetLogonType(LogonType logonType);
-
-	void SetUser(std::wstring const& user);
-
-	explicit operator bool() const {
-		return static_cast<bool>(server);
-	}
-
 	bool operator==(ServerWithCredentials const& rhs) const {
 		return server == rhs.server;
 	}
@@ -124,11 +107,25 @@ public:
 		: server_(s, handle, c)
 	{}
 
-	explicit operator bool() const { return server_.operator bool(); }
+	explicit operator bool() const { return server_.server.operator bool(); }
 
-	bool empty() const { return !server_; }
+	bool empty() const { return !*this; }
 	bool operator==(Site const& s) const;
 	bool operator!=(Site const& s) const { return !(*this == s); }
+
+	// Return true if URL could be parsed correctly, false otherwise.
+	// If parsing fails, pError is filled with the reason and the CServer instance may be left an undefined state.
+	bool ParseUrl(std::wstring host, unsigned int port, std::wstring user, std::wstring pass, std::wstring &error, CServerPath &path, ServerProtocol const hint = UNKNOWN);
+	bool ParseUrl(std::wstring const& host, std::wstring const& port, std::wstring const& user, std::wstring const& pass, std::wstring &error, CServerPath &path, ServerProtocol const hint = UNKNOWN);
+
+	std::wstring Format(ServerFormat formatType) const {
+		return server_.server.Format(formatType, server_.credentials);
+	}
+
+	void SetLogonType(LogonType logonType);
+
+	void SetUser(std::wstring const& user);
+
 
 	ServerWithCredentials server_;
 	std::wstring comments_;

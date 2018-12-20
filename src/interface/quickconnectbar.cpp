@@ -113,7 +113,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	std::wstring error;
 
 	CServerPath path;
-	if (!site.server_.ParseUrl(host, port, user, pass, error, path)) {
+	if (!site.ParseUrl(host, port, user, pass, error, path)) {
 		wxString msg = _("Could not parse server address:");
 		msg += _T("\n");
 		msg += error;
@@ -121,7 +121,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 		return;
 	}
 
-	host = site.server_.Format(ServerFormat::host_only);
+	host = site.Format(ServerFormat::host_only);
 	ServerProtocol protocol = site.server_.server.GetProtocol();
 	switch (protocol)
 	{
@@ -174,7 +174,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.server_.credentials.logonType_ == LogonType::normal) {
-		site.server_.SetLogonType(LogonType::ask);
+		site.SetLogonType(LogonType::ask);
 		CLoginManager::Get().RememberPassword(site);
 	}
 	Bookmark bm;
@@ -206,7 +206,7 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 			iter != m_recentServers.end();
 			++iter, ++i)
 		{
-			wxString name(iter->server_.Format(ServerFormat::with_user_and_optional_port));
+			wxString name(iter->Format(ServerFormat::with_user_and_optional_port));
 			name.Replace(_T("&"), _T("&&"));
 			pMenu->Append(10 + i, name);
 		}

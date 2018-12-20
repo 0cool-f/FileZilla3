@@ -232,7 +232,7 @@ void CToolBar::UpdateToolbarState()
 		canReconnect = false;
 	}
 	else {
-		canReconnect = static_cast<bool>(pState->GetLastSite().server_);
+		canReconnect = static_cast<bool>(pState->GetLastSite());
 	}
 	EnableTool(XRCID("ID_TOOLBAR_RECONNECT"), canReconnect);
 }

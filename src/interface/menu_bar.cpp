@@ -335,7 +335,7 @@ void CMenuBar::UpdateBookmarkMenu()
 	}
 
 	Site site = pState->GetSite();
-	if (!site.server_) {
+	if (!site) {
 		site = pState->GetLastSite();
 	}
 	if (site.m_bookmarks.empty()) {
@@ -381,7 +381,7 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 		}
 
 		Site site = pState->GetSite();
-		if (!site.server_) {
+		if (!site) {
 			site = pState->GetLastSite();
 		}
 
@@ -601,7 +601,7 @@ void CMenuBar::UpdateMenubarState()
 		canReconnect = false;
 	}
 	else {
-		canReconnect = static_cast<bool>(pState->GetLastSite().server_);
+		canReconnect = static_cast<bool>(pState->GetLastSite());
 	}
 	Enable(XRCID("ID_MENU_SERVER_RECONNECT"), canReconnect);
 

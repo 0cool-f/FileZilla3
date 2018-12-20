@@ -331,7 +331,7 @@ bool CUpdater::CreateConnectCommand(std::wstring const& url)
 	Site s;
 	CServerPath path;
 	std::wstring error;
-	if (!s.server_.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server_.server.GetProtocol() != HTTP && s.server_.server.GetProtocol() != HTTPS)) {
+	if (!s.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server_.server.GetProtocol() != HTTP && s.server_.server.GetProtocol() != HTTPS)) {
 		return false;
 	}
 
@@ -347,7 +347,7 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 	Site s;
 	CServerPath path;
 	std::wstring error;
-	if (!s.server_.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server_.server.GetProtocol() != HTTP && s.server_.server.GetProtocol() != HTTPS)) {
+	if (!s.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server_.server.GetProtocol() != HTTP && s.server_.server.GetProtocol() != HTTPS)) {
 		return false;
 	}
 	std::wstring file = path.GetLastSegment();

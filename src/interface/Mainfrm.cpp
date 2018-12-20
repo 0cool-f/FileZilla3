@@ -860,11 +860,11 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		// controls->last_bookmark_path can get modified if it's empty now
 		int res;
 		if (event.GetId() == XRCID("ID_BOOKMARK_ADD")) {
-			CNewBookmarkDialog dlg(this, sitePath, old_site.server_ ? &old_site : 0);
+			CNewBookmarkDialog dlg(this, sitePath, old_site ? &old_site : 0);
 			res = dlg.Run(pState->GetLocalDir().GetPath(), pState->GetRemotePath());
 		}
 		else {
-			CBookmarksDialog dlg(this, sitePath, old_site.server_ ? &old_site : 0);
+			CBookmarksDialog dlg(this, sitePath, old_site ? &old_site : 0);
 			res = dlg.Run();
 		}
 		if (res == wxID_OK) {
@@ -1464,7 +1464,7 @@ void CMainFrame::OpenSiteManager(Site const* site)
 		}
 
 		Site site = controls->pState->GetSite();
-		if (!site.server_) {
+		if (!site) {
 			site = controls->pState->GetLastSite();
 		}
 
@@ -2539,21 +2539,21 @@ void CMainFrame::ProcessCommandLine()
 
 		wxString logontype = pCommandLine->GetOption(CCommandLine::logontype);
 		if (logontype == _T("ask")) {
-			site.server_.SetLogonType(LogonType::ask);
+			site.SetLogonType(LogonType::ask);
 		}
 		else if (logontype == _T("interactive")) {
-			site.server_.SetLogonType(LogonType::interactive);
+			site.SetLogonType(LogonType::interactive);
 		}
 
 		CServerPath path;
-		if (!site.server_.ParseUrl(param, 0, std::wstring(), std::wstring(), error, path)) {
+		if (!site.ParseUrl(param, 0, std::wstring(), std::wstring(), error, path)) {
 			wxString str = _("Parameter not a valid URL");
 			str += _T("\n") + error;
 			wxMessageBoxEx(error, _("Syntax error in command line"));
 		}
 
 		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.server_.credentials.logonType_ == LogonType::normal) {
-			site.server_.SetLogonType(LogonType::ask);
+			site.SetLogonType(LogonType::ask);
 			CLoginManager::Get().RememberPassword(site);
 		}
 

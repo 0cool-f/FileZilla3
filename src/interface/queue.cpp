@@ -410,7 +410,7 @@ CServerItem::~CServerItem()
 
 wxString CServerItem::GetName() const
 {
-	return site_.server_.Format(ServerFormat::with_user_and_optional_port);
+	return site_.Format(ServerFormat::with_user_and_optional_port);
 }
 
 void CServerItem::AddChild(CQueueItem* pItem)

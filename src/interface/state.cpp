@@ -275,7 +275,7 @@ bool CState::SetLocalDir(CLocalPath const& dir, std::wstring *error, bool rememb
 	}
 
 	if (!m_sync_browse.local_root.empty()) {
-		wxASSERT(m_site.server_);
+		wxASSERT(m_site);
 
 		if (dir != m_sync_browse.local_root && !dir.IsSubdirOf(m_sync_browse.local_root)) {
 			wxString msg = wxString::Format(_("The local directory '%s' is not below the synchronization root (%s).\nDisable synchronized browsing and continue changing the local directory?"),
@@ -497,8 +497,8 @@ void CState::LocalDirCreated(const CLocalPath& path)
 
 void CState::SetSite(Site const& site, CServerPath const& path)
 {
-	if (m_site.server_) {
-		if (site.server_ && site.server_ == m_site.server_ &&
+	if (m_site) {
+		if (site && site.server_ == m_site.server_ &&
 			site.server_.server.GetName() == m_site.server_.server.GetName() &&
 			site.server_.server.MaximumMultipleConnections() == m_site.server_.server.MaximumMultipleConnections())
 		{
@@ -510,7 +510,7 @@ void CState::SetSite(Site const& site, CServerPath const& path)
 		m_pCertificate.reset();
 		m_pSftpEncryptionInfo.reset();
 	}
-	if (site.server_) {
+	if (site) {
 		if (!path.empty()) {
 			m_last_path = path;
 		}
@@ -541,7 +541,7 @@ wxString CState::GetTitle() const
 
 bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 {
-	if (!site.server_) {
+	if (!site) {
 		return false;
 	}
 	if (!m_pEngine) {
@@ -717,7 +717,7 @@ CGlobalStateEventHandler::~CGlobalStateEventHandler()
 
 void CState::UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, std::wstring const& subdir, bool queueOnly)
 {
-	if (!m_site.server_ || !m_pDirectoryListing) {
+	if (!m_site || !m_pDirectoryListing) {
 		return;
 	}
 
@@ -734,7 +734,7 @@ void CState::UploadDroppedFiles(CLocalDataObject const* pLocalDataObject, std::w
 
 void CState::UploadDroppedFiles(const wxFileDataObject* pFileDataObject, std::wstring const& subdir, bool queueOnly)
 {
-	if (!m_site.server_ || !m_pDirectoryListing) {
+	if (!m_site || !m_pDirectoryListing) {
 		return;
 	}
 
@@ -1039,7 +1039,7 @@ bool CState::IsRemoteConnected() const
 		return false;
 	}
 
-	return static_cast<bool>(m_site.server_);
+	return static_cast<bool>(m_site);
 }
 
 bool CState::IsRemoteIdle(bool ignore_recursive) const
@@ -1110,7 +1110,7 @@ void CState::LinkIsNotDir(const CServerPath& path, const wxString& subdir)
 
 bool CState::ChangeRemoteDir(CServerPath const& path, std::wstring const& subdir, int flags, bool ignore_busy, bool compare)
 {
-	if (!m_site.server_ || !m_pCommandQueue) {
+	if (!m_site || !m_pCommandQueue) {
 		return false;
 	}
 
@@ -1327,22 +1327,22 @@ void CState::SetSecurityInfo(CSftpEncryptionNotification const& info)
 
 void CState::UpdateSite(wxString const& oldPath, Site const& newSite)
 {
-	if (newSite.SitePath().empty() || !newSite.server_) {
+	if (newSite.SitePath().empty() || !newSite) {
 		return;
 	}
 
 	bool changed = false;
-	if (m_site.server_ && m_site != newSite) {
+	if (m_site && m_site != newSite) {
 		if (m_site.SitePath() == oldPath && m_site.server_ == newSite.server_) {
 			// Update handles
 			m_site.Update(newSite);
 			changed = true;
 		}
 	}
-	if (m_last_site.server_ && m_last_site != newSite) {
+	if (m_last_site && m_last_site != newSite) {
 		if (m_last_site.SitePath() == oldPath && m_last_site.server_ == newSite.server_) {
 			m_last_site.Update(newSite);
-			if (!m_site.server_) {
+			if (!m_site) {
 				// Active site has precedence over historic data
 				changed = true;
 			}
@@ -1357,7 +1357,7 @@ void CState::UpdateSite(wxString const& oldPath, Site const& newSite)
 void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> const& active_sites)
 {
 	bool changed{};
-	if (m_site.server_) {
+	if (m_site) {
 		for (auto const& active_site : active_sites) {
 			if (active_site.old_path == m_site.SitePath()) {
 				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
@@ -1377,7 +1377,7 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 			}
 		}
 	}
-	else if (m_last_site.server_) {
+	else if (m_last_site) {
 		for (auto const& active_site : active_sites) {
 			if (active_site.old_path == m_last_site.SitePath()) {
 				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
@@ -1404,13 +1404,13 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 
 void CState::UpdateTitle()
 {
-	if (m_site.server_) {
+	if (m_site) {
 		wxString const& name = m_site.server_.server.GetName();
 		m_title.clear();
 		if (!name.empty()) {
 			m_title = name + _T(" - ");
 		}
-		m_title += m_site.server_.Format(ServerFormat::with_user_and_optional_port);
+		m_title += m_site.Format(ServerFormat::with_user_and_optional_port);
 	}
 	else {
 		m_title = _("Not connected");

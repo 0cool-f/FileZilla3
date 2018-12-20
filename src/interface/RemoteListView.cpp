@@ -2770,10 +2770,10 @@ void CRemoteListView::OnMenuGeturl(wxCommandEvent& event)
 
 	const CServerPath& path = m_pDirectoryListing->path;
 
-	wxString const url = site.server_.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
+	std::wstring const url = site.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
 
-	auto getUrl = [](wxString const& serverPart, CServerPath const& path, std::wstring const& name) {
-		wxString url = serverPart;
+	auto getUrl = [](std::wstring const& serverPart, CServerPath const& path, std::wstring const& name) {
+		std::wstring url = serverPart;
 
 		auto const pathPart = fz::percent_encode_w(path.FormatFilename(name, false), true);
 		if (!pathPart.empty() && pathPart[0] != '/') {
@@ -2784,7 +2784,7 @@ void CRemoteListView::OnMenuGeturl(wxCommandEvent& event)
 		return url;
 	};
 
-	wxString urls;
+	std::wstring urls;
 	if (selected_item_list.size() == 1) {
 		urls = getUrl(url, path, selected_item_list.front().name);
 	}
@@ -2792,9 +2792,9 @@ void CRemoteListView::OnMenuGeturl(wxCommandEvent& event)
 		for (auto const& entry : selected_item_list) {
 			urls += getUrl(url, path, entry.name);
 #ifdef __WXMSW__
-			urls += _T("\r\n");
+			urls += L"\r\n";
 #else
-			urls += _T("\n");
+			urls += L"\n";
 #endif
 		}
 	}

@@ -527,19 +527,19 @@ bool CSiteManagerSite::Verify(bool predefined)
 
 	// Set selected type
 	Site site;
-	site.server_.SetLogonType(logon_type);
+	site.SetLogonType(logon_type);
 	site.server_.server.SetProtocol(protocol);
 
 	std::wstring port = xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring();
 	CServerPath path;
 	std::wstring error;
-	if (!site.server_.ParseUrl(host, port, std::wstring(), std::wstring(), error, path, protocol)) {
+	if (!site.ParseUrl(host, port, std::wstring(), std::wstring(), error, path, protocol)) {
 		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->SetFocus();
 		wxMessageBoxEx(error, _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
 		return false;
 	}
 
-	XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site.server_.Format(ServerFormat::host_only));
+	XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site.Format(ServerFormat::host_only));
 	if (site.server_.server.GetPort() != CServer::GetDefaultPort(site.server_.server.GetProtocol())) {
 		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), site.server_.server.GetPort()));
 	}
@@ -702,9 +702,9 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	site.server_.server.SetHost(host, port);
 
 	auto logon_type = GetLogonType();
-	site.server_.SetLogonType(logon_type);
+	site.SetLogonType(logon_type);
 
-	site.server_.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
+	site.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
 	auto pw = xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring();
 
 	if (protocol == STORJ && logon_type == LogonType::normal && (!pw.empty() || !site.server_.credentials.encrypted_)) {
@@ -863,7 +863,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::Enable, false);
 	}
 	else {
-		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.server_.Format(ServerFormat::host_only));
+		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
 		unsigned int port = site.server_.server.GetPort();
 
 		if (port != CServer::GetDefaultPort(site.server_.server.GetProtocol())) {

@@ -293,8 +293,6 @@ bool GetServer(pugi::xml_node node, Site & site)
 {
 	wxASSERT(node);
 
-	auto & server = site.server_;
-
 	std::wstring host = GetTextElement(node, "Host");
 	if (host.empty()) {
 		return false;
@@ -305,7 +303,7 @@ bool GetServer(pugi::xml_node node, Site & site)
 		return false;
 	}
 
-	if (!server.server.SetHost(host, port)) {
+	if (!site.server_.server.SetHost(host, port)) {
 		return false;
 	}
 
@@ -313,30 +311,30 @@ bool GetServer(pugi::xml_node node, Site & site)
 	if (protocol < 0 || protocol > ServerProtocol::MAX_VALUE) {
 		return false;
 	}
-	server.server.SetProtocol(static_cast<ServerProtocol>(protocol));
+	site.server_.server.SetProtocol(static_cast<ServerProtocol>(protocol));
 
 	int type = GetTextElementInt(node, "Type");
 	if (type < 0 || type >= SERVERTYPE_MAX) {
 		return false;
 	}
 
-	server.server.SetType(static_cast<ServerType>(type));
+	site.server_.server.SetType(static_cast<ServerType>(type));
 
 	int logonType = GetTextElementInt(node, "Logontype");
 	if (logonType < 0 || logonType >= static_cast<int>(LogonType::count)) {
 		return false;
 	}
 
-	server.SetLogonType(static_cast<LogonType>(logonType));
+	site.SetLogonType(static_cast<LogonType>(logonType));
 	
-	if (server.credentials.logonType_ != LogonType::anonymous) {
+	if (site.server_.credentials.logonType_ != LogonType::anonymous) {
 		std::wstring user = GetTextElement(node, "User");
-		if (user.empty() && server.credentials.logonType_ != LogonType::interactive && server.credentials.logonType_ != LogonType::ask) {
+		if (user.empty() && site.server_.credentials.logonType_ != LogonType::interactive && site.server_.credentials.logonType_ != LogonType::ask) {
 			return false;
 		}
 
 		std::wstring pass, key;
-		if (server.credentials.logonType_ == LogonType::normal || server.credentials.logonType_ == LogonType::account) {
+		if (site.server_.credentials.logonType_ == LogonType::normal || site.server_.credentials.logonType_ == LogonType::account) {
 			auto passElement = node.child("Pass");
 			if (passElement) {
 				std::wstring encoding = GetTextAttribute(passElement, "encoding");
@@ -347,75 +345,75 @@ bool GetServer(pugi::xml_node node, Site & site)
 				}
 				else if (encoding == _T("crypt")) {
 					pass = fz::to_wstring_from_utf8(passElement.child_value());
-					server.credentials.encrypted_ = fz::public_key::from_base64(passElement.attribute("pubkey").value());
-					if (!server.credentials.encrypted_) {
+					site.server_.credentials.encrypted_ = fz::public_key::from_base64(passElement.attribute("pubkey").value());
+					if (!site.server_.credentials.encrypted_) {
 						pass.clear();
-						server.SetLogonType(LogonType::ask);
+						site.SetLogonType(LogonType::ask);
 					}
 				}
 				else if (!encoding.empty()) {
-					server.SetLogonType(LogonType::ask);
+					site.SetLogonType(LogonType::ask);
 				}
 				else {
 					pass = GetTextElement(passElement);
 				}
 			}
 		}
-		else if (server.credentials.logonType_ == LogonType::key) {
+		else if (site.server_.credentials.logonType_ == LogonType::key) {
 			key = GetTextElement(node, "Keyfile");
 
 			// password should be empty if we're using a key file
 			pass.clear();
 
-			server.credentials.keyFile_ = key;
+			site.server_.credentials.keyFile_ = key;
 		}
 
-		server.SetUser(user);
-		server.credentials.SetPass(pass);
+		site.SetUser(user);
+		site.server_.credentials.SetPass(pass);
 
-		server.credentials.account_ = GetTextElement(node, "Account");
+		site.server_.credentials.account_ = GetTextElement(node, "Account");
 	}
 
 	int timezoneOffset = GetTextElementInt(node, "TimezoneOffset");
-	if (!server.server.SetTimezoneOffset(timezoneOffset)) {
+	if (!site.server_.server.SetTimezoneOffset(timezoneOffset)) {
 		return false;
 	}
 
 	wxString pasvMode = GetTextElement(node, "PasvMode");
 	if (pasvMode == _T("MODE_PASSIVE")) {
-		server.server.SetPasvMode(MODE_PASSIVE);
+		site.server_.server.SetPasvMode(MODE_PASSIVE);
 	}
 	else if (pasvMode == _T("MODE_ACTIVE")) {
-		server.server.SetPasvMode(MODE_ACTIVE);
+		site.server_.server.SetPasvMode(MODE_ACTIVE);
 	}
 	else {
-		server.server.SetPasvMode(MODE_DEFAULT);
+		site.server_.server.SetPasvMode(MODE_DEFAULT);
 	}
 
 	int maximumMultipleConnections = GetTextElementInt(node, "MaximumMultipleConnections");
-	server.server.MaximumMultipleConnections(maximumMultipleConnections);
+	site.server_.server.MaximumMultipleConnections(maximumMultipleConnections);
 
 	wxString encodingType = GetTextElement(node, "EncodingType");
 	if (encodingType == _T("Auto")) {
-		server.server.SetEncodingType(ENCODING_AUTO);
+		site.server_.server.SetEncodingType(ENCODING_AUTO);
 	}
 	else if (encodingType == _T("UTF-8")) {
-		server.server.SetEncodingType(ENCODING_UTF8);
+		site.server_.server.SetEncodingType(ENCODING_UTF8);
 	}
 	else if (encodingType == _T("Custom")) {
 		std::wstring customEncoding = GetTextElement(node, "CustomEncoding");
 		if (customEncoding.empty()) {
 			return false;
 		}
-		if (!server.server.SetEncodingType(ENCODING_CUSTOM, customEncoding)) {
+		if (!site.server_.server.SetEncodingType(ENCODING_CUSTOM, customEncoding)) {
 			return false;
 		}
 	}
 	else {
-		server.server.SetEncodingType(ENCODING_AUTO);
+		site.server_.server.SetEncodingType(ENCODING_AUTO);
 	}
 
-	if (CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
+	if (CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
 		std::vector<std::wstring> postLoginCommands;
 		auto element = node.child("PostLoginCommands");
 		if (element) {
@@ -426,20 +424,20 @@ bool GetServer(pugi::xml_node node, Site & site)
 				}
 			}
 		}
-		if (!server.server.SetPostLoginCommands(postLoginCommands)) {
+		if (!site.server_.server.SetPostLoginCommands(postLoginCommands)) {
 			return false;
 		}
 	}
 
-	server.server.SetBypassProxy(GetTextElementInt(node, "BypassProxy", false) == 1);
-	server.server.SetName(GetTextElement_Trimmed(node, "Name"));
+	site.server_.server.SetBypassProxy(GetTextElementInt(node, "BypassProxy", false) == 1);
+	site.server_.server.SetName(GetTextElement_Trimmed(node, "Name"));
 
-	if (server.server.GetName().empty()) {
-		server.server.SetName(GetTextElement_Trimmed(node));
+	if (site.server_.server.GetName().empty()) {
+		site.server_.server.SetName(GetTextElement_Trimmed(node));
 	}
 
 	for (auto parameter = node.child("Parameter"); parameter; parameter = parameter.next_sibling("Parameter")) {
-		server.server.SetExtraParameter(parameter.attribute("Name").value(), GetTextElement(parameter));
+		site.server_.server.SetExtraParameter(parameter.attribute("Name").value(), GetTextElement(parameter));
 	}
 
 	return true;

@@ -86,7 +86,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site, std::wstring const& n
 		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, name);
 	}
 
-	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.server_.Format(ServerFormat::with_optional_port));
+	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
 
 	XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server_.server.GetUser());
 
@@ -158,7 +158,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_REMEMBER", wxCheckBox), canRemember, true);
 		XRCCTRL(pwdDlg, "ID_CHALLENGE", wxTextCtrl)->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 	}
-	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.server_.Format(ServerFormat::with_optional_port));
+	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
 
 	if (site.server_.server.GetUser().empty()) {
 		XRCCTRL(pwdDlg, "ID_OLD_USER_LABEL", wxStaticText)->Hide();

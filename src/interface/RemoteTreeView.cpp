@@ -1477,7 +1477,7 @@ void CRemoteTreeView::OnMenuGeturl(wxCommandEvent& event)
 		return;
 	}
 
-	wxString url = site.server_.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
+	std::wstring url = site.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
 
 	std::wstring const pathPart = fz::percent_encode_w(path.GetPath(), true);
 	if (!pathPart.empty() && pathPart[0] != '/') {

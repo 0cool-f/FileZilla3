@@ -558,7 +558,7 @@ public:
 			data->server_.credentials.logonType_ == LogonType::normal)
 		{
 			// Clear saved password
-			data->server_.SetLogonType(LogonType::ask);
+			data->SetLogonType(LogonType::ask);
 			data->server_.credentials.SetPass(std::wstring());
 		}
 
