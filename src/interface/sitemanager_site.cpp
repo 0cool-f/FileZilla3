@@ -528,7 +528,7 @@ bool CSiteManagerSite::Verify(bool predefined)
 	// Set selected type
 	Site site;
 	site.SetLogonType(logon_type);
-	site.server_.server.SetProtocol(protocol);
+	site.server.SetProtocol(protocol);
 
 	std::wstring port = xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring();
 	CServerPath path;
@@ -540,14 +540,14 @@ bool CSiteManagerSite::Verify(bool predefined)
 	}
 
 	XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site.Format(ServerFormat::host_only));
-	if (site.server_.server.GetPort() != CServer::GetDefaultPort(site.server_.server.GetProtocol())) {
-		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), site.server_.server.GetPort()));
+	if (site.server.GetPort() != CServer::GetDefaultPort(site.server.GetProtocol())) {
+		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), site.server.GetPort()));
 	}
 	else {
 		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString());
 	}
 
-	SetProtocol(site.server_.server.GetProtocol());
+	SetProtocol(site.server.GetProtocol());
 
 	if (XRCCTRL(*this, "ID_CHARSET_CUSTOM", wxRadioButton)->GetValue()) {
 		if (XRCCTRL(*this, "ID_ENCODING", wxTextCtrl)->GetValue().empty()) {
@@ -688,7 +688,7 @@ void CSiteManagerSite::UpdateSite(Site &site)
 {
 	ServerProtocol const protocol = GetProtocol();
 	wxASSERT(protocol != UNKNOWN);
-	site.server_.server.SetProtocol(protocol);
+	site.server.SetProtocol(protocol);
 
 	unsigned long port;
 	if (!xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToULong(&port) || !port || port > 65535) {
@@ -699,7 +699,7 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	if (!host.empty() && host[0] == '[') {
 		host = host.substr(1, host.size() - 2);
 	}
-	site.server_.server.SetHost(host, port);
+	site.server.SetHost(host, port);
 
 	auto logon_type = GetLogonType();
 	site.SetLogonType(logon_type);
@@ -729,11 +729,11 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	site.m_colour = CSiteManager::GetColourFromIndex(xrc_call(*this, "ID_COLOR", &wxChoice::GetSelection));
 
 	std::wstring const serverType = xrc_call(*this, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
-	site.server_.server.SetType(CServer::GetServerTypeFromName(serverType));
+	site.server.SetType(CServer::GetServerTypeFromName(serverType));
 
 	site.m_default_bookmark.m_localDir = xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
 	site.m_default_bookmark.m_remoteDir = CServerPath();
-	site.m_default_bookmark.m_remoteDir.SetType(site.server_.server.GetType());
+	site.m_default_bookmark.m_remoteDir.SetType(site.server.GetType());
 	site.m_default_bookmark.m_remoteDir.SetPath(xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
 	site.m_default_bookmark.m_sync = xrc_call(*this, "ID_SYNC", &wxCheckBox::GetValue);
 	site.m_default_bookmark.m_comparison = xrc_call(*this, "ID_COMPARISON", &wxCheckBox::GetValue);
@@ -741,43 +741,43 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	int hours = xrc_call(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::GetValue);
 	int minutes = xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::GetValue);
 
-	site.server_.server.SetTimezoneOffset(hours * 60 + minutes);
+	site.server.SetTimezoneOffset(hours * 60 + minutes);
 
 	if (xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::GetValue)) {
-		site.server_.server.SetPasvMode(MODE_ACTIVE);
+		site.server.SetPasvMode(MODE_ACTIVE);
 	}
 	else if (xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::GetValue)) {
-		site.server_.server.SetPasvMode(MODE_PASSIVE);
+		site.server.SetPasvMode(MODE_PASSIVE);
 	}
 	else {
-		site.server_.server.SetPasvMode(MODE_DEFAULT);
+		site.server.SetPasvMode(MODE_DEFAULT);
 	}
 
 	if (xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::GetValue)) {
-		site.server_.server.MaximumMultipleConnections(xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::GetValue));
+		site.server.MaximumMultipleConnections(xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::GetValue));
 	}
 	else {
-		site.server_.server.MaximumMultipleConnections(0);
+		site.server.MaximumMultipleConnections(0);
 	}
 
 	if (xrc_call(*this, "ID_CHARSET_UTF8", &wxRadioButton::GetValue))
-		site.server_.server.SetEncodingType(ENCODING_UTF8);
+		site.server.SetEncodingType(ENCODING_UTF8);
 	else if (xrc_call(*this, "ID_CHARSET_CUSTOM", &wxRadioButton::GetValue)) {
 		std::wstring encoding = xrc_call(*this, "ID_ENCODING", &wxTextCtrl::GetValue).ToStdWstring();
-		site.server_.server.SetEncodingType(ENCODING_CUSTOM, encoding);
+		site.server.SetEncodingType(ENCODING_CUSTOM, encoding);
 	}
 	else {
-		site.server_.server.SetEncodingType(ENCODING_AUTO);
+		site.server.SetEncodingType(ENCODING_AUTO);
 	}
 
 	if (xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::GetValue)) {
-		site.server_.server.SetBypassProxy(true);
+		site.server.SetBypassProxy(true);
 	}
 	else {
-		site.server_.server.SetBypassProxy(false);
+		site.server.SetBypassProxy(false);
 	}
 
-	UpdateExtraParameters(site.server_.server);
+	UpdateExtraParameters(site.server);
 }
 
 void CSiteManagerSite::UpdateExtraParameters(CServer & server)
@@ -864,18 +864,18 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 	}
 	else {
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
-		unsigned int port = site.server_.server.GetPort();
+		unsigned int port = site.server.GetPort();
 
-		if (port != CServer::GetDefaultPort(site.server_.server.GetProtocol())) {
+		if (port != CServer::GetDefaultPort(site.server.GetProtocol())) {
 			xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString::Format(_T("%d"), port));
 		}
 		else {
 			xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
 		}
 
-		ServerProtocol protocol = site.server_.server.GetProtocol();
+		ServerProtocol protocol = site.server.GetProtocol();
 		SetProtocol(protocol);
-		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, site.server_.server.GetBypassProxy());
+		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, site.server.GetBypassProxy());
 
 		LogonType const logonType = site.credentials.logonType_;
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
@@ -883,7 +883,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		SetControlVisibility(protocol, logonType);
 		SetLogonTypeCtrlState();
 
-		xrc_call(*this, "ID_USER", &wxTextCtrl::ChangeValue, site.server_.server.GetUser());
+		xrc_call(*this, "ID_USER", &wxTextCtrl::ChangeValue, site.server.GetUser());
 		xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.credentials.account_);
 
 		std::wstring pass = site.credentials.GetPass();
@@ -924,22 +924,22 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			}
 		}
 
-		SetExtraParameters(site.server_.server);
+		SetExtraParameters(site.server);
 
 		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.credentials.keyFile_);
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.comments_);
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site.m_colour));
 
-		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server_.server.GetType());
+		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server.GetType());
 		xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_localDir);
 		xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_remoteDir.GetPath());
 		xrc_call(*this, "ID_SYNC", &wxCheckBox::SetValue, site.m_default_bookmark.m_sync);
 		xrc_call(*this, "ID_COMPARISON", &wxCheckBox::SetValue, site.m_default_bookmark.m_comparison);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server_.server.GetTimezoneOffset() / 60);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server_.server.GetTimezoneOffset() % 60);
+		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() / 60);
+		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() % 60);
 
-		if (CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::TransferMode)) {
-			PasvMode pasvMode = site.server_.server.GetPasvMode();
+		if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
+			PasvMode pasvMode = site.server.GetPasvMode();
 			if (pasvMode == MODE_ACTIVE) {
 				xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::SetValue, true);
 			}
@@ -951,7 +951,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			}
 		}
 
-		int const maxMultiple = site.server_.server.MaximumMultipleConnections();
+		int const maxMultiple = site.server.MaximumMultipleConnections();
 		xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, maxMultiple != 0);
 		if (maxMultiple != 0) {
 			xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined);
@@ -962,7 +962,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			xrc_call<wxSpinCtrl, int>(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
 		}
 
-		switch (site.server_.server.GetEncodingType()) {
+		switch (site.server.GetEncodingType()) {
 		default:
 		case ENCODING_AUTO:
 			xrc_call(*this, "ID_CHARSET_AUTO", &wxRadioButton::SetValue, true);
@@ -974,8 +974,8 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			xrc_call(*this, "ID_CHARSET_CUSTOM", &wxRadioButton::SetValue, true);
 			break;
 		}
-		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::Enable, !predefined && site.server_.server.GetEncodingType() == ENCODING_CUSTOM);
-		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::ChangeValue, site.server_.server.GetCustomEncoding());
+		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::Enable, !predefined && site.server.GetEncodingType() == ENCODING_CUSTOM);
+		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::ChangeValue, site.server.GetCustomEncoding());
 	}
 }
 

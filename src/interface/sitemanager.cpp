@@ -53,7 +53,7 @@ bool Bookmark::operator==(Bookmark const& b) const
 
 bool Site::operator==(Site const& s) const
 {
-	if (server_.server != s.server_.server) {
+	if (server != s.server) {
 		return false;
 	}
 
@@ -192,7 +192,7 @@ std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
 	if (!::GetServer(element, *data)) {
 		return 0;
 	}
-	if (data->server_.server.GetName().empty()) {
+	if (data->server.GetName().empty()) {
 		return 0;
 	}
 
@@ -270,12 +270,12 @@ public:
 
 	virtual bool AddSite(std::unique_ptr<Site> data)
 	{
-		wxString newName(data->server_.server.GetName());
+		wxString newName(data->server.GetName());
 		int i = GetInsertIndex(m_pMenu, newName);
 		newName.Replace(_T("&"), _T("&&"));
 		wxMenuItem* pItem = m_pMenu->Insert(i, wxID_ANY, newName);
 
-		data->SetSitePath(path + _T("/") + CSiteManager::EscapeSegment(data->server_.server.GetName()));
+		data->SetSitePath(path + _T("/") + CSiteManager::EscapeSegment(data->server.GetName()));
 
 		(*m_idMap)[pItem->GetId()] = std::move(data);
 
@@ -652,7 +652,7 @@ std::wstring CSiteManager::AddServer(Site site)
 		name = _("New site").ToStdWstring() + fz::sprintf(L" %d", ++i);
 	}
 
-	site.server_.server.SetName(name);
+	site.server.SetName(name);
 
 	auto xServer = element.append_child("Server");
 	SetServer(xServer, site);

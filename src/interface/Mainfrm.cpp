@@ -2029,7 +2029,7 @@ void CMainFrame::OnSitemanagerDropdown(wxCommandEvent& event)
 bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pState)
 {
 	// First check if we need to ask user for a password
-	if (!CLoginManager::Get().GetPassword(data, false, data.server_.server.GetName())) {
+	if (!CLoginManager::Get().GetPassword(data, false, data.server.GetName())) {
 		return false;
 	}
 

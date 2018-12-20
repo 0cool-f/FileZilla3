@@ -725,7 +725,7 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 		}
 
 		CServerPath path;
-		path.SetType(site.server_.server.GetType());
+		path.SetType(site.server.GetType());
 		if (!path.SetPath(xrc_call(*this, "ID_PATH", &wxTextCtrl::GetValue).ToStdWstring()) || path.empty()) {
 			wxMessageBoxEx(_("Need to enter valid remote path"), _("Remote file search"), wxICON_EXCLAMATION);
 			return;

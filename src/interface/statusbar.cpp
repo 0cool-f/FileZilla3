@@ -392,7 +392,7 @@ void CStatusBar::DisplayDataType()
 		site = pState->GetSite();
 	}
 
-	if (!site || !CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::DataTypeConcept)) {
+	if (!site || !CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::DataTypeConcept)) {
 		if (m_pDataTypeIndicator) {
 			RemoveField(widget_datatype);
 			m_pDataTypeIndicator->Destroy();
@@ -459,7 +459,7 @@ void CStatusBar::DisplayEncrypted()
 	bool encrypted = false;
 	if (site) {
 		CCertificateNotification* info;
-		auto const protocol = site.server_.server.GetProtocol();
+		auto const protocol = site.server.GetProtocol();
 		if (protocol == FTPS || protocol == FTPES || protocol == SFTP || protocol == S3||
 				protocol == WEBDAV || protocol == AZURE_BLOB || protocol == AZURE_FILE ||
 				protocol == SWIFT || protocol == GOOGLE_CLOUD || protocol == GOOGLE_DRIVE) {

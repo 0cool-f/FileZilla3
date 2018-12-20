@@ -205,7 +205,7 @@ void CContextManager::ProcessDirectoryListing(CServer const& server, std::shared
 		if (state == exempt) {
 			continue;
 		}
-		if (state->GetSite() && state->GetSite().server_.server == server) {
+		if (state->GetSite() && state->GetSite().server == server) {
 			state->SetRemoteDir(listing, false);
 		}
 	}
@@ -511,7 +511,7 @@ void CState::SetSite(Site const& site, CServerPath const& path)
 		if (!path.empty()) {
 			m_last_path = path;
 		}
-		else if (m_last_site.server_.server != site.server_.server) {
+		else if (m_last_site.server != site.server) {
 			m_last_path.clear();
 		}
 		m_last_site = site;
@@ -550,7 +550,7 @@ bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 	m_pRemoteRecursiveOperation->StopRecursiveOperation();
 	SetSyncBrowse(false);
 
-	m_pCommandQueue->ProcessCommand(new CConnectCommand(site.server_.server, site.Handle(), site.credentials));
+	m_pCommandQueue->ProcessCommand(new CConnectCommand(site.server, site.Handle(), site.credentials));
 	m_pCommandQueue->ProcessCommand(new CListCommand(path, std::wstring(), LIST_FLAG_FALLBACK_CURRENT));
 
 	SetSite(site, path);
@@ -1330,14 +1330,14 @@ void CState::UpdateSite(wxString const& oldPath, Site const& newSite)
 
 	bool changed = false;
 	if (m_site && m_site != newSite) {
-		if (m_site.SitePath() == oldPath && m_site.server_.server == newSite.server_.server) {
+		if (m_site.SitePath() == oldPath && m_site.server == newSite.server) {
 			// Update handles
 			m_site.Update(newSite);
 			changed = true;
 		}
 	}
 	if (m_last_site && m_last_site != newSite) {
-		if (m_last_site.SitePath() == oldPath && m_last_site.server_.server == newSite.server_.server) {
+		if (m_last_site.SitePath() == oldPath && m_last_site.server == newSite.server) {
 			m_last_site.Update(newSite);
 			if (!m_site) {
 				// Active site has precedence over historic data
@@ -1402,7 +1402,7 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 void CState::UpdateTitle()
 {
 	if (m_site) {
-		wxString const& name = m_site.server_.server.GetName();
+		wxString const& name = m_site.server.GetName();
 		m_title.clear();
 		if (!name.empty()) {
 			m_title = name + _T(" - ");

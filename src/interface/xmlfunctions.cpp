@@ -303,7 +303,7 @@ bool GetServer(pugi::xml_node node, Site & site)
 		return false;
 	}
 
-	if (!site.server_.server.SetHost(host, port)) {
+	if (!site.server.SetHost(host, port)) {
 		return false;
 	}
 
@@ -311,14 +311,14 @@ bool GetServer(pugi::xml_node node, Site & site)
 	if (protocol < 0 || protocol > ServerProtocol::MAX_VALUE) {
 		return false;
 	}
-	site.server_.server.SetProtocol(static_cast<ServerProtocol>(protocol));
+	site.server.SetProtocol(static_cast<ServerProtocol>(protocol));
 
 	int type = GetTextElementInt(node, "Type");
 	if (type < 0 || type >= SERVERTYPE_MAX) {
 		return false;
 	}
 
-	site.server_.server.SetType(static_cast<ServerType>(type));
+	site.server.SetType(static_cast<ServerType>(type));
 
 	int logonType = GetTextElementInt(node, "Logontype");
 	if (logonType < 0 || logonType >= static_cast<int>(LogonType::count)) {
@@ -375,45 +375,45 @@ bool GetServer(pugi::xml_node node, Site & site)
 	}
 
 	int timezoneOffset = GetTextElementInt(node, "TimezoneOffset");
-	if (!site.server_.server.SetTimezoneOffset(timezoneOffset)) {
+	if (!site.server.SetTimezoneOffset(timezoneOffset)) {
 		return false;
 	}
 
 	wxString pasvMode = GetTextElement(node, "PasvMode");
 	if (pasvMode == _T("MODE_PASSIVE")) {
-		site.server_.server.SetPasvMode(MODE_PASSIVE);
+		site.server.SetPasvMode(MODE_PASSIVE);
 	}
 	else if (pasvMode == _T("MODE_ACTIVE")) {
-		site.server_.server.SetPasvMode(MODE_ACTIVE);
+		site.server.SetPasvMode(MODE_ACTIVE);
 	}
 	else {
-		site.server_.server.SetPasvMode(MODE_DEFAULT);
+		site.server.SetPasvMode(MODE_DEFAULT);
 	}
 
 	int maximumMultipleConnections = GetTextElementInt(node, "MaximumMultipleConnections");
-	site.server_.server.MaximumMultipleConnections(maximumMultipleConnections);
+	site.server.MaximumMultipleConnections(maximumMultipleConnections);
 
 	wxString encodingType = GetTextElement(node, "EncodingType");
 	if (encodingType == _T("Auto")) {
-		site.server_.server.SetEncodingType(ENCODING_AUTO);
+		site.server.SetEncodingType(ENCODING_AUTO);
 	}
 	else if (encodingType == _T("UTF-8")) {
-		site.server_.server.SetEncodingType(ENCODING_UTF8);
+		site.server.SetEncodingType(ENCODING_UTF8);
 	}
 	else if (encodingType == _T("Custom")) {
 		std::wstring customEncoding = GetTextElement(node, "CustomEncoding");
 		if (customEncoding.empty()) {
 			return false;
 		}
-		if (!site.server_.server.SetEncodingType(ENCODING_CUSTOM, customEncoding)) {
+		if (!site.server.SetEncodingType(ENCODING_CUSTOM, customEncoding)) {
 			return false;
 		}
 	}
 	else {
-		site.server_.server.SetEncodingType(ENCODING_AUTO);
+		site.server.SetEncodingType(ENCODING_AUTO);
 	}
 
-	if (CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
 		std::vector<std::wstring> postLoginCommands;
 		auto element = node.child("PostLoginCommands");
 		if (element) {
@@ -424,20 +424,20 @@ bool GetServer(pugi::xml_node node, Site & site)
 				}
 			}
 		}
-		if (!site.server_.server.SetPostLoginCommands(postLoginCommands)) {
+		if (!site.server.SetPostLoginCommands(postLoginCommands)) {
 			return false;
 		}
 	}
 
-	site.server_.server.SetBypassProxy(GetTextElementInt(node, "BypassProxy", false) == 1);
-	site.server_.server.SetName(GetTextElement_Trimmed(node, "Name"));
+	site.server.SetBypassProxy(GetTextElementInt(node, "BypassProxy", false) == 1);
+	site.server.SetName(GetTextElement_Trimmed(node, "Name"));
 
-	if (site.server_.server.GetName().empty()) {
-		site.server_.server.SetName(GetTextElement_Trimmed(node));
+	if (site.server.GetName().empty()) {
+		site.server.SetName(GetTextElement_Trimmed(node));
 	}
 
 	for (auto parameter = node.child("Parameter"); parameter; parameter = parameter.next_sibling("Parameter")) {
-		site.server_.server.SetExtraParameter(parameter.attribute("Name").value(), GetTextElement(parameter));
+		site.server.SetExtraParameter(parameter.attribute("Name").value(), GetTextElement(parameter));
 	}
 
 	return true;
@@ -445,7 +445,6 @@ bool GetServer(pugi::xml_node node, Site & site)
 
 void SetServer(pugi::xml_node node, Site const& site)
 {
-	auto const& server = site.server_;
 	if (!node) {
 		return;
 	}
@@ -454,17 +453,17 @@ void SetServer(pugi::xml_node node, Site const& site)
 		node.remove_child(child);
 	}
 
-	ServerProtocol const protocol = server.server.GetProtocol();
+	ServerProtocol const protocol = site.server.GetProtocol();
 
-	AddTextElement(node, "Host", server.server.GetHost());
-	AddTextElement(node, "Port", server.server.GetPort());
+	AddTextElement(node, "Host", site.server.GetHost());
+	AddTextElement(node, "Port", site.server.GetPort());
 	AddTextElement(node, "Protocol", protocol);
-	AddTextElement(node, "Type", server.server.GetType());
+	AddTextElement(node, "Type", site.server.GetType());
 
 	ProtectedCredentials credentials = site.credentials;
 
 	if (credentials.logonType_ != LogonType::anonymous) {
-		AddTextElement(node, "User", server.server.GetUser());
+		AddTextElement(node, "User", site.server.GetUser());
 
 		credentials.Protect();
 
@@ -495,8 +494,8 @@ void SetServer(pugi::xml_node node, Site const& site)
 	}
 	AddTextElement(node, "Logontype", static_cast<int>(credentials.logonType_));
 
-	AddTextElement(node, "TimezoneOffset", server.server.GetTimezoneOffset());
-	switch (server.server.GetPasvMode())
+	AddTextElement(node, "TimezoneOffset", site.server.GetTimezoneOffset());
+	switch (site.server.GetPasvMode())
 	{
 	case MODE_PASSIVE:
 		AddTextElementUtf8(node, "PasvMode", "MODE_PASSIVE");
@@ -508,9 +507,9 @@ void SetServer(pugi::xml_node node, Site const& site)
 		AddTextElementUtf8(node, "PasvMode", "MODE_DEFAULT");
 		break;
 	}
-	AddTextElement(node, "MaximumMultipleConnections", server.server.MaximumMultipleConnections());
+	AddTextElement(node, "MaximumMultipleConnections", site.server.MaximumMultipleConnections());
 
-	switch (server.server.GetEncodingType())
+	switch (site.server.GetEncodingType())
 	{
 	case ENCODING_AUTO:
 		AddTextElementUtf8(node, "EncodingType", "Auto");
@@ -520,12 +519,12 @@ void SetServer(pugi::xml_node node, Site const& site)
 		break;
 	case ENCODING_CUSTOM:
 		AddTextElementUtf8(node, "EncodingType", "Custom");
-		AddTextElement(node, "CustomEncoding", server.server.GetCustomEncoding());
+		AddTextElement(node, "CustomEncoding", site.server.GetCustomEncoding());
 		break;
 	}
 
-	if (CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
-		std::vector<std::wstring> const& postLoginCommands = server.server.GetPostLoginCommands();
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
+		std::vector<std::wstring> const& postLoginCommands = site.server.GetPostLoginCommands();
 		if (!postLoginCommands.empty()) {
 			auto element = node.append_child("PostLoginCommands");
 			for (auto const& command : postLoginCommands) {
@@ -534,13 +533,13 @@ void SetServer(pugi::xml_node node, Site const& site)
 		}
 	}
 
-	AddTextElementUtf8(node, "BypassProxy", server.server.GetBypassProxy() ? "1" : "0");
-	std::wstring const& name = server.server.GetName();
+	AddTextElementUtf8(node, "BypassProxy", site.server.GetBypassProxy() ? "1" : "0");
+	std::wstring const& name = site.server.GetName();
 	if (!name.empty()) {
 		AddTextElement(node, "Name", name);
 	}
 
-	for (auto const& parameter : server.server.GetExtraParameters()) {
+	for (auto const& parameter : site.server.GetExtraParameters()) {
 		auto element = AddTextElement(node, "Parameter", parameter.second);
 		SetTextAttribute(element, "Name", parameter.first);
 	}

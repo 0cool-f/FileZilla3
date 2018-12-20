@@ -60,7 +60,7 @@ void CRecentServerList::SetMostRecentServer(Site const& site)
 
 	bool relocated = false;
 	for (auto iter = mostRecentServers.begin(); iter != mostRecentServers.end(); ++iter) {
-		if (iter->server_.server == site.server_.server) {
+		if (iter->server == site.server) {
 			mostRecentServers.erase(iter);
 			mostRecentServers.push_front(site);
 			relocated = true;

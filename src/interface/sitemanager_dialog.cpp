@@ -562,7 +562,7 @@ public:
 			data->credentials.SetPass(std::wstring());
 		}
 
-		const wxString name(data->server_.server.GetName());
+		const wxString name(data->server.GetName());
 
 		CSiteManagerItemData* pData = new CSiteManagerItemData(std::move(data));
 		wxTreeItemId newItem = m_pTree->AppendItem(m_item, name, 2, 2, pData);
@@ -809,7 +809,7 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 		CSiteManager::Save(node, *data->m_site);
 
 		if (data->connected_item != -1) {
-			if ((*m_connected_sites)[data->connected_item].site.server_.server == data->m_site->server_.server) {
+			if ((*m_connected_sites)[data->connected_item].site.server == data->m_site->server) {
 				(*m_connected_sites)[data->connected_item].new_path = GetSitePath(child);
 				(*m_connected_sites)[data->connected_item].site = *data->m_site;
 			}
@@ -885,12 +885,12 @@ bool CSiteManagerDialog::Verify()
 		const wxString remotePathRaw = XRCCTRL(*this, "ID_BOOKMARK_REMOTEDIR", wxTextCtrl)->GetValue();
 		if (!remotePathRaw.empty()) {
 			CServerPath remotePath;
-			remotePath.SetType(pServer->m_site->server_.server.GetType());
+			remotePath.SetType(pServer->m_site->server.GetType());
 			if (!remotePath.SetPath(remotePathRaw.ToStdWstring())) {
 				XRCCTRL(*this, "ID_BOOKMARK_REMOTEDIR", wxTextCtrl)->SetFocus();
 				wxString msg;
-				if (pServer->m_site->server_.server.GetType() != DEFAULT) {
-					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the servertype (%s) selected on the parent site."), CServer::GetNameFromServerType(pServer->m_site->server_.server.GetType()));
+				if (pServer->m_site->server.GetType() != DEFAULT) {
+					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the servertype (%s) selected on the parent site."), CServer::GetNameFromServerType(pServer->m_site->server.GetType()));
 				}
 				else {
 					msg = _("Remote path cannot be parsed. Make sure it is a valid absolute path.");
@@ -1079,7 +1079,7 @@ void CSiteManagerDialog::OnNewSite(wxCommandEvent&)
 	}
 
 	Site site;
-	site.server_.server.SetProtocol(ServerProtocol::FTP);
+	site.server.SetProtocol(ServerProtocol::FTP);
 	AddNewSite(item, site);
 }
 
@@ -1124,7 +1124,7 @@ bool CSiteManagerDialog::UpdateBookmark(Bookmark &bookmark, Site const& site)
 {
 	bookmark.m_localDir = xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
 	bookmark.m_remoteDir = CServerPath();
-	bookmark.m_remoteDir.SetType(site.server_.server.GetType());
+	bookmark.m_remoteDir.SetType(site.server.GetType());
 	bookmark.m_remoteDir.SetPath(xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
 	bookmark.m_sync = xrc_call(*this, "ID_BOOKMARK_SYNC", &wxCheckBox::GetValue);
 	bookmark.m_comparison = xrc_call(*this, "ID_BOOKMARK_COMPARISON", &wxCheckBox::GetValue);
@@ -1136,7 +1136,7 @@ void CSiteManagerDialog::UpdateServer(Site & site, const wxString &name)
 {
 	m_pNotebook_Site->UpdateSite(site);
 
-	site.server_.server.SetName(name.ToStdWstring());
+	site.server.SetName(name.ToStdWstring());
 }
 
 bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)

@@ -426,7 +426,7 @@ void CStatusView::OnContextMenu(wxContextMenuEvent&)
 	if (pState) {
 		auto pItem = menu.FindItem(XRCID("ID_MENU_SERVER_CMD"));
 		Site const& site = pState->GetSite();
-		if (!site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::EnterCommand)) {
+		if (!site || CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::EnterCommand)) {
 			pItem->Enable(true);
 		}
 		else {

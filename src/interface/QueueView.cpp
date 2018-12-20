@@ -102,7 +102,7 @@ public:
 				return wxDragNone;
 			}
 
-			if (site.server_.server != m_pRemoteDataObject->GetSite().server_.server) {
+			if (site.server != m_pRemoteDataObject->GetSite().server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}
@@ -272,7 +272,7 @@ bool CQueueView::QueueFile(const bool queueOnly, const bool download,
 	}
 	else {
 		fileItem = new CFileItem(pServerItem, queueOnly, download, sourceFile, targetFile, localPath, remotePath, size);
-		if (site.server_.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
+		if (site.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
 			if (download) {
 				fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(sourceFile, remotePath.GetType()));
 			}
@@ -327,7 +327,7 @@ bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, c
 
 	std::vector<CRemoteDataObject::t_fileInfo> const& files = dataObject.GetFiles();
 
-	bool const hasDataTypeConcept = dataObject.GetSite().server_.server.HasFeature(ProtocolFeature::DataTypeConcept);
+	bool const hasDataTypeConcept = dataObject.GetSite().server.HasFeature(ProtocolFeature::DataTypeConcept);
 
 	for (auto const& fileInfo : files) {
 		if (fileInfo.dir) {
@@ -365,7 +365,7 @@ bool CQueueView::QueueFiles(const bool queueOnly, Site const& site, CLocalRecurs
 		InsertItem(pServerItem, fileItem);
 	}
 	else {
-		bool const hasDataTypeConcept = site.server_.server.HasFeature(ProtocolFeature::DataTypeConcept);
+		bool const hasDataTypeConcept = site.server.HasFeature(ProtocolFeature::DataTypeConcept);
 
 		for (auto const& file : files) {
 			CFileItem* fileItem = new CFileItem(pServerItem, queueOnly, false,
@@ -510,7 +510,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 			if (!listingNotification.GetPath().empty() && !listingNotification.Failed() && pEngineData->pEngine) {
 				std::shared_ptr<CDirectoryListing> pListing = std::make_shared<CDirectoryListing>();
 				if (pEngineData->pEngine->CacheLookup(listingNotification.GetPath(), *pListing) == FZ_REPLY_OK) {
-					CContextManager::Get()->ProcessDirectoryListing(pEngineData->lastSite.server_.server, pListing, 0);
+					CContextManager::Get()->ProcessDirectoryListing(pEngineData->lastSite.server, pListing, 0);
 				}
 			}
 		}
@@ -523,7 +523,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData *&pEngineData)
 {
 	Site const& site = server_item.GetSite();
-	const int max_count = site.server_.server.MaximumMultipleConnections();
+	const int max_count = site.server.MaximumMultipleConnections();
 	if (!max_count) {
 		return true;
 	}
@@ -538,7 +538,7 @@ bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData 
 			continue;
 		}
 
-		if (browsingSite.server_.server == site.server_.server) {
+		if (browsingSite.server == site.server) {
 			++active_count;
 			browsingStateOnSameServer = pState;
 			break;
@@ -827,7 +827,7 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 		}
 		else {
 			if (replyCode & FZ_REPLY_PASSWORDFAILED) {
-				CLoginManager::Get().CachedPasswordFailed(pEngineData->lastSite.server_.server);
+				CLoginManager::Get().CachedPasswordFailed(pEngineData->lastSite.server);
 			}
 
 			if ((replyCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
@@ -1224,7 +1224,7 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			engineData.pItem->SetStatusMessage(CFileItem::Status::connecting);
 			RefreshItem(engineData.pItem);
 
-			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastSite.server_.server, engineData.lastSite.server_.handle_, engineData.lastSite.credentials, false));
+			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastSite.server, engineData.lastSite.server_.handle_, engineData.lastSite.credentials, false));
 
 			wxASSERT((res & FZ_REPLY_BUSY) != FZ_REPLY_BUSY);
 			if (res == FZ_REPLY_WOULDBLOCK) {
@@ -2359,7 +2359,7 @@ void CQueueView::TryRefreshListings()
 			continue;
 		}
 
-		if (m_last_refresh_server == site.server_.server && m_last_refresh_path == pListing->path &&
+		if (m_last_refresh_server == site.server && m_last_refresh_path == pListing->path &&
 			m_last_refresh_listing_time == pListing->m_firstListTime)
 		{
 			// Do not try to refresh same directory multiple times
@@ -2375,7 +2375,7 @@ void CQueueView::TryRefreshListings()
 			continue;
 		}
 
-		m_last_refresh_server = site.server_.server;
+		m_last_refresh_server = site.server;
 		m_last_refresh_path = pListing->path;
 		m_last_refresh_listing_time = pListing->m_firstListTime;
 
@@ -2653,7 +2653,7 @@ void CQueueView::OnExclusiveEngineRequestGranted(wxCommandEvent& event)
 
 	wxASSERT(pServerItem);
 
-	if (!currentSite || currentSite.server_.server != pServerItem->GetSite().server_.server) {
+	if (!currentSite || currentSite.server != pServerItem->GetSite().server) {
 		if (pState->m_pCommandQueue) {
 			pState->m_pCommandQueue->ReleaseEngine();
 		}

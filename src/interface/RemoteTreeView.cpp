@@ -99,7 +99,7 @@ public:
 				return wxDragNone;
 			}
 
-			if (!m_pRemoteTreeView->m_state.GetSite() || m_pRemoteDataObject->GetSite().server_.server != m_pRemoteTreeView->m_state.GetSite().server_.server) {
+			if (!m_pRemoteTreeView->m_state.GetSite() || m_pRemoteDataObject->GetSite().server != m_pRemoteTreeView->m_state.GetSite().server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}
@@ -918,7 +918,7 @@ void CRemoteTreeView::OnContextMenu(wxTreeEvent& event)
 	menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
 	menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
 
-	auto const protocol = m_state.GetSite().server_.server.GetProtocol();
+	auto const protocol = m_state.GetSite().server.GetProtocol();
 	bool const hasChmod = protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP || protocol == SFTP;
 
 	if (hasChmod) {
@@ -1124,7 +1124,7 @@ void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
 	bool const hasParent = pathToDelete.HasParent();
 
 	CFilterManager filter;
-	if (CServer::ProtocolHasFeature(m_state.GetSite().server_.server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
+	if (CServer::ProtocolHasFeature(m_state.GetSite().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
 		if (hasParent) {
 			std::wstring const name = GetItemText(m_contextMenuItem).ToStdWstring();
 			m_state.m_pCommandQueue->ProcessCommand(new CRemoveDirCommand(pathToDelete.GetParent(), name));

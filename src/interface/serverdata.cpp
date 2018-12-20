@@ -21,7 +21,7 @@ bool Site::ParseUrl(std::wstring const& host, std::wstring const& port, std::wst
 
 bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std::wstring pass, std::wstring &error, CServerPath &path, ServerProtocol const hint)
 {
-	server_.server.SetType(DEFAULT);
+	server.SetType(DEFAULT);
 
 	if (host.empty()) {
 		error = fztranslate("No host given, please enter a host.");
@@ -40,7 +40,7 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 			error = fztranslate("Invalid protocol specified. Valid protocols are:\nftp:// for normal FTP with optional encryption,\nsftp:// for SSH file transfer protocol,\nftps:// for FTP over TLS (implicit) and\nftpes:// for FTP over TLS (explicit).");
 			return false;
 		}
-		server_.server.SetProtocol(p);
+		server.SetProtocol(p);
 	}
 
 	pos = host.find('@');
@@ -123,7 +123,7 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 	}
 	else {
 		if (!port) {
-			port = CServer::GetDefaultPort(server_.server.GetProtocol());
+			port = CServer::GetDefaultPort(server.GetProtocol());
 		}
 	}
 
@@ -143,7 +143,7 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 		host = host.substr(1, host.size() - 2);
 	}
 
-	server_.server.SetHost(host, port);
+	server.SetHost(host, port);
 
 	credentials.account_.clear();
 
@@ -167,11 +167,11 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 		user.clear();
 		pass.clear();
 	}
-	server_.server.SetUser(user);
+	server.SetUser(user);
 	credentials.SetPass(pass);
 
-	if (server_.server.GetProtocol() == UNKNOWN) {
-		server_.server.SetProtocol(CServer::GetProtocolFromPort(port));
+	if (server.GetProtocol() == UNKNOWN) {
+		server.SetProtocol(CServer::GetProtocolFromPort(port));
 	}
 
 	return true;
@@ -181,17 +181,17 @@ void Site::SetLogonType(LogonType logonType)
 {
 	credentials.logonType_ = logonType;
 	if (logonType == LogonType::anonymous) {
-		server_.server.SetUser(L"");
+		server.SetUser(L"");
 	}
 }
 
 void Site::SetUser(std::wstring const& user)
 {
 	if (credentials.logonType_ == LogonType::anonymous) {
-		server_.server.SetUser(L"");
+		server.SetUser(L"");
 	}
 	else {
-		server_.server.SetUser(user);
+		server.SetUser(user);
 	}
 }
 

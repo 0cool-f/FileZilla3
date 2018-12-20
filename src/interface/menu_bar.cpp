@@ -605,9 +605,9 @@ void CMenuBar::UpdateMenubarState()
 	}
 	Enable(XRCID("ID_MENU_SERVER_RECONNECT"), canReconnect);
 
-	Enable(XRCID("ID_MENU_TRANSFER_TYPE"), !site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::DataTypeConcept));
-	Enable(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), !site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::PreserveTimestamp));
-	Enable(XRCID("ID_MENU_SERVER_CMD"), !site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::EnterCommand));
+	Enable(XRCID("ID_MENU_TRANSFER_TYPE"), !site || CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::DataTypeConcept));
+	Enable(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), !site || CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::PreserveTimestamp));
+	Enable(XRCID("ID_MENU_SERVER_CMD"), !site || CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::EnterCommand));
 }
 
 bool CMenuBar::ShowItem(int id)

@@ -123,7 +123,7 @@ public:
 			}
 
 			auto & state = m_pLocalTreeView->m_state;
-			if (!state.GetSite() || m_pRemoteDataObject->GetSite().server_.server != state.GetSite().server_.server) {
+			if (!state.GetSite() || m_pRemoteDataObject->GetSite().server != state.GetSite().server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}

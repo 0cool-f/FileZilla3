@@ -108,7 +108,7 @@ void CManualTransfer::SetAutoAsciiState()
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Hide();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
-		else if (CAutoAsciiFiles::TransferLocalAsAscii(remote_file, site_.server_.server.GetType())) {
+		else if (CAutoAsciiFiles::TransferLocalAsAscii(remote_file, site_.server.GetType())) {
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Show();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
@@ -123,7 +123,7 @@ void CManualTransfer::SetAutoAsciiState()
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Hide();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
-		else if (CAutoAsciiFiles::TransferLocalAsAscii(local_file, site_.server_.server.GetType())) {
+		else if (CAutoAsciiFiles::TransferLocalAsAscii(local_file, site_.server.GetType())) {
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Show();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
@@ -153,16 +153,16 @@ void CManualTransfer::DisplayServer()
 {
 	if (site_) {
 		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site_.Format(ServerFormat::host_only));
-		unsigned int port = site_.server_.server.GetPort();
+		unsigned int port = site_.server.GetPort();
 
-		if (port != CServer::GetDefaultPort(site_.server_.server.GetProtocol())) {
+		if (port != CServer::GetDefaultPort(site_.server.GetProtocol())) {
 			XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), port));
 		}
 		else {
 			XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(_T(""));
 		}
 
-		const wxString& protocolName = CServer::GetProtocolName(site_.server_.server.GetProtocol());
+		const wxString& protocolName = CServer::GetProtocolName(site_.server.GetProtocol());
 		if (!protocolName.empty()) {
 			XRCCTRL(*this, "ID_PROTOCOL", wxChoice)->SetStringSelection(protocolName);
 		}
@@ -189,7 +189,7 @@ void CManualTransfer::DisplayServer()
 			break;
 		}
 
-		XRCCTRL(*this, "ID_USER", wxTextCtrl)->ChangeValue(site_.server_.server.GetUser());
+		XRCCTRL(*this, "ID_USER", wxTextCtrl)->ChangeValue(site_.server.GetUser());
 		XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->ChangeValue(site_.credentials.account_);
 		XRCCTRL(*this, "ID_PASS", wxTextCtrl)->ChangeValue(site_.credentials.GetPass());
 	}
@@ -318,7 +318,7 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		return;
 	}
 
-	CServerPath path(remote_path_str, site_.server_.server.GetType());
+	CServerPath path(remote_path_str, site_.server.GetType());
 	if (path.empty()) {
 		wxMessageBoxEx(_("Remote path could not be parsed."), _("Manual transfer"), wxICON_EXCLAMATION);
 		return;
@@ -380,15 +380,15 @@ bool CManualTransfer::UpdateServer()
 	if (!host.empty() && host[0] == '[') {
 		host = host.substr(1, host.size() - 2);
 	}
-	site_.server_.server.SetHost(host, port);
+	site_.server.SetHost(host, port);
 
 	std::wstring const protocolName = xrc_call(*this, "ID_PROTOCOL", &wxChoice::GetStringSelection).ToStdWstring();
 	ServerProtocol const protocol = CServer::GetProtocolFromName(protocolName);
 	if (protocol != UNKNOWN) {
-		site_.server_.server.SetProtocol(protocol);
+		site_.server.SetProtocol(protocol);
 	}
 	else {
-		site_.server_.server.SetProtocol(FTP);
+		site_.server.SetProtocol(FTP);
 	}
 
 	site_.SetLogonType(GetLogonTypeFromName(xrc_call(*this, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring()));
@@ -445,7 +445,7 @@ bool CManualTransfer::VerifyServer()
 	site.SetLogonType(logon_type);
 
 	if (protocol != UNKNOWN) {
-		site.server_.server.SetProtocol(protocol);
+		site.server.SetProtocol(protocol);
 	}
 
 	CServerPath path;
@@ -457,9 +457,9 @@ bool CManualTransfer::VerifyServer()
 	}
 
 	xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
-	xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, fz::to_wstring(site.server_.server.GetPort()));
+	xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, fz::to_wstring(site.server.GetPort()));
 
-	protocolName = CServer::GetProtocolName(site.server_.server.GetProtocol());
+	protocolName = CServer::GetProtocolName(site.server.GetProtocol());
 	if (protocolName.empty()) {
 		CServer::GetProtocolName(FTP);
 	}
@@ -524,7 +524,7 @@ void CManualTransfer::OnSelectedSite(wxCommandEvent& event)
 	site_ = *pData;
 	lastSite_ = *pData;
 
-	xrc_call(*this, "ID_SERVER_SITE_SERVER", &wxStaticText::SetLabel, site_.server_.server.GetName());
+	xrc_call(*this, "ID_SERVER_SITE_SERVER", &wxStaticText::SetLabel, site_.server.GetName());
 
 	DisplayServer();
 }

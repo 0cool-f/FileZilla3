@@ -609,17 +609,17 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 
 	Site const& site = item.GetSite();
 
-	Bind(insertServerQuery_, server_table_column_names::host, site.server_.server.GetHost());
-	Bind(insertServerQuery_, server_table_column_names::port, static_cast<int>(site.server_.server.GetPort()));
-	Bind(insertServerQuery_, server_table_column_names::protocol, static_cast<int>(site.server_.server.GetProtocol()));
-	Bind(insertServerQuery_, server_table_column_names::type, static_cast<int>(site.server_.server.GetType()));
+	Bind(insertServerQuery_, server_table_column_names::host, site.server.GetHost());
+	Bind(insertServerQuery_, server_table_column_names::port, static_cast<int>(site.server.GetPort()));
+	Bind(insertServerQuery_, server_table_column_names::protocol, static_cast<int>(site.server.GetProtocol()));
+	Bind(insertServerQuery_, server_table_column_names::type, static_cast<int>(site.server.GetType()));
 
 	ProtectedCredentials credentials = site.credentials;
 	credentials.Protect();
 
 	LogonType logonType = credentials.logonType_;
 	if (logonType != LogonType::anonymous) {
-		Bind(insertServerQuery_, server_table_column_names::user, site.server_.server.GetUser());
+		Bind(insertServerQuery_, server_table_column_names::user, site.server.GetUser());
 
 		if (logonType == LogonType::normal || logonType == LogonType::account) {
 			if (kiosk_mode) {
@@ -672,9 +672,9 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 		Bind(insertServerQuery_, server_table_column_names::logontype, lt);
 	}
 
-	Bind(insertServerQuery_, server_table_column_names::timezone_offset, site.server_.server.GetTimezoneOffset());
+	Bind(insertServerQuery_, server_table_column_names::timezone_offset, site.server.GetTimezoneOffset());
 
-	switch (site.server_.server.GetPasvMode())
+	switch (site.server.GetPasvMode())
 	{
 	case MODE_PASSIVE:
 		Bind(insertServerQuery_, server_table_column_names::transfer_mode, _T("passive"));
@@ -686,9 +686,9 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 		Bind(insertServerQuery_, server_table_column_names::transfer_mode, _T("default"));
 		break;
 	}
-	Bind(insertServerQuery_, server_table_column_names::max_connections, site.server_.server.MaximumMultipleConnections());
+	Bind(insertServerQuery_, server_table_column_names::max_connections, site.server.MaximumMultipleConnections());
 
-	switch (site.server_.server.GetEncodingType())
+	switch (site.server.GetEncodingType())
 	{
 	default:
 	case ENCODING_AUTO:
@@ -698,12 +698,12 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 		Bind(insertServerQuery_, server_table_column_names::encoding, _T("UTF-8"));
 		break;
 	case ENCODING_CUSTOM:
-		Bind(insertServerQuery_, server_table_column_names::encoding, site.server_.server.GetCustomEncoding());
+		Bind(insertServerQuery_, server_table_column_names::encoding, site.server.GetCustomEncoding());
 		break;
 	}
 
-	if (CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
-		std::vector<std::wstring> const& postLoginCommands = site.server_.server.GetPostLoginCommands();
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
+		std::vector<std::wstring> const& postLoginCommands = site.server.GetPostLoginCommands();
 		if (!postLoginCommands.empty()) {
 			std::wstring commands;
 			for (auto const& command : commands) {
@@ -722,15 +722,15 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 		BindNull(insertServerQuery_, server_table_column_names::post_login_commands);
 	}
 
-	Bind(insertServerQuery_, server_table_column_names::bypass_proxy, site.server_.server.GetBypassProxy() ? 1 : 0);
-	if (!site.server_.server.GetName().empty()) {
-		Bind(insertServerQuery_, server_table_column_names::name, site.server_.server.GetName());
+	Bind(insertServerQuery_, server_table_column_names::bypass_proxy, site.server.GetBypassProxy() ? 1 : 0);
+	if (!site.server.GetName().empty()) {
+		Bind(insertServerQuery_, server_table_column_names::name, site.server.GetName());
 	}
 	else {
 		BindNull(insertServerQuery_, server_table_column_names::name);
 	}
 
-	auto const& parameters = site.server_.server.GetExtraParameters();
+	auto const& parameters = site.server.GetExtraParameters();
 	if (!parameters.empty()) {
 		fz::query_string qs;
 		for (auto const& parameter : parameters) {
@@ -934,7 +934,7 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 		return INVALID_DATA;
 	}
 
-	if (!site.server_.server.SetHost(host, port)) {
+	if (!site.server.SetHost(host, port)) {
 		return INVALID_DATA;
 	}
 
@@ -942,14 +942,14 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 	if (protocol < 0 || protocol > MAX_VALUE) {
 		return INVALID_DATA;
 	}
-	site.server_.server.SetProtocol(static_cast<ServerProtocol>(protocol));
+	site.server.SetProtocol(static_cast<ServerProtocol>(protocol));
 
 	int type = GetColumnInt(selectServersQuery_, server_table_column_names::type);
 	if (type < 0 || type >= SERVERTYPE_MAX) {
 		return INVALID_DATA;
 	}
 
-	site.server_.server.SetType(static_cast<ServerType>(type));
+	site.server.SetType(static_cast<ServerType>(type));
 
 	int64_t logonType = GetColumnInt64(selectServersQuery_, server_table_column_names::logontype);
 	bool const encrypted = logonType & (1ll << 62);
@@ -989,55 +989,55 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 	}
 
 	int timezoneOffset = GetColumnInt(selectServersQuery_, server_table_column_names::timezone_offset);
-	if (!site.server_.server.SetTimezoneOffset(timezoneOffset)) {
+	if (!site.server.SetTimezoneOffset(timezoneOffset)) {
 		return INVALID_DATA;
 	}
 
 	std::wstring pasvMode = GetColumnText(selectServersQuery_, server_table_column_names::transfer_mode);
 	if (pasvMode == _T("passive")) {
-		site.server_.server.SetPasvMode(MODE_PASSIVE);
+		site.server.SetPasvMode(MODE_PASSIVE);
 	}
 	else if (pasvMode == _T("active")) {
-		site.server_.server.SetPasvMode(MODE_ACTIVE);
+		site.server.SetPasvMode(MODE_ACTIVE);
 	}
 	else {
-		site.server_.server.SetPasvMode(MODE_DEFAULT);
+		site.server.SetPasvMode(MODE_DEFAULT);
 	}
 
 	int maximumMultipleConnections = GetColumnInt(selectServersQuery_, server_table_column_names::max_connections);
 	if (maximumMultipleConnections < 0) {
 		return INVALID_DATA;
 	}
-	site.server_.server.MaximumMultipleConnections(maximumMultipleConnections);
+	site.server.MaximumMultipleConnections(maximumMultipleConnections);
 
 	std::wstring encodingType = GetColumnText(selectServersQuery_, server_table_column_names::encoding);
 	if (encodingType.empty() || encodingType == _T("Auto")) {
-		site.server_.server.SetEncodingType(ENCODING_AUTO);
+		site.server.SetEncodingType(ENCODING_AUTO);
 	}
 	else if (encodingType == _T("UTF-8")) {
-		site.server_.server.SetEncodingType(ENCODING_UTF8);
+		site.server.SetEncodingType(ENCODING_UTF8);
 	}
 	else {
-		if (!site.server_.server.SetEncodingType(ENCODING_CUSTOM, encodingType)) {
+		if (!site.server.SetEncodingType(ENCODING_CUSTOM, encodingType)) {
 			return INVALID_DATA;
 		}
 	}
 
-	if (CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
 		std::wstring const commands = GetColumnText(selectServersQuery_, server_table_column_names::post_login_commands);
 		std::vector<std::wstring> postLoginCommands = fz::strtok(commands, '\n');
-		if (!site.server_.server.SetPostLoginCommands(postLoginCommands)) {
+		if (!site.server.SetPostLoginCommands(postLoginCommands)) {
 			return INVALID_DATA;
 		}
 	}
 
 
-	site.server_.server.SetBypassProxy(GetColumnInt(selectServersQuery_, server_table_column_names::bypass_proxy) == 1 );
-	site.server_.server.SetName(GetColumnText(selectServersQuery_, server_table_column_names::name));
+	site.server.SetBypassProxy(GetColumnInt(selectServersQuery_, server_table_column_names::bypass_proxy) == 1 );
+	site.server.SetName(GetColumnText(selectServersQuery_, server_table_column_names::name));
 
 	fz::query_string qs = fz::query_string(GetColumnTextUtf8(selectServersQuery_, server_table_column_names::parameters));
 	for (auto const& pair : qs.pairs()) {
-		site.server_.server.SetExtraParameter(pair.first, fz::to_wstring_from_utf8(pair.second));
+		site.server.SetExtraParameter(pair.first, fz::to_wstring_from_utf8(pair.second));
 	}
 
 	return GetColumnInt64(selectServersQuery_, server_table_column_names::id);

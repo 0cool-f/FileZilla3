@@ -21,7 +21,7 @@ std::list<CLoginManager::t_passwordcache>::iterator CLoginManager::FindItem(CSer
 
 bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& name)
 {
-	bool const needsUser = ProtocolHasUser(site.server_.server.GetProtocol()) && site.server_.server.GetUser().empty() && (site.credentials.logonType_ == LogonType::ask || site.credentials.logonType_ == LogonType::interactive);
+	bool const needsUser = ProtocolHasUser(site.server.GetProtocol()) && site.server.GetUser().empty() && (site.credentials.logonType_ == LogonType::ask || site.credentials.logonType_ == LogonType::interactive);
 
 	if (site.credentials.logonType_ != LogonType::ask && !site.credentials.encrypted_ && !needsUser) {
 		return true;
@@ -38,7 +38,7 @@ bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& na
 		}
 	}
 	else {
-		auto it = FindItem(site.server_.server, std::wstring());
+		auto it = FindItem(site.server, std::wstring());
 		if (it != m_passwordCache.end()) {
 			site.credentials.SetPass(it->password);
 			return true;
@@ -56,7 +56,7 @@ bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& na
 bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& name, std::wstring const& challenge, bool canRemember)
 {
 	if (canRemember) {
-		auto it = FindItem(site.server_.server, challenge);
+		auto it = FindItem(site.server, challenge);
 		if (it != m_passwordCache.end()) {
 			site.credentials.SetPass(it->password);
 			return true;
@@ -88,7 +88,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site, std::wstring const& n
 
 	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
 
-	XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server_.server.GetUser());
+	XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server.GetUser());
 
 	XRCCTRL(pwdDlg, "wxID_OK", wxButton)->SetId(wxID_OK);
 	XRCCTRL(pwdDlg, "wxID_CANCEL", wxButton)->SetId(wxID_CANCEL);
@@ -160,7 +160,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 	}
 	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
 
-	if (site.server_.server.GetUser().empty()) {
+	if (site.server.GetUser().empty()) {
 		XRCCTRL(pwdDlg, "ID_OLD_USER_LABEL", wxStaticText)->Hide();
 		XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->Hide();
 
@@ -181,14 +181,14 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 		XRCCTRL(pwdDlg, "ID_NEW_USER", wxTextCtrl)->SetFocus();
 	}
 	else {
-		XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server_.server.GetUser());
+		XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server.GetUser());
 		XRCCTRL(pwdDlg, "ID_NEW_USER_LABEL", wxStaticText)->Hide();
 		XRCCTRL(pwdDlg, "ID_NEW_USER", wxTextCtrl)->Hide();
 		XRCCTRL(pwdDlg, "ID_HEADER_USER", wxStaticText)->Hide();
 		xrc_call(pwdDlg, "ID_HEADER_BOTH", &wxStaticText::Hide);
 	}
 
-	if (site.server_.server.GetProtocol() == STORJ) {
+	if (site.server.GetProtocol() == STORJ) {
 		XRCCTRL(pwdDlg, "ID_ENCRYPTIONKEY_LABEL", wxStaticText)->Show();
 		XRCCTRL(pwdDlg, "ID_ENCRYPTIONKEY", wxTextCtrl)->Show();
 	}
@@ -203,17 +203,17 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 			return false;
 		}
 
-		if (site.server_.server.GetUser().empty()) {
+		if (site.server.GetUser().empty()) {
 			auto user = xrc_call(pwdDlg, "ID_NEW_USER", &wxTextCtrl::GetValue).ToStdWstring();
 			if (user.empty()) {
 				wxMessageBoxEx(_("No username given."), _("Invalid input"), wxICON_EXCLAMATION);
 				continue;
 			}
-			site.server_.server.SetUser(user);
+			site.server.SetUser(user);
 		}
 
 /* FIXME?
-	if (site.server_.server.GetProtocol() == STORJ) {
+	if (site.server.GetProtocol() == STORJ) {
 		std::wstring encryptionKey = XRCCTRL(pwdDlg, "ID_ENCRYPTIONKEY", wxTextCtrl)->GetValue().ToStdWstring();
 		if (encryptionKey.empty()) {
 			wxMessageBoxEx(_("No encryption key given."), _("Invalid input"), wxICON_EXCLAMATION);
@@ -222,7 +222,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 	}
 */
 		std::wstring pass = xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue).ToStdWstring();
-		if (site.server_.server.GetProtocol() == STORJ) {
+		if (site.server.GetProtocol() == STORJ) {
 			std::wstring encryptionKey = xrc_call(pwdDlg, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
 			pass += L"|" + encryptionKey;
 		}
@@ -251,15 +251,15 @@ void CLoginManager::RememberPassword(Site & site, std::wstring const& challenge)
 		return;
 	}
 
-	auto it = FindItem(site.server_.server, challenge);
+	auto it = FindItem(site.server, challenge);
 	if (it != m_passwordCache.end()) {
 		it->password = site.credentials.GetPass();
 	}
 	else {
 		t_passwordcache entry;
-		entry.host = site.server_.server.GetHost();
-		entry.port = site.server_.server.GetPort();
-		entry.user = site.server_.server.GetUser();
+		entry.host = site.server.GetHost();
+		entry.port = site.server.GetPort();
+		entry.user = site.server.GetUser();
 		entry.password = site.credentials.GetPass();
 		entry.challenge = challenge;
 		m_passwordCache.push_back(entry);

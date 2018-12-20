@@ -122,20 +122,20 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	host = site.Format(ServerFormat::host_only);
-	ServerProtocol protocol = site.server_.server.GetProtocol();
+	ServerProtocol protocol = site.server.GetProtocol();
 	switch (protocol)
 	{
 	case FTP:
 	case UNKNOWN:
-		if (CServer::GetProtocolFromPort(site.server_.server.GetPort()) != FTP &&
-			CServer::GetProtocolFromPort(site.server_.server.GetPort()) != UNKNOWN)
+		if (CServer::GetProtocolFromPort(site.server.GetPort()) != FTP &&
+			CServer::GetProtocolFromPort(site.server.GetPort()) != UNKNOWN)
 		{
 			host = _T("ftp://") + host;
 		}
 		break;
 	default:
 		{
-			std::wstring const prefix = site.server_.server.GetPrefixFromProtocol(protocol);
+			std::wstring const prefix = site.server.GetPrefixFromProtocol(protocol);
 			if (!prefix.empty()) {
 				host = prefix + _T("://") + host;
 			}
@@ -144,14 +144,14 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	m_pHost->SetValue(host);
-	if (site.server_.server.GetPort() != site.server_.server.GetDefaultPort(site.server_.server.GetProtocol())) {
-		m_pPort->SetValue(wxString::Format(_T("%d"), site.server_.server.GetPort()));
+	if (site.server.GetPort() != site.server.GetDefaultPort(site.server.GetProtocol())) {
+		m_pPort->SetValue(wxString::Format(_T("%d"), site.server.GetPort()));
 	}
 	else {
 		m_pPort->ChangeValue(wxString());
 	}
 
-	m_pUser->SetValue(site.server_.server.GetUser());
+	m_pUser->SetValue(site.server.GetUser());
 	if (site.credentials.logonType_ != LogonType::anonymous) {
 		m_pPass->SetValue(site.credentials.GetPass());
 	}
@@ -166,7 +166,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	if (event.GetId() == 1) {
-		site.server_.server.SetBypassProxy(true);
+		site.server.SetBypassProxy(true);
 	}
 
 	if (site.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this)) {

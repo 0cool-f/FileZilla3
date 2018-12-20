@@ -67,7 +67,7 @@ void CNewBookmarkDialog::OnOK(wxCommandEvent&)
 	CServerPath remote_path;
 	if (!remote_path_raw.empty()) {
 		if (!global && site_) {
-			remote_path.SetType(site_->server_.server.GetType());
+			remote_path.SetType(site_->server.GetType());
 		}
 		if (!remote_path.SetPath(remote_path_raw.ToStdWstring())) {
 			wxMessageBoxEx(_("Could not parse remote path."), _("New bookmark"), wxICON_EXCLAMATION);
@@ -432,14 +432,14 @@ bool CBookmarksDialog::Verify()
 	if (!remotePathRaw.empty()) {
 		CServerPath remotePath;
 		if (site) {
-			remotePath.SetType(site->server_.server.GetType());
+			remotePath.SetType(site->server.GetType());
 		}
 		if (!remotePath.SetPath(remotePathRaw.ToStdWstring())) {
 			xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::SetFocus);
 			if (site) {
 				wxString msg;
-				if (site->server_.server.GetType() != DEFAULT) {
-					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the current site's servertype (%s)."), CServer::GetNameFromServerType(site->server_.server.GetType()));
+				if (site->server.GetType() != DEFAULT) {
+					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the current site's servertype (%s)."), CServer::GetNameFromServerType(site->server.GetType()));
 				}
 				else {
 					msg = _("Remote path cannot be parsed. Make sure it is a valid absolute path.");
@@ -493,7 +493,7 @@ void CBookmarksDialog::UpdateBookmark()
 	wxString const remotePathRaw = xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue);
 	if (!remotePathRaw.empty()) {
 		if (site) {
-			data->m_remote_dir.SetType(site->server_.server.GetType());
+			data->m_remote_dir.SetType(site->server.GetType());
 		}
 		data->m_remote_dir.SetPath(remotePathRaw.ToStdWstring());
 	}

@@ -150,7 +150,7 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 			return;
 		}
 		if (nReplyCode & FZ_REPLY_PASSWORDFAILED) {
-			CLoginManager::Get().CachedPasswordFailed(m_state.GetSite().server_.server);
+			CLoginManager::Get().CachedPasswordFailed(m_state.GetSite().server);
 		}
 	}
 
@@ -178,7 +178,7 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 			// Try automatic reconnect
 			Site const& site = m_state.GetSite();
 			if (site) {
-				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(site.server_.server, site.Handle(), site.credentials));
+				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(site.server, site.Handle(), site.credentials));
 				ProcessNextCommand();
 				return;
 			}
@@ -327,6 +327,6 @@ void CCommandQueue::ProcessDirectoryListing(CDirectoryListingNotification const&
 	}
 
 	if (pListing && !listingNotification.Failed() && m_state.GetSite()) {
-		CContextManager::Get()->ProcessDirectoryListing(m_state.GetSite().server_.server, pListing, listingIsRecursive ? 0 : &m_state);
+		CContextManager::Get()->ProcessDirectoryListing(m_state.GetSite().server, pListing, listingIsRecursive ? 0 : &m_state);
 	}
 }

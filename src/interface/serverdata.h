@@ -34,12 +34,10 @@ class ServerWithCredentials final
 public:
 	ServerWithCredentials() = default;
 
-	explicit ServerWithCredentials(CServer const& s, ServerHandle const& handle)
-		: server(s)
-		, handle_(handle)
+	explicit ServerWithCredentials(ServerHandle const& handle)
+		: handle_(handle)
 	{}
 
-	CServer server;
 	ServerHandle handle_;
 };
 
@@ -81,16 +79,18 @@ public:
 	Site() = default;
 
 	explicit Site(CServer const& s, ServerHandle const& handle, Credentials const& c)
-		: server_(s, handle)
+		: server_(handle)
+		, server(s)
 		, credentials(c)
 	{}
 
 	explicit Site(CServer const& s, ServerHandle const& handle, ProtectedCredentials const& c)
-		: server_(s, handle)
+		: server_(handle)
+		, server(s)
 		, credentials(c)
 	{}
 
-	explicit operator bool() const { return server_.server.operator bool(); }
+	explicit operator bool() const { return server.operator bool(); }
 
 	bool empty() const { return !*this; }
 	bool operator==(Site const& s) const;
@@ -102,7 +102,7 @@ public:
 	bool ParseUrl(std::wstring const& host, std::wstring const& port, std::wstring const& user, std::wstring const& pass, std::wstring &error, CServerPath &path, ServerProtocol const hint = UNKNOWN);
 
 	std::wstring Format(ServerFormat formatType) const {
-		return server_.server.Format(formatType, credentials);
+		return server.Format(formatType, credentials);
 	}
 
 	void SetLogonType(LogonType logonType);
@@ -111,6 +111,7 @@ public:
 
 
 	ServerWithCredentials server_;
+	CServer server;
 	ProtectedCredentials credentials;
 
 	std::wstring comments_;
@@ -130,7 +131,7 @@ public:
 	void Update(Site const& rhs);
 
 	bool SameResource(Site const& other) const {
-		return server_.server.SameResource(other.server_.server);
+		return server.SameResource(other.server);
 	}
 
 private:

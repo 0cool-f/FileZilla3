@@ -116,7 +116,7 @@ public:
 			return wxDragNone;
 		}
 
-		if (m_pRemoteDataObject->GetSite().server_.server != m_pRemoteListView->m_state.GetSite().server_.server) {
+		if (m_pRemoteDataObject->GetSite().server != m_pRemoteListView->m_state.GetSite().server) {
 			wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 			return wxDragNone;
 		}
@@ -1233,7 +1233,7 @@ void CRemoteListView::OnContextMenu(wxContextMenuEvent& event)
 		else {
 			if (selectedDir) {
 				menu.Enable(XRCID("ID_EDIT"), false);
-				if (!CServer::ProtocolHasFeature(m_state.GetSite().server_.server.GetProtocol(), ProtocolFeature::DirectoryRename)) {
+				if (!CServer::ProtocolHasFeature(m_state.GetSite().server.GetProtocol(), ProtocolFeature::DirectoryRename)) {
 					menu.Enable(XRCID("ID_RENAME"), false);
 				}
 			}
@@ -1511,7 +1511,7 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 	}
 
 	CFilterManager filter;
-	if (CServer::ProtocolHasFeature(m_state.GetSite().server_.server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
+	if (CServer::ProtocolHasFeature(m_state.GetSite().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
 		std::deque<std::wstring> filesToDelete;
 
 		for (item = -1; ;) {
@@ -1755,7 +1755,7 @@ bool CRemoteListView::OnAcceptRename(const wxListEvent& event)
 void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 {
 	Site const& site = m_state.GetSite();
-	auto protocol = site.server_.server.GetProtocol();
+	auto protocol = site.server.GetProtocol();
 	
 	if (!m_state.IsRemoteConnected() || !m_state.IsRemoteIdle()) {
 		wxBell();
