@@ -48,15 +48,15 @@ public:
 	void Release();
 
 	fileState GetFileState(wxString const& fileName) const; // Local files
-	fileState GetFileState(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server) const; // Remote files
+	fileState GetFileState(wxString const& fileName, CServerPath const& remotePath, Site const& site) const; // Remote files
 
 	// Returns the number of files in given state
 	// pServer may be set only if state isn't unknown
-	int GetFileCount(fileType type, fileState state, ServerWithCredentials const& server = ServerWithCredentials()) const;
+	int GetFileCount(fileType type, fileState state, Site const& site = Site()) const;
 
 	// Starts editing the given file, queues it if needed. For local files, fileName must include local path.
 	// Can be used to edit files already being added, user is prompted for action.
-	bool Edit(CEditHandler::fileType type, std::wstring const& fileName, CServerPath const& path, ServerWithCredentials const& server, int64_t size, wxWindow* parent);
+	bool Edit(CEditHandler::fileType type, std::wstring const& fileName, CServerPath const& path, Site const& site, int64_t size, wxWindow* parent);
 
 	class FileData final {
 	public:
@@ -67,20 +67,20 @@ public:
 		std::wstring name;
 		int64_t size{};
 	};
-	bool Edit(CEditHandler::fileType type, std::vector<FileData> const& data, CServerPath const& path, ServerWithCredentials const& server, wxWindow* parent);
+	bool Edit(CEditHandler::fileType type, std::vector<FileData> const& data, CServerPath const& path, Site const& site, wxWindow* parent);
 
 	// Adds the file that doesn't exist yet. (Has to be in unknown state)
 	// The initial state will be download
-	bool AddFile(fileType type, std::wstring& fileName, CServerPath const& remotePath, ServerWithCredentials const& server);
+	bool AddFile(fileType type, std::wstring& fileName, CServerPath const& remotePath, Site const& site);
 
 	// Tries to unedit and remove file
 	bool Remove(wxString const& fileName); // Local files
-	bool Remove(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server); // Remote files
+	bool Remove(wxString const& fileName, CServerPath const& remotePath, Site const& site); // Remote files
 	bool RemoveAll(bool force);
-	bool RemoveAll(fileState state, ServerWithCredentials const& server = ServerWithCredentials());
+	bool RemoveAll(fileState state, Site const& site = Site());
 
 	void FinishTransfer(bool successful, wxString const& fileName);
-	void FinishTransfer(bool successful, wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server);
+	void FinishTransfer(bool successful, wxString const& fileName, CServerPath const& remotePath, Site const& site);
 
 	void CheckForModifications(bool emitEvent = false);
 
@@ -96,7 +96,7 @@ public:
 	 */
 	wxString CanOpen(fileType type, wxString const& fileName, bool &dangerous, bool& program_exists);
 	bool StartEditing(wxString const& file);
-	bool StartEditing(wxString const& file, CServerPath const& remotePath, ServerWithCredentials const& server);
+	bool StartEditing(wxString const& file, CServerPath const& remotePath, Site const& site);
 
 	struct t_fileData
 	{
@@ -105,20 +105,20 @@ public:
 		fileState state;
 		fz::datetime modificationTime;
 		CServerPath remotePath;
-		ServerWithCredentials server;
+		Site site;
 	};
 
 	const std::list<t_fileData>& GetFiles(fileType type) const { wxASSERT(type != none); return m_fileDataList[(type == local) ? 0 : 1]; }
 
 	bool UploadFile(wxString const& file, bool unedit);
-	bool UploadFile(wxString const& file, CServerPath const& remotePath, ServerWithCredentials const& server, bool unedit);
+	bool UploadFile(wxString const& file, CServerPath const& remotePath, Site const& site, bool unedit);
 
 	// Returns command to open the file. If association is set but
 	// program does not exist, program_exists is set to false.
 	wxString GetOpenCommand(wxString const& file, bool& program_exists);
 
 protected:
-	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, ServerWithCredentials const& server, wxWindow* parent, size_t fileCount, int & already_editing_action);
+	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int & already_editing_action);
 
 	CEditHandler();
 
@@ -138,8 +138,8 @@ protected:
 
 	std::list<t_fileData>::iterator GetFile(wxString const& fileName);
 	std::list<t_fileData>::const_iterator GetFile(wxString const& fileName) const;
-	std::list<t_fileData>::iterator GetFile(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server);
-	std::list<t_fileData>::const_iterator GetFile(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server) const;
+	std::list<t_fileData>::iterator GetFile(wxString const& fileName, CServerPath const& remotePath, Site const& site);
+	std::list<t_fileData>::const_iterator GetFile(wxString const& fileName, CServerPath const& remotePath, Site const& site) const;
 
 	CQueueView* m_pQueue;
 

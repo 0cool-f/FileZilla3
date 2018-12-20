@@ -717,14 +717,15 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 			return;
 		}
 
-		CServerPath path;
 
-		ServerWithCredentials const& server = m_state.GetServer();
-		if (!server) {
+		Site const& site = m_state.GetSite();
+		if (!site) {
 			wxMessageBoxEx(_("Connection to server lost."), _("Remote file search"), wxICON_EXCLAMATION);
 			return;
 		}
-		path.SetType(server.server.GetType());
+
+		CServerPath path;
+		path.SetType(site.server_.server.GetType());
 		if (!path.SetPath(xrc_call(*this, "ID_PATH", &wxTextCtrl::GetValue).ToStdWstring()) || path.empty()) {
 			wxMessageBoxEx(_("Need to enter valid remote path"), _("Remote file search"), wxICON_EXCLAMATION);
 			return;
@@ -1041,8 +1042,8 @@ void CSearchDialog::OnDownload(wxCommandEvent&)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -1074,7 +1075,7 @@ void CSearchDialog::OnDownload(wxCommandEvent&)
 
 		m_pQueue->QueueFile(!start, true,
 			entry.name, (localName != entry.name) ? localName : std::wstring(),
-			target_path, remote_path, server, entry.size);
+			target_path, remote_path, site, entry.size);
 	}
 	m_pQueue->QueueFile_Finish(start);
 
@@ -1122,8 +1123,8 @@ void CSearchDialog::OnUpload(wxCommandEvent&)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -1153,7 +1154,7 @@ void CSearchDialog::OnUpload(wxCommandEvent&)
 
 		m_pQueue->QueueFile(!start, false,
 			entry.name, (localName != entry.name) ? localName : std::wstring(),
-			local_path, target_path, server, entry.size);
+			local_path, target_path, site, entry.size);
 	}
 	m_pQueue->QueueFile_Finish(start);
 
@@ -1209,8 +1210,8 @@ void CSearchDialog::OnEdit(wxCommandEvent&)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -1229,7 +1230,7 @@ void CSearchDialog::OnEdit(wxCommandEvent&)
 		const CDirentry& entry = m_results->remoteFileData_[item];
 		const CServerPath path = m_results->remoteFileData_[item].path;
 
-		pEditHandler->Edit(CEditHandler::remote, entry.name, path, server, entry.size, this);
+		pEditHandler->Edit(CEditHandler::remote, entry.name, path, site, entry.size, this);
 	}
 }
 
@@ -1408,8 +1409,8 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -1419,7 +1420,7 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 		return;
 	}
 
-	wxString const url = server.Format((event.GetId() == XRCID("ID_MENU_SEARCH_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
+	wxString const url = site.server_.Format((event.GetId() == XRCID("ID_MENU_SEARCH_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
 
 	auto getUrl = [](wxString const& serverPart, CServerPath const& path, std::wstring const& name) {
 		wxString url = serverPart;

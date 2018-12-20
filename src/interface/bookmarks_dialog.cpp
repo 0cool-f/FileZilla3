@@ -26,10 +26,10 @@ EVT_TREE_BEGIN_LABEL_EDIT(XRCID("ID_TREE"), CBookmarksDialog::OnBeginLabelEdit)
 EVT_TREE_END_LABEL_EDIT(XRCID("ID_TREE"), CBookmarksDialog::OnEndLabelEdit)
 END_EVENT_TABLE()
 
-CNewBookmarkDialog::CNewBookmarkDialog(wxWindow* parent, std::wstring& site_path, ServerWithCredentials const* server)
+CNewBookmarkDialog::CNewBookmarkDialog(wxWindow* parent, std::wstring& site_path, Site const* site)
 	: m_parent(parent)
 	, m_site_path(site_path)
-	, m_server(server)
+	, site_(site)
 {
 }
 
@@ -44,7 +44,7 @@ int CNewBookmarkDialog::Run(const wxString &local_path, const CServerPath &remot
 		xrc_call(*this, "ID_REMOTEPATH", &wxTextCtrl::ChangeValue, remote_path.GetPath());
 	}
 
-	if (!m_server) {
+	if (!site_) {
 		xrc_call(*this, "ID_TYPE_SITE", &wxRadioButton::Enable, false);
 	}
 
@@ -66,8 +66,8 @@ void CNewBookmarkDialog::OnOK(wxCommandEvent&)
 
 	CServerPath remote_path;
 	if (!remote_path_raw.empty()) {
-		if (!global && m_server) {
-			remote_path.SetType(m_server->server.GetType());
+		if (!global && site_) {
+			remote_path.SetType(site_->server_.server.GetType());
 		}
 		if (!remote_path.SetPath(remote_path_raw.ToStdWstring())) {
 			wxMessageBoxEx(_("Could not parse remote path."), _("New bookmark"), wxICON_EXCLAMATION);
@@ -88,7 +88,7 @@ void CNewBookmarkDialog::OnOK(wxCommandEvent&)
 
 	bool const comparison = xrc_call(*this, "ID_COMPARISON", &wxCheckBox::GetValue);
 
-	if (!global && m_server) {
+	if (!global && site_) {
 		std::unique_ptr<Site> site;
 		if (!m_site_path.empty()) {
 			site = CSiteManager::GetSiteByPath(m_site_path).first;
@@ -98,7 +98,7 @@ void CNewBookmarkDialog::OnOK(wxCommandEvent&)
 				return;
 			}
 
-			m_site_path = CSiteManager::AddServer(*m_server);
+			m_site_path = CSiteManager::AddServer(*site);
 			if (m_site_path.empty()) {
 				wxMessageBoxEx(_("Could not add connection to Site Manager"), _("New bookmark"), wxICON_EXCLAMATION, this);
 				EndModal(wxID_CANCEL);
@@ -156,10 +156,10 @@ public:
 	bool m_comparison{};
 };
 
-CBookmarksDialog::CBookmarksDialog(wxWindow* parent, std::wstring& site_path, ServerWithCredentials const* server)
+CBookmarksDialog::CBookmarksDialog(wxWindow* parent, std::wstring& site_path, Site const* site)
 	: m_parent(parent)
 	, m_site_path(site_path)
-	, m_server(server)
+	, site_(site)
 	, m_pTree()
 {
 }
@@ -258,7 +258,7 @@ int CBookmarksDialog::Run()
 	m_bookmarks_global = m_pTree->AppendItem(root, _("Global bookmarks"), 0, 0);
 	LoadGlobalBookmarks();
 	m_pTree->Expand(m_bookmarks_global);
-	if (m_server) {
+	if (site_) {
 		m_bookmarks_site = m_pTree->AppendItem(root, _("Site-specific bookmarks"), 0, 0);
 		LoadSiteSpecificBookmarks();
 		m_pTree->Expand(m_bookmarks_site);
@@ -420,26 +420,26 @@ bool CBookmarksDialog::Verify()
 		return true;
 	}
 
-	ServerWithCredentials const* server;
+	Site const* site;
 	if (m_pTree->GetItemParent(item) == m_bookmarks_site) {
-		server = m_server;
+		site = site_;
 	}
 	else {
-		server = 0;
+		site = 0;
 	}
 
 	wxString const remotePathRaw = xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue);
 	if (!remotePathRaw.empty()) {
 		CServerPath remotePath;
-		if (server) {
-			remotePath.SetType(server->server.GetType());
+		if (site) {
+			remotePath.SetType(site->server_.server.GetType());
 		}
 		if (!remotePath.SetPath(remotePathRaw.ToStdWstring())) {
 			xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::SetFocus);
-			if (server) {
+			if (site) {
 				wxString msg;
-				if (server->server.GetType() != DEFAULT) {
-					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the current site's servertype (%s)."), CServer::GetNameFromServerType(server->server.GetType()));
+				if (site->server_.server.GetType() != DEFAULT) {
+					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the current site's servertype (%s)."), CServer::GetNameFromServerType(site->server_.server.GetType()));
 				}
 				else {
 					msg = _("Remote path cannot be parsed. Make sure it is a valid absolute path.");
@@ -482,18 +482,18 @@ void CBookmarksDialog::UpdateBookmark()
 		return;
 	}
 
-	ServerWithCredentials const* server;
+	Site const* site;
 	if (m_pTree->GetItemParent(item) == m_bookmarks_site) {
-		server = m_server;
+		site = site_;
 	}
 	else {
-		server = 0;
+		site = 0;
 	}
 
 	wxString const remotePathRaw = xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue);
 	if (!remotePathRaw.empty()) {
-		if (server) {
-			data->m_remote_dir.SetType(server->server.GetType());
+		if (site) {
+			data->m_remote_dir.SetType(site->server_.server.GetType());
 		}
 		data->m_remote_dir.SetPath(remotePathRaw.ToStdWstring());
 	}
@@ -568,7 +568,7 @@ void CBookmarksDialog::OnNewBookmark(wxCommandEvent&)
 				return;
 			}
 
-			m_site_path = CSiteManager::AddServer(*m_server);
+			m_site_path = CSiteManager::AddServer(*site_);
 			if (m_site_path.empty()) {
 				wxMessageBoxEx(_("Could not add connection to Site Manager"), _("New bookmark"), wxICON_EXCLAMATION, this);
 				return;

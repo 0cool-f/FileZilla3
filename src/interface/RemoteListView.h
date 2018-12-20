@@ -108,9 +108,9 @@ protected:
 	// already.
 	struct t_linkResolveState
 	{
-		ServerWithCredentials server;
+		Site site;
 		CServerPath remote_path;
-		wxString link;
+		std::wstring link;
 		CLocalPath local_path;
 	};
 	std::unique_ptr<t_linkResolveState> m_pLinkResolveState;

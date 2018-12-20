@@ -422,12 +422,11 @@ void CStatusView::OnContextMenu(wxContextMenuEvent&)
 
 	menu.Check(XRCID("ID_SHOW_DETAILED_LOG"), COptions::Get()->GetOptionVal(OPTION_LOGGING_SHOW_DETAILED_LOGS) != 0);
 
-	ServerWithCredentials server;
 	CState* pState = CContextManager::Get()->GetCurrentContext();
 	if (pState) {
 		auto pItem = menu.FindItem(XRCID("ID_MENU_SERVER_CMD"));
-		server = pState->GetServer();
-		if (!server || CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::EnterCommand)) {
+		Site const& site = pState->GetSite();
+		if (!site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::EnterCommand)) {
 			pItem->Enable(true);
 		}
 		else {

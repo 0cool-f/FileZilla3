@@ -79,4 +79,76 @@ public:
 	ProtectedCredentials credentials;
 };
 
+class Bookmark final
+{
+public:
+	bool operator==(Bookmark const& b) const;
+	bool operator!=(Bookmark const& b) const { return !(*this == b); }
+
+	std::wstring m_localDir;
+	CServerPath m_remoteDir;
+
+	bool m_sync{};
+	bool m_comparison{};
+
+	std::wstring m_name;
+};
+
+struct SiteHandleData final : public ServerHandleDataBase
+{
+public:
+	std::wstring sitePath_;
+
+	bool operator==(SiteHandleData& rhs) const {
+		return sitePath_ == rhs.sitePath_;
+	}
+
+	bool operator!=(SiteHandleData& rhs) const {
+		return !(*this == rhs);
+	}
+};
+
+SiteHandleData toSiteHandle(ServerHandle const& handle);
+
+
+class Site final
+{
+public:
+	Site() = default;
+
+	explicit Site(CServer const& s, ServerHandle const& handle, Credentials const& c)
+		: server_(s, handle, c)
+	{}
+
+	explicit Site(CServer const& s, ServerHandle const& handle, ProtectedCredentials const& c)
+		: server_(s, handle, c)
+	{}
+
+	explicit operator bool() const { return server_.operator bool(); }
+
+	bool empty() const { return !server_; }
+	bool operator==(Site const& s) const;
+	bool operator!=(Site const& s) const { return !(*this == s); }
+
+	ServerWithCredentials server_;
+	std::wstring comments_;
+
+	Bookmark m_default_bookmark;
+
+	std::vector<Bookmark> m_bookmarks;
+
+	wxColour m_colour;
+
+	void SetSitePath(std::wstring const& sitePath);
+	std::wstring const& SitePath() const;
+
+	ServerHandle Handle() const;
+
+	// Almost like operator= but does not invalidate exiting handles.
+	void Update(Site const& rhs);
+
+private:
+	std::shared_ptr<SiteHandleData> data_;
+};
+
 #endif

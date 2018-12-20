@@ -386,13 +386,13 @@ void CStatusBar::DoDisplayQueueSize()
 
 void CStatusBar::DisplayDataType()
 {
-	ServerWithCredentials server;
+	Site site;
 	CState const* pState = CContextManager::Get()->GetCurrentContext();
 	if (pState) {
-		server = pState->GetServer();
+		site = pState->GetSite();
 	}
 
-	if (!server || !CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::DataTypeConcept)) {
+	if (!site || !CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::DataTypeConcept)) {
 		if (m_pDataTypeIndicator) {
 			RemoveField(widget_datatype);
 			m_pDataTypeIndicator->Destroy();
@@ -450,16 +450,16 @@ void CStatusBar::MeasureQueueSizeWidth()
 
 void CStatusBar::DisplayEncrypted()
 {
-	ServerWithCredentials server;
+	Site site;
 	CState *const pState = CContextManager::Get()->GetCurrentContext();
 	if (pState) {
-		server = pState->GetServer();
+		site = pState->GetSite();
 	}
 
 	bool encrypted = false;
-	if (server) {
+	if (site) {
 		CCertificateNotification* info;
-		auto const protocol = server.server.GetProtocol();
+		auto const protocol = site.server_.server.GetProtocol();
 		if (protocol == FTPS || protocol == FTPES || protocol == SFTP || protocol == S3||
 				protocol == WEBDAV || protocol == AZURE_BLOB || protocol == AZURE_FILE ||
 				protocol == SWIFT || protocol == GOOGLE_CLOUD || protocol == GOOGLE_DRIVE) {

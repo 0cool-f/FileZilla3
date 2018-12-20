@@ -183,8 +183,6 @@ protected:
 
 	t_OptionsCache m_optionsCache[OPTIONS_NUM];
 
-	std::unique_ptr<ServerWithCredentials> lastServer_;
-
 	static COptions* m_theOptions;
 
 	wxTimer m_save_timer;

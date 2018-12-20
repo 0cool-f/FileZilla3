@@ -203,7 +203,7 @@ protected:
 	{
 		if (notification == STATECHANGE_CHANGEDCONTEXT) {
 			// Update window title
-			if (!pState || !pState->GetServer()) {
+			if (!pState || !pState->GetSite()) {
 				m_pMainFrame->SetTitle(_T("FileZilla"));
 			}
 			else {
@@ -235,10 +235,9 @@ protected:
 		}
 
 		if (notification == STATECHANGE_SERVER) {
-			ServerWithCredentials const& server = pState->GetServer();
-
 			if (pState == CContextManager::Get()->GetCurrentContext()) {
-				if (!server) {
+				Site const& site = pState->GetSite();
+				if (!site) {
 					m_pMainFrame->SetTitle(_T("FileZilla"));
 				}
 				else {
@@ -608,16 +607,16 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		OpenSiteManager();
 	}
 	else if (event.GetId() == XRCID("ID_MENU_FILE_COPYSITEMANAGER")) {
-		ServerWithCredentials server;
+		Site site;
 		CState* pState = CContextManager::Get()->GetCurrentContext();
 		if (pState) {
-			server = pState->GetServer();
+			site = pState->GetSite();
 		}
-		if (!server) {
+		if (!site) {
 			wxMessageBoxEx(_("Not connected to any server."), _("Cannot add server to Site Manager"), wxICON_EXCLAMATION);
 			return;
 		}
-		OpenSiteManager(&server);
+		OpenSiteManager(&site);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_SERVER_CMD")) {
 		CState* pState = CContextManager::Get()->GetCurrentContext();
@@ -861,11 +860,11 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		// controls->last_bookmark_path can get modified if it's empty now
 		int res;
 		if (event.GetId() == XRCID("ID_BOOKMARK_ADD")) {
-			CNewBookmarkDialog dlg(this, sitePath, old_site.server_ ? &old_site.server_ : 0);
+			CNewBookmarkDialog dlg(this, sitePath, old_site.server_ ? &old_site : 0);
 			res = dlg.Run(pState->GetLocalDir().GetPath(), pState->GetRemotePath());
 		}
 		else {
-			CBookmarksDialog dlg(this, sitePath, old_site.server_ ? &old_site.server_ : 0);
+			CBookmarksDialog dlg(this, sitePath, old_site.server_ ? &old_site : 0);
 			res = dlg.Run();
 		}
 		if (res == wxID_OK) {
@@ -1441,7 +1440,7 @@ void CMainFrame::OnTimer(wxTimerEvent& event)
 #endif
 }
 
-void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
+void CMainFrame::OpenSiteManager(Site const* site)
 {
 	CState* pState = CContextManager::Get()->GetCurrentContext();
 	if (!pState) {
@@ -1452,9 +1451,9 @@ void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
 
 	std::vector<CSiteManagerDialog::_connected_site> connected_sites;
 
-	if (pServer) {
+	if (site) {
 		CSiteManagerDialog::_connected_site connected_site;
-		connected_site.server = *pServer;
+		connected_site.site = *site;
 		connected_sites.push_back(connected_site);
 	}
 
@@ -1481,11 +1480,11 @@ void CMainFrame::OpenSiteManager(ServerWithCredentials const* pServer)
 
 		CSiteManagerDialog::_connected_site connected_site;
 		connected_site.old_path = path;
-		connected_site.server = site.server_;
+		connected_site.site = site;
 		connected_sites.push_back(connected_site);
 	}
 
-	if (!dlg.Create(this, &connected_sites, pServer)) {
+	if (!dlg.Create(this, &connected_sites, site)) {
 		return;
 	}
 
@@ -2030,7 +2029,7 @@ void CMainFrame::OnSitemanagerDropdown(wxCommandEvent& event)
 bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pState)
 {
 	// First check if we need to ask user for a password
-	if (!CLoginManager::Get().GetPassword(data.server_, false, data.server_.server.GetName())) {
+	if (!CLoginManager::Get().GetPassword(data, false, data.server_.server.GetName())) {
 		return false;
 	}
 
@@ -2536,30 +2535,28 @@ void CMainFrame::ProcessCommandLine()
 	if (!param.empty()) {
 		std::wstring error;
 
-		ServerWithCredentials server;
+		Site site;
 
 		wxString logontype = pCommandLine->GetOption(CCommandLine::logontype);
 		if (logontype == _T("ask")) {
-			server.SetLogonType(LogonType::ask);
+			site.server_.SetLogonType(LogonType::ask);
 		}
 		else if (logontype == _T("interactive")) {
-			server.SetLogonType(LogonType::interactive);
+			site.server_.SetLogonType(LogonType::interactive);
 		}
 
 		CServerPath path;
-		if (!server.ParseUrl(param, 0, std::wstring(), std::wstring(), error, path)) {
+		if (!site.server_.ParseUrl(param, 0, std::wstring(), std::wstring(), error, path)) {
 			wxString str = _("Parameter not a valid URL");
 			str += _T("\n") + error;
 			wxMessageBoxEx(error, _("Syntax error in command line"));
 		}
 
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && server.credentials.logonType_ == LogonType::normal) {
-			server.SetLogonType(LogonType::ask);
-			CLoginManager::Get().RememberPassword(server);
+		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.server_.credentials.logonType_ == LogonType::normal) {
+			site.server_.SetLogonType(LogonType::ask);
+			CLoginManager::Get().RememberPassword(site);
 		}
 
-		Site site;
-		site.server_ = server;
 		Bookmark bm;
 		bm.m_remoteDir = path;
 		ConnectToSite(site, bm);

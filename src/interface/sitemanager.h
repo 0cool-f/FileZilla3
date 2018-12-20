@@ -5,67 +5,6 @@
 
 #include "xmlfunctions.h"
 
-class Bookmark final
-{
-public:
-	bool operator==(Bookmark const& b) const;
-	bool operator!=(Bookmark const& b) const { return !(*this == b); }
-
-	std::wstring m_localDir;
-	CServerPath m_remoteDir;
-
-	bool m_sync{};
-	bool m_comparison{};
-
-	std::wstring m_name;
-};
-
-struct SiteHandleData final : public ServerHandleDataBase
-{
-public:
-	std::wstring sitePath_;
-
-	bool operator==(SiteHandleData& rhs) const {
-		return sitePath_ == rhs.sitePath_;
-	}
-
-	bool operator!=(SiteHandleData& rhs) const {
-		return !(*this == rhs);
-	}
-};
-
-class Site final
-{
-public:
-	explicit operator bool() const { return server_.operator bool(); }
-
-	bool empty() const { return !server_; }
-	bool operator==(Site const& s) const;
-	bool operator!=(Site const& s) const { return !(*this == s); }
-
-	ServerWithCredentials server_;
-	wxString m_comments;
-
-	Bookmark m_default_bookmark;
-
-	std::vector<Bookmark> m_bookmarks;
-
-	wxColour m_colour;
-
-	void SetSitePath(std::wstring const& sitePath);
-	std::wstring const& SitePath() const;
-
-	ServerHandle Handle() const;
-
-	// Almost like operator= but does not invalidate exiting handles.
-	void Update(Site const& rhs);
-
-private:
-	std::shared_ptr<SiteHandleData> data_;
-};
-
-SiteHandleData toSiteHandle(ServerHandle const& handle);
-
 class CSiteManagerXmlHandler
 {
 public:
@@ -93,7 +32,7 @@ public:
 
 	static std::pair<std::unique_ptr<Site>, Bookmark> GetSiteByPath(std::wstring const& sitePath, bool printErrors = true);
 
-	static std::wstring AddServer(ServerWithCredentials server);
+	static std::wstring AddServer(Site site);
 	static bool AddBookmark(std::wstring sitePath, const wxString& name, const wxString &local_dir, const CServerPath &remote_dir, bool sync, bool comparison);
 	static bool ClearBookmarks(std::wstring sitePath);
 

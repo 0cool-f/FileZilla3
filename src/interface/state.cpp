@@ -205,7 +205,7 @@ void CContextManager::ProcessDirectoryListing(CServer const& server, std::shared
 		if (state == exempt) {
 			continue;
 		}
-		if (state->GetServer() && state->GetServer().server == server) {
+		if (state->GetSite() && state->GetSite().server_.server == server) {
 			state->SetRemoteDir(listing, false);
 		}
 	}
@@ -534,11 +534,6 @@ Site const& CState::GetSite() const
 	return m_site;
 }
 
-ServerWithCredentials const& CState::GetServer() const
-{
-	return m_site.server_;
-}
-
 wxString CState::GetTitle() const
 {
 	return m_title;
@@ -762,7 +757,7 @@ void DoUploadDroppedFiles(CState& state, CMainFrame & mainFrame, T const& files,
 		return;
 	}
 
-	if (!state.GetServer()) {
+	if (!state.GetSite()) {
 		return;
 	}
 
@@ -783,7 +778,7 @@ void DoUploadDroppedFiles(CState& state, CMainFrame & mainFrame, T const& files,
 		if (type == fz::local_filesys::file) {
 			std::wstring localFile;
 			CLocalPath const localPath(fz::to_wstring(file), &localFile);
-			mainFrame.GetQueue()->QueueFile(queueOnly, false, localFile, wxEmptyString, localPath, path, state.GetServer(), size);
+			mainFrame.GetQueue()->QueueFile(queueOnly, false, localFile, wxEmptyString, localPath, path, state.GetSite(), size);
 			mainFrame.GetQueue()->QueueFile_Finish(!queueOnly);
 		}
 		else if (type == fz::local_filesys::dir) {

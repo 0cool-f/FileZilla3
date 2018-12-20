@@ -545,12 +545,12 @@ void CRemoteViewHeader::OnStateChange(t_statechange_notifications notification, 
 			Disable();
 		}
 		else {
-			ServerWithCredentials const& server = m_state.GetServer();
-			if (server && server.server != m_lastServer) {
+			Site const& site = m_state.GetSite();
+			if (site && site.server_.server != m_lastServer) {
 				m_pComboBox->Clear();
 				m_recentDirectories.clear();
 				m_sortedRecentDirectories.clear();
-				m_lastServer = server.server;
+				m_lastServer = site.server_.server;
 			}
 			Enable();
 #ifdef __WXGTK__

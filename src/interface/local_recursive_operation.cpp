@@ -48,16 +48,16 @@ bool CLocalRecursiveOperation::DoStartRecursiveOperation(OperationMode mode, Act
 		return false;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (server) {
-		server_ = server;
+	Site const& site = m_state.GetSite();
+	if (site) {
+		site_ = site;
 	}
 	else {
 		if (mode != OperationMode::recursive_list) {
 			return false;
 		}
 
-		server_ = ServerWithCredentials();
+		site_ = Site();
 	}
 
 	{
@@ -277,7 +277,7 @@ void CLocalRecursiveOperation::OnListedDirectory()
 		}
 		else {
 			if (queue) {
-				m_pQueue->QueueFiles(!m_immediate, server_, d);
+				m_pQueue->QueueFiles(!m_immediate, site_, d);
 			}
 			++m_processedDirectories;
 			processed += d.files.size();

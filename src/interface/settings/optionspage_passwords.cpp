@@ -96,9 +96,9 @@ bool COptionsPagePasswords::SavePage()
 	// Now actually change stored passwords
 	{
 		auto recentServers = CRecentServerList::GetMostRecentServers();
-		for (auto & server : recentServers) {
-			loginManager.AskDecryptor(server.credentials.encrypted_, true, false);
-			server.credentials.Unprotect(loginManager.GetDecryptor(server.credentials.encrypted_), true);
+		for (auto & site : recentServers) {
+			loginManager.AskDecryptor(site.server_.credentials.encrypted_, true, false);
+			site.server_.credentials.Unprotect(loginManager.GetDecryptor(site.server_.credentials.encrypted_), true);
 		}
 		CRecentServerList::SetMostRecentServers(recentServers);
 	}

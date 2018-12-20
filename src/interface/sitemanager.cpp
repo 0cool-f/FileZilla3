@@ -57,7 +57,7 @@ bool Site::operator==(Site const& s) const
 		return false;
 	}
 
-	if (m_comments != s.m_comments) {
+	if (comments_ != s.comments_) {
 		return false;
 	}
 
@@ -115,19 +115,6 @@ void Site::Update(Site const& rhs)
 		*data = *rhs.data_;
 		data_ = data;
 	}
-}
-
-SiteHandleData toSiteHandle(ServerHandle const& handle)
-{
-	auto l = handle.lock();
-	if (l) {
-		auto d = dynamic_cast<SiteHandleData const*>(l.get());
-		if (d) {
-			return *d;
-		}
-	}
-
-	return SiteHandleData();
 }
 
 std::map<int, std::unique_ptr<Site>> CSiteManager::m_idMap;
@@ -201,18 +188,15 @@ bool CSiteManager::ReadBookmarkElement(Bookmark & bookmark, pugi::xml_node eleme
 
 std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
 {
-	ServerWithCredentials server;
-	if (!::GetServer(element, server)) {
-		return 0;
-	}
-	if (server.server.GetName().empty()) {
-		return 0;
-	}
-
 	auto data = std::make_unique<Site>();
-	data->server_ = server;
+	if (!::GetServer(element, *data)) {
+		return 0;
+	}
+	if (data->server_.server.GetName().empty()) {
+		return 0;
+	}
 
-	data->m_comments = GetTextElement(element, "Comments");
+	data->comments_ = GetTextElement(element, "Comments");
 	data->m_colour = GetColourFromIndex(GetTextElementInt(element, "Colour"));
 
 	ReadBookmarkElement(data->m_default_bookmark, element);
@@ -621,7 +605,7 @@ std::pair<std::unique_ptr<Site>, Bookmark> CSiteManager::DoGetSiteByPath(std::ws
 	return ret;
 }
 
-std::wstring CSiteManager::AddServer(ServerWithCredentials server)
+std::wstring CSiteManager::AddServer(Site site)
 {
 	// We have to synchronize access to sitemanager.xml so that multiple processed don't write
 	// to the same file or one is reading while the other one writes.
@@ -668,10 +652,10 @@ std::wstring CSiteManager::AddServer(ServerWithCredentials server)
 		name = _("New site").ToStdWstring() + fz::sprintf(L" %d", ++i);
 	}
 
-	server.server.SetName(name);
+	site.server_.server.SetName(name);
 
 	auto xServer = element.append_child("Server");
-	SetServer(xServer, server);
+	SetServer(xServer, site);
 	AddTextElement(xServer, name);
 
 	if (!file.Save(false)) {
@@ -946,10 +930,10 @@ void CSiteManager::Rewrite(CLoginManager & loginManager, bool on_failure_set_to_
 
 void CSiteManager::Save(pugi::xml_node element, Site const& site)
 {
-	SetServer(element, site.server_);
+	SetServer(element, site);
 
 	// Save comments
-	AddTextElement(element, "Comments", site.m_comments.ToStdWstring());
+	AddTextElement(element, "Comments", site.comments_);
 
 	// Save colour
 	AddTextElement(element, "Colour", CSiteManager::GetColourIndex(site.m_colour));

@@ -23,7 +23,7 @@ public:
 
 	CLocalPath localParent;
 
-	ServerWithCredentials server;
+	Site site;
 	CServerPath remoteParent;
 
 protected:

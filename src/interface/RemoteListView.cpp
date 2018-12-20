@@ -116,7 +116,7 @@ public:
 			return wxDragNone;
 		}
 
-		if (m_pRemoteDataObject->GetServer().server != m_pRemoteListView->m_state.GetServer().server) {
+		if (m_pRemoteDataObject->GetSite().server_.server != m_pRemoteListView->m_state.GetSite().server_.server) {
 			wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 			return wxDragNone;
 		}
@@ -257,15 +257,18 @@ public:
 			return wxDragNone;
 		}
 
-		ServerWithCredentials server = m_pRemoteListView->m_state.GetServer();
-		wxASSERT(server);
+		Site const& site = m_pRemoteListView->m_state.GetSite();
+		if (!site) {
+			ClearDropHighlight();
+			return wxDragNone;
+		}
 
 		int hit = DoDisplayDropHighlight(wxPoint(x, y));
 		const CDragDropManager* pDragDropManager = CDragDropManager::Get();
 
 		if (hit == -1 && pDragDropManager &&
 			pDragDropManager->remoteParent == m_pRemoteListView->m_pDirectoryListing->path &&
-			server == pDragDropManager->server)
+			site == pDragDropManager->site)
 		{
 			return wxDragNone;
 		}
@@ -988,8 +991,8 @@ void CRemoteListView::OnItemActivated(wxListEvent &event)
 		CDirentry const& entry = (*m_pDirectoryListing)[index];
 		std::wstring const& name = entry.name;
 
-		ServerWithCredentials const& server = m_state.GetServer();
-		if (!server) {
+		Site const& site = m_state.GetSite();
+		if (!site) {
 			wxBell();
 			return;
 		}
@@ -1007,7 +1010,7 @@ void CRemoteListView::OnItemActivated(wxListEvent &event)
 					m_pLinkResolveState->remote_path = m_pDirectoryListing->path;
 					m_pLinkResolveState->link = name;
 					m_pLinkResolveState->local_path = m_state.GetLocalDir();
-					m_pLinkResolveState->server = server;
+					m_pLinkResolveState->site = site;
 				}
 				m_state.ChangeRemoteDir(m_pDirectoryListing->path, name, entry.is_link() ? LIST_FLAG_LINK : 0);
 			}
@@ -1045,7 +1048,7 @@ void CRemoteListView::OnItemActivated(wxListEvent &event)
 			}
 			m_pQueue->QueueFile(queue_only, true, name,
 				(name == localFile) ? std::wstring() : localFile,
-				local_path, m_pDirectoryListing->path, server, entry.size);
+				local_path, m_pDirectoryListing->path, site, entry.size);
 			m_pQueue->QueueFile_Finish(true);
 		}
 	}
@@ -1082,8 +1085,8 @@ void CRemoteListView::OnMenuEnter(wxCommandEvent &)
 		CDirentry const& entry = (*m_pDirectoryListing)[index];
 		std::wstring const& name = entry.name;
 
-		ServerWithCredentials const& server = m_state.GetServer();
-		if (!server) {
+		Site const& site = m_state.GetSite();
+		if (!site) {
 			wxBell();
 			return;
 		}
@@ -1098,7 +1101,7 @@ void CRemoteListView::OnMenuEnter(wxCommandEvent &)
 			m_pLinkResolveState->remote_path = m_pDirectoryListing->path;
 			m_pLinkResolveState->link = name;
 			m_pLinkResolveState->local_path = m_state.GetLocalDir();
-			m_pLinkResolveState->server = server;
+			m_pLinkResolveState->site = site;
 		}
 		m_state.ChangeRemoteDir(m_pDirectoryListing->path, name, entry.is_link() ? LIST_FLAG_LINK : 0);
 	}
@@ -1230,7 +1233,7 @@ void CRemoteListView::OnContextMenu(wxContextMenuEvent& event)
 		else {
 			if (selectedDir) {
 				menu.Enable(XRCID("ID_EDIT"), false);
-				if (!CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::DirectoryRename)) {
+				if (!CServer::ProtocolHasFeature(m_state.GetSite().server_.server.GetProtocol(), ProtocolFeature::DirectoryRename)) {
 					menu.Enable(XRCID("ID_RENAME"), false);
 				}
 			}
@@ -1299,8 +1302,8 @@ void CRemoteListView::TransferSelectedFiles(const CLocalPath& local_parent, bool
 
 	wxASSERT(local_parent.IsWriteable());
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -1347,7 +1350,7 @@ void CRemoteListView::TransferSelectedFiles(const CLocalPath& local_parent, bool
 			}
 			m_pQueue->QueueFile(queue_only, true,
 				name, (name == localFile) ? std::wstring() : localFile,
-				local_parent, m_pDirectoryListing->path, server, entry.size);
+				local_parent, m_pDirectoryListing->path, site, entry.size);
 			added = true;
 		}
 	}
@@ -1508,7 +1511,7 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 	}
 
 	CFilterManager filter;
-	if (CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
+	if (CServer::ProtocolHasFeature(m_state.GetSite().server_.server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
 		std::deque<std::wstring> filesToDelete;
 
 		for (item = -1; ;) {
@@ -1751,8 +1754,8 @@ bool CRemoteListView::OnAcceptRename(const wxListEvent& event)
 
 void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 {
-	auto const& server = m_state.GetServer();
-	auto protocol = server.server.GetProtocol();
+	Site const& site = m_state.GetSite();
+	auto protocol = site.server_.server.GetProtocol();
 	
 	if (!m_state.IsRemoteConnected() || !m_state.IsRemoteIdle()) {
 		wxBell();
@@ -2296,18 +2299,18 @@ void CRemoteListView::OnBeginDrag(wxListEvent&)
 
 	wxDataObjectComposite object;
 
-	ServerWithCredentials server = m_state.GetServer(); // Make copy doe to DoDragDrop running the event loop
-	if (!server) {
+	Site site = m_state.GetSite(); // Make copy doe to DoDragDrop running the event loop
+	if (!site) {
 		return;
 	}
 	CServerPath const path = m_pDirectoryListing->path;
 
-	CRemoteDataObject *pRemoteDataObject = new CRemoteDataObject(server, m_pDirectoryListing->path);
+	CRemoteDataObject *pRemoteDataObject = new CRemoteDataObject(site, m_pDirectoryListing->path);
 	pRemoteDataObject->Reserve(count);
 
 	CDragDropManager* pDragDropManager = CDragDropManager::Init();
 	pDragDropManager->pDragSource = this;
-	pDragDropManager->server = server;
+	pDragDropManager->site = site;
 	pDragDropManager->remoteParent = m_pDirectoryListing->path;
 
 	// Add files to remote data object
@@ -2361,9 +2364,9 @@ void CRemoteListView::OnBeginDrag(wxListEvent&)
 #if FZ3_USESHELLEXT
 	if (ext) {
 		if (!pRemoteDataObject->DidSendData()) {
-			server = m_state.GetServer();
+			Site newSite = m_state.GetSite();
 			if (!m_state.IsRemoteIdle() ||
-				!server || server != pRemoteDataObject->GetServer() ||
+				!newSite || newSite.server_ != pRemoteDataObject->GetServer() ||
 				!m_pDirectoryListing || m_pDirectoryListing->path != path)
 			{
 				// Remote listing has changed since drag started
@@ -2448,7 +2451,7 @@ void CRemoteListView::OnMenuEdit(wxCommandEvent&)
 	}
 
 	CServerPath const path = m_pDirectoryListing->path;
-	pEditHandler->Edit(CEditHandler::remote, selected_items, path, m_state.GetServer(), this);
+	pEditHandler->Edit(CEditHandler::remote, selected_items, path, m_state.GetSite(), this);
 }
 
 #ifdef __WXDEBUG__
@@ -2719,7 +2722,7 @@ void CRemoteListView::LinkIsNotDir(CServerPath const& path, std::wstring const& 
 		}
 		m_pQueue->QueueFile(false, true,
 			link, (link != localFile) ? localFile : std::wstring(),
-			m_pLinkResolveState->local_path, m_pLinkResolveState->remote_path, m_pLinkResolveState->server, -1);
+			m_pLinkResolveState->local_path, m_pLinkResolveState->remote_path, m_pLinkResolveState->site, -1);
 		m_pQueue->QueueFile_Finish(true);
 	}
 
@@ -2732,8 +2735,8 @@ void CRemoteListView::OnMenuGeturl(wxCommandEvent& event)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		return;
 	}
 
@@ -2767,7 +2770,7 @@ void CRemoteListView::OnMenuGeturl(wxCommandEvent& event)
 
 	const CServerPath& path = m_pDirectoryListing->path;
 
-	wxString const url = server.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
+	wxString const url = site.server_.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
 
 	auto getUrl = [](wxString const& serverPart, CServerPath const& path, std::wstring const& name) {
 		wxString url = serverPart;
@@ -2886,8 +2889,8 @@ void CRemoteListView::OnMenuNewfile(wxCommandEvent&)
 		fz::local_filesys::set_modification_time(fn, fz::datetime::now());
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}

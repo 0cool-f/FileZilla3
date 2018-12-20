@@ -122,12 +122,13 @@ public:
 				return wxDragNone;
 			}
 
-			if (!m_pLocalTreeView->m_state.GetServer() || m_pRemoteDataObject->GetServer().server != m_pLocalTreeView->m_state.GetServer().server) {
+			auto & state = m_pLocalTreeView->m_state;
+			if (!state.GetSite() || m_pRemoteDataObject->GetSite().server_.server != state.GetSite().server_.server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}
 
-			if (!m_pLocalTreeView->m_state.DownloadDroppedFiles(m_pRemoteDataObject, path)) {
+			if (!state.DownloadDroppedFiles(m_pRemoteDataObject, path)) {
 				return wxDragNone;
 			}
 		}
@@ -1147,8 +1148,8 @@ void CLocalTreeView::OnMenuUpload(wxCommandEvent& event)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		return;
 	}
 

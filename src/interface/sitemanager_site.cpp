@@ -526,28 +526,28 @@ bool CSiteManagerSite::Verify(bool predefined)
 	}
 
 	// Set selected type
-	ServerWithCredentials server;
-	server.SetLogonType(logon_type);
-	server.server.SetProtocol(protocol);
+	Site site;
+	site.server_.SetLogonType(logon_type);
+	site.server_.server.SetProtocol(protocol);
 
 	std::wstring port = xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring();
 	CServerPath path;
 	std::wstring error;
-	if (!server.ParseUrl(host, port, std::wstring(), std::wstring(), error, path, protocol)) {
+	if (!site.server_.ParseUrl(host, port, std::wstring(), std::wstring(), error, path, protocol)) {
 		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->SetFocus();
 		wxMessageBoxEx(error, _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
 		return false;
 	}
 
-	XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(server.Format(ServerFormat::host_only));
-	if (server.server.GetPort() != CServer::GetDefaultPort(server.server.GetProtocol())) {
-		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), server.server.GetPort()));
+	XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site.server_.Format(ServerFormat::host_only));
+	if (site.server_.server.GetPort() != CServer::GetDefaultPort(site.server_.server.GetProtocol())) {
+		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), site.server_.server.GetPort()));
 	}
 	else {
 		XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString());
 	}
 
-	SetProtocol(server.server.GetProtocol());
+	SetProtocol(site.server_.server.GetProtocol());
 
 	if (XRCCTRL(*this, "ID_CHARSET_CUSTOM", wxRadioButton)->GetValue()) {
 		if (XRCCTRL(*this, "ID_ENCODING", wxTextCtrl)->GetValue().empty()) {
@@ -725,7 +725,7 @@ void CSiteManagerSite::UpdateSite(Site &site)
 
 	site.server_.credentials.keyFile_ = xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::GetValue).ToStdWstring();
 
-	site.m_comments = xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::GetValue);
+	site.comments_ = xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::GetValue).ToStdWstring();
 	site.m_colour = CSiteManager::GetColourFromIndex(xrc_call(*this, "ID_COLOR", &wxChoice::GetSelection));
 
 	std::wstring const serverType = xrc_call(*this, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
@@ -927,7 +927,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		SetExtraParameters(site.server_.server);
 
 		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.server_.credentials.keyFile_);
-		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.m_comments);
+		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.comments_);
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site.m_colour));
 
 		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server_.server.GetType());

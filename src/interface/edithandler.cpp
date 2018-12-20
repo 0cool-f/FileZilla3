@@ -251,9 +251,9 @@ CEditHandler::fileState CEditHandler::GetFileState(wxString const& fileName) con
 	return iter->state;
 }
 
-CEditHandler::fileState CEditHandler::GetFileState(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server) const
+CEditHandler::fileState CEditHandler::GetFileState(wxString const& fileName, CServerPath const& remotePath, Site const& site) const
 {
-	std::list<t_fileData>::const_iterator iter = GetFile(fileName, remotePath, server);
+	std::list<t_fileData>::const_iterator iter = GetFile(fileName, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return unknown;
 	}
@@ -261,11 +261,11 @@ CEditHandler::fileState CEditHandler::GetFileState(wxString const& fileName, CSe
 	return iter->state;
 }
 
-int CEditHandler::GetFileCount(CEditHandler::fileType type, CEditHandler::fileState state, ServerWithCredentials const& server) const
+int CEditHandler::GetFileCount(CEditHandler::fileType type, CEditHandler::fileState state, Site const& site) const
 {
 	int count = 0;
 	if (state == unknown) {
-		wxASSERT(!server);
+		wxASSERT(!site);
 		if (type != remote) {
 			count += m_fileDataList[local].size();
 		}
@@ -274,14 +274,14 @@ int CEditHandler::GetFileCount(CEditHandler::fileType type, CEditHandler::fileSt
 		}
 	}
 	else {
-		auto f = [state, &server](decltype(m_fileDataList[0]) & items) {
+		auto f = [state, &site](decltype(m_fileDataList[0]) & items) {
 			int cnt = 0;
 			for (auto const& data : items) {
 				if (data.state != state) {
 					continue;
 				}
 
-				if (!server || data.server == server) {
+				if (!site || data.site == site) {
 					++cnt;
 				}
 			}
@@ -298,7 +298,7 @@ int CEditHandler::GetFileCount(CEditHandler::fileType type, CEditHandler::fileSt
 	return count;
 }
 
-bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, CServerPath const& remotePath, ServerWithCredentials const& server)
+bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, CServerPath const& remotePath, Site const& site)
 {
 	wxASSERT(type != none);
 
@@ -307,7 +307,7 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, 
 		state = GetFileState(fileName);
 	}
 	else {
-		state = GetFileState(fileName, remotePath, server);
+		state = GetFileState(fileName, remotePath, site);
 	}
 	if (state != unknown) {
 		wxFAIL_MSG(_T("File state not unknown"));
@@ -327,7 +327,7 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, 
 		data.state = edit;
 	}
 	data.remotePath = remotePath;
-	data.server = server;
+	data.site = site;
 
 	if (type == local && !COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
 		return StartEditing(local, data);
@@ -357,9 +357,9 @@ bool CEditHandler::Remove(const wxString& fileName)
 	return true;
 }
 
-bool CEditHandler::Remove(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server)
+bool CEditHandler::Remove(wxString const& fileName, CServerPath const& remotePath, Site const& site)
 {
-	std::list<t_fileData>::iterator iter = GetFile(fileName, remotePath, server);
+	std::list<t_fileData>::iterator iter = GetFile(fileName, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return true;
 	}
@@ -417,7 +417,7 @@ bool CEditHandler::RemoveAll(bool force)
 	return m_fileDataList[local].empty() && m_fileDataList[remote].empty();
 }
 
-bool CEditHandler::RemoveAll(fileState state, ServerWithCredentials const& server)
+bool CEditHandler::RemoveAll(fileState state, Site const& site)
 {
 	// Others not implemented
 	wxASSERT(state == upload_and_remove_failed);
@@ -433,7 +433,7 @@ bool CEditHandler::RemoveAll(fileState state, ServerWithCredentials const& serve
 			continue;
 		}
 
-		if (server && iter->server != server) {
+		if (site && iter->site != site) {
 			keep.push_back(*iter);
 			continue;
 		}
@@ -475,7 +475,7 @@ std::list<CEditHandler::t_fileData>::const_iterator CEditHandler::GetFile(const 
 	return iter;
 }
 
-std::list<CEditHandler::t_fileData>::iterator CEditHandler::GetFile(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server)
+std::list<CEditHandler::t_fileData>::iterator CEditHandler::GetFile(wxString const& fileName, CServerPath const& remotePath, Site const& site)
 {
 	std::list<t_fileData>::iterator iter;
 	for (iter = m_fileDataList[remote].begin(); iter != m_fileDataList[remote].end(); ++iter) {
@@ -483,7 +483,7 @@ std::list<CEditHandler::t_fileData>::iterator CEditHandler::GetFile(wxString con
 			continue;
 		}
 
-		if (iter->server != server) {
+		if (iter->site != site) {
 			continue;
 		}
 
@@ -497,7 +497,7 @@ std::list<CEditHandler::t_fileData>::iterator CEditHandler::GetFile(wxString con
 	return iter;
 }
 
-std::list<CEditHandler::t_fileData>::const_iterator CEditHandler::GetFile(wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server) const
+std::list<CEditHandler::t_fileData>::const_iterator CEditHandler::GetFile(wxString const& fileName, CServerPath const& remotePath, Site const& site) const
 {
 	std::list<t_fileData>::const_iterator iter;
 	for (iter = m_fileDataList[remote].begin(); iter != m_fileDataList[remote].end(); ++iter) {
@@ -505,7 +505,7 @@ std::list<CEditHandler::t_fileData>::const_iterator CEditHandler::GetFile(wxStri
 			continue;
 		}
 
-		if (iter->server != server) {
+		if (iter->site != site) {
 			continue;
 		}
 
@@ -548,9 +548,9 @@ void CEditHandler::FinishTransfer(bool, wxString const& fileName)
 	SetTimerState();
 }
 
-void CEditHandler::FinishTransfer(bool successful, wxString const& fileName, CServerPath const& remotePath, ServerWithCredentials const& server)
+void CEditHandler::FinishTransfer(bool successful, wxString const& fileName, CServerPath const& remotePath, Site const& site)
 {
-	auto iter = GetFile(fileName, remotePath, server);
+	auto iter = GetFile(fileName, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return;
 	}
@@ -616,9 +616,9 @@ bool CEditHandler::StartEditing(wxString const& file)
 	return StartEditing(local, *iter);
 }
 
-bool CEditHandler::StartEditing(wxString const& file, CServerPath const& remotePath, ServerWithCredentials const& server)
+bool CEditHandler::StartEditing(wxString const& file, CServerPath const& remotePath, Site const& site)
 {
-	auto iter = GetFile(file, remotePath, server);
+	auto iter = GetFile(file, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return false;
 	}
@@ -632,16 +632,19 @@ bool CEditHandler::StartEditing(CEditHandler::fileType type, t_fileData& data)
 	wxASSERT(data.state == edit);
 
 	bool is_link;
-	if (fz::local_filesys::get_file_info(fz::to_native(data.file), is_link, 0, &data.modificationTime, 0) != fz::local_filesys::file)
+	if (fz::local_filesys::get_file_info(fz::to_native(data.file), is_link, 0, &data.modificationTime, 0) != fz::local_filesys::file) {
 		return false;
+	}
 
 	bool program_exists = false;
 	wxString cmd = GetOpenCommand(data.file, program_exists);
-	if (cmd.empty() || !program_exists)
+	if (cmd.empty() || !program_exists) {
 		return false;
+	}
 
-	if (!wxExecute(cmd))
+	if (!wxExecute(cmd)) {
 		return false;
+	}
 
 	return true;
 }
@@ -763,7 +766,7 @@ int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, std::li
 			dlg.SetChildLabel(XRCID("ID_OPENEDAS"), file);
 	}
 
-	dlg.SetChildLabel(XRCID("ID_SERVER"), iter->server.Format(ServerFormat::with_user_and_optional_port));
+	dlg.SetChildLabel(XRCID("ID_SERVER"), iter->site.server_.Format(ServerFormat::with_user_and_optional_port));
 	dlg.SetChildLabel(XRCID("ID_REMOTEPATH"), iter->remotePath.GetPath());
 
 	dlg.GetSizer()->Fit(&dlg);
@@ -775,9 +778,9 @@ int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, std::li
 	return res;
 }
 
-bool CEditHandler::UploadFile(wxString const& file, CServerPath const& remotePath, ServerWithCredentials const& server, bool unedit)
+bool CEditHandler::UploadFile(wxString const& file, CServerPath const& remotePath, Site const& site, bool unedit)
 {
-	std::list<t_fileData>::iterator iter = GetFile(file, remotePath, server);
+	std::list<t_fileData>::iterator iter = GetFile(file, remotePath, site);
 	return UploadFile(remote, iter, unedit);
 }
 
@@ -826,7 +829,7 @@ bool CEditHandler::UploadFile(fileType type, std::list<t_fileData>::iterator ite
 		return false;
 	}
 
-	m_pQueue->QueueFile(false, false, file, iter->name, localPath, iter->remotePath, iter->server, size, type, QueuePriority::high);
+	m_pQueue->QueueFile(false, false, file, iter->name, localPath, iter->remotePath, iter->site, size, type, QueuePriority::high);
 	m_pQueue->QueueFile_Finish(true);
 
 	return true;
@@ -1176,7 +1179,7 @@ int CEditHandlerStatusDialog::ShowModal()
 				pListCtrl->SetItem(i, COLUMN_STATUS, _("Unknown"));
 				break;
 			}
-			pListCtrl->SetItem(i, COLUMN_REMOTEPATH, iter->server.Format(ServerFormat::with_user_and_optional_port) + iter->remotePath.GetPath());
+			pListCtrl->SetItem(i, COLUMN_REMOTEPATH, iter->site.server_.Format(ServerFormat::with_user_and_optional_port) + iter->remotePath.GetPath());
 			CEditHandler::t_fileData* pData = new CEditHandler::t_fileData(*iter);
 			pListCtrl->SetItemPtrData(i, (wxUIntPtr)pData);
 		}
@@ -1204,7 +1207,7 @@ int CEditHandlerStatusDialog::ShowModal()
 				pListCtrl->SetItem(i, COLUMN_STATUS, _("Unknown"));
 				break;
 			}
-			pListCtrl->SetItem(i, COLUMN_REMOTEPATH, iter->server.Format(ServerFormat::with_user_and_optional_port) + iter->remotePath.GetPath());
+			pListCtrl->SetItem(i, COLUMN_REMOTEPATH, iter->site.server_.Format(ServerFormat::with_user_and_optional_port) + iter->remotePath.GetPath());
 			CEditHandler::t_fileData* pData = new CEditHandler::t_fileData(*iter);
 			pListCtrl->SetItemPtrData(i, (wxUIntPtr)pData);
 		}
@@ -1299,7 +1302,7 @@ void CEditHandlerStatusDialog::OnUnedit(wxCommandEvent&)
 			pListCtrl->DeleteItem(i);
 		}
 		else {
-			if (pEditHandler->Remove(pData->name, pData->remotePath, pData->server)) {
+			if (pEditHandler->Remove(pData->name, pData->remotePath, pData->site)) {
 				delete pData;
 				pListCtrl->DeleteItem(i);
 			}
@@ -1314,8 +1317,9 @@ void CEditHandlerStatusDialog::OnUnedit(wxCommandEvent&)
 void CEditHandlerStatusDialog::OnUpload(wxCommandEvent& event)
 {
 	CEditHandler* const pEditHandler = CEditHandler::Get();
-	if (!pEditHandler)
+	if (!pEditHandler) {
 		return;
+	}
 
 	wxListCtrl* pListCtrl = XRCCTRL(*this, "ID_FILES", wxListCtrl);
 
@@ -1342,17 +1346,22 @@ void CEditHandlerStatusDialog::OnUpload(wxCommandEvent& event)
 
 		bool unedit = event.GetId() == XRCID("ID_UPLOADANDUNEDIT") || pData->state == CEditHandler::upload_and_remove_failed;
 
-		if (type == CEditHandler::local)
+		if (type == CEditHandler::local) {
 			pEditHandler->UploadFile(pData->file, unedit);
-		else
-			pEditHandler->UploadFile(pData->name, pData->remotePath, pData->server, unedit);
+		}
+		else {
+			pEditHandler->UploadFile(pData->name, pData->remotePath, pData->site, unedit);
+		}
 
-		if (!unedit)
+		if (!unedit) {
 			pListCtrl->SetItem(i, COLUMN_STATUS, _("Uploading"));
-		else if (type == CEditHandler::remote)
+		}
+		else if (type == CEditHandler::remote) {
 			pListCtrl->SetItem(i, COLUMN_STATUS, _("Uploading and pending removal"));
-		else
+		}
+		else {
 			pListCtrl->SetItem(i, COLUMN_STATUS, _("Uploading and unediting"));
+		}
 	}
 
 	SetCtrlState();
@@ -1361,8 +1370,9 @@ void CEditHandlerStatusDialog::OnUpload(wxCommandEvent& event)
 void CEditHandlerStatusDialog::OnEdit(wxCommandEvent&)
 {
 	CEditHandler* const pEditHandler = CEditHandler::Get();
-	if (!pEditHandler)
+	if (!pEditHandler) {
 		return;
+	}
 
 	wxListCtrl* pListCtrl = XRCCTRL(*this, "ID_FILES", wxListCtrl);
 
@@ -1398,13 +1408,14 @@ void CEditHandlerStatusDialog::OnEdit(wxCommandEvent&)
 			}
 		}
 		else {
-			if (!pEditHandler->StartEditing(pData->name, pData->remotePath, pData->server)) {
-				if (pEditHandler->Remove(pData->name, pData->remotePath, pData->server)) {
+			if (!pEditHandler->StartEditing(pData->name, pData->remotePath, pData->site)) {
+				if (pEditHandler->Remove(pData->name, pData->remotePath, pData->site)) {
 					delete pData;
 					pListCtrl->DeleteItem(i);
 				}
-				else
+				else {
 					pListCtrl->SetItem(i, COLUMN_STATUS, _("Pending removal"));
+				}
 			}
 		}
 	}
@@ -1424,10 +1435,12 @@ CEditHandler::t_fileData* CEditHandlerStatusDialog::GetDataFromItem(int item, CE
 	info.SetId(item);
 	info.SetColumn(1);
 	pListCtrl->GetItem(info);
-	if (info.GetText() == _("Local"))
+	if (info.GetText() == _("Local")) {
 		type = CEditHandler::local;
-	else
+	}
+	else {
 		type = CEditHandler::remote;
+	}
 
 	return pData;
 }
@@ -1447,16 +1460,20 @@ CNewAssociationDialog::CNewAssociationDialog(wxWindow *parent)
 
 bool CNewAssociationDialog::Run(const wxString &file)
 {
-	if (!Load(m_pParent, _T("ID_EDIT_NOPROGRAM")))
+	if (!Load(m_pParent, _T("ID_EDIT_NOPROGRAM"))) {
 		return true;
+	}
 
 	int pos = file.Find('.', true);
-	if (!pos)
+	if (!pos) {
 		m_ext = _T(".");
-	else if (pos != -1)
+	}
+	else if (pos != -1) {
 		m_ext = file.Mid(pos + 1);
-	else
+	}
+	else {
 		m_ext.clear();
+	}
 
 	wxStaticText *const pDesc = XRCCTRL(*this, "ID_DESC", wxStaticText);
 	if (pDesc) {
@@ -1465,16 +1482,19 @@ bool CNewAssociationDialog::Run(const wxString &file)
 
 	bool program_exists = false;
 	wxString cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
-	if (!program_exists)
+	if (!program_exists) {
 		cmd.clear();
+	}
 	if (!cmd.empty()) {
 		wxString args;
-		if (!UnquoteCommand(cmd, args))
+		if (!UnquoteCommand(cmd, args)) {
 			cmd.clear();
+		}
 	}
 
-	if (!PathExpand(cmd))
+	if (!PathExpand(cmd)) {
 		cmd.clear();
+	}
 
 	if (cmd.empty()) {
 		xrc_call(*this, "ID_USE_CUSTOM", &wxRadioButton::SetValue, true);
@@ -1493,8 +1513,9 @@ bool CNewAssociationDialog::Run(const wxString &file)
 
 	GetSizer()->Fit(this);
 
-	if (ShowModal() != wxID_OK)
+	if (ShowModal() != wxID_OK) {
 		return false;
+	}
 
 	return true;
 }
@@ -1536,30 +1557,36 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 			return;
 		}
 
-		if (always)
+		if (always) {
 			COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("2") + cmd.ToStdWstring());
+		}
 		else {
 			wxString associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-			if (!associations.empty() && associations.Last() != '\n')
+			if (!associations.empty() && associations.Last() != '\n') {
 				associations += '\n';
-			if (m_ext.empty())
+			}
+			if (m_ext.empty()) {
 				m_ext = _T("/");
+			}
 			associations += m_ext.ToStdWstring() + _T(" ") + cmd.ToStdWstring();
 			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations.ToStdWstring());
 		}
 	}
 	else {
-		if (always)
+		if (always) {
 			COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
+		}
 		else {
 			bool program_exists = false;
 			wxString cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
-			if (!program_exists)
+			if (!program_exists) {
 				cmd.clear();
+			}
 			if (!cmd.empty()) {
 				wxString args;
-				if (!UnquoteCommand(cmd, args))
+				if (!UnquoteCommand(cmd, args)) {
 					cmd.clear();
+				}
 			}
 			if (cmd.empty()
 #ifdef __WXGTK__
@@ -1619,16 +1646,16 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 	XRCCTRL(*this, "ID_CUSTOM", wxTextCtrl)->ChangeValue(editor);
 }
 
-bool CEditHandler::Edit(CEditHandler::fileType type, std::wstring const& fileName, CServerPath const& path, ServerWithCredentials const& server, int64_t size, wxWindow * parent)
+bool CEditHandler::Edit(CEditHandler::fileType type, std::wstring const& fileName, CServerPath const& path, Site const& site, int64_t size, wxWindow * parent)
 {
 	std::vector<FileData> data;
 	FileData d{fileName, size};
 	data.push_back(d);
 
-	return Edit(type, data, path, server, parent);
+	return Edit(type, data, path, site, parent);
 }
 
-bool CEditHandler::Edit(CEditHandler::fileType type, std::vector<FileData> const& data, CServerPath const& path, ServerWithCredentials const& server, wxWindow * parent)
+bool CEditHandler::Edit(CEditHandler::fileType type, std::vector<FileData> const& data, CServerPath const& path, Site const& site, wxWindow * parent)
 {
 	if (type == CEditHandler::remote) {
 		wxString const& localDir = GetLocalDirectory();
@@ -1656,7 +1683,7 @@ bool CEditHandler::Edit(CEditHandler::fileType type, std::vector<FileData> const
 	bool success = true;
 	int already_editing_action{};
 	for (auto const& file : data) {
-		if (!DoEdit(type, file, path, server, parent, data.size(), already_editing_action)) {
+		if (!DoEdit(type, file, path, site, parent, data.size(), already_editing_action)) {
 			success = false;
 		}
 	}
@@ -1664,7 +1691,7 @@ bool CEditHandler::Edit(CEditHandler::fileType type, std::vector<FileData> const
 	return success;
 }
 
-bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, ServerWithCredentials const& server, wxWindow * parent, size_t fileCount, int & already_editing_action)
+bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow * parent, size_t fileCount, int & already_editing_action)
 {
 	bool dangerous = false;
 	bool program_exists = false;
@@ -1698,7 +1725,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 		state = GetFileState(file.name);
 	}
 	else {
-		state = GetFileState(file.name, path, server);
+		state = GetFileState(file.name, path, site);
 	}
 	switch (state)
 	{
@@ -1709,7 +1736,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 		wxMessageBoxEx(_("A file with that name is already being transferred."), _("Cannot view/edit selected file"), wxICON_EXCLAMATION);
 		return false;
 	case CEditHandler::removing:
-		if (!Remove(file.name, path, server)) {
+		if (!Remove(file.name, path, site)) {
 			wxMessageBoxEx(_("A file with that name is still being edited. Please close it and try again."), _("Selected file is already opened"), wxICON_EXCLAMATION);
 			return false;
 		}
@@ -1776,12 +1803,12 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 					StartEditing(file.name);
 				}
 				else {
-					StartEditing(file.name, path, server);
+					StartEditing(file.name, path, site);
 				}
 				return true;
 			}
 			else {
-				if (!Remove(file.name, path, server)) {
+				if (!Remove(file.name, path, site)) {
 					wxMessageBoxEx(_("The selected file is still opened in some other program, please close it."), _("Selected file is still being edited"), wxICON_EXCLAMATION);
 					return false;
 				}
@@ -1793,7 +1820,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 	}
 
 	std::wstring localFile = file.name;
-	if (!AddFile(type, localFile, path, server)) {
+	if (!AddFile(type, localFile, path, site)) {
 		if( type == CEditHandler::local) {
 			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nThe associated command failed"), file.name), _("Opening failed"), wxICON_EXCLAMATION);
 		}
@@ -1809,7 +1836,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 		CLocalPath localPath(localFile, &localFileName);
 
 		m_pQueue->QueueFile(false, true, file.name, (localFileName != file.name) ? localFileName : std::wstring(),
-			localPath, path, server, file.size, type, QueuePriority::high);
+			localPath, path, site, file.size, type, QueuePriority::high);
 		m_pQueue->QueueFile_Finish(true);
 	}
 

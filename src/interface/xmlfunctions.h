@@ -74,8 +74,8 @@ protected:
 };
 
 // Functions to save and retrieve CServer objects to the XML file
-void SetServer(pugi::xml_node node, ServerWithCredentials const& server);
+void SetServer(pugi::xml_node node, Site const& site);
 
-bool GetServer(pugi::xml_node node, ServerWithCredentials& server);
+bool GetServer(pugi::xml_node node, Site& site);
 
 #endif

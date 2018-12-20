@@ -70,8 +70,8 @@ public:
 			if (!pState) {
 				return wxDragNone;
 			}
-			ServerWithCredentials const& server = pState->GetServer();
-			if (!server) {
+			Site const& site = pState->GetSite();
+			if (!site) {
 				return wxDragNone;
 			}
 
@@ -97,12 +97,12 @@ public:
 			if (!pState) {
 				return wxDragNone;
 			}
-			ServerWithCredentials const& server = pState->GetServer();
-			if (!server) {
+			Site const& site = pState->GetSite();
+			if (!site) {
 				return wxDragNone;
 			}
 
-			if (server.server != m_pRemoteDataObject->GetServer().server) {
+			if (site.server_.server != m_pRemoteDataObject->GetSite().server_.server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}
@@ -253,10 +253,10 @@ CQueueView::~CQueueView()
 bool CQueueView::QueueFile(const bool queueOnly, const bool download,
 						   std::wstring const& sourceFile, std::wstring const& targetFile,
 						   const CLocalPath& localPath, const CServerPath& remotePath,
-						   ServerWithCredentials const& server, int64_t size, CEditHandler::fileType edit,
+						   Site const& site, int64_t size, CEditHandler::fileType edit,
 						   QueuePriority priority)
 {
-	CServerItem* pServerItem = CreateServerItem(server);
+	CServerItem* pServerItem = CreateServerItem(site);
 
 	CFileItem* fileItem;
 	if (sourceFile.empty()) {
@@ -272,7 +272,7 @@ bool CQueueView::QueueFile(const bool queueOnly, const bool download,
 	}
 	else {
 		fileItem = new CFileItem(pServerItem, queueOnly, download, sourceFile, targetFile, localPath, remotePath, size);
-		if (server.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
+		if (site.server_.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
 			if (download) {
 				fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(sourceFile, remotePath.GetType()));
 			}
@@ -323,11 +323,11 @@ std::wstring StripVMSRevision(std::wstring const& name);
 
 bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, const CRemoteDataObject& dataObject)
 {
-	CServerItem* pServerItem = CreateServerItem(dataObject.GetServer());
+	CServerItem* pServerItem = CreateServerItem(dataObject.GetSite());
 
 	std::vector<CRemoteDataObject::t_fileInfo> const& files = dataObject.GetFiles();
 
-	bool const hasDataTypeConcept = dataObject.GetServer().server.HasFeature(ProtocolFeature::DataTypeConcept);
+	bool const hasDataTypeConcept = dataObject.GetSite().server_.server.HasFeature(ProtocolFeature::DataTypeConcept);
 
 	for (auto const& fileInfo : files) {
 		if (fileInfo.dir) {
@@ -354,9 +354,9 @@ bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, c
 	return true;
 }
 
-bool CQueueView::QueueFiles(const bool queueOnly, ServerWithCredentials const& server, CLocalRecursiveOperation::listing const& listing)
+bool CQueueView::QueueFiles(const bool queueOnly, Site const& site, CLocalRecursiveOperation::listing const& listing)
 {
-	CServerItem* pServerItem = CreateServerItem(server);
+	CServerItem* pServerItem = CreateServerItem(site);
 
 	auto const& files = listing.files;
 	if (files.empty() && listing.dirs.empty()) {
@@ -365,7 +365,7 @@ bool CQueueView::QueueFiles(const bool queueOnly, ServerWithCredentials const& s
 		InsertItem(pServerItem, fileItem);
 	}
 	else {
-		bool const hasDataTypeConcept = server.server.HasFeature(ProtocolFeature::DataTypeConcept);
+		bool const hasDataTypeConcept = site.server_.server.HasFeature(ProtocolFeature::DataTypeConcept);
 
 		for (auto const& file : files) {
 			CFileItem* fileItem = new CFileItem(pServerItem, queueOnly, false,
@@ -510,7 +510,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 			if (!listingNotification.GetPath().empty() && !listingNotification.Failed() && pEngineData->pEngine) {
 				std::shared_ptr<CDirectoryListing> pListing = std::make_shared<CDirectoryListing>();
 				if (pEngineData->pEngine->CacheLookup(listingNotification.GetPath(), *pListing) == FZ_REPLY_OK) {
-					CContextManager::Get()->ProcessDirectoryListing(pEngineData->lastServer.server, pListing, 0);
+					CContextManager::Get()->ProcessDirectoryListing(pEngineData->lastSite.server_.server, pListing, 0);
 				}
 			}
 		}
@@ -522,8 +522,8 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 
 bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData *&pEngineData)
 {
-	ServerWithCredentials const& server = server_item.GetServer();
-	const int max_count = server.server.MaximumMultipleConnections();
+	Site const& site = server_item.GetSite();
+	const int max_count = site.server_.server.MaximumMultipleConnections();
 	if (!max_count) {
 		return true;
 	}
@@ -533,12 +533,12 @@ bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData 
 	CState* browsingStateOnSameServer = 0;
 	const std::vector<CState*> *pStates = CContextManager::Get()->GetAllStates();
 	for (auto pState : *pStates) {
-		ServerWithCredentials const& browsingServer = pState->GetServer();
-		if (!browsingServer) {
+		Site const& browsingSite = pState->GetSite();
+		if (!browsingSite) {
 			continue;
 		}
 
-		if (browsingServer == server) {
+		if (browsingSite.server_ == site.server_) {
 			++active_count;
 			browsingStateOnSameServer = pState;
 			break;
@@ -551,11 +551,11 @@ bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData 
 
 	// Max count has been reached
 
-	pEngineData = GetIdleEngine(server, true);
+	pEngineData = GetIdleEngine(site, true);
 	if (pEngineData) {
 		// If we got an idle engine connected to this very server, start the
 		// transfer anyhow. Let's not get this connection go to waste.
-		if (pEngineData->lastServer == server && pEngineData->pEngine->IsConnected()) {
+		if (pEngineData->lastSite == site && pEngineData->pEngine->IsConnected()) {
 			return true;
 		}
 	}
@@ -676,7 +676,7 @@ bool CQueueView::TryStartNextTransfer()
 		pEngineData = bestMatch.pEngineData;
 	}
 	else {
-		pEngineData = GetIdleEngine(bestMatch.serverItem->GetServer());
+		pEngineData = GetIdleEngine(bestMatch.serverItem->GetSite());
 		if (!pEngineData) {
 			return false;
 		}
@@ -701,19 +701,19 @@ bool CQueueView::TryStartNextTransfer()
 		m_activeCountUp++;
 	}
 
-	ServerWithCredentials const oldServer = pEngineData->lastServer;
-	pEngineData->lastServer = bestMatch.serverItem->GetServer();
+	Site const oldSite = pEngineData->lastSite;
+	pEngineData->lastSite = bestMatch.serverItem->GetSite();
 
 	if (pEngineData->state != t_EngineData::waitprimary) {
 		if (!pEngineData->pEngine->IsConnected()) {
-			if (CLoginManager::Get().GetPassword(pEngineData->lastServer, true)) {
+			if (CLoginManager::Get().GetPassword(pEngineData->lastSite, true)) {
 				pEngineData->state = t_EngineData::connect;
 			}
 			else {
 				pEngineData->state = t_EngineData::askpassword;
 			}
 		}
-		else if (oldServer != bestMatch.serverItem->GetServer()) {
+		else if (oldSite != bestMatch.serverItem->GetSite()) {
 			pEngineData->state = t_EngineData::disconnect;
 		}
 		else if (pEngineData->pItem->GetType() == QueueItemType::File) {
@@ -827,7 +827,7 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 		}
 		else {
 			if (replyCode & FZ_REPLY_PASSWORDFAILED) {
-				CLoginManager::Get().CachedPasswordFailed(pEngineData->lastServer.server);
+				CLoginManager::Get().CachedPasswordFailed(pEngineData->lastSite.server_.server);
 			}
 
 			if ((replyCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
@@ -951,7 +951,7 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 	}
 
 	if (pEngineData->state == t_EngineData::connect) {
-		if (!CLoginManager::Get().GetPassword(pEngineData->lastServer, true)) {
+		if (!CLoginManager::Get().GetPassword(pEngineData->lastSite, true)) {
 			pEngineData->state = t_EngineData::askpassword;
 		}
 	}
@@ -1016,7 +1016,7 @@ void CQueueView::ResetEngine(t_EngineData& data, const ResetReason reason)
 				CEditHandler* pEditHandler = CEditHandler::Get();
 				wxASSERT(pEditHandler);
 				if (pFileItem->m_edit == CEditHandler::remote) {
-					pEditHandler->FinishTransfer(reason == ResetReason::success, pFileItem->GetRemoteFile(), pFileItem->GetRemotePath(), pServerItem->GetServer());
+					pEditHandler->FinishTransfer(reason == ResetReason::success, pFileItem->GetRemoteFile(), pFileItem->GetRemotePath(), pServerItem->GetSite());
 				}
 				else {
 					pEditHandler->FinishTransfer(reason == ResetReason::success, pFileItem->GetLocalPath().GetPath() + pFileItem->GetLocalFile());
@@ -1060,12 +1060,12 @@ void CQueueView::ResetEngine(t_EngineData& data, const ResetReason reason)
 		}
 		else if (reason == ResetReason::failure) {
 			if (data.pItem->GetType() == QueueItemType::File || data.pItem->GetType() == QueueItemType::Folder) {
-				ServerWithCredentials const server = ((CServerItem*)data.pItem->GetTopLevelItem())->GetServer();
+				Site const site = ((CServerItem*)data.pItem->GetTopLevelItem())->GetSite();
 
 				RemoveItem(data.pItem, false);
 
 				CQueueViewFailed* pQueueViewFailed = m_pQueue->GetQueueView_Failed();
-				CServerItem* pNewServerItem = pQueueViewFailed->CreateServerItem(server);
+				CServerItem* pNewServerItem = pQueueViewFailed->CreateServerItem(site);
 				data.pItem->SetParent(pNewServerItem);
 				data.pItem->UpdateTime();
 				pQueueViewFailed->InsertItem(pNewServerItem, data.pItem);
@@ -1079,11 +1079,11 @@ void CQueueView::ResetEngine(t_EngineData& data, const ResetReason reason)
 					RemoveItem(data.pItem, true);
 				}
 				else {
-					ServerWithCredentials const server = ((CServerItem*)data.pItem->GetTopLevelItem())->GetServer();
+					Site const site = ((CServerItem*)data.pItem->GetTopLevelItem())->GetSite();
 
 					RemoveItem(data.pItem, false);
 
-					CServerItem* pNewServerItem = pQueueViewSuccessful->CreateServerItem(server);
+					CServerItem* pNewServerItem = pQueueViewSuccessful->CreateServerItem(site);
 					data.pItem->UpdateTime();
 					data.pItem->SetParent(pNewServerItem);
 					data.pItem->SetStatusMessage(CFileItem::Status::none);
@@ -1198,7 +1198,7 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 				return;
 			}
 
-			if (!CLoginManager::Get().GetPassword(engineData.lastServer, true)) {
+			if (!CLoginManager::Get().GetPassword(engineData.lastSite, true)) {
 				engineData.state = t_EngineData::askpassword;
 			}
 			else {
@@ -1224,11 +1224,12 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			engineData.pItem->SetStatusMessage(CFileItem::Status::connecting);
 			RefreshItem(engineData.pItem);
 
-			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastServer.server, engineData.lastServer.handle_, engineData.lastServer.credentials, false));
+			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastSite.server_.server, engineData.lastSite.server_.handle_, engineData.lastSite.server_.credentials, false));
 
 			wxASSERT((res & FZ_REPLY_BUSY) != FZ_REPLY_BUSY);
-			if (res == FZ_REPLY_WOULDBLOCK)
+			if (res == FZ_REPLY_WOULDBLOCK) {
 				return;
+			}
 
 			if (res == FZ_REPLY_ALREADYCONNECTED) {
 				engineData.state = t_EngineData::disconnect;
@@ -1617,13 +1618,13 @@ void CQueueView::LoadQueue()
 		error = true;
 	}
 	else {
-		ServerWithCredentials server;
-		int64_t const first_id = m_queue_storage.GetServer(server, true);
+		Site site;
+		int64_t const first_id = m_queue_storage.GetServer(site, true);
 		auto id = first_id;
-		for (; id > 0; id = m_queue_storage.GetServer(server, false)) {
+		for (; id > 0; id = m_queue_storage.GetServer(site, false)) {
 			m_insertionStart = -1;
 			m_insertionCount = 0;
-			CServerItem *pServerItem = CreateServerItem(server);
+			CServerItem *pServerItem = CreateServerItem(site);
 
 			CFileItem* fileItem = 0;
 			int64_t fileId;
@@ -1683,11 +1684,11 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 {
 	auto xServer = element.child("Server");
 	while (xServer) {
-		ServerWithCredentials server;
-		if (GetServer(xServer, server)) {
+		Site site;
+		if (GetServer(xServer, site)) {
 			m_insertionStart = -1;
 			m_insertionCount = 0;
-			CServerItem *pServerItem = CreateServerItem(server);
+			CServerItem *pServerItem = CreateServerItem(site);
 
 			CLocalPath previousLocalPath;
 			CServerPath previousRemotePath;
@@ -2261,9 +2262,9 @@ void CQueueView::OnSetDefaultFileExistsAction(wxCommandEvent &)
 	}
 }
 
-t_EngineData* CQueueView::GetIdleEngine(ServerWithCredentials const& server, bool allowTransient)
+t_EngineData* CQueueView::GetIdleEngine(Site const& site, bool allowTransient)
 {
-	wxASSERT(!allowTransient || server);
+	wxASSERT(!allowTransient || site);
 
 	t_EngineData* pFirstIdle = 0;
 
@@ -2280,11 +2281,11 @@ t_EngineData* CQueueView::GetIdleEngine(ServerWithCredentials const& server, boo
 			}
 		}
 
-		if (!server) {
+		if (!site) {
 			return m_engineData[i];
 		}
 
-		if (m_engineData[i]->pEngine->IsConnected() && m_engineData[i]->lastServer == server) {
+		if (m_engineData[i]->pEngine->IsConnected() && m_engineData[i]->lastSite == site) {
 			return m_engineData[i];
 		}
 
@@ -2330,8 +2331,8 @@ void CQueueView::TryRefreshListings()
 	for (std::vector<CState*>::const_iterator iter = pStates->begin(); iter != pStates->end(); ++iter) {
 		CState* pState = *iter;
 
-		ServerWithCredentials const& server = pState->GetServer();
-		if (!server) {
+		Site const& site = pState->GetSite();
+		if (!site) {
 			continue;
 		}
 
@@ -2347,7 +2348,7 @@ void CQueueView::TryRefreshListings()
 				continue;
 			}
 
-			if (m_engineData[i]->lastServer != server) {
+			if (m_engineData[i]->lastSite != site) {
 				continue;
 			}
 
@@ -2358,23 +2359,23 @@ void CQueueView::TryRefreshListings()
 			continue;
 		}
 
-		if (m_last_refresh_server == server.server && m_last_refresh_path == pListing->path &&
+		if (m_last_refresh_server == site.server_.server && m_last_refresh_path == pListing->path &&
 			m_last_refresh_listing_time == pListing->m_firstListTime)
 		{
 			// Do not try to refresh same directory multiple times
 			continue;
 		}
 
-		t_EngineData* pEngineData = GetIdleEngine(server);
+		t_EngineData* pEngineData = GetIdleEngine(site);
 		if (!pEngineData) {
 			continue;
 		}
 
-		if (!pEngineData->pEngine->IsConnected() || pEngineData->lastServer != server) {
+		if (!pEngineData->pEngine->IsConnected() || pEngineData->lastSite != site) {
 			continue;
 		}
 
-		m_last_refresh_server = server.server;
+		m_last_refresh_server = site.server_.server;
 		m_last_refresh_path = pListing->path;
 		m_last_refresh_listing_time = pListing->m_firstListTime;
 
@@ -2408,7 +2409,7 @@ void CQueueView::OnAskPassword()
 			continue;
 		}
 
-		if (m_activeMode && CLoginManager::Get().GetPassword(pEngineData->lastServer, false)) {
+		if (m_activeMode && CLoginManager::Get().GetPassword(pEngineData->lastSite, false)) {
 			pEngineData->state = t_EngineData::connect;
 			SendNextCommand(*pEngineData);
 		}
@@ -2648,11 +2649,11 @@ void CQueueView::OnExclusiveEngineRequestGranted(wxCommandEvent& event)
 
 	CServerItem* pServerItem = (CServerItem*)pEngineData->pItem->GetParent();
 
-	ServerWithCredentials const& currentServer = pState->GetServer();
+	Site const& currentSite = pState->GetSite();
 
 	wxASSERT(pServerItem);
 
-	if (!currentServer || currentServer != pServerItem->GetServer()) {
+	if (!currentSite || currentSite.server_ != pServerItem->GetSite().server_) {
 		if (pState->m_pCommandQueue) {
 			pState->m_pCommandQueue->ReleaseEngine();
 		}
@@ -2892,7 +2893,7 @@ bool CQueueView::SwitchEngine(t_EngineData** ppEngineData)
 			continue;
 		}
 
-		if (pNewEngineData->lastServer != pEngineData->lastServer) {
+		if (pNewEngineData->lastSite != pEngineData->lastSite) {
 			continue;
 		}
 
@@ -2953,7 +2954,7 @@ bool CQueueView::IsOtherEngineConnected(t_EngineData* pEngineData)
 			continue;
 		}
 
-		if (current->lastServer != pEngineData->lastServer) {
+		if (current->lastSite != pEngineData->lastSite) {
 			continue;
 		}
 
@@ -3197,15 +3198,15 @@ void CQueueView::OnStateChange(CState*, t_statechange_notifications notification
 
 
 		for (auto it = m_serverList.begin(); it != m_serverList.end(); ) {
-			ServerWithCredentials server = (*it)->GetServer();
-			loginManager->AskDecryptor(server.credentials.encrypted_, true, false);
+			Site site = (*it)->GetSite();
+			loginManager->AskDecryptor(site.server_.credentials.encrypted_, true, false);
 
 			// Since the queue may be running and AskDecryptor uses the GUI, re-find matching server item
 			for (it = m_serverList.begin(); it != m_serverList.end(); ++it) {
-				if ((*it)->GetServer() == server) {
-					server = (*it)->GetServer(); // Credentials aren't in ==
-					server.credentials.Unprotect(loginManager->GetDecryptor(server.credentials.encrypted_), true);
-					(*it)->GetCredentials() = server.credentials;
+				if ((*it)->GetSite() == site) {
+					site = (*it)->GetSite(); // Credentials aren't in ==
+					site.server_.credentials.Unprotect(loginManager->GetDecryptor(site.server_.credentials.encrypted_), true);
+					(*it)->GetCredentials() = site.server_.credentials;
 					break;
 				}
 			}

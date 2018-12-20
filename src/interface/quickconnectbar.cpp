@@ -20,15 +20,6 @@ EVT_MENU(wxID_ANY, CQuickconnectBar::OnMenu)
 EVT_TEXT_ENTER(wxID_ANY, CQuickconnectBar::OnQuickconnect)
 END_EVENT_TABLE()
 
-CQuickconnectBar::CQuickconnectBar()
-	: m_pHost()
-	, m_pUser()
-	, m_pPass()
-	, m_pPort()
-	, m_pMainFrame()
-{
-}
-
 bool CQuickconnectBar::Create(CMainFrame* pParent)
 {
 	m_pMainFrame = pParent;
@@ -117,12 +108,12 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	std::wstring pass = m_pPass->GetValue().ToStdWstring();
 	std::wstring port = m_pPort->GetValue().ToStdWstring();
 
-	ServerWithCredentials server;
+	Site site;
 
 	std::wstring error;
 
 	CServerPath path;
-	if (!server.ParseUrl(host, port, user, pass, error, path)) {
+	if (!site.server_.ParseUrl(host, port, user, pass, error, path)) {
 		wxString msg = _("Could not parse server address:");
 		msg += _T("\n");
 		msg += error;
@@ -130,21 +121,21 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 		return;
 	}
 
-	host = server.Format(ServerFormat::host_only);
-	ServerProtocol protocol = server.server.GetProtocol();
+	host = site.server_.Format(ServerFormat::host_only);
+	ServerProtocol protocol = site.server_.server.GetProtocol();
 	switch (protocol)
 	{
 	case FTP:
 	case UNKNOWN:
-		if (CServer::GetProtocolFromPort(server.server.GetPort()) != FTP &&
-			CServer::GetProtocolFromPort(server.server.GetPort()) != UNKNOWN)
+		if (CServer::GetProtocolFromPort(site.server_.server.GetPort()) != FTP &&
+			CServer::GetProtocolFromPort(site.server_.server.GetPort()) != UNKNOWN)
 		{
 			host = _T("ftp://") + host;
 		}
 		break;
 	default:
 		{
-			std::wstring const prefix = server.server.GetPrefixFromProtocol(protocol);
+			std::wstring const prefix = site.server_.server.GetPrefixFromProtocol(protocol);
 			if (!prefix.empty()) {
 				host = prefix + _T("://") + host;
 			}
@@ -153,16 +144,16 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	m_pHost->SetValue(host);
-	if (server.server.GetPort() != server.server.GetDefaultPort(server.server.GetProtocol())) {
-		m_pPort->SetValue(wxString::Format(_T("%d"), server.server.GetPort()));
+	if (site.server_.server.GetPort() != site.server_.server.GetDefaultPort(site.server_.server.GetProtocol())) {
+		m_pPort->SetValue(wxString::Format(_T("%d"), site.server_.server.GetPort()));
 	}
 	else {
 		m_pPort->ChangeValue(wxString());
 	}
 
-	m_pUser->SetValue(server.server.GetUser());
-	if (server.credentials.logonType_ != LogonType::anonymous) {
-		m_pPass->SetValue(server.credentials.GetPass());
+	m_pUser->SetValue(site.server_.server.GetUser());
+	if (site.server_.credentials.logonType_ != LogonType::anonymous) {
+		m_pPass->SetValue(site.server_.credentials.GetPass());
 	}
 	else {
 		m_pPass->ChangeValue(wxString());
@@ -175,26 +166,24 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	if (event.GetId() == 1) {
-		server.server.SetBypassProxy(true);
+		site.server_.server.SetBypassProxy(true);
 	}
 
-	if (server.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this)) {
+	if (site.server_.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this)) {
 		return;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && server.credentials.logonType_ == LogonType::normal) {
-		server.SetLogonType(LogonType::ask);
-		CLoginManager::Get().RememberPassword(server);
+	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.server_.credentials.logonType_ == LogonType::normal) {
+		site.server_.SetLogonType(LogonType::ask);
+		CLoginManager::Get().RememberPassword(site);
 	}
-	Site site;
-	site.server_ = server;
 	Bookmark bm;
 	bm.m_remoteDir = path;
 	if (!m_pMainFrame->ConnectToSite(site, bm)) {
 		return;
 	}
 
-	CRecentServerList::SetMostRecentServer(server);
+	CRecentServerList::SetMostRecentServer(site);
 }
 
 void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
@@ -217,7 +206,7 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 			iter != m_recentServers.end();
 			++iter, ++i)
 		{
-			wxString name(iter->Format(ServerFormat::with_user_and_optional_port));
+			wxString name(iter->server_.Format(ServerFormat::with_user_and_optional_port));
 			name.Replace(_T("&"), _T("&&"));
 			pMenu->Append(10 + i, name);
 		}
@@ -258,8 +247,7 @@ void CQuickconnectBar::OnMenu(wxCommandEvent& event)
 	auto iter = m_recentServers.cbegin();
 	std::advance(iter, index);
 
-	Site site;
-	site.server_ = *iter;
+	Site site = *iter;
 	m_pMainFrame->ConnectToSite(site, Bookmark());
 }
 

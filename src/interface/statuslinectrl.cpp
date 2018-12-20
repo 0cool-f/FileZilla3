@@ -253,15 +253,16 @@ void CStatusLineCtrl::ClearTransferStatus()
 		m_statusText = _("Waiting for transfer to be cancelled");
 		break;
 	case t_EngineData::connect:
-		m_statusText = wxString::Format(_("Connecting to %s"), m_pEngineData->lastServer.Format(ServerFormat::with_user_and_optional_port));
+		m_statusText = wxString::Format(_("Connecting to %s"), m_pEngineData->lastSite.server_.Format(ServerFormat::with_user_and_optional_port));
 		break;
 	default:
 		m_statusText = _("Transferring");
 		break;
 	}
 
-	if (m_transferStatusTimer.IsRunning())
+	if (m_transferStatusTimer.IsRunning()) {
 		m_transferStatusTimer.Stop();
+	}
 
 	m_past_data_count = 0;
 
@@ -279,8 +280,9 @@ void CStatusLineCtrl::SetTransferStatus(CTransferStatus const& status)
 
 		m_lastOffset = status.currentOffset;
 
-		if (!m_transferStatusTimer.IsRunning())
+		if (!m_transferStatusTimer.IsRunning()) {
 			m_transferStatusTimer.Start(100);
+		}
 		Refresh(false);
 	}
 }

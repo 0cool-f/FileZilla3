@@ -398,9 +398,9 @@ void CFolderItem::SetActive(const bool active)
 	}
 }
 
-CServerItem::CServerItem(ServerWithCredentials const& server)
+CServerItem::CServerItem(Site const& site)
 	: m_activeCount(0)
-	, server_(server)
+	, site_(site)
 {
 }
 
@@ -408,14 +408,9 @@ CServerItem::~CServerItem()
 {
 }
 
-ServerWithCredentials const& CServerItem::GetServer() const
-{
-	return server_;
-}
-
 wxString CServerItem::GetName() const
 {
-	return server_.Format(ServerFormat::with_user_and_optional_port);
+	return site_.server_.Format(ServerFormat::with_user_and_optional_port);
 }
 
 void CServerItem::AddChild(CQueueItem* pItem)
@@ -719,7 +714,7 @@ void CServerItem::QueueImmediateFile(CFileItem* pItem)
 void CServerItem::SaveItem(pugi::xml_node& element) const
 {
 	auto server_node = element.append_child("Server");
-	SetServer(server_node, server_);
+	SetServer(server_node, site_);
 
 	for (auto iter = m_children.cbegin() + m_removed_at_front; iter != m_children.cend(); ++iter) {
 		(*iter)->SaveItem(server_node);
@@ -1298,22 +1293,22 @@ void CQueueViewBase::CreateColumns(std::vector<ColumnId> const& extraColumns)
 	LoadColumnSettings(OPTION_QUEUE_COLUMN_WIDTHS, -1, -1);
 }
 
-CServerItem* CQueueViewBase::GetServerItem(ServerWithCredentials const& server)
+CServerItem* CQueueViewBase::GetServerItem(Site const& site)
 {
 	for (auto iter = m_serverList.begin(); iter != m_serverList.end(); ++iter) {
-		if ((*iter)->GetServer() == server) {
+		if ((*iter)->GetSite() == site) {
 			return *iter;
 		}
 	}
 	return NULL;
 }
 
-CServerItem* CQueueViewBase::CreateServerItem(ServerWithCredentials const& server)
+CServerItem* CQueueViewBase::CreateServerItem(Site const& site)
 {
-	CServerItem* pItem = GetServerItem(server);
+	CServerItem* pItem = GetServerItem(site);
 
 	if (!pItem) {
-		pItem = new CServerItem(server);
+		pItem = new CServerItem(site);
 		m_serverList.push_back(pItem);
 		++m_itemCount;
 

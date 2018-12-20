@@ -275,9 +275,9 @@ std::unique_ptr<CShellExtensionInterface> CShellExtensionInterface::CreateInitia
 
 #endif
 
-CRemoteDataObject::CRemoteDataObject(ServerWithCredentials const& server, const CServerPath& path)
+CRemoteDataObject::CRemoteDataObject(Site const& site, const CServerPath& path)
 	: wxDataObjectSimple(wxDataFormat(_T("FileZilla3RemoteDataObject")))
-	, server_(server)
+	, site_(site)
 	, m_path(path)
 	, m_processId(wxGetProcessId())
 {
@@ -326,7 +326,7 @@ void CRemoteDataObject::Finalize()
 	AddTextElement(element, "Count", m_fileList.size());
 
 	auto xServer = element.append_child("Server");
-	SetServer(xServer, server_);
+	SetServer(xServer, site_);
 
 	AddTextElement(element, "Path", m_path.GetSafePath());
 
@@ -372,7 +372,7 @@ bool CRemoteDataObject::SetData(size_t len, const void* buf)
 	}
 
 	auto serverElement = element.child("Server");
-	if (!serverElement || !::GetServer(serverElement, server_)) {
+	if (!serverElement || !::GetServer(serverElement, site_)) {
 		return false;
 	}
 

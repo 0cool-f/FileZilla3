@@ -217,7 +217,7 @@ void CToolBar::UpdateToolbarState()
 		return;
 	}
 
-	bool const hasServer = static_cast<bool>(pState->GetServer());
+	bool const hasServer = static_cast<bool>(pState->GetSite());
 	bool const idle = pState->IsRemoteIdle();
 
 	EnableTool(XRCID("ID_TOOLBAR_DISCONNECT"), hasServer && idle);

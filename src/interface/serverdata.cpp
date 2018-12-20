@@ -309,3 +309,16 @@ bool ProtectedCredentials::Unprotect(fz::private_key const& key, bool on_failure
 
 	return ret;
 }
+
+SiteHandleData toSiteHandle(ServerHandle const& handle)
+{
+	auto l = handle.lock();
+	if (l) {
+		auto d = dynamic_cast<SiteHandleData const*>(l.get());
+		if (d) {
+			return *d;
+		}
+	}
+
+	return SiteHandleData();
+}

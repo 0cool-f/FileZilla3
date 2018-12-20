@@ -328,14 +328,14 @@ int CUpdater::ContinueDownload()
 
 bool CUpdater::CreateConnectCommand(std::wstring const& url)
 {
-	ServerWithCredentials s;
+	Site s;
 	CServerPath path;
 	std::wstring error;
-	if (!s.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server.GetProtocol() != HTTP && s.server.GetProtocol() != HTTPS)) {
+	if (!s.server_.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server_.server.GetProtocol() != HTTP && s.server_.server.GetProtocol() != HTTPS)) {
 		return false;
 	}
 
-	pending_commands_.emplace_back(new CConnectCommand(s.server, ServerHandle(), s.credentials));
+	pending_commands_.emplace_back(new CConnectCommand(s.server_.server, s.Handle(), s.server_.credentials));
 	return true;
 }
 
@@ -344,10 +344,10 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 	CFileTransferCommand::t_transferSettings transferSettings;
 	transferSettings.fsync = true;
 
-	ServerWithCredentials s;
+	Site s;
 	CServerPath path;
 	std::wstring error;
-	if (!s.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server.GetProtocol() != HTTP && s.server.GetProtocol() != HTTPS)) {
+	if (!s.server_.ParseUrl(url, 0, std::wstring(), std::wstring(), error, path) || (s.server_.server.GetProtocol() != HTTP && s.server_.server.GetProtocol() != HTTPS)) {
 		return false;
 	}
 	std::wstring file = path.GetLastSegment();

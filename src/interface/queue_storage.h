@@ -5,7 +5,7 @@
 
 class CFileItem;
 class CServerItem;
-class ServerWithCredentials;
+class Site;
 
 class CQueueStorage final
 {
@@ -33,7 +33,7 @@ public:
 	// > 0 = server id
 	//   0 = No server
 	// < 0 = failure.
-	int64_t GetServer(ServerWithCredentials& server, bool fromBeginning);
+	int64_t GetServer(Site& site, bool fromBeginning);
 
 	int64_t GetFile(CFileItem** pItem, int64_t server);
 

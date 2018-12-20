@@ -149,7 +149,6 @@ public:
 	const CServerPath GetRemotePath() const;
 
 	Site const& GetSite() const;
-	ServerWithCredentials const& GetServer() const;
 	wxString GetTitle() const;
 
 	void RefreshLocal();

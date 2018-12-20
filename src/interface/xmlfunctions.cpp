@@ -289,9 +289,11 @@ bool CXmlFile::SaveXmlFile()
 	return true;
 }
 
-bool GetServer(pugi::xml_node node, ServerWithCredentials & server)
+bool GetServer(pugi::xml_node node, Site & site)
 {
 	wxASSERT(node);
+
+	auto & server = site.server_;
 
 	std::wstring host = GetTextElement(node, "Host");
 	if (host.empty()) {
@@ -443,8 +445,9 @@ bool GetServer(pugi::xml_node node, ServerWithCredentials & server)
 	return true;
 }
 
-void SetServer(pugi::xml_node node, ServerWithCredentials const& server)
+void SetServer(pugi::xml_node node, Site const& site)
 {
+	auto const& server = site.server_;
 	if (!node) {
 		return;
 	}

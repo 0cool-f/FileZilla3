@@ -24,8 +24,8 @@ protected:
 
 	bool m_local_file_exists;
 
-	ServerWithCredentials server_;
-	ServerWithCredentials lastSite_;
+	Site site_;
+	Site lastSite_;
 
 	CState* m_pState;
 	CQueueView* m_pQueueView;

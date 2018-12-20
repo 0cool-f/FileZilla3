@@ -272,7 +272,7 @@ CSiteManagerDialog::~CSiteManagerDialog()
 	}
 }
 
-bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site> *connected_sites, ServerWithCredentials const* pServer)
+bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site> *connected_sites, Site const* site)
 {
 	m_pSiteManagerMutex = new CInterProcessMutex(MUTEX_SITEMANAGERGLOBAL, false);
 	if (m_pSiteManagerMutex->TryLock() == 0) {
@@ -375,8 +375,8 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site> *
 	m_connected_sites = connected_sites;
 	MarkConnectedSites();
 
-	if (pServer && *pServer) {
-		CopyAddServer(*pServer);
+	if (site && *site) {
+		CopyAddServer(*site);
 	}
 
 	return true;
@@ -809,9 +809,9 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 		CSiteManager::Save(node, *data->m_site);
 
 		if (data->connected_item != -1) {
-			if ((*m_connected_sites)[data->connected_item].server.server == data->m_site->server_.server) {
+			if ((*m_connected_sites)[data->connected_item].site.server_.server == data->m_site->server_.server) {
 				(*m_connected_sites)[data->connected_item].new_path = GetSitePath(child);
-				(*m_connected_sites)[data->connected_item].server = data->m_site->server_;
+				(*m_connected_sites)[data->connected_item].site = *data->m_site;
 			}
 		}
 	}
@@ -1078,9 +1078,9 @@ void CSiteManagerDialog::OnNewSite(wxCommandEvent&)
 		return;
 	}
 
-	ServerWithCredentials server;
-	server.server.SetProtocol(ServerProtocol::FTP);
-	AddNewSite(item, server);
+	Site site;
+	site.server_.server.SetProtocol(ServerProtocol::FTP);
+	AddNewSite(item, site);
 }
 
 bool CSiteManagerDialog::UpdateItem()
@@ -1116,15 +1116,15 @@ bool CSiteManagerDialog::UpdateItem()
 			return false;
 		}
 		data->m_bookmark->m_name = pTree->GetItemText(item).ToStdWstring();
-		return UpdateBookmark(*data->m_bookmark, pServer->m_site->server_);
+		return UpdateBookmark(*data->m_bookmark, *pServer->m_site);
 	}
 }
 
-bool CSiteManagerDialog::UpdateBookmark(Bookmark &bookmark, ServerWithCredentials const& server)
+bool CSiteManagerDialog::UpdateBookmark(Bookmark &bookmark, Site const& site)
 {
 	bookmark.m_localDir = xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
 	bookmark.m_remoteDir = CServerPath();
-	bookmark.m_remoteDir.SetType(server.server.GetType());
+	bookmark.m_remoteDir.SetType(site.server_.server.GetType());
 	bookmark.m_remoteDir.SetPath(xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
 	bookmark.m_sync = xrc_call(*this, "ID_BOOKMARK_SYNC", &wxCheckBox::GetValue);
 	bookmark.m_comparison = xrc_call(*this, "ID_BOOKMARK_COMPARISON", &wxCheckBox::GetValue);
@@ -1132,11 +1132,11 @@ bool CSiteManagerDialog::UpdateBookmark(Bookmark &bookmark, ServerWithCredential
 	return true;
 }
 
-void CSiteManagerDialog::UpdateServer(Site &server, const wxString &name)
+void CSiteManagerDialog::UpdateServer(Site & site, const wxString &name)
 {
-	m_pNotebook_Site->UpdateSite(server);
+	m_pNotebook_Site->UpdateSite(site);
 
-	server.server_.server.SetName(name.ToStdWstring());
+	site.server_.server.SetName(name.ToStdWstring());
 }
 
 bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)
@@ -1649,13 +1649,13 @@ void CSiteManagerDialog::OnChar(wxKeyEvent& event)
 	OnRename(cmdEvent);
 }
 
-void CSiteManagerDialog::CopyAddServer(ServerWithCredentials const& server)
+void CSiteManagerDialog::CopyAddServer(Site const& site)
 {
 	if (!Verify()) {
 		return;
 	}
 
-	AddNewSite(m_ownSites, server, true);
+	AddNewSite(m_ownSites, site, true);
 }
 
 wxString CSiteManagerDialog::FindFirstFreeName(const wxTreeItemId &parent, const wxString& name)
@@ -1689,7 +1689,7 @@ wxString CSiteManagerDialog::FindFirstFreeName(const wxTreeItemId &parent, const
 	return newName;
 }
 
-void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, ServerWithCredentials const& server, bool connected)
+void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, Site const& site, bool connected)
 {
 	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
 	if (!pTree) {
@@ -1700,7 +1700,7 @@ void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, ServerWithCredentials c
 
 	CSiteManagerItemData* pData = new CSiteManagerItemData;
 	pData->m_site = std::make_unique<Site>();
-	pData->m_site->server_ = server;
+	*pData->m_site = site;
 	if (connected) {
 		pData->connected_item = 0;
 	}

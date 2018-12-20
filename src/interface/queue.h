@@ -81,12 +81,12 @@ class CFileItem;
 class CServerItem final : public CQueueItem
 {
 public:
-	CServerItem(ServerWithCredentials const& server);
+	CServerItem(Site const& site);
 	virtual ~CServerItem();
 	virtual QueueItemType GetType() const { return QueueItemType::Server; }
 
-	ServerWithCredentials const& GetServer() const;
-	ProtectedCredentials& GetCredentials() {return server_.credentials; }
+	Site const& GetSite() const { return site_; }
+	ProtectedCredentials& GetCredentials() {return site_.server_.credentials; }
 	wxString GetName() const;
 
 	virtual void AddChild(CQueueItem* pItem);
@@ -123,7 +123,7 @@ protected:
 	void AddFileItemToList(CFileItem* pItem);
 	void RemoveFileItemFromList(CFileItem* pItem, bool forward);
 
-	ServerWithCredentials server_;
+	Site site_;
 
 	// array of item lists, sorted by priority. Used by scheduler to find
 	// next file to transfer
@@ -323,7 +323,7 @@ public:
 	virtual ~CQueueViewBase();
 
 	// Gets item for given server or creates new if it doesn't exist
-	CServerItem* CreateServerItem(ServerWithCredentials const& server);
+	CServerItem* CreateServerItem(Site const& site);
 
 	virtual void InsertItem(CServerItem* pServerItem, CQueueItem* pItem);
 	virtual bool RemoveItem(CQueueItem* pItem, bool destroy, bool updateItemCount = true, bool updateSelections = true, bool forward = true);
@@ -344,7 +344,7 @@ protected:
 	void AddQueueColumn(ColumnId id);
 
 	// Gets item for given server
-	CServerItem* GetServerItem(ServerWithCredentials const& server);
+	CServerItem* GetServerItem(Site const& site);
 
 	// Gets item with given index
 	CQueueItem* GetQueueItem(unsigned int item) const;

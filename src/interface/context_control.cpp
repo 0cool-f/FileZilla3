@@ -656,7 +656,7 @@ void CContextControl::SaveTabs()
 		Site const site = controls->pState->GetLastSite();
 
 		auto tab = tabs.append_child("Tab");
-		SetServer(tab, site.server_);
+		SetServer(tab, site);
 		tab.append_child("Site").text().set(fz::to_utf8(site.SitePath()).c_str());
 		tab.append_child("RemotePath").text().set(fz::to_utf8(controls->pState->GetLastServerPath().GetSafePath()).c_str());
 		tab.append_child("LocalPath").text().set(fz::to_utf8(controls->pState->GetLocalDir().GetPath()).c_str());
@@ -703,11 +703,9 @@ void CContextControl::RestoreTabs()
 			CLocalPath localPath(fz::to_wstring_from_utf8(tab.child("LocalPath").child_value()));
 
 			Site site;
-
-			ServerWithCredentials last_server;
 			CServerPath last_path;
 
-			if (GetServer(tab, site.server_) && last_path.SetSafePath(fz::to_wstring_from_utf8(tab.child("RemotePath").child_value()))) {
+			if (GetServer(tab, site) && last_path.SetSafePath(fz::to_wstring_from_utf8(tab.child("RemotePath").child_value()))) {
 				std::wstring last_site_path = fz::to_wstring_from_utf8(tab.child("Site").child_value());
 
 				std::unique_ptr<Site> ssite;

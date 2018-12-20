@@ -55,8 +55,8 @@ void CManualTransfer::Run(wxWindow* pParent, CState* pState)
 		pChoice->Append(GetNameFromLogonType(static_cast<LogonType>(i)));
 	}
 
-	server_ = m_pState->GetServer();
-	if (server_) {
+	site_ = m_pState->GetSite();
+	if (site_) {
 		XRCCTRL(*this, "ID_SERVER_CURRENT", wxRadioButton)->SetValue(true);
 		DisplayServer();
 	}
@@ -108,7 +108,7 @@ void CManualTransfer::SetAutoAsciiState()
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Hide();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
-		else if (CAutoAsciiFiles::TransferLocalAsAscii(remote_file, server_.server.GetType())) {
+		else if (CAutoAsciiFiles::TransferLocalAsAscii(remote_file, site_.server_.server.GetType())) {
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Show();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
@@ -123,7 +123,7 @@ void CManualTransfer::SetAutoAsciiState()
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Hide();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
-		else if (CAutoAsciiFiles::TransferLocalAsAscii(local_file, server_.server.GetType())) {
+		else if (CAutoAsciiFiles::TransferLocalAsAscii(local_file, site_.server_.server.GetType())) {
 			XRCCTRL(*this, "ID_TYPE_AUTO_ASCII", wxStaticText)->Show();
 			XRCCTRL(*this, "ID_TYPE_AUTO_BINARY", wxStaticText)->Hide();
 		}
@@ -137,32 +137,32 @@ void CManualTransfer::SetAutoAsciiState()
 
 void CManualTransfer::SetServerState()
 {
-	bool server_enabled = XRCCTRL(*this, "ID_SERVER_CUSTOM", wxRadioButton)->GetValue();
-	XRCCTRL(*this, "ID_HOST", wxWindow)->Enable(server_enabled);
-	XRCCTRL(*this, "ID_PORT", wxWindow)->Enable(server_enabled);
-	XRCCTRL(*this, "ID_PROTOCOL", wxWindow)->Enable(server_enabled);
-	XRCCTRL(*this, "ID_LOGONTYPE", wxWindow)->Enable(server_enabled);
+	bool site_enabled = XRCCTRL(*this, "ID_SERVER_CUSTOM", wxRadioButton)->GetValue();
+	XRCCTRL(*this, "ID_HOST", wxWindow)->Enable(site_enabled);
+	XRCCTRL(*this, "ID_PORT", wxWindow)->Enable(site_enabled);
+	XRCCTRL(*this, "ID_PROTOCOL", wxWindow)->Enable(site_enabled);
+	XRCCTRL(*this, "ID_LOGONTYPE", wxWindow)->Enable(site_enabled);
 
 	wxString logon_type = XRCCTRL(*this, "ID_LOGONTYPE", wxChoice)->GetStringSelection();
-	XRCCTRL(*this, "ID_USER", wxTextCtrl)->Enable(server_enabled && logon_type != _("Anonymous"));
-	XRCCTRL(*this, "ID_PASS", wxTextCtrl)->Enable(server_enabled && (logon_type == _("Normal") || logon_type == _("Account")));
-	XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->Enable(server_enabled && logon_type == _("Account"));
+	XRCCTRL(*this, "ID_USER", wxTextCtrl)->Enable(site_enabled && logon_type != _("Anonymous"));
+	XRCCTRL(*this, "ID_PASS", wxTextCtrl)->Enable(site_enabled && (logon_type == _("Normal") || logon_type == _("Account")));
+	XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->Enable(site_enabled && logon_type == _("Account"));
 }
 
 void CManualTransfer::DisplayServer()
 {
-	if (server_) {
-		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(server_.Format(ServerFormat::host_only));
-		unsigned int port = server_.server.GetPort();
+	if (site_) {
+		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(site_.server_.Format(ServerFormat::host_only));
+		unsigned int port = site_.server_.server.GetPort();
 
-		if (port != CServer::GetDefaultPort(server_.server.GetProtocol())) {
+		if (port != CServer::GetDefaultPort(site_.server_.server.GetProtocol())) {
 			XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(wxString::Format(_T("%d"), port));
 		}
 		else {
 			XRCCTRL(*this, "ID_PORT", wxTextCtrl)->ChangeValue(_T(""));
 		}
 
-		const wxString& protocolName = CServer::GetProtocolName(server_.server.GetProtocol());
+		const wxString& protocolName = CServer::GetProtocolName(site_.server_.server.GetProtocol());
 		if (!protocolName.empty()) {
 			XRCCTRL(*this, "ID_PROTOCOL", wxChoice)->SetStringSelection(protocolName);
 		}
@@ -170,7 +170,7 @@ void CManualTransfer::DisplayServer()
 			XRCCTRL(*this, "ID_PROTOCOL", wxChoice)->SetStringSelection(CServer::GetProtocolName(FTP));
 		}
 
-		switch (server_.credentials.logonType_)
+		switch (site_.server_.credentials.logonType_)
 		{
 		case LogonType::normal:
 			XRCCTRL(*this, "ID_LOGONTYPE", wxChoice)->SetStringSelection(_("Normal"));
@@ -189,9 +189,9 @@ void CManualTransfer::DisplayServer()
 			break;
 		}
 
-		XRCCTRL(*this, "ID_USER", wxTextCtrl)->ChangeValue(server_.server.GetUser());
-		XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->ChangeValue(server_.credentials.account_);
-		XRCCTRL(*this, "ID_PASS", wxTextCtrl)->ChangeValue(server_.credentials.GetPass());
+		XRCCTRL(*this, "ID_USER", wxTextCtrl)->ChangeValue(site_.server_.server.GetUser());
+		XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->ChangeValue(site_.server_.credentials.account_);
+		XRCCTRL(*this, "ID_PASS", wxTextCtrl)->ChangeValue(site_.server_.credentials.GetPass());
 	}
 	else {
 		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(_T(""));
@@ -264,10 +264,10 @@ void CManualTransfer::OnDirection(wxCommandEvent& event)
 void CManualTransfer::OnServerTypeChanged(wxCommandEvent& event)
 {
 	if (event.GetId() == XRCID("ID_SERVER_CURRENT")) {
-		server_ = m_pState->GetServer();
+		site_ = m_pState->GetSite();
 	}
 	else if (event.GetId() == XRCID("ID_SERVER_SITE")) {
-		server_ = lastSite_;
+		site_ = lastSite_;
 	}
 	xrc_call(*this, "ID_SERVER_SITE_SELECT", &wxButton::Enable, event.GetId() == XRCID("ID_SERVER_SITE"));
 	DisplayServer();
@@ -284,7 +284,7 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 
 	bool start = xrc_call(*this, "ID_START", &wxCheckBox::GetValue);
 
-	if (!server_) {
+	if (!site_) {
 		wxMessageBoxEx(_("You need to specify a server."), _("Manual transfer"), wxICON_EXCLAMATION);
 		return;
 	}
@@ -318,7 +318,7 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		return;
 	}
 
-	CServerPath path(remote_path_str, server_.server.GetType());
+	CServerPath path(remote_path_str, site_.server_.server.GetType());
 	if (path.empty()) {
 		wxMessageBoxEx(_("Remote path could not be parsed."), _("Manual transfer"), wxICON_EXCLAMATION);
 		return;
@@ -348,7 +348,7 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 	m_pQueueView->QueueFile(!start, download,
 		download ? remote_file : name,
 		(remote_file != name) ? (download ? name : remote_file) : std::wstring(),
-		localPath, path, server_, -1);
+		localPath, path, site_, -1);
 
 	// Restore old data type
 	COptions::Get()->SetOption(OPTION_ASCIIBINARY, old_data_type);
@@ -373,28 +373,28 @@ bool CManualTransfer::UpdateServer()
 		return false;
 	}
 
-	server_ = ServerWithCredentials();
+	site_ = Site();
 
 	std::wstring host = xrc_call(*this, "ID_HOST", &wxTextCtrl::GetValue).ToStdWstring();
 	// SetHost does not accept URL syntax
 	if (!host.empty() && host[0] == '[') {
 		host = host.substr(1, host.size() - 2);
 	}
-	server_.server.SetHost(host, port);
+	site_.server_.server.SetHost(host, port);
 
 	std::wstring const protocolName = xrc_call(*this, "ID_PROTOCOL", &wxChoice::GetStringSelection).ToStdWstring();
 	ServerProtocol const protocol = CServer::GetProtocolFromName(protocolName);
 	if (protocol != UNKNOWN) {
-		server_.server.SetProtocol(protocol);
+		site_.server_.server.SetProtocol(protocol);
 	}
 	else {
-		server_.server.SetProtocol(FTP);
+		site_.server_.server.SetProtocol(FTP);
 	}
 
-	server_.SetLogonType(GetLogonTypeFromName(xrc_call(*this, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring()));
-	server_.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
-	server_.credentials.SetPass(xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring());
-	server_.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
+	site_.server_.SetLogonType(GetLogonTypeFromName(xrc_call(*this, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring()));
+	site_.server_.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
+	site_.server_.credentials.SetPass(xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring());
+	site_.server_.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
 
 	return true;
 }
@@ -439,27 +439,27 @@ bool CManualTransfer::VerifyServer()
 		wxMessageBoxEx(msg, _("Cannot remember password"), wxICON_INFORMATION, this);
 	}
 
-	ServerWithCredentials server;
+	Site site;
 
 	// Set selected type
-	server.SetLogonType(logon_type);
+	site.server_.SetLogonType(logon_type);
 
 	if (protocol != UNKNOWN) {
-		server.server.SetProtocol(protocol);
+		site.server_.server.SetProtocol(protocol);
 	}
 
 	CServerPath path;
 	std::wstring error;
-	if (!server.ParseUrl(host, xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring(), std::wstring(), std::wstring(), error, path, protocol)) {
+	if (!site.server_.ParseUrl(host, xrc_call(*this, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring(), std::wstring(), std::wstring(), error, path, protocol)) {
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::SetFocus);
 		wxMessageBoxEx(error);
 		return false;
 	}
 
-	xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, server.Format(ServerFormat::host_only));
-	xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString::Format(_T("%d"), server.server.GetPort()));
+	xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.server_.Format(ServerFormat::host_only));
+	xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString::Format(_T("%d"), site.server_.server.GetPort()));
 
-	protocolName = CServer::GetProtocolName(server.server.GetProtocol());
+	protocolName = CServer::GetProtocolName(site.server_.server.GetProtocol());
 	if (protocolName.empty()) {
 		CServer::GetProtocolName(FTP);
 	}
@@ -521,10 +521,10 @@ void CManualTransfer::OnSelectedSite(wxCommandEvent& event)
 		return;
 	}
 
-	server_ = pData->server_;
-	lastSite_ = pData->server_;
+	site_ = *pData;
+	lastSite_ = *pData;
 
-	xrc_call(*this, "ID_SERVER_SITE_SERVER", &wxStaticText::SetLabel, server_.server.GetName());
+	xrc_call(*this, "ID_SERVER_SITE_SERVER", &wxStaticText::SetLabel, site_.server_.server.GetName());
 
 	DisplayServer();
 }

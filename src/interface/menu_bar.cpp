@@ -391,8 +391,8 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 
 				pState->SetSyncBrowse(false);
 				if (!bookmark.m_remoteDir.empty() && pState->IsRemoteIdle(true)) {
-					ServerWithCredentials const& server = pState->GetServer();
-					if (!server || server != site.server_) {
+					Site const& activeSite = pState->GetSite();
+					if (!activeSite || activeSite.server_ != site.server_) {
 						m_pMainFrame->ConnectToSite(site, bookmark);
 						break;
 					}
@@ -433,8 +433,8 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 
 		pState->SetSyncBrowse(false);
 		if (!remote_dir.empty() && pState->IsRemoteIdle(true)) {
-			ServerWithCredentials const& server = pState->GetServer();
-			if (server) {
+			Site const& activeSite = pState->GetSite();
+			if (activeSite) {
 				CServerPath current_remote_path = pState->GetRemotePath();
 				if (!current_remote_path.empty() && current_remote_path.GetType() != remote_dir.GetType()) {
 					wxMessageBoxEx(_("Selected global bookmark and current server use a different server type.\nUse site-specific bookmarks for this server."), _("Bookmark"), wxICON_EXCLAMATION, this);
@@ -584,20 +584,20 @@ void CMenuBar::UpdateMenubarState()
 		return;
 	}
 
-	ServerWithCredentials const& server = pState->GetServer();
+	Site const& site = pState->GetSite();
 	const bool idle = pState->IsRemoteIdle();
 
-	Enable(XRCID("ID_MENU_SERVER_DISCONNECT"), server && idle);
-	Enable(XRCID("ID_CANCEL"), server && !idle);
-	Enable(XRCID("ID_MENU_SERVER_CMD"), server && idle);
-	Enable(XRCID("ID_MENU_FILE_COPYSITEMANAGER"), server.operator bool());
-	Enable(XRCID("ID_TOOLBAR_SYNCHRONIZED_BROWSING"), server.operator bool());
+	Enable(XRCID("ID_MENU_SERVER_DISCONNECT"), site && idle);
+	Enable(XRCID("ID_CANCEL"), site && !idle);
+	Enable(XRCID("ID_MENU_SERVER_CMD"), site && idle);
+	Enable(XRCID("ID_MENU_FILE_COPYSITEMANAGER"), site.operator bool());
+	Enable(XRCID("ID_TOOLBAR_SYNCHRONIZED_BROWSING"), site.operator bool());
 
 	Check(XRCID("ID_TOOLBAR_COMPARISON"), pState->GetComparisonManager()->IsComparing());
 	Check(XRCID("ID_TOOLBAR_SYNCHRONIZED_BROWSING"), pState->GetSyncBrowse());
 
 	bool canReconnect;
-	if (server || !idle) {
+	if (site || !idle) {
 		canReconnect = false;
 	}
 	else {
@@ -605,9 +605,9 @@ void CMenuBar::UpdateMenubarState()
 	}
 	Enable(XRCID("ID_MENU_SERVER_RECONNECT"), canReconnect);
 
-	Enable(XRCID("ID_MENU_TRANSFER_TYPE"), !server || CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::DataTypeConcept));
-	Enable(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), !server || CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::PreserveTimestamp));
-	Enable(XRCID("ID_MENU_SERVER_CMD"), !server || CServer::ProtocolHasFeature(server.server.GetProtocol(), ProtocolFeature::EnterCommand));
+	Enable(XRCID("ID_MENU_TRANSFER_TYPE"), !site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::DataTypeConcept));
+	Enable(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), !site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::PreserveTimestamp));
+	Enable(XRCID("ID_MENU_SERVER_CMD"), !site || CServer::ProtocolHasFeature(site.server_.server.GetProtocol(), ProtocolFeature::EnterCommand));
 }
 
 bool CMenuBar::ShowItem(int id)

@@ -99,14 +99,13 @@ public:
 				return wxDragNone;
 			}
 
-			if (!m_pRemoteTreeView->m_state.GetServer() || m_pRemoteDataObject->GetServer().server != m_pRemoteTreeView->m_state.GetServer().server) {
+			if (!m_pRemoteTreeView->m_state.GetSite() || m_pRemoteDataObject->GetSite().server_.server != m_pRemoteTreeView->m_state.GetSite().server_.server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}
 
 			// Make sure path path is valid
-			if (path == m_pRemoteDataObject->GetServerPath())
-			{
+			if (path == m_pRemoteDataObject->GetServerPath()) {
 				wxMessageBoxEx(_("Source and path of the drop operation are identical"));
 				return wxDragNone;
 			}
@@ -833,12 +832,12 @@ void CRemoteTreeView::OnBeginDrag(wxTreeEvent& event)
 
 	wxDataObjectComposite object;
 
-	ServerWithCredentials server = m_state.GetServer(); // Make a copy as DoDragDrop later runs the event loop
-	if (!server) {
+	Site site = m_state.GetSite(); // Make a copy as DoDragDrop later runs the event loop
+	if (!site) {
 		return;
 	}
 
-	CRemoteDataObject *pRemoteDataObject = new CRemoteDataObject(server, parent);
+	CRemoteDataObject *pRemoteDataObject = new CRemoteDataObject(site, parent);
 	pRemoteDataObject->AddFile(lastSegment, true, -1, false);
 
 	pRemoteDataObject->Finalize();
@@ -861,7 +860,7 @@ void CRemoteTreeView::OnBeginDrag(wxTreeEvent& event)
 
 	CDragDropManager* pDragDropManager = CDragDropManager::Init();
 	pDragDropManager->pDragSource = this;
-	pDragDropManager->server = server;
+	pDragDropManager->site = site;
 	pDragDropManager->remoteParent = parent;
 
 	wxDropSource source(this);
@@ -878,8 +877,8 @@ void CRemoteTreeView::OnBeginDrag(wxTreeEvent& event)
 #if FZ3_USESHELLEXT
 	if (ext) {
 		if (!pRemoteDataObject->DidSendData()) {
-			server = m_state.GetServer();
-			if (!server || !m_state.IsRemoteIdle() || server != server) {
+			Site newSite = m_state.GetSite();
+			if (!newSite || !m_state.IsRemoteIdle() || site != newSite) {
 				wxBell();
 				return;
 			}
@@ -919,7 +918,7 @@ void CRemoteTreeView::OnContextMenu(wxTreeEvent& event)
 	menu.Append(XRCID("ID_GETURL"), _("C&opy URL(s) to clipboard"), _("Copy the URLs of the selected items to clipboard."));
 	menu.Append(XRCID("ID_GETURL_PASSWORD"), _("C&opy URL(s) with password to clipboard"), _("Copy the URLs of the selected items to clipboard, including password."));
 
-	auto const protocol = m_state.GetServer().server.GetProtocol();
+	auto const protocol = m_state.GetSite().server_.server.GetProtocol();
 	bool const hasChmod = protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP || protocol == SFTP;
 
 	if (hasChmod) {
@@ -1125,7 +1124,7 @@ void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
 	bool const hasParent = pathToDelete.HasParent();
 
 	CFilterManager filter;
-	if (CServer::ProtocolHasFeature(m_state.GetServer().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
+	if (CServer::ProtocolHasFeature(m_state.GetSite().server_.server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
 		if (hasParent) {
 			std::wstring const name = GetItemText(m_contextMenuItem).ToStdWstring();
 			m_state.m_pCommandQueue->ProcessCommand(new CRemoveDirCommand(pathToDelete.GetParent(), name));
@@ -1467,8 +1466,8 @@ void CRemoteTreeView::OnMenuGeturl(wxCommandEvent& event)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -1478,7 +1477,7 @@ void CRemoteTreeView::OnMenuGeturl(wxCommandEvent& event)
 		return;
 	}
 
-	wxString url = server.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
+	wxString url = site.server_.Format((event.GetId() == XRCID("ID_GETURL_PASSWORD")) ? ServerFormat::url_with_password : ServerFormat::url);
 
 	std::wstring const pathPart = fz::percent_encode_w(path.GetPath(), true);
 	if (!pathPart.empty() && pathPart[0] != '/') {

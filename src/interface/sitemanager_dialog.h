@@ -18,7 +18,7 @@ class CSiteManagerDialog final : public wxDialogEx
 public:
 	struct _connected_site
 	{
-		ServerWithCredentials server;
+		Site site;
 		std::wstring old_path;
 		std::wstring new_path;
 	};
@@ -28,7 +28,7 @@ public:
 	virtual ~CSiteManagerDialog();
 
 	// Creation. If pServer is set, it will cause a new item to be created.
-	bool Create(wxWindow* parent, std::vector<_connected_site> *connected_sites, ServerWithCredentials const* pServer = 0);
+	bool Create(wxWindow* parent, std::vector<_connected_site> *connected_sites, Site const* site = 0);
 
 	bool GetServer(Site& data, Bookmark& bookmark);
 
@@ -36,11 +36,11 @@ protected:
 
 	bool Verify();
 	bool UpdateItem();
-	bool UpdateBookmark(Bookmark &bookmark, ServerWithCredentials const& server);
+	bool UpdateBookmark(Bookmark &bookmark, Site const& site);
 	bool Load();
 	bool Save(pugi::xml_node element = pugi::xml_node(), wxTreeItemId treeId = wxTreeItemId());
 	bool SaveChild(pugi::xml_node element, wxTreeItemId child);
-	void UpdateServer(Site &server, wxString const& name);
+	void UpdateServer(Site & site, wxString const& name);
 	void SetCtrlState();
 	bool LoadDefaultSites();
 
@@ -48,8 +48,8 @@ protected:
 
 	wxString FindFirstFreeName(const wxTreeItemId &parent, const wxString& name);
 
-	void AddNewSite(wxTreeItemId parent, ServerWithCredentials const& server, bool connected = false);
-	void CopyAddServer(ServerWithCredentials const& server);
+	void AddNewSite(wxTreeItemId parent, Site const& site, bool connected = false);
+	void CopyAddServer(Site const& site);
 
 	void AddNewBookmark(wxTreeItemId parent);
 

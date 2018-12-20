@@ -114,7 +114,7 @@ public:
 				return wxDragNone;
 			}
 
-			if (!m_pLocalListView->m_state.GetServer() || m_pRemoteDataObject->GetServer().server != m_pLocalListView->m_state.GetServer().server) {
+			if (!m_pLocalListView->m_state.GetSite() || m_pRemoteDataObject->GetSite().server_.server != m_pLocalListView->m_state.GetSite().server_.server) {
 				wxMessageBoxEx(_("Drag&drop between different servers has not been implemented yet."));
 				return wxDragNone;
 			}
@@ -572,8 +572,8 @@ void CLocalListView::OnItemActivated(wxListEvent &event)
 		return;
 	}
 
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -586,7 +586,7 @@ void CLocalListView::OnItemActivated(wxListEvent &event)
 
 	const bool queue_only = action == 1;
 
-	m_pQueue->QueueFile(queue_only, false, data->name, wxEmptyString, m_dir, path, server, data->size);
+	m_pQueue->QueueFile(queue_only, false, data->name, wxEmptyString, m_dir, path, site, data->size);
 	m_pQueue->QueueFile_Finish(true);
 }
 
@@ -860,8 +860,8 @@ void CLocalListView::OnContextMenu(wxContextMenuEvent& event)
 
 void CLocalListView::OnMenuUpload(wxCommandEvent& event)
 {
-	ServerWithCredentials const& server = m_state.GetServer();
-	if (!server) {
+	Site const& site = m_state.GetSite();
+	if (!site) {
 		wxBell();
 		return;
 	}
@@ -915,7 +915,7 @@ void CLocalListView::OnMenuUpload(wxCommandEvent& event)
 			root.add_dir_to_visit(localPath, remotePath);
 		}
 		else {
-			m_pQueue->QueueFile(queue_only, false, data->name, wxEmptyString, m_dir, remotePath, server, data->size);
+			m_pQueue->QueueFile(queue_only, false, data->name, wxEmptyString, m_dir, remotePath, site, data->size);
 			added = true;
 		}
 	}
@@ -1748,17 +1748,17 @@ wxString CLocalListView::GetItemText(int item, unsigned int column)
 
 void CLocalListView::OnMenuEdit(wxCommandEvent&)
 {
-	ServerWithCredentials server;
+	Site site;
 	CServerPath path;
 
-	if (!m_state.GetServer()) {
+	if (!m_state.GetSite()) {
 		if (COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
 			wxMessageBoxEx(_("Cannot edit file, not connected to any server."), _("Editing failed"), wxICON_EXCLAMATION);
 			return;
 		}
 	}
 	else {
-		server = m_state.GetServer();
+		site = m_state.GetSite();
 
 		path = m_state.GetRemotePath();
 		if (path.empty()) {
@@ -1794,7 +1794,7 @@ void CLocalListView::OnMenuEdit(wxCommandEvent&)
 	}
 
 	CEditHandler* pEditHandler = CEditHandler::Get();
-	pEditHandler->Edit(CEditHandler::local, selected_item, path, server, this);
+	pEditHandler->Edit(CEditHandler::local, selected_item, path, site, this);
 }
 
 void CLocalListView::OnMenuOpen(wxCommandEvent&)

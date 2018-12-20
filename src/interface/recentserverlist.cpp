@@ -5,9 +5,9 @@
 #include "Options.h"
 #include "xmlfunctions.h"
 
-const std::deque<ServerWithCredentials> CRecentServerList::GetMostRecentServers(bool lockMutex)
+const std::deque<Site> CRecentServerList::GetMostRecentServers(bool lockMutex)
 {
-	std::deque<ServerWithCredentials> mostRecentServers;
+	std::deque<Site> mostRecentServers;
 
 	CInterProcessMutex mutex(MUTEX_MOSTRECENTSERVERS, false);
 	if (lockMutex) {
@@ -23,22 +23,22 @@ const std::deque<ServerWithCredentials> CRecentServerList::GetMostRecentServers(
 	bool modified = false;
 	auto xServer = element.child("Server");
 	while (xServer) {
-		ServerWithCredentials server;
-		if (!GetServer(xServer, server) || mostRecentServers.size() >= 10) {
+		Site site;
+		if (!GetServer(xServer, site) || mostRecentServers.size() >= 10) {
 			auto xRemove = xServer;
 			xServer = xServer.next_sibling("Server");
 			element.remove_child(xRemove);
 			modified = true;
 		}
 		else {
-			std::deque<ServerWithCredentials>::const_iterator iter;
+			std::deque<Site>::const_iterator iter;
 			for (iter = mostRecentServers.begin(); iter != mostRecentServers.end(); ++iter) {
-				if (*iter == server) {
+				if (*iter == site) {
 					break;
 				}
 			}
 			if (iter == mostRecentServers.end()) {
-				mostRecentServers.push_back(server);
+				mostRecentServers.push_back(site);
 			}
 			xServer = xServer.next_sibling("Server");
 		}
@@ -51,7 +51,7 @@ const std::deque<ServerWithCredentials> CRecentServerList::GetMostRecentServers(
 	return mostRecentServers;
 }
 
-void CRecentServerList::SetMostRecentServer(ServerWithCredentials const& server)
+void CRecentServerList::SetMostRecentServer(Site const& site)
 {
 	CInterProcessMutex mutex(MUTEX_MOSTRECENTSERVERS);
 
@@ -60,15 +60,15 @@ void CRecentServerList::SetMostRecentServer(ServerWithCredentials const& server)
 
 	bool relocated = false;
 	for (auto iter = mostRecentServers.begin(); iter != mostRecentServers.end(); ++iter) {
-		if (iter->server == server.server) {
+		if (iter->server_.server == site.server_.server) {
 			mostRecentServers.erase(iter);
-			mostRecentServers.push_front(server);
+			mostRecentServers.push_front(site);
 			relocated = true;
 			break;
 		}
 	}
 	if (!relocated) {
-		mostRecentServers.push_front(server);
+		mostRecentServers.push_front(site);
 		if (mostRecentServers.size() > 10) {
 			mostRecentServers.pop_back();
 		}
@@ -81,7 +81,7 @@ void CRecentServerList::SetMostRecentServer(ServerWithCredentials const& server)
 	SetMostRecentServers(mostRecentServers, false);
 }
 
-void CRecentServerList::SetMostRecentServers(std::deque<ServerWithCredentials> const& servers, bool lockMutex)
+void CRecentServerList::SetMostRecentServers(std::deque<Site> const& sites, bool lockMutex)
 {
 	CInterProcessMutex mutex(MUTEX_MOSTRECENTSERVERS, false);
 	if (lockMutex) {
@@ -103,9 +103,9 @@ void CRecentServerList::SetMostRecentServers(std::deque<ServerWithCredentials> c
 		serversNode = element.append_child("RecentServers");
 	}
 
-	for (auto const& server : servers) {
+	for (auto const& site : sites) {
 		auto node = serversNode.append_child("Server");
-		SetServer(node, server);
+		SetServer(node, site);
 	}
 
 	xmlFile.Save(true);
