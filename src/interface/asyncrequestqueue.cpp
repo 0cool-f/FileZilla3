@@ -167,7 +167,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 
 		Site site(notification.server, notification.handle_, notification.credentials);
 		if (CLoginManager::Get().GetPassword(site, true, std::wstring(), notification.GetChallenge(), canRemember)) {
-			notification.credentials = site.server_.credentials;
+			notification.credentials = site.credentials;
 			notification.passwordSet = true;
 		}
 		else {
@@ -178,7 +178,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 			}
 
 			if (CLoginManager::Get().GetPassword(site, false, std::wstring(), notification.GetChallenge(), canRemember)) {
-				notification.credentials = site.server_.credentials;
+				notification.credentials = site.credentials;
 				notification.passwordSet = true;
 			}
 		}

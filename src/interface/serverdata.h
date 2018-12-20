@@ -34,32 +34,13 @@ class ServerWithCredentials final
 public:
 	ServerWithCredentials() = default;
 
-	explicit ServerWithCredentials(CServer const& s, ServerHandle const& handle, Credentials const& c)
+	explicit ServerWithCredentials(CServer const& s, ServerHandle const& handle)
 		: server(s)
 		, handle_(handle)
-		, credentials(c)
 	{}
-
-	explicit ServerWithCredentials(CServer const& s, ServerHandle const& handle, ProtectedCredentials const& c)
-		: server(s)
-		, handle_(handle)
-		, credentials(c)
-	{}
-
-	bool operator==(ServerWithCredentials const& rhs) const {
-		return server == rhs.server;
-	}
-	bool operator!=(ServerWithCredentials const& rhs) const {
-		return !(*this == rhs);
-	}
-
-	bool SameResource(ServerWithCredentials const& other) const {
-		return server.SameResource(other.server);
-	}
 
 	CServer server;
 	ServerHandle handle_;
-	ProtectedCredentials credentials;
 };
 
 class Bookmark final
@@ -100,11 +81,13 @@ public:
 	Site() = default;
 
 	explicit Site(CServer const& s, ServerHandle const& handle, Credentials const& c)
-		: server_(s, handle, c)
+		: server_(s, handle)
+		, credentials(c)
 	{}
 
 	explicit Site(CServer const& s, ServerHandle const& handle, ProtectedCredentials const& c)
-		: server_(s, handle, c)
+		: server_(s, handle)
+		, credentials(c)
 	{}
 
 	explicit operator bool() const { return server_.server.operator bool(); }
@@ -119,7 +102,7 @@ public:
 	bool ParseUrl(std::wstring const& host, std::wstring const& port, std::wstring const& user, std::wstring const& pass, std::wstring &error, CServerPath &path, ServerProtocol const hint = UNKNOWN);
 
 	std::wstring Format(ServerFormat formatType) const {
-		return server_.server.Format(formatType, server_.credentials);
+		return server_.server.Format(formatType, credentials);
 	}
 
 	void SetLogonType(LogonType logonType);
@@ -128,6 +111,8 @@ public:
 
 
 	ServerWithCredentials server_;
+	ProtectedCredentials credentials;
+
 	std::wstring comments_;
 
 	Bookmark m_default_bookmark;
@@ -143,6 +128,10 @@ public:
 
 	// Almost like operator= but does not invalidate exiting handles.
 	void Update(Site const& rhs);
+
+	bool SameResource(Site const& other) const {
+		return server_.server.SameResource(other.server_.server);
+	}
 
 private:
 	std::shared_ptr<SiteHandleData> data_;

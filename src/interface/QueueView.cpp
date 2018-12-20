@@ -538,7 +538,7 @@ bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData 
 			continue;
 		}
 
-		if (browsingSite.server_ == site.server_) {
+		if (browsingSite.server_.server == site.server_.server) {
 			++active_count;
 			browsingStateOnSameServer = pState;
 			break;
@@ -1224,7 +1224,7 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			engineData.pItem->SetStatusMessage(CFileItem::Status::connecting);
 			RefreshItem(engineData.pItem);
 
-			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastSite.server_.server, engineData.lastSite.server_.handle_, engineData.lastSite.server_.credentials, false));
+			int res = engineData.pEngine->Execute(CConnectCommand(engineData.lastSite.server_.server, engineData.lastSite.server_.handle_, engineData.lastSite.credentials, false));
 
 			wxASSERT((res & FZ_REPLY_BUSY) != FZ_REPLY_BUSY);
 			if (res == FZ_REPLY_WOULDBLOCK) {
@@ -2653,7 +2653,7 @@ void CQueueView::OnExclusiveEngineRequestGranted(wxCommandEvent& event)
 
 	wxASSERT(pServerItem);
 
-	if (!currentSite || currentSite.server_ != pServerItem->GetSite().server_) {
+	if (!currentSite || currentSite.server_.server != pServerItem->GetSite().server_.server) {
 		if (pState->m_pCommandQueue) {
 			pState->m_pCommandQueue->ReleaseEngine();
 		}
@@ -3199,14 +3199,14 @@ void CQueueView::OnStateChange(CState*, t_statechange_notifications notification
 
 		for (auto it = m_serverList.begin(); it != m_serverList.end(); ) {
 			Site site = (*it)->GetSite();
-			loginManager->AskDecryptor(site.server_.credentials.encrypted_, true, false);
+			loginManager->AskDecryptor(site.credentials.encrypted_, true, false);
 
 			// Since the queue may be running and AskDecryptor uses the GUI, re-find matching server item
 			for (it = m_serverList.begin(); it != m_serverList.end(); ++it) {
 				if ((*it)->GetSite() == site) {
 					site = (*it)->GetSite(); // Credentials aren't in ==
-					site.server_.credentials.Unprotect(loginManager->GetDecryptor(site.server_.credentials.encrypted_), true);
-					(*it)->GetCredentials() = site.server_.credentials;
+					site.credentials.Unprotect(loginManager->GetDecryptor(site.credentials.encrypted_), true);
+					(*it)->GetCredentials() = site.credentials;
 					break;
 				}
 			}

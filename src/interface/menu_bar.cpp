@@ -392,7 +392,7 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 				pState->SetSyncBrowse(false);
 				if (!bookmark.m_remoteDir.empty() && pState->IsRemoteIdle(true)) {
 					Site const& activeSite = pState->GetSite();
-					if (!activeSite || activeSite.server_ != site.server_) {
+					if (!activeSite || activeSite != site) {
 						m_pMainFrame->ConnectToSite(site, bookmark);
 						break;
 					}

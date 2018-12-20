@@ -327,14 +327,14 @@ bool GetServer(pugi::xml_node node, Site & site)
 
 	site.SetLogonType(static_cast<LogonType>(logonType));
 	
-	if (site.server_.credentials.logonType_ != LogonType::anonymous) {
+	if (site.credentials.logonType_ != LogonType::anonymous) {
 		std::wstring user = GetTextElement(node, "User");
-		if (user.empty() && site.server_.credentials.logonType_ != LogonType::interactive && site.server_.credentials.logonType_ != LogonType::ask) {
+		if (user.empty() && site.credentials.logonType_ != LogonType::interactive && site.credentials.logonType_ != LogonType::ask) {
 			return false;
 		}
 
 		std::wstring pass, key;
-		if (site.server_.credentials.logonType_ == LogonType::normal || site.server_.credentials.logonType_ == LogonType::account) {
+		if (site.credentials.logonType_ == LogonType::normal || site.credentials.logonType_ == LogonType::account) {
 			auto passElement = node.child("Pass");
 			if (passElement) {
 				std::wstring encoding = GetTextAttribute(passElement, "encoding");
@@ -345,8 +345,8 @@ bool GetServer(pugi::xml_node node, Site & site)
 				}
 				else if (encoding == _T("crypt")) {
 					pass = fz::to_wstring_from_utf8(passElement.child_value());
-					site.server_.credentials.encrypted_ = fz::public_key::from_base64(passElement.attribute("pubkey").value());
-					if (!site.server_.credentials.encrypted_) {
+					site.credentials.encrypted_ = fz::public_key::from_base64(passElement.attribute("pubkey").value());
+					if (!site.credentials.encrypted_) {
 						pass.clear();
 						site.SetLogonType(LogonType::ask);
 					}
@@ -359,19 +359,19 @@ bool GetServer(pugi::xml_node node, Site & site)
 				}
 			}
 		}
-		else if (site.server_.credentials.logonType_ == LogonType::key) {
+		else if (site.credentials.logonType_ == LogonType::key) {
 			key = GetTextElement(node, "Keyfile");
 
 			// password should be empty if we're using a key file
 			pass.clear();
 
-			site.server_.credentials.keyFile_ = key;
+			site.credentials.keyFile_ = key;
 		}
 
 		site.SetUser(user);
-		site.server_.credentials.SetPass(pass);
+		site.credentials.SetPass(pass);
 
-		site.server_.credentials.account_ = GetTextElement(node, "Account");
+		site.credentials.account_ = GetTextElement(node, "Account");
 	}
 
 	int timezoneOffset = GetTextElementInt(node, "TimezoneOffset");
@@ -461,7 +461,7 @@ void SetServer(pugi::xml_node node, Site const& site)
 	AddTextElement(node, "Protocol", protocol);
 	AddTextElement(node, "Type", server.server.GetType());
 
-	ProtectedCredentials credentials = server.credentials;
+	ProtectedCredentials credentials = site.credentials;
 
 	if (credentials.logonType_ != LogonType::anonymous) {
 		AddTextElement(node, "User", server.server.GetUser());

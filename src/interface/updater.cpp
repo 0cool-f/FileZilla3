@@ -335,7 +335,7 @@ bool CUpdater::CreateConnectCommand(std::wstring const& url)
 		return false;
 	}
 
-	pending_commands_.emplace_back(new CConnectCommand(s.server_.server, s.Handle(), s.server_.credentials));
+	pending_commands_.emplace_back(new CConnectCommand(s.server_.server, s.Handle(), s.credentials));
 	return true;
 }
 

@@ -97,8 +97,8 @@ bool COptionsPagePasswords::SavePage()
 	{
 		auto recentServers = CRecentServerList::GetMostRecentServers();
 		for (auto & site : recentServers) {
-			loginManager.AskDecryptor(site.server_.credentials.encrypted_, true, false);
-			site.server_.credentials.Unprotect(loginManager.GetDecryptor(site.server_.credentials.encrypted_), true);
+			loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
+			site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
 		}
 		CRecentServerList::SetMostRecentServers(recentServers);
 	}
@@ -106,8 +106,8 @@ bool COptionsPagePasswords::SavePage()
 	for (auto state : *CContextManager::Get()->GetAllStates()) {
 		auto site = state->GetLastSite();
 		auto path = state->GetLastServerPath();
-		loginManager.AskDecryptor(site.server_.credentials.encrypted_, true, false);
-		site.server_.credentials.Unprotect(loginManager.GetDecryptor(site.server_.credentials.encrypted_), true);
+		loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
+		site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
 		state->SetLastSite(site, path);
 	}
 

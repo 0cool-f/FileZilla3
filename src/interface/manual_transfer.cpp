@@ -170,7 +170,7 @@ void CManualTransfer::DisplayServer()
 			XRCCTRL(*this, "ID_PROTOCOL", wxChoice)->SetStringSelection(CServer::GetProtocolName(FTP));
 		}
 
-		switch (site_.server_.credentials.logonType_)
+		switch (site_.credentials.logonType_)
 		{
 		case LogonType::normal:
 			XRCCTRL(*this, "ID_LOGONTYPE", wxChoice)->SetStringSelection(_("Normal"));
@@ -190,8 +190,8 @@ void CManualTransfer::DisplayServer()
 		}
 
 		XRCCTRL(*this, "ID_USER", wxTextCtrl)->ChangeValue(site_.server_.server.GetUser());
-		XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->ChangeValue(site_.server_.credentials.account_);
-		XRCCTRL(*this, "ID_PASS", wxTextCtrl)->ChangeValue(site_.server_.credentials.GetPass());
+		XRCCTRL(*this, "ID_ACCOUNT", wxTextCtrl)->ChangeValue(site_.credentials.account_);
+		XRCCTRL(*this, "ID_PASS", wxTextCtrl)->ChangeValue(site_.credentials.GetPass());
 	}
 	else {
 		XRCCTRL(*this, "ID_HOST", wxTextCtrl)->ChangeValue(_T(""));
@@ -393,8 +393,8 @@ bool CManualTransfer::UpdateServer()
 
 	site_.SetLogonType(GetLogonTypeFromName(xrc_call(*this, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring()));
 	site_.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
-	site_.server_.credentials.SetPass(xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring());
-	site_.server_.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
+	site_.credentials.SetPass(xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring());
+	site_.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
 
 	return true;
 }

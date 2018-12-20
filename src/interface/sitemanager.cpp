@@ -53,7 +53,7 @@ bool Bookmark::operator==(Bookmark const& b) const
 
 bool Site::operator==(Site const& s) const
 {
-	if (server_ != s.server_) {
+	if (server_.server != s.server_.server) {
 		return false;
 	}
 
@@ -896,8 +896,8 @@ void CSiteManager::Rewrite(CLoginManager & loginManager, pugi::xml_node element,
 		else if (!strcmp(child.name(), "Server")) {
 			auto site = ReadServerElement(child);
 			if (site) {
-				loginManager.AskDecryptor(site->server_.credentials.encrypted_, true, false);
-				site->server_.credentials.Unprotect(loginManager.GetDecryptor(site->server_.credentials.encrypted_), on_failure_set_to_ask);
+				loginManager.AskDecryptor(site->credentials.encrypted_, true, false);
+				site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), on_failure_set_to_ask);
 				Save(child, *site);
 			}
 		}

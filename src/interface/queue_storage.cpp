@@ -614,7 +614,7 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 	Bind(insertServerQuery_, server_table_column_names::protocol, static_cast<int>(site.server_.server.GetProtocol()));
 	Bind(insertServerQuery_, server_table_column_names::type, static_cast<int>(site.server_.server.GetType()));
 
-	ProtectedCredentials credentials = site.server_.credentials;
+	ProtectedCredentials credentials = site.credentials;
 	credentials.Protect();
 
 	LogonType logonType = credentials.logonType_;
@@ -960,7 +960,7 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 
 	site.SetLogonType(static_cast<LogonType>(logonType));
 
-	if (site.server_.credentials.logonType_ != LogonType::anonymous) {
+	if (site.credentials.logonType_ != LogonType::anonymous) {
 		std::wstring user = GetColumnText(selectServersQuery_, server_table_column_names::user);
 		std::wstring pass = GetColumnText(selectServersQuery_, server_table_column_names::password);
 
@@ -971,19 +971,19 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 				return INVALID_DATA;
 			}
 			else {
-				site.server_.credentials.encrypted_ = fz::public_key::from_base64(fz::to_utf8(pass.substr(0, pos)));
+				site.credentials.encrypted_ = fz::public_key::from_base64(fz::to_utf8(pass.substr(0, pos)));
 				pass = pass.substr(pos + 1);
 			}
 		}
-		site.server_.credentials.SetPass(pass);
+		site.credentials.SetPass(pass);
 
-		site.server_.credentials.account_ = GetColumnText(selectServersQuery_, server_table_column_names::account);
-		if (site.server_.credentials.account_.empty() && site.server_.credentials.logonType_ == LogonType::account) {
+		site.credentials.account_ = GetColumnText(selectServersQuery_, server_table_column_names::account);
+		if (site.credentials.account_.empty() && site.credentials.logonType_ == LogonType::account) {
 			return INVALID_DATA;
 		}
 
-		site.server_.credentials.keyFile_ = GetColumnText(selectServersQuery_, server_table_column_names::keyfile);
-		if (site.server_.credentials.keyFile_.empty() && site.server_.credentials.logonType_ == LogonType::key) {
+		site.credentials.keyFile_ = GetColumnText(selectServersQuery_, server_table_column_names::keyfile);
+		if (site.credentials.keyFile_.empty() && site.credentials.logonType_ == LogonType::key) {
 			return INVALID_DATA;
 		}
 	}

@@ -152,8 +152,8 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 	}
 
 	m_pUser->SetValue(site.server_.server.GetUser());
-	if (site.server_.credentials.logonType_ != LogonType::anonymous) {
-		m_pPass->SetValue(site.server_.credentials.GetPass());
+	if (site.credentials.logonType_ != LogonType::anonymous) {
+		m_pPass->SetValue(site.credentials.GetPass());
 	}
 	else {
 		m_pPass->ChangeValue(wxString());
@@ -169,11 +169,11 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 		site.server_.server.SetBypassProxy(true);
 	}
 
-	if (site.server_.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this)) {
+	if (site.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this)) {
 		return;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.server_.credentials.logonType_ == LogonType::normal) {
+	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
 		site.SetLogonType(LogonType::ask);
 		CLoginManager::Get().RememberPassword(site);
 	}

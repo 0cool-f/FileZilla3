@@ -86,7 +86,7 @@ public:
 	virtual QueueItemType GetType() const { return QueueItemType::Server; }
 
 	Site const& GetSite() const { return site_; }
-	ProtectedCredentials& GetCredentials() {return site_.server_.credentials; }
+	ProtectedCredentials& GetCredentials() {return site_.credentials; }
 	wxString GetName() const;
 
 	virtual void AddChild(CQueueItem* pItem);

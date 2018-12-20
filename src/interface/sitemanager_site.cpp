@@ -707,23 +707,23 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	site.SetUser(xrc_call(*this, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring());
 	auto pw = xrc_call(*this, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring();
 
-	if (protocol == STORJ && logon_type == LogonType::normal && (!pw.empty() || !site.server_.credentials.encrypted_)) {
+	if (protocol == STORJ && logon_type == LogonType::normal && (!pw.empty() || !site.credentials.encrypted_)) {
 		pw += '|';
 		pw += xrc_call(*this, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
 	}
 
-	if (site.server_.credentials.encrypted_) {
+	if (site.credentials.encrypted_) {
 		if (!pw.empty()) {
-			site.server_.credentials.encrypted_ = fz::public_key();
-			site.server_.credentials.SetPass(pw);
+			site.credentials.encrypted_ = fz::public_key();
+			site.credentials.SetPass(pw);
 		}
 	}
 	else {
-		site.server_.credentials.SetPass(pw);
+		site.credentials.SetPass(pw);
 	}
-	site.server_.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
+	site.credentials.account_ = xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::GetValue).ToStdWstring();
 
-	site.server_.credentials.keyFile_ = xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::GetValue).ToStdWstring();
+	site.credentials.keyFile_ = xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::GetValue).ToStdWstring();
 
 	site.comments_ = xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::GetValue).ToStdWstring();
 	site.m_colour = CSiteManager::GetColourFromIndex(xrc_call(*this, "ID_COLOR", &wxChoice::GetSelection));
@@ -877,16 +877,16 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		SetProtocol(protocol);
 		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, site.server_.server.GetBypassProxy());
 
-		LogonType const logonType = site.server_.credentials.logonType_;
+		LogonType const logonType = site.credentials.logonType_;
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
 
 		SetControlVisibility(protocol, logonType);
 		SetLogonTypeCtrlState();
 
 		xrc_call(*this, "ID_USER", &wxTextCtrl::ChangeValue, site.server_.server.GetUser());
-		xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.server_.credentials.account_);
+		xrc_call(*this, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.credentials.account_);
 
-		std::wstring pass = site.server_.credentials.GetPass();
+		std::wstring pass = site.credentials.GetPass();
 		std::wstring encryptionKey;
 		if (protocol == STORJ) {
 			size_t pos = pass.rfind('|');
@@ -896,7 +896,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 			}
 		}
 
-		if (site.server_.credentials.encrypted_) {
+		if (site.credentials.encrypted_) {
 			xrc_call(*this, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
 			xrc_call(*this, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
 
@@ -919,14 +919,14 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 					continue;
 				}
 
-				it->second->ChangeValue(site.server_.credentials.GetExtraParameter(trait.name_));
+				it->second->ChangeValue(site.credentials.GetExtraParameter(trait.name_));
 				++it;
 			}
 		}
 
 		SetExtraParameters(site.server_.server);
 
-		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.server_.credentials.keyFile_);
+		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.credentials.keyFile_);
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.comments_);
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site.m_colour));
 

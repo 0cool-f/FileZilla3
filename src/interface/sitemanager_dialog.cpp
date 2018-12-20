@@ -555,11 +555,11 @@ public:
 	virtual bool AddSite(std::unique_ptr<Site> data)
 	{
 		if (m_kiosk && !m_predefined &&
-			data->server_.credentials.logonType_ == LogonType::normal)
+			data->credentials.logonType_ == LogonType::normal)
 		{
 			// Clear saved password
 			data->SetLogonType(LogonType::ask);
-			data->server_.credentials.SetPass(std::wstring());
+			data->credentials.SetPass(std::wstring());
 		}
 
 		const wxString name(data->server_.server.GetName());

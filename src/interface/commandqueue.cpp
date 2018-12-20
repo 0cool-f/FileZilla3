@@ -178,7 +178,7 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 			// Try automatic reconnect
 			Site const& site = m_state.GetSite();
 			if (site) {
-				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(site.server_.server, site.Handle(), site.server_.credentials));
+				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(site.server_.server, site.Handle(), site.credentials));
 				ProcessNextCommand();
 				return;
 			}

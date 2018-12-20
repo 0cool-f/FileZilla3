@@ -2552,7 +2552,7 @@ void CMainFrame::ProcessCommandLine()
 			wxMessageBoxEx(error, _("Syntax error in command line"));
 		}
 
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.server_.credentials.logonType_ == LogonType::normal) {
+		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
 			site.SetLogonType(LogonType::ask);
 			CLoginManager::Get().RememberPassword(site);
 		}

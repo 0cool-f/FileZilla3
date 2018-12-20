@@ -145,30 +145,30 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 
 	server_.server.SetHost(host, port);
 
-	server_.credentials.account_.clear();
+	credentials.account_.clear();
 
-	if (server_.credentials.logonType_ != LogonType::ask && server_.credentials.logonType_ != LogonType::interactive) {
+	if (credentials.logonType_ != LogonType::ask && credentials.logonType_ != LogonType::interactive) {
 		if (user.empty()) {
-			server_.credentials.logonType_ = LogonType::anonymous;
+			credentials.logonType_ = LogonType::anonymous;
 		}
 		else if (user == L"anonymous") {
 			if (pass.empty() || pass == L"anonymous@example.com") {
-				server_.credentials.logonType_ = LogonType::anonymous;
+				credentials.logonType_ = LogonType::anonymous;
 			}
 			else {
-				server_.credentials.logonType_ = LogonType::normal;
+				credentials.logonType_ = LogonType::normal;
 			}
 		}
 		else {
-			server_.credentials.logonType_ = LogonType::normal;
+			credentials.logonType_ = LogonType::normal;
 		}
 	}
-	if (server_.credentials.logonType_ == LogonType::anonymous) {
+	if (credentials.logonType_ == LogonType::anonymous) {
 		user.clear();
 		pass.clear();
 	}
 	server_.server.SetUser(user);
-	server_.credentials.SetPass(pass);
+	credentials.SetPass(pass);
 
 	if (server_.server.GetProtocol() == UNKNOWN) {
 		server_.server.SetProtocol(CServer::GetProtocolFromPort(port));
@@ -179,7 +179,7 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 
 void Site::SetLogonType(LogonType logonType)
 {
-	server_.credentials.logonType_ = logonType;
+	credentials.logonType_ = logonType;
 	if (logonType == LogonType::anonymous) {
 		server_.server.SetUser(L"");
 	}
@@ -187,7 +187,7 @@ void Site::SetLogonType(LogonType logonType)
 
 void Site::SetUser(std::wstring const& user)
 {
-	if (server_.credentials.logonType_ == LogonType::anonymous) {
+	if (credentials.logonType_ == LogonType::anonymous) {
 		server_.server.SetUser(L"");
 	}
 	else {
