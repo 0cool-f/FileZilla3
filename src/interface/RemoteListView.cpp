@@ -2366,7 +2366,7 @@ void CRemoteListView::OnBeginDrag(wxListEvent&)
 		if (!pRemoteDataObject->DidSendData()) {
 			Site newSite = m_state.GetSite();
 			if (!m_state.IsRemoteIdle() ||
-				!newSite || newSite.server_ != pRemoteDataObject->GetServer() ||
+				!newSite || newSite.server != pRemoteDataObject->GetSite().server ||
 				!m_pDirectoryListing || m_pDirectoryListing->path != path)
 			{
 				// Remote listing has changed since drag started

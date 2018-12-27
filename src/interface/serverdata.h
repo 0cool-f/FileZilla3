@@ -29,18 +29,6 @@ private:
 	bool DoUnprotect(fz::private_key const& key);
 };
 
-class ServerWithCredentials final
-{
-public:
-	ServerWithCredentials() = default;
-
-	explicit ServerWithCredentials(ServerHandle const& handle)
-		: handle_(handle)
-	{}
-
-	ServerHandle handle_;
-};
-
 class Bookmark final
 {
 public:
@@ -79,15 +67,15 @@ public:
 	Site() = default;
 
 	explicit Site(CServer const& s, ServerHandle const& handle, Credentials const& c)
-		: server_(handle)
-		, server(s)
+		: server(s)
 		, credentials(c)
+		, data_(std::dynamic_pointer_cast<SiteHandleData>(handle.lock()))
 	{}
 
 	explicit Site(CServer const& s, ServerHandle const& handle, ProtectedCredentials const& c)
-		: server_(handle)
-		, server(s)
+		: server(s)
 		, credentials(c)
+		, data_(std::dynamic_pointer_cast<SiteHandleData>(handle.lock()))
 	{}
 
 	explicit operator bool() const { return server.operator bool(); }
@@ -110,7 +98,6 @@ public:
 	void SetUser(std::wstring const& user);
 
 
-	ServerWithCredentials server_;
 	CServer server;
 	ProtectedCredentials credentials;
 
