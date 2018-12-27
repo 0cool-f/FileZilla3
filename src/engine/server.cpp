@@ -887,3 +887,15 @@ bool CServer::SameResource(CServer const& other) const
 
 	return l == r;
 }
+
+bool CServer::SameContent(CServer const& other) const
+{
+	if (!SameResource(other)) {
+		return false;
+	}
+
+	auto l = std::tie(m_timezoneOffset, m_encodingType, m_customEncoding);
+	auto r = std::tie(other.m_timezoneOffset, other.m_encodingType, other.m_customEncoding);
+
+	return l == r;
+}

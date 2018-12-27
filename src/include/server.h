@@ -132,6 +132,10 @@ public:
 	// Compares things like protocol and hostname, but excludes things like the name or the timezone offset.
 	bool SameResource(CServer const& other) const;
 
+	// Stricter than SameResource, also compares things like the encoding.
+	// Can be used as key comparator in content caches
+	bool SameContent(CServer const& other) const;
+
 	bool SetTimezoneOffset(int minutes);
 	void SetPasvMode(PasvMode pasvMode);
 	void MaximumMultipleConnections(int maximum);
