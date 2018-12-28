@@ -303,7 +303,7 @@ void CMenuBar::UpdateBookmarkMenu()
 	auto ids = m_bookmark_menu_ids.begin();
 
 	// Insert global bookmarks
-	std::vector<wxString> global_bookmarks;
+	std::vector<std::wstring> global_bookmarks;
 	if (CBookmarksDialog::GetGlobalBookmarks(global_bookmarks) && !global_bookmarks.empty()) {
 		pMenu->AppendSeparator();
 
@@ -318,8 +318,7 @@ void CMenuBar::UpdateBookmarkMenu()
 				id = *ids;
 				++ids;
 			}
-			wxString name(bookmark);
-			name.Replace(_T("&"), _T("&&"));
+			std::wstring name(LabelEscape(bookmark));
 			pMenu->Append(id, name);
 
 			m_bookmark_menu_id_map_global[id] = bookmark;
@@ -355,8 +354,7 @@ void CMenuBar::UpdateBookmarkMenu()
 			id = *ids;
 			++ids;
 		}
-		wxString name(bookmark.m_name);
-		name.Replace(_T("&"), _T("&&"));
+		wxString name(LabelEscape(bookmark.m_name));
 		pMenu->Append(id, name);
 
 		m_bookmark_menu_id_map_site[id] = bookmark.m_name;

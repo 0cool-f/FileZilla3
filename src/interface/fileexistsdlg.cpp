@@ -36,10 +36,9 @@ bool CFileExistsDlg::Create(wxWindow* parent)
 	return true;
 }
 
-void CFileExistsDlg::DisplayFile(bool left, wxString name, int64_t size, fz::datetime const& time, wxString const& iconFile)
+void CFileExistsDlg::DisplayFile(bool left, std::wstring const& name, int64_t size, fz::datetime const& time, wxString const& iconFile)
 {
-	name = GetPathEllipsis(name, FindWindow(left ? XRCID("ID_FILE1_NAME") : XRCID("ID_FILE2_NAME")));
-	name.Replace(_T("&"), _T("&&"));
+	std::wstring labelName = LabelEscape(GetPathEllipsis(name, FindWindow(left ? XRCID("ID_FILE1_NAME") : XRCID("ID_FILE2_NAME"))));
 
 	wxString sizeStr = _("Size unknown");
 	if (size >= 0) {
@@ -52,7 +51,7 @@ void CFileExistsDlg::DisplayFile(bool left, wxString name, int64_t size, fz::dat
 		timeStr = CTimeFormat::Format(time);
 	}
 
-	xrc_call(*this, left ? "ID_FILE1_NAME" : "ID_FILE2_NAME", &wxStaticText::SetLabel, name);
+	xrc_call(*this, left ? "ID_FILE1_NAME" : "ID_FILE2_NAME", &wxStaticText::SetLabel, labelName);
 	xrc_call(*this, left ? "ID_FILE1_SIZE" : "ID_FILE2_SIZE", &wxStaticText::SetLabel, sizeStr);
 	xrc_call(*this, left ? "ID_FILE1_TIME" : "ID_FILE2_TIME", &wxStaticText::SetLabel, timeStr);
 
@@ -65,8 +64,8 @@ bool CFileExistsDlg::CreateControls()
 		return false;
 	}
 
-	wxString localFile = m_pNotification->localFile;
-	wxString remoteFile = m_pNotification->remotePath.FormatFilename(m_pNotification->remoteFile);
+	std::wstring const& localFile = m_pNotification->localFile;
+	std::wstring remoteFile = m_pNotification->remotePath.FormatFilename(m_pNotification->remoteFile);
 
 	DisplayFile(m_pNotification->download, localFile, m_pNotification->localSize, m_pNotification->localTime, m_pNotification->localFile);
 	DisplayFile(!m_pNotification->download, remoteFile, m_pNotification->remoteSize, m_pNotification->remoteTime, m_pNotification->remoteFile);
@@ -217,7 +216,7 @@ bool CFileExistsDlg::Always(bool &directionOnly, bool &queueOnly) const
 	return m_always;
 }
 
-wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
+std::wstring CFileExistsDlg::GetPathEllipsis(std::wstring const& path, wxWindow *window)
 {
 	int dn = wxDisplay::GetFromWindow(GetParent()); // Use parent window as the dialog isn't realized yet.
 	if (dn < 0) {
@@ -234,7 +233,7 @@ wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
 	const int maxWidth = (int)(DESKTOP_WIDTH * 0.75);
 
 	// If the path is already short enough, don't change it
-	if (string_width <= maxWidth || path.Length() < 20) {
+	if (string_width <= maxWidth || path.size() < 20) {
 		return path;
 	}
 
@@ -246,9 +245,9 @@ wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
 	window->GetTextExtent(fill, &fillWidth, &y);
 
 	// Do initial split roughly in the middle of the string
-	int middle = path.Length() / 2;
-	wxString left = path.Left(middle);
-	wxString right = path.Mid(middle);
+	size_t middle = path.size() / 2;
+	wxString left = path.substr(0, middle);
+	wxString right = path.substr(middle);
 
 	int leftWidth, rightWidth;
 	window->GetTextExtent(left, &leftWidth, &y);
@@ -270,7 +269,7 @@ wxString CFileExistsDlg::GetPathEllipsis(wxString path, wxWindow *window)
 		}
 	}
 
-	return left + fill + right;
+	return (left + fill + right).ToStdWstring();
 }
 
 void CFileExistsDlg::OnCheck(wxCommandEvent& event)

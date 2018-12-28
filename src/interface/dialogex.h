@@ -62,4 +62,6 @@ protected:
 	std::unique_ptr<DialogLayout> layout_;
 };
 
+std::wstring LabelEscape(std::wstring const& label);
+
 #endif

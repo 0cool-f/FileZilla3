@@ -738,7 +738,7 @@ void CBookmarksDialog::OnEndLabelEdit(wxTreeEvent& event)
 	m_pTree->SortChildren(parent);
 }
 
-bool CBookmarksDialog::GetGlobalBookmarks(std::vector<wxString> &bookmarks)
+bool CBookmarksDialog::GetGlobalBookmarks(std::vector<std::wstring> &bookmarks)
 {
 	CInterProcessMutex mutex(MUTEX_GLOBALBOOKMARKS);
 
@@ -751,8 +751,8 @@ bool CBookmarksDialog::GetGlobalBookmarks(std::vector<wxString> &bookmarks)
 	}
 
 	for (auto bookmark = element.child("Bookmark"); bookmark; bookmark = bookmark.next_sibling("Bookmark")) {
-		wxString name;
-		wxString local_dir;
+		std::wstring name;
+		std::wstring local_dir;
 		std::wstring remote_dir_raw;
 		CServerPath remote_dir;
 

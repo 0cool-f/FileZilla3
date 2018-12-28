@@ -19,7 +19,7 @@ std::list<CLoginManager::t_passwordcache>::iterator CLoginManager::FindItem(CSer
 	);
 }
 
-bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& name)
+bool CLoginManager::GetPassword(Site & site, bool silent)
 {
 	bool const needsUser = ProtocolHasUser(site.server.GetProtocol()) && site.server.GetUser().empty() && (site.credentials.logonType_ == LogonType::ask || site.credentials.logonType_ == LogonType::interactive);
 
@@ -34,7 +34,7 @@ bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& na
 		}
 
 		if (!silent) {
-			return DisplayDialogForEncrypted(site, name);
+			return DisplayDialogForEncrypted(site);
 		}
 	}
 	else {
@@ -45,7 +45,7 @@ bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& na
 		}
 
 		if (!silent) {
-			return DisplayDialog(site, name, std::wstring(), true);
+			return DisplayDialog(site, std::wstring(), true);
 		}
 	}
 
@@ -53,7 +53,7 @@ bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& na
 }
 
 
-bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& name, std::wstring const& challenge, bool canRemember)
+bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& challenge, bool canRemember)
 {
 	if (canRemember) {
 		auto it = FindItem(site.server, challenge);
@@ -66,10 +66,10 @@ bool CLoginManager::GetPassword(Site & site, bool silent, std::wstring const& na
 		return false;
 	}
 
-	return DisplayDialog(site, name, challenge, canRemember);
+	return DisplayDialog(site, challenge, canRemember);
 }
 
-bool CLoginManager::DisplayDialogForEncrypted(Site & site, std::wstring const& name)
+bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 {
 	assert(site.credentials.encrypted_);
 
@@ -78,17 +78,18 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site, std::wstring const& n
 		return false;
 	}
 
+	std::wstring const& name = site.server.GetName();
 	if (name.empty()) {
 		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAMELABEL", wxStaticText), false, true);
 		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAME", wxStaticText), false, true);
 	}
 	else {
-		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, name);
+		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, LabelEscape(name));
 	}
 
 	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
 
-	XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server.GetUser());
+	XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(LabelEscape(site.server.GetUser()));
 
 	XRCCTRL(pwdDlg, "wxID_OK", wxButton)->SetId(wxID_OK);
 	XRCCTRL(pwdDlg, "wxID_CANCEL", wxButton)->SetId(wxID_CANCEL);
@@ -125,7 +126,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site, std::wstring const& n
 	return true;
 }
 
-bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::wstring const& challenge, bool canRemember)
+bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bool canRemember)
 {
 	assert(!site.credentials.encrypted_);
 
@@ -134,12 +135,13 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 		return false;
 	}
 
+	std::wstring const& name = site.server.GetName();
 	if (name.empty()) {
 		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAMELABEL", wxStaticText), false, true);
 		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAME", wxStaticText), false, true);
 	}
 	else {
-		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, name);
+		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, LabelEscape(name));
 	}
 
 	if (challenge.empty()) {
@@ -148,11 +150,9 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& name, std::ws
 
 	}
 	else {
-		wxString displayChallenge = challenge;
-		displayChallenge.Trim(true);
-		displayChallenge.Trim(false);
+		std::wstring displayChallenge = LabelEscape(fz::trimmed(challenge));
 #ifdef FZ_WINDOWS
-		displayChallenge.Replace(_T("\n"), _T("\r\n"));
+		fz::replace_substrings(displayChallenge, L"\n", L"\r\n");
 #endif
 		XRCCTRL(pwdDlg, "ID_CHALLENGE", wxTextCtrl)->ChangeValue(displayChallenge);
 		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_REMEMBER", wxCheckBox), canRemember, true);

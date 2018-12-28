@@ -21,14 +21,14 @@ protected:
 	/// Creates the controls and sizers
 	bool CreateControls();
 
-	void DisplayFile(bool left, wxString name, int64_t size, fz::datetime const& time, wxString const& iconFile);
+	void DisplayFile(bool left, std::wstring const& name, int64_t size, fz::datetime const& time, wxString const& iconFile);
 
 	void OnOK(wxCommandEvent& event);
 	void OnCancel(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
 
 	void LoadIcon(int id, const wxString &file);
-	wxString GetPathEllipsis(wxString path, wxWindow *window);
+	std::wstring GetPathEllipsis(std::wstring const& path, wxWindow *window);
 
 	CFileExistsNotification *m_pNotification;
 	CFileExistsNotification::OverwriteAction m_action;

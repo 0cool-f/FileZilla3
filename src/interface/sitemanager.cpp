@@ -1,6 +1,7 @@
 #include <filezilla.h>
 #include "sitemanager.h"
 
+#include "dialogex.h"
 #include "filezillaapp.h"
 #include "ipcmutex.h"
 #include "loginmanager.h"
@@ -179,9 +180,9 @@ public:
 
 	virtual bool AddSite(std::unique_ptr<Site> data)
 	{
-		wxString newName(data->server.GetName());
+		std::wstring newName(data->server.GetName());
 		int i = GetInsertIndex(m_pMenu, newName);
-		newName.Replace(_T("&"), _T("&&"));
+		newName = LabelEscape(newName);
 		wxMenuItem* pItem = m_pMenu->Insert(i, wxID_ANY, newName);
 
 		data->SetSitePath(path + _T("/") + CSiteManager::EscapeSegment(data->server.GetName()));
@@ -201,9 +202,9 @@ public:
 		wxMenu* pChild = m_pMenu;
 		m_pMenu = m_parents.back();
 		if (pChild->GetMenuItemCount()) {
-			wxString name = m_childNames.back();
+			std::wstring name = m_childNames.back();
 			int i = GetInsertIndex(m_pMenu, name);
-			name.Replace(_T("&"), _T("&&"));
+			name = LabelEscape(name);
 
 			wxMenuItem* pItem = new wxMenuItem(m_pMenu, wxID_ANY, name, _T(""), wxITEM_NORMAL, pChild);
 			m_pMenu->Insert(i, pItem);

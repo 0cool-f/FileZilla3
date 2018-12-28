@@ -15,8 +15,8 @@ class CLoginManager
 public:
 	static CLoginManager& Get() { return m_theLoginManager; }
 
-	bool GetPassword(Site & site, bool silent, std::wstring const& name = std::wstring());
-	bool GetPassword(Site & site, bool silent, std::wstring const& name, std::wstring const& challenge, bool canRemember);
+	bool GetPassword(Site & site, bool silent);
+	bool GetPassword(Site & site, bool silent, std::wstring const& challenge, bool canRemember);
 
 	void CachedPasswordFailed(CServer const& server, std::wstring const& challenge = std::wstring());
 
@@ -27,8 +27,8 @@ public:
 	void Remember(fz::private_key const& key);
 
 protected:
-	bool DisplayDialogForEncrypted(Site & site, std::wstring const& name);
-	bool DisplayDialog(Site & site, std::wstring const& name, std::wstring const& challenge, bool canRemember);
+	bool DisplayDialogForEncrypted(Site & site);
+	bool DisplayDialog(Site & site, std::wstring const& challenge, bool canRemember);
 
 	static CLoginManager m_theLoginManager;
 

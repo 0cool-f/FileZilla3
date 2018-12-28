@@ -206,8 +206,7 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 			iter != m_recentServers.end();
 			++iter, ++i)
 		{
-			wxString name(iter->Format(ServerFormat::with_user_and_optional_port));
-			name.Replace(_T("&"), _T("&&"));
+			wxString name(LabelEscape(iter->Format(ServerFormat::with_user_and_optional_port)));
 			pMenu->Append(10 + i, name);
 		}
 	}

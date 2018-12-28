@@ -263,3 +263,8 @@ wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlag
 	auto item = gb->Add(wnd, wxGBPosition(row, col), wxGBSpan(), flags.GetFlags(), flags.GetBorderInPixels());
 	return item;
 }
+
+std::wstring LabelEscape(std::wstring const& label)
+{
+	return fz::replaced_substrings(label, L"&", L"&&");
+}
