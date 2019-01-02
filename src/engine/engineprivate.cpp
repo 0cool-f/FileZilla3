@@ -447,7 +447,7 @@ void CFileZillaEnginePrivate::RegisterFailedLoginAttempt(const CServer& server, 
 	while (iter != m_failedLogins.end()) {
 		fz::duration const span = fz::monotonic_clock::now() - iter->time;
 		if (span.get_seconds() >= m_options.GetOptionVal(OPTION_RECONNECTDELAY) ||
-			iter->server == server || (!critical && (iter->server.GetHost() == server.GetHost() && iter->server.GetPort() == server.GetPort())))
+			iter->server.SameResource(server) || (!critical && (iter->server.GetHost() == server.GetHost() && iter->server.GetPort() == server.GetPort())))
 		{
 			std::list<t_failedLogins>::iterator prev = iter;
 			++iter;

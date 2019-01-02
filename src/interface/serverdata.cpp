@@ -29,6 +29,37 @@ bool Bookmark::operator==(Bookmark const& b) const
 	return true;
 }
 
+Site::Site(Site const& s)
+	: server(s.server)
+	, credentials(s.credentials)
+	, comments_(s.comments_)
+	, m_default_bookmark(s.m_default_bookmark)
+	, m_bookmarks(s.m_bookmarks)
+	, m_colour(s.m_colour)
+{
+	if (s.data_) {
+		data_ = std::make_shared<SiteHandleData>(*s.data_);
+	}
+}
+
+Site& Site::operator=(Site const& s)
+{
+	if (this != &s) {
+		server = s.server;
+		credentials = s.credentials;
+		comments_ = s.comments_;
+		m_default_bookmark = s.m_default_bookmark;
+		m_bookmarks = s.m_bookmarks;
+		m_colour = s.m_colour;
+		data_.reset();
+
+		if (s.data_) {
+			data_ = std::make_shared<SiteHandleData>(*s.data_);
+		}
+	}
+
+	return *this;
+}
 
 bool Site::operator==(Site const& s) const
 {

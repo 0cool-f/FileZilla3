@@ -44,7 +44,7 @@ public:
 	std::wstring m_name;
 };
 
-struct SiteHandleData final : public ServerHandleDataBase
+struct SiteHandleData final : public ServerHandleData
 {
 public:
 	std::wstring sitePath_;
@@ -78,6 +78,9 @@ public:
 		, data_(std::dynamic_pointer_cast<SiteHandleData>(handle.lock()))
 	{}
 
+	Site(Site const& s);
+	Site& operator=(Site const& s);
+
 	explicit operator bool() const { return server.operator bool(); }
 
 	bool empty() const { return !*this; }
@@ -96,7 +99,6 @@ public:
 	void SetLogonType(LogonType logonType);
 
 	void SetUser(std::wstring const& user);
-
 
 	CServer server;
 	ProtectedCredentials credentials;

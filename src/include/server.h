@@ -282,9 +282,13 @@ protected:
 	std::map<std::string, std::wstring> extraParameters_;
 };
 
-struct ServerHandleDataBase {
-	virtual ~ServerHandleDataBase() = default;
+struct ServerHandleData {
+protected:
+	ServerHandleData() = default;
+	virtual ~ServerHandleData() = default;
+	ServerHandleData(ServerHandleData const&) = default;
+	ServerHandleData& operator=(ServerHandleData const&) = default;
 };
-typedef std::weak_ptr<ServerHandleDataBase> ServerHandle;
+typedef std::weak_ptr<ServerHandleData> ServerHandle;
 
 #endif

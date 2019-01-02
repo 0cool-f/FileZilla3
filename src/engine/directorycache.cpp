@@ -320,7 +320,7 @@ void CDirectoryCache::InvalidateServer(CServer const& server)
 	fz::scoped_lock lock(mutex_);
 
 	for (auto iter = m_serverList.begin(); iter != m_serverList.end(); ++iter) {
-		if (iter->server != server) {
+		if (!iter->server.SameContent(server)) {
 			continue;
 		}
 
@@ -460,7 +460,7 @@ void CDirectoryCache::Rename(CServer const& server, CServerPath const& pathFrom,
 CDirectoryCache::tServerIter CDirectoryCache::CreateServerEntry(CServer const& server)
 {
 	for (tServerIter iter = m_serverList.begin(); iter != m_serverList.end(); ++iter) {
-		if (iter->server == server) {
+		if (iter->server.SameContent(server)) {
 			return iter;
 		}
 	}
@@ -473,7 +473,7 @@ CDirectoryCache::tServerIter CDirectoryCache::GetServerEntry(CServer const& serv
 {
 	tServerIter iter;
 	for (iter = m_serverList.begin(); iter != m_serverList.end(); ++iter) {
-		if (iter->server == server) {
+		if (iter->server.SameContent(server)) {
 			break;
 		}
 	}

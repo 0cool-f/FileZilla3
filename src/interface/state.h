@@ -192,7 +192,7 @@ public:
 	bool SetSyncBrowse(bool enable, CServerPath const& assumed_remote_root = CServerPath());
 	bool GetSyncBrowse() const { return !m_sync_browse.local_root.empty(); }
 
-	Site GetLastSite() const { return m_last_site; }
+	Site const& GetLastSite() const { return m_last_site; }
 	CServerPath GetLastServerPath() const { return m_last_path; }
 	void SetLastSite(Site const& server, CServerPath const& path)
 		{ m_last_site = server; m_last_path = path; }

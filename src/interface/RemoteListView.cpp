@@ -2299,7 +2299,7 @@ void CRemoteListView::OnBeginDrag(wxListEvent&)
 
 	wxDataObjectComposite object;
 
-	Site site = m_state.GetSite(); // Make copy doe to DoDragDrop running the event loop
+	Site site = m_state.GetSite(); // Make a copy as DoDragDrop later runs the event loop
 	if (!site) {
 		return;
 	}
