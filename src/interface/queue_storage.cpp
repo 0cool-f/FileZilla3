@@ -19,8 +19,9 @@ enum class Column_type
 
 enum _column_flags
 {
-	not_null = 1,
-	autoincrement
+	not_null = 0x1,
+	default_null = 0x2,
+	autoincrement = 0x4
 };
 
 struct _column
@@ -51,7 +52,8 @@ namespace server_table_column_names
 		bypass_proxy,
 		post_login_commands,
 		name,
-		parameters
+		parameters,
+		site_path
 	};
 }
 
@@ -73,7 +75,8 @@ _column server_table_columns[] = {
 	{ "bypass_proxy", Column_type::integer, 0 },
 	{ "post_login_commands", Column_type::text, 0 },
 	{ "name", Column_type::text, 0 },
-	{ "parameters", Column_type::text, 0 }
+	{ "parameters", Column_type::text, 0 },
+	{ "site_path", Column_type::text, default_null }
 };
 
 namespace file_table_column_names
@@ -292,7 +295,7 @@ bool CQueueStorage::Impl::MigrateSchema()
 	bool ret = sqlite3_exec(db_, "PRAGMA user_version", int_callback, &version, 0) == SQLITE_OK;
 
 	if (ret) {
-		if (version > 4) {
+		if (version > 5) {
 			ret = false;
 		}
 		else if (version > 0) {
@@ -303,9 +306,12 @@ bool CQueueStorage::Impl::MigrateSchema()
 			if (ret && version < 4) {
 				ret = sqlite3_exec(db_, "ALTER TABLE servers ADD COLUMN parameters TEXT", 0, 0, 0) == SQLITE_OK;
 			}
+			if (ret && version < 5) {
+				ret = sqlite3_exec(db_, "ALTER TABLE servers ADD COLUMN site_path TEXT DEFAULT NULL", 0, 0, 0) == SQLITE_OK;
+			}
 		}
-		if (ret && version != 4) {
-			ret = sqlite3_exec(db_, "PRAGMA user_version = 4", 0, 0, 0) == SQLITE_OK;
+		if (ret && version != 5) {
+			ret = sqlite3_exec(db_, "PRAGMA user_version = 5", 0, 0, 0) == SQLITE_OK;
 		}
 	}
 
@@ -400,6 +406,9 @@ std::string CQueueStorage::Impl::CreateColumnDefs(_column const* columns, size_t
 		}
 		if (columns[i].flags & not_null) {
 			query += " NOT NULL";
+		}
+		if (columns[i].flags & default_null) {
+			query += " DEFAULT NULL";
 		}
 	}
 	query += ")";
@@ -739,6 +748,14 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 		Bind(insertServerQuery_, server_table_column_names::parameters, qs.to_string(false));
 	}
 
+	auto const& site_path = site.SitePath();
+	if (site_path.empty()) {
+		BindNull(insertServerQuery_, server_table_column_names::site_path);
+	}
+	else {
+		Bind(insertServerQuery_, server_table_column_names::site_path, site_path);
+	}
+
 	int res;
 	do {
 		res = sqlite3_step(insertServerQuery_);
@@ -879,8 +896,8 @@ std::wstring CQueueStorage::Impl::GetColumnText(sqlite3_stmt* statement, int ind
 	}
 #else
 	char const* text = reinterpret_cast<char const*>(sqlite3_column_text(statement, index));
-	int len = sqlite3_column_bytes(statement, index);
 	if (text) {
+		int len = sqlite3_column_bytes(statement, index);
 		std::string utf8(text, len);
 		ret = fz::to_wstring_from_utf8(utf8);
 	}
@@ -892,8 +909,8 @@ std::wstring CQueueStorage::Impl::GetColumnText(sqlite3_stmt* statement, int ind
 std::string CQueueStorage::Impl::GetColumnTextUtf8(sqlite3_stmt* statement, int index)
 {
 	char const* text = reinterpret_cast<char const*>(sqlite3_column_text(statement, index));
-	int len = sqlite3_column_bytes(statement, index);
 	if (text) {
+		int len = sqlite3_column_bytes(statement, index);
 		return std::string(text, len);
 	}
 
@@ -1038,6 +1055,11 @@ int64_t CQueueStorage::Impl::ParseServerFromRow(Site & site)
 	fz::query_string qs = fz::query_string(GetColumnTextUtf8(selectServersQuery_, server_table_column_names::parameters));
 	for (auto const& pair : qs.pairs()) {
 		site.server.SetExtraParameter(pair.first, fz::to_wstring_from_utf8(pair.second));
+	}
+
+	std::wstring site_path = GetColumnText(selectServersQuery_, server_table_column_names::site_path);
+	if (!site_path.empty()) {
+		site.SetSitePath(site_path);
 	}
 
 	return GetColumnInt64(selectServersQuery_, server_table_column_names::id);
