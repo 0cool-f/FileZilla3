@@ -96,7 +96,7 @@ public:
 	CFileItem* GetIdleChild(bool immadiateOnly, TransferDirection direction);
 
 	virtual bool RemoveChild(CQueueItem* pItem, bool destroy = true, bool forward = true); // Removes a child item with is somewhere in the tree of children
-	virtual bool TryRemoveAll();
+	virtual bool TryRemoveAll() override;
 
 	int64_t GetTotalSize(int& filesWithUnknownSize, int& queuedFiles) const;
 
@@ -197,8 +197,9 @@ public:
 
 	virtual void SaveItem(pugi::xml_node& element) const;
 
-	virtual bool TryRemoveAll(); // Removes inactive children, queues active children for removal.
-								 // Returns true if item can be removed itself
+	// Removes inactive children, queues active children for removal.
+	// Returns true if item can be removed itself
+	virtual bool TryRemoveAll() override final;
 
 	void SetTargetFile(wxString const& file);
 
@@ -287,8 +288,6 @@ public:
 	virtual void SaveItem(pugi::xml_node& element) const;
 
 	virtual void SetActive(bool active);
-
-	virtual bool TryRemoveAll() { return true; }
 };
 
 class CStatusItem final : public CQueueItem
@@ -299,7 +298,7 @@ public:
 
 	virtual QueueItemType GetType() const { return QueueItemType::Status; }
 
-	virtual bool TryRemoveAll() { return true; }
+	virtual bool TryRemoveAll() override { return true; }
 };
 
 class CQueue;
