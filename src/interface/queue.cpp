@@ -1167,7 +1167,7 @@ void CQueueViewBase::UpdateSelections_ItemRangeAdded(int added, int count)
 			SetItemState(itemsToSelect.front(), wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 			itemsToSelect.pop_front();
 		}
-		if (itemsToSelect.front() == item) {
+		if (!itemsToSelect.empty() && itemsToSelect.front() == item) {
 			itemsToSelect.pop_front();
 		}
 		else {
