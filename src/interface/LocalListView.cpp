@@ -1298,7 +1298,7 @@ void CLocalListView::ReselectItems(const std::vector<std::wstring>& selectedName
 
 		if (focusedItem != -1 && GetItemCount() != 0) {
 			if (focusedItem >= GetItemCount()) {
-				--focusedItem;
+				focusedItem = GetItemCount() - 1;
 			}
 			SetItemState(focusedItem, wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
 		}
