@@ -144,7 +144,9 @@ bool COptionsPageInterface::CreateControls(wxWindow* parent)
 
 	auto behaviour = layout.createFlex(1);
 	boxSizer->Add(behaviour, 0, wxALL, layout.border);
+#ifndef __WXMAC__
 	behaviour->Add(new wxCheckBox(box, XRCID("ID_MINIMIZE_TRAY"), _("&Minimize to tray")));
+#endif
 	behaviour->Add(new wxCheckBox(box, XRCID("ID_PREVENT_IDLESLEEP"), _("P&revent system from entering idle sleep during transfers and other operations")));
 	behaviour->AddSpacer(0);
 	behaviour->Add(new wxStaticText(box, -1, _("On startup of FileZilla:")));
