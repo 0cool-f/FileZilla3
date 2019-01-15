@@ -52,7 +52,7 @@ enum t_statechange_notifications
 class CDirectoryListing;
 class CFileZillaEngine;
 class CCommandQueue;
-class CLocalDataObject; 
+class CLocalDataObject;
 class CLocalRecursiveOperation;
 class CMainFrame;
 class CGlobalStateEventHandler;

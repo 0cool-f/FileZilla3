@@ -72,7 +72,7 @@ void InitXrc()
 
 	InitHandlers(*pResource);
 
-	fz::local_filesys fs;	
+	fz::local_filesys fs;
 	std::wstring dir = wxGetApp().GetResourceDir().GetPath() + L"xrc/";
 	pResource->LoadFile(wxString(dir + L"certificate.xrc"));
 	pResource->LoadFile(wxString(dir + L"dialogs.xrc"));

@@ -19,7 +19,7 @@ bool COptionsPagePasswords::LoadPage()
 		xrc_call(*this, "ID_MASTERPASSWORD", &wxControl::Enable, checked);
 		xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxControl::Enable, checked);
 
-	};	
+	};
 	XRCCTRL(*this, "ID_PASSWORDS_SAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 	XRCCTRL(*this, "ID_PASSWORDS_NOSAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 	XRCCTRL(*this, "ID_PASSWORDS_USEMASTERPASSWORD", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);

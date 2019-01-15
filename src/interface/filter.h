@@ -28,7 +28,7 @@ class CFilterCondition
 public:
 	bool set(t_filterType t, std::wstring const& v, int c, bool matchCase);
 
-	std::wstring strValue; 
+	std::wstring strValue;
 	std::wstring lowerValue; // Name and path matches
 	fz::datetime date; // If type is date
 	int64_t value{}; // If type is size

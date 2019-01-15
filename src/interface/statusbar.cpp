@@ -561,7 +561,7 @@ void CStatusBar::ShowDataTypeMenu()
 {
 	wxMenu menu;
 	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), _("&Auto"), wxString(), wxITEM_RADIO);
-    menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), _("A&SCII"), wxString(), wxITEM_RADIO); 
+	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), _("A&SCII"), wxString(), wxITEM_RADIO);
 	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), _("&Binary"), wxString(), wxITEM_RADIO);
 
 	const int type = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
