@@ -24,7 +24,7 @@ protected:
 
 	static CPowerManagement* m_pPowerManagement;
 
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, wxString const& data, void const* data2);
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, void const* data2) override;
 
 	void DoSetBusy();
 	void DoSetIdle();

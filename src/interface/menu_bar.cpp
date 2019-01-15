@@ -460,7 +460,7 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 	event.Skip();
 }
 
-void CMenuBar::OnStateChange(CState* pState, t_statechange_notifications notification, const wxString&, const void*)
+void CMenuBar::OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*)
 {
 	switch (notification)
 	{

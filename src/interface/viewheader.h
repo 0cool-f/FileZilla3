@@ -53,7 +53,7 @@ public:
 	CLocalViewHeader(wxWindow* pParent, CState& state);
 
 protected:
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	wxString m_oldValue;
 
@@ -74,7 +74,7 @@ public:
 	CRemoteViewHeader(wxWindow* pParent, CState& state);
 
 protected:
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	CServer m_lastServer;
 	CServerPath m_path;

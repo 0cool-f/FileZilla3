@@ -27,7 +27,7 @@ protected:
 	void MakeTool(char const* id, std::wstring const& art, wxString const& tooltip, wxString const& help = wxString(), wxItemKind type = wxITEM_NORMAL);
 	void MakeTools();
 
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 	virtual void OnOptionsChanged(changed_options_t const& options);
 
 	CMainFrame* m_pMainFrame{};

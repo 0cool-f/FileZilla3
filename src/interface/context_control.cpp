@@ -598,7 +598,7 @@ void CContextControl::AdvanceTab(bool forward)
 	m_tabs->AdvanceTab(forward);
 }
 
-void CContextControl::OnStateChange(CState* pState, t_statechange_notifications notification, const wxString&, const void*)
+void CContextControl::OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*)
 {
 	if (notification == STATECHANGE_CHANGEDCONTEXT) {
 		if (!pState) {

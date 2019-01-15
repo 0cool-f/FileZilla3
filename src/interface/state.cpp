@@ -161,7 +161,7 @@ size_t CContextManager::HandlerCount(t_statechange_notifications notification) c
 	return m_handlers[notification].size();
 }
 
-void CContextManager::NotifyHandlers(CState* pState, t_statechange_notifications notification, wxString const& data, void const* data2)
+void CContextManager::NotifyHandlers(CState* pState, t_statechange_notifications notification, std::wstring const& data, void const* data2)
 {
 	wxASSERT(notification != STATECHANGE_NONE && notification != STATECHANGE_MAX);
 
@@ -184,14 +184,14 @@ CState* CContextManager::GetCurrentContext()
 	return m_contexts[m_current_context];
 }
 
-void CContextManager::NotifyAllHandlers(t_statechange_notifications notification, wxString const& data, void const* data2)
+void CContextManager::NotifyAllHandlers(t_statechange_notifications notification, std::wstring const& data, void const* data2)
 {
 	for (auto const& context : m_contexts) {
 		context->NotifyHandlers(notification, data, data2);
 	}
 }
 
-void CContextManager::NotifyGlobalHandlers(t_statechange_notifications notification, wxString const& data, void const* data2)
+void CContextManager::NotifyGlobalHandlers(t_statechange_notifications notification, std::wstring const& data, void const* data2)
 {
 	auto const& handlers = m_handlers[notification];
 	for (auto const& handler : handlers) {
@@ -348,7 +348,7 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 
 		if (m_pDirectoryListing) {
 			m_pDirectoryListing = 0;
-			NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &primary);
+			NotifyHandlers(STATECHANGE_REMOTE_DIR, std::wstring(), &primary);
 		}
 		m_previouslyVisitedRemoteSubdir.clear();
 		return true;
@@ -384,7 +384,7 @@ bool CState::SetRemoteDir(std::shared_ptr<CDirectoryListing> const& pDirectoryLi
 
 	m_pDirectoryListing = pDirectoryListing;
 
-	NotifyHandlers(STATECHANGE_REMOTE_DIR, wxString(), &primary);
+	NotifyHandlers(STATECHANGE_REMOTE_DIR, std::wstring(), &primary);
 
 	bool compare = m_changeDirFlags.compare;
 	if (primary) {
@@ -481,9 +481,9 @@ void CState::LocalDirCreated(const CLocalPath& path)
 		return;
 	}
 
-	wxString next_segment = path.GetPath().substr(m_localDir.GetPath().size());
-	int pos = next_segment.Find(CLocalPath::path_separator);
-	if (pos <= 0) {
+	std::wstring next_segment = path.GetPath().substr(m_localDir.GetPath().size());
+	size_t pos = next_segment.find(CLocalPath::path_separator);
+	if (pos == std::wstring::npos || !pos) {
 		// Shouldn't ever come true
 		return;
 	}
@@ -491,7 +491,7 @@ void CState::LocalDirCreated(const CLocalPath& path)
 	// Current local path is /foo/
 	// Called with /foo/bar/baz/
 	// -> Refresh /foo/bar/
-	next_segment = next_segment.Left(pos);
+	next_segment = next_segment.substr(0, pos);
 	NotifyHandlers(STATECHANGE_LOCAL_REFRESH_FILE, next_segment);
 }
 
@@ -671,7 +671,7 @@ void CState::UnregisterHandler(CStateEventHandler* pHandler, t_statechange_notif
 	}
 }
 
-void CState::NotifyHandlers(t_statechange_notifications notification, const wxString& data, const void* data2)
+void CState::NotifyHandlers(t_statechange_notifications notification, std::wstring const& data, const void* data2)
 {
 	wxASSERT(notification != STATECHANGE_NONE && notification != STATECHANGE_MAX);
 
@@ -1097,7 +1097,7 @@ void CState::ListingFailed(int)
 	}
 }
 
-void CState::LinkIsNotDir(const CServerPath& path, const wxString& subdir)
+void CState::LinkIsNotDir(const CServerPath& path, std::wstring const& subdir)
 {
 	m_changeDirFlags.compare = false;
 	m_changeDirFlags.syncbrowse = false;
@@ -1322,7 +1322,7 @@ void CState::SetSecurityInfo(CSftpEncryptionNotification const& info)
 	NotifyHandlers(STATECHANGE_ENCRYPTION);
 }
 
-void CState::UpdateSite(wxString const& oldPath, Site const& newSite)
+void CState::UpdateSite(std::wstring const& oldPath, Site const& newSite)
 {
 	if (newSite.SitePath().empty() || !newSite) {
 		return;
@@ -1353,6 +1353,7 @@ void CState::UpdateSite(wxString const& oldPath, Site const& newSite)
 
 void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> const& active_sites)
 {
+	std::cerr << "Pre:  c:" << m_site.SitePath() << " l:" << m_last_site.SitePath() << std::endl;
 	bool changed{};
 	if (m_site) {
 		for (auto const& active_site : active_sites) {
@@ -1393,6 +1394,8 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 		}
 	}
 
+	std::cerr << "Post:  c:" << m_site.SitePath() << " l:" << m_last_site.SitePath() << std::endl;
+
 	if (changed) {
 		UpdateTitle();
 		NotifyHandlers(STATECHANGE_SERVER);
@@ -1402,7 +1405,7 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 void CState::UpdateTitle()
 {
 	if (m_site) {
-		wxString const& name = m_site.server.GetName();
+		std::wstring const& name = m_site.server.GetName();
 		m_title.clear();
 		if (!name.empty()) {
 			m_title = name + _T(" - ");

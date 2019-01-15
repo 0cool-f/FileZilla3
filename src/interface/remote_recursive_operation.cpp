@@ -53,7 +53,7 @@ CRemoteRecursiveOperation::~CRemoteRecursiveOperation()
 	}
 }
 
-void CRemoteRecursiveOperation::OnStateChange(t_statechange_notifications notification, const wxString&, const void* data2)
+void CRemoteRecursiveOperation::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2)
 {
 	if (notification == STATECHANGE_REMOTE_DIR_OTHER && data2) {
 		std::shared_ptr<CDirectoryListing> const& listing = *reinterpret_cast<std::shared_ptr<CDirectoryListing> const*>(data2);

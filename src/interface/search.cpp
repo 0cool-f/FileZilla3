@@ -518,7 +518,7 @@ void CSearchDialog::Run()
 	}
 }
 
-void CSearchDialog::OnStateChange(t_statechange_notifications notification, const wxString&, const void* data2)
+void CSearchDialog::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2)
 {
 	if (notification == STATECHANGE_REMOTE_DIR_OTHER && data2) {
 		if (m_searching == search_mode::remote) {

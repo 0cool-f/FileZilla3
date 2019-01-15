@@ -67,7 +67,7 @@ protected:
 
 	virtual std::unique_ptr<CFileListCtrlSortBase> GetSortComparisonObject() override;
 
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 	void ApplyCurrentFilter();
 	void SetDirectoryListing(std::shared_ptr<CDirectoryListing> const& pDirectoryListing);
 	bool UpdateDirectoryListing(std::shared_ptr<CDirectoryListing> const& pDirectoryListing);

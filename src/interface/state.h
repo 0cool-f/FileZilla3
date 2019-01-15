@@ -98,8 +98,8 @@ public:
 
 	static CContextManager* Get();
 
-	void NotifyAllHandlers(t_statechange_notifications notification, wxString const& data = wxString(), void const* data2 = 0);
-	void NotifyGlobalHandlers(t_statechange_notifications notification, wxString const& data = wxString(), void const* data2 = 0);
+	void NotifyAllHandlers(t_statechange_notifications notification, std::wstring const& data = std::wstring(), void const* data2 = 0);
+	void NotifyGlobalHandlers(t_statechange_notifications notification, std::wstring const& data = std::wstring(), void const* data2 = 0);
 
 	void SetCurrentContext(CState* pState);
 
@@ -118,7 +118,7 @@ protected:
 	};
 	std::vector<t_handler> m_handlers[STATECHANGE_MAX];
 
-	void NotifyHandlers(CState* pState, t_statechange_notifications notification, wxString const& data, void const* data2);
+	void NotifyHandlers(CState* pState, t_statechange_notifications notification, std::wstring const& data, void const* data2);
 
 	static CContextManager m_the_context_manager;
 };
@@ -181,13 +181,13 @@ public:
 	CLocalRecursiveOperation* GetLocalRecursiveOperation() { return m_pLocalRecursiveOperation; }
 	CRemoteRecursiveOperation* GetRemoteRecursiveOperation() { return m_pRemoteRecursiveOperation; }
 
-	void NotifyHandlers(t_statechange_notifications notification, wxString const& data = wxString(), void const* data2 = 0);
+	void NotifyHandlers(t_statechange_notifications notification, std::wstring const& data = std::wstring(), void const* data2 = 0);
 
 	bool SuccessfulConnect() const { return m_successful_connect; }
 	void SetSuccessfulConnect() { m_successful_connect = true; }
 
 	void ListingFailed(int error);
-	void LinkIsNotDir(CServerPath const& path, wxString const& subdir);
+	void LinkIsNotDir(CServerPath const& path, std::wstring const& subdir);
 
 	bool SetSyncBrowse(bool enable, CServerPath const& assumed_remote_root = CServerPath());
 	bool GetSyncBrowse() const { return !m_sync_browse.local_root.empty(); }
@@ -210,7 +210,7 @@ public:
 	void ClearPreviouslyVisitedRemoteSubdir() { m_previouslyVisitedRemoteSubdir.clear(); }
 
 	void UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> const& active_sites);
-	void UpdateSite(wxString const& oldPath, Site const& newSite);
+	void UpdateSite(std::wstring const& oldPath, Site const& newSite);
 
 	CStateFilterManager& GetStateFilterManager() { return m_stateFilterManager; }
 
@@ -279,7 +279,7 @@ public:
 	CGlobalStateEventHandler() = default;
 	virtual ~CGlobalStateEventHandler();
 
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, const wxString& data, const void* data2) = 0;
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) = 0;
 };
 
 class CStateEventHandler
@@ -290,7 +290,7 @@ public:
 
 	CState& m_state;
 
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2) = 0;
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) = 0;
 };
 
 #endif

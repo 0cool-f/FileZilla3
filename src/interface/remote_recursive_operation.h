@@ -74,7 +74,7 @@ protected:
 
 	bool NextOperation();
 
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString&, const void* data2);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2) override;
 
 	bool BelowRecursionRoot(const CServerPath& path, recursion_root::new_dir &dir);
 

@@ -60,7 +60,7 @@ bool CRecursiveOperationStatus::Show(bool show)
 	return ret;
 }
 
-void CRecursiveOperationStatus::OnStateChange(t_statechange_notifications, const wxString&, const void*)
+void CRecursiveOperationStatus::OnStateChange(t_statechange_notifications, std::wstring const&, const void*)
 {
 	CRecursiveOperation* op = m_local ? static_cast<CRecursiveOperation*>(m_state.GetLocalRecursiveOperation()) : static_cast<CRecursiveOperation*>(m_state.GetRemoteRecursiveOperation());
 	auto mode = CRecursiveOperation::recursive_none;

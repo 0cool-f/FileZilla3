@@ -175,7 +175,7 @@ bool CToolBar::Realize()
 
 #endif
 
-void CToolBar::OnStateChange(CState* pState, t_statechange_notifications notification, const wxString&, const void*)
+void CToolBar::OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*)
 {
 	switch (notification)
 	{

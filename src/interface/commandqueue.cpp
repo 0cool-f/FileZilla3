@@ -319,7 +319,7 @@ void CCommandQueue::ProcessDirectoryListing(CDirectoryListingNotification const&
 
 	if (listingIsRecursive) {
 		if (listingNotification.Primary() && m_state.GetRemoteRecursiveOperation()->IsActive()) {
-			m_state.NotifyHandlers(STATECHANGE_REMOTE_DIR_OTHER, wxString(), &pListing);
+			m_state.NotifyHandlers(STATECHANGE_REMOTE_DIR_OTHER, std::wstring(), &pListing);
 		}
 	}
 	else {

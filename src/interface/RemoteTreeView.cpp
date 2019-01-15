@@ -277,7 +277,7 @@ CRemoteTreeView::~CRemoteTreeView()
 	delete m_pImageList;
 }
 
-void CRemoteTreeView::OnStateChange(t_statechange_notifications notification, const wxString&, const void* data2)
+void CRemoteTreeView::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2)
 {
 	if (notification == STATECHANGE_REMOTE_DIR) {
 		SetDirectoryListing(m_state.GetRemoteDir(), data2 ? *reinterpret_cast<bool const*>(data2) : true);

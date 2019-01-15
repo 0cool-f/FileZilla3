@@ -40,7 +40,7 @@ protected:
 	CSearchDialogFileList *m_results{};
 	CQueueView* m_pQueue;
 
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	CWindowStateManager* m_pWindowStateManager{};
 

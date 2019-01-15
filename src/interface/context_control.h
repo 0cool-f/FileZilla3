@@ -91,7 +91,7 @@ protected:
 	void OnTabContextCloseOthers(wxCommandEvent& event);
 	void OnTabContextNew(wxCommandEvent&);
 
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, const wxString&, const void*);
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*) override;
 };
 
 #endif

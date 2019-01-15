@@ -28,7 +28,7 @@ protected:
 
 	void UpdateSpeedLimitMenuItem();
 
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 	virtual void OnOptionsChanged(changed_options_t const& options);
 
 	DECLARE_DYNAMIC_CLASS(CMenuBar)

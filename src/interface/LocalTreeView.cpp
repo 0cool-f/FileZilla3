@@ -903,7 +903,7 @@ void CLocalTreeView::OnSelectionChanged(wxTreeEvent& event)
 	}
 }
 
-void CLocalTreeView::OnStateChange(t_statechange_notifications notification, const wxString&, const void*)
+void CLocalTreeView::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void*)
 {
 	if (notification == STATECHANGE_LOCAL_DIR) {
 		SetDir(m_state.GetLocalDir().GetPath());

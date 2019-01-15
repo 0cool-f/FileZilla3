@@ -115,7 +115,7 @@ bool COptionsPagePasswords::SavePage()
 
 	CSiteManager::Rewrite(loginManager, true);
 
-	CContextManager::Get()->NotifyGlobalHandlers(STATECHANGE_REWRITE_CREDENTIALS, wxString(), &loginManager);
+	CContextManager::Get()->NotifyGlobalHandlers(STATECHANGE_REWRITE_CREDENTIALS, std::wstring(), &loginManager);
 
 	return true;
 }

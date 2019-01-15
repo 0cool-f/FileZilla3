@@ -505,7 +505,7 @@ void CLocalViewHeader::OnTextEnter(wxCommandEvent&)
 	}
 }
 
-void CLocalViewHeader::OnStateChange(t_statechange_notifications notification, const wxString&, const void*)
+void CLocalViewHeader::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void*)
 {
 	if (notification == STATECHANGE_SERVER) {
 		m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
@@ -533,7 +533,7 @@ CRemoteViewHeader::CRemoteViewHeader(wxWindow* pParent, CState& state)
 	Disable();
 }
 
-void CRemoteViewHeader::OnStateChange(t_statechange_notifications notification, const wxString&, const void*)
+void CRemoteViewHeader::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void*)
 {
 	if (notification == STATECHANGE_SERVER) {
 		m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);

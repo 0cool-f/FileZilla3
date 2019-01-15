@@ -199,7 +199,7 @@ public:
 	}
 
 protected:
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, const wxString&, const void*)
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*) override
 	{
 		if (notification == STATECHANGE_CHANGEDCONTEXT) {
 			// Update window title

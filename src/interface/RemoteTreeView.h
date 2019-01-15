@@ -20,7 +20,7 @@ public:
 protected:
 	wxTreeItemId MakeParent(CServerPath path, bool select);
 	void SetDirectoryListing(std::shared_ptr<CDirectoryListing> const& pListing, bool primary);
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString&, const void*);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void*) override;
 
 	void DisplayItem(wxTreeItemId parent, const CDirectoryListing& listing);
 	void RefreshItem(wxTreeItemId parent, const CDirectoryListing& listing, bool will_select_parent);

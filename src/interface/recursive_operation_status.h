@@ -14,7 +14,7 @@ public:
 private:
 	virtual bool Show(bool show);
 
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString&, const void*);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void*) override;
 
 	void UpdateText();
 

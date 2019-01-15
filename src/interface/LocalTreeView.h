@@ -27,7 +27,7 @@ public:
 #endif
 
 protected:
-	virtual void OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2);
+	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	void SetDir(wxString const& localDir);
 	void RefreshListing();

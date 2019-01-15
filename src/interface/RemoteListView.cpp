@@ -2204,14 +2204,14 @@ void CRemoteListView::RepositionInfoText()
 
 }
 
-void CRemoteListView::OnStateChange(t_statechange_notifications notification, const wxString& data, const void* data2)
+void CRemoteListView::OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2)
 {
 	if (notification == STATECHANGE_REMOTE_DIR) {
 		SetDirectoryListing(m_state.GetRemoteDir());
 	}
 	else if (notification == STATECHANGE_REMOTE_LINKNOTDIR) {
 		wxASSERT(data2);
-		LinkIsNotDir(*(CServerPath*)data2, data.ToStdWstring());
+		LinkIsNotDir(*(CServerPath*)data2, data);
 	}
 	else if (notification == STATECHANGE_SERVER) {
 		m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);

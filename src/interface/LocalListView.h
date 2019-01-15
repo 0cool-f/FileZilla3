@@ -36,7 +36,7 @@ public:
 	virtual ~CLocalListView();
 
 protected:
-	void OnStateChange(t_statechange_notifications notification, const wxString& data, const void*);
+	void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void*) override;
 	bool DisplayDir(CLocalPath const& dirname);
 	void ApplyCurrentFilter();
 

@@ -3188,7 +3188,7 @@ CActionAfterBlocker::~CActionAfterBlocker()
 	}
 }
 
-void CQueueView::OnStateChange(CState*, t_statechange_notifications notification, wxString const&, const void* data2)
+void CQueueView::OnStateChange(CState*, t_statechange_notifications notification, std::wstring const&, const void* data2)
 {
 	if (notification == STATECHANGE_REWRITE_CREDENTIALS) {
 		auto * loginManager = const_cast<CLoginManager*>(reinterpret_cast<CLoginManager const*>(data2));

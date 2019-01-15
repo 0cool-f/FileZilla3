@@ -51,7 +51,7 @@ CPowerManagement::~CPowerManagement()
 #endif
 }
 
-void CPowerManagement::OnStateChange(CState*, t_statechange_notifications, wxString const&, void const*)
+void CPowerManagement::OnStateChange(CState*, t_statechange_notifications, std::wstring const&, void const*)
 {
 	auto const queue = m_pMainFrame->GetQueue();
 	if (queue && queue->IsActive()) {

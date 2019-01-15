@@ -121,7 +121,7 @@ void CLocalRecursiveOperation::StopRecursiveOperation()
 	m_actionAfterBlocker.reset();
 }
 
-void CLocalRecursiveOperation::OnStateChange(t_statechange_notifications, const wxString&, const void*)
+void CLocalRecursiveOperation::OnStateChange(t_statechange_notifications, std::wstring const&, const void*)
 {
 }
 
@@ -281,7 +281,7 @@ void CLocalRecursiveOperation::OnListedDirectory()
 			}
 			++m_processedDirectories;
 			processed += d.files.size();
-			m_state.NotifyHandlers(STATECHANGE_LOCAL_RECURSION_LISTING, wxString(), &d);
+			m_state.NotifyHandlers(STATECHANGE_LOCAL_RECURSION_LISTING, std::wstring(), &d);
 		}
 	}
 

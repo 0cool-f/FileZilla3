@@ -298,7 +298,7 @@ protected:
 
 	std::weak_ptr<CActionAfterBlocker> m_actionAfterBlocker;
 
-	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, wxString const& data, const void* data2) override;
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	DECLARE_EVENT_TABLE()
 	void OnChar(wxKeyEvent& event);

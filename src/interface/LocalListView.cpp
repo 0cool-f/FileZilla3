@@ -1362,7 +1362,7 @@ void CLocalListView::ReselectItems(const std::vector<std::wstring>& selectedName
 	}
 }
 
-void CLocalListView::OnStateChange(t_statechange_notifications notification, const wxString& data, const void*)
+void CLocalListView::OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void*)
 {
 	if (notification == STATECHANGE_LOCAL_DIR) {
 		DisplayDir(m_state.GetLocalDir());
@@ -1375,7 +1375,7 @@ void CLocalListView::OnStateChange(t_statechange_notifications notification, con
 	}
 	else {
 		wxASSERT(notification == STATECHANGE_LOCAL_REFRESH_FILE);
-		RefreshFile(data.ToStdWstring());
+		RefreshFile(data);
 	}
 }
 
