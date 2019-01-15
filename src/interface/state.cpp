@@ -549,13 +549,13 @@ bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 	}
 	m_pRemoteRecursiveOperation->StopRecursiveOperation();
 	SetSyncBrowse(false);
-
-	m_pCommandQueue->ProcessCommand(new CConnectCommand(site.server, site.Handle(), site.credentials));
-	m_pCommandQueue->ProcessCommand(new CListCommand(path, std::wstring(), LIST_FLAG_FALLBACK_CURRENT));
+	m_changeDirFlags.compare = compare;
 
 	SetSite(site, path);
 
-	m_changeDirFlags.compare = compare;
+	// Use m_site from here on
+	m_pCommandQueue->ProcessCommand(new CConnectCommand(m_site.server, m_site.Handle(), m_site.credentials));
+	m_pCommandQueue->ProcessCommand(new CListCommand(path, std::wstring(), LIST_FLAG_FALLBACK_CURRENT));
 
 	return true;
 }
