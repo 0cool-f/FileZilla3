@@ -1353,7 +1353,6 @@ void CState::UpdateSite(std::wstring const& oldPath, Site const& newSite)
 
 void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> const& active_sites)
 {
-	std::cerr << "Pre:  c:" << m_site.SitePath() << " l:" << m_last_site.SitePath() << std::endl;
 	bool changed{};
 	if (m_site) {
 		for (auto const& active_site : active_sites) {
@@ -1393,8 +1392,6 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 			break;
 		}
 	}
-
-	std::cerr << "Post:  c:" << m_site.SitePath() << " l:" << m_last_site.SitePath() << std::endl;
 
 	if (changed) {
 		UpdateTitle();
