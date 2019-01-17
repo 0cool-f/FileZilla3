@@ -1661,7 +1661,7 @@ void CLocalListView::StartComparison()
 	}
 }
 
-bool CLocalListView::get_next_file(wxString& name, bool& dir, int64_t& size, fz::datetime& date)
+bool CLocalListView::get_next_file(std::wstring & name, bool& dir, int64_t& size, fz::datetime& date)
 {
 	if (++m_comparisonIndex >= (int)m_originalIndexMapping.size()) {
 		return false;
@@ -1672,7 +1672,7 @@ bool CLocalListView::get_next_file(wxString& name, bool& dir, int64_t& size, fz:
 		return false;
 	}
 
-	const CLocalFileData& data = m_fileData[index];
+	CLocalFileData const& data = m_fileData[index];
 
 	name = data.name;
 	dir = data.dir;

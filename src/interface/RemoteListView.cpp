@@ -2518,7 +2518,7 @@ void CRemoteListView::StartComparison()
 	}
 }
 
-bool CRemoteListView::get_next_file(wxString& name, bool& dir, int64_t& size, fz::datetime& date)
+bool CRemoteListView::get_next_file(std::wstring & name, bool& dir, int64_t& size, fz::datetime& date)
 {
 	if (++m_comparisonIndex >= (int)m_originalIndexMapping.size()) {
 		return false;
@@ -2536,7 +2536,7 @@ bool CRemoteListView::get_next_file(wxString& name, bool& dir, int64_t& size, fz
 		return true;
 	}
 
-	const CDirentry& entry = (*m_pDirectoryListing)[index];
+	CDirentry const& entry = (*m_pDirectoryListing)[index];
 
 	name = entry.name;
 	dir = entry.is_dir();

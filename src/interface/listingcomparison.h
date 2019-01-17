@@ -20,7 +20,7 @@ public:
 
 	virtual bool CanStartComparison() = 0;
 	virtual void StartComparison() = 0;
-	virtual bool get_next_file(wxString& name, bool &dir, int64_t &size, fz::datetime& date) = 0;
+	virtual bool get_next_file(std::wstring & name, bool &dir, int64_t &size, fz::datetime& date) = 0;
 	virtual void CompareAddFile(t_fileEntryFlags flags) = 0;
 	virtual void FinishComparison() = 0;
 	virtual void ScrollTopItem(int item) = 0;
@@ -59,7 +59,7 @@ public:
 	void SetListings(CComparableListing* pLeft, CComparableListing* pRight);
 
 protected:
-	int CompareFiles(const int dirSortMode, const wxString& local, const wxString& remote, bool localDir, bool remoteDir);
+	int CompareFiles(const int dirSortMode, std::wstring const& local, std::wstring const& remote, bool localDir, bool remoteDir);
 
 	CState& m_state;
 

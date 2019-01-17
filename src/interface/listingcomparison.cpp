@@ -91,7 +91,7 @@ bool CComparisonManager::CompareListings()
 	m_pLeft->StartComparison();
 	m_pRight->StartComparison();
 
-	wxString localFile, remoteFile;
+	std::wstring localFile, remoteFile;
 	bool localDir = false;
 	bool remoteDir = false;
 	int64_t localSize, remoteSize;
@@ -110,14 +110,14 @@ bool CComparisonManager::CompareListings()
 			if (!mode) {
 				const CComparableListing::t_fileEntryFlags flag = (localDir || localSize == remoteSize) ? CComparableListing::normal : CComparableListing::different;
 
-				if (!hide_identical || flag != CComparableListing::normal || localFile == _T("..")) {
+				if (!hide_identical || flag != CComparableListing::normal || localFile == L"..") {
 					m_pLeft->CompareAddFile(flag);
 					m_pRight->CompareAddFile(flag);
 				}
 			}
 			else {
 				if (localDate.empty() || remoteDate.empty()) {
-					if (!hide_identical || !localDate.empty() || !remoteDate.empty() || localFile == _T("..")) {
+					if (!hide_identical || !localDate.empty() || !remoteDate.empty() || localFile == L"..") {
 						const CComparableListing::t_fileEntryFlags flag = CComparableListing::normal;
 						m_pLeft->CompareAddFile(flag);
 						m_pRight->CompareAddFile(flag);
@@ -146,7 +146,7 @@ bool CComparisonManager::CompareListings()
 					else if (dateCmp > 0) {
 						localFlag = CComparableListing::newer;
 					}
-					if (!hide_identical || localFlag != CComparableListing::normal || remoteFlag != CComparableListing::normal || localFile == _T("..")) {
+					if (!hide_identical || localFlag != CComparableListing::normal || remoteFlag != CComparableListing::normal || localFile == L"..") {
 						m_pLeft->CompareAddFile(localFlag);
 						m_pRight->CompareAddFile(remoteFlag);
 					}
@@ -185,7 +185,7 @@ bool CComparisonManager::CompareListings()
 	return true;
 }
 
-int CComparisonManager::CompareFiles(const int dirSortMode, const wxString& local, const wxString& remote, bool localDir, bool remoteDir)
+int CComparisonManager::CompareFiles(const int dirSortMode, std::wstring const& local, std::wstring const& remote, bool localDir, bool remoteDir)
 {
 	switch (dirSortMode)
 	{
@@ -205,9 +205,9 @@ int CComparisonManager::CompareFiles(const int dirSortMode, const wxString& loca
 	}
 
 #ifdef __WXMSW__
-	return local.CmpNoCase(remote);
+	return fz::stricmp(local, remote);
 #else
-	return local.Cmp(remote);
+	return local.compare(remote);
 #endif
 
 	return 0;

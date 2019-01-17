@@ -122,7 +122,7 @@ protected:
 private:
 	virtual bool CanStartComparison() { return false; }
 	virtual void StartComparison() {}
-	virtual bool get_next_file(wxString&, bool &, int64_t&, fz::datetime&) { return false; }
+	virtual bool get_next_file(std::wstring &, bool &, int64_t&, fz::datetime&) override { return false; }
 	virtual void CompareAddFile(CComparableListing::t_fileEntryFlags) {}
 	virtual void FinishComparison() {}
 	virtual void ScrollTopItem(int) {}
