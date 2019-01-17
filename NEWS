@@ -10,6 +10,18 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.40.0-rc1 (2019-01-18)
+
++ Added TLS 1.3 support by linking official binaries against GnuTLS 3.6.5
++ Refactored how sites and servers are being represented internally to fix issues trigged by renaming sites in the Site Manager
+- Fix display of server names containing ampersands in several dialogs
+- Fix regular expression filter in the quick search panel
+- Fix a crash if files are added to the queue when there are already files for multiple different servers in the queue
+- Fix a crash applying filters when there are no selected files and the focused item is past the new file count
+- Fix a crash if emptying the queue while a directory creation item is active
+- Fix a potential crash if FileZilla is being closed the moment a delayed dialog has already been created but before it is shown.
+
+
 3.39.0 (2018-11-30)
 
 - Fix timestamps of newly created empty files on the server if the option to preserve timestamps is set
