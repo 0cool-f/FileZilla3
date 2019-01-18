@@ -51,7 +51,10 @@ wxListCtrlEx::wxListCtrlEx(wxWindow *parent,
 	m_editing = false;
 #else
 	m_columnDragging = false;
+
+	::SendMessage(GetHandle(), LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_HEADERDRAGDROP, 0);
 #endif
+
 	m_blockedLabelEditing = false;
 }
 
@@ -135,8 +138,9 @@ void wxListCtrlEx::ScrollTopItem(int item)
 
 	int delta = item - current;
 
-	if (!delta)
+	if (!delta) {
 		return;
+	}
 
 	wxRect rect;
 	GetItemRect(current, rect, wxLIST_RECT_BOUNDS);
@@ -165,8 +169,9 @@ void wxListCtrlEx::HandlePrefixSearch(wxChar character)
 	int item;
 #ifndef __WXMSW__
 	// GetNextItem is O(n) if nothing is selected, GetSelectedItemCount() is O(1)
-	if (!GetSelectedItemCount())
+	if (!GetSelectedItemCount()) {
 		item = -1;
+	}
 	else
 #endif
 	{
@@ -176,15 +181,18 @@ void wxListCtrlEx::HandlePrefixSearch(wxChar character)
 	bool beep = false;
 	if (item != -1) {
 		wxString text = GetItemText(item, 0);
-		if (text.Length() >= m_prefixSearch_prefix.Length() && !m_prefixSearch_prefix.CmpNoCase(text.Left(m_prefixSearch_prefix.Length())))
+		if (text.Length() >= m_prefixSearch_prefix.Length() && !m_prefixSearch_prefix.CmpNoCase(text.Left(m_prefixSearch_prefix.Length()))) {
 			beep = true;
+		}
 	}
-	else if (m_prefixSearch_prefix.empty())
+	else if (m_prefixSearch_prefix.empty()) {
 		beep = true;
+	}
 
 	int start = item;
-	if (start < 0)
+	if (start < 0) {
 		start = 0;
+	}
 
 	int newPos = FindItemWithPrefix(newPrefix, start);
 
@@ -195,15 +203,14 @@ void wxListCtrlEx::HandlePrefixSearch(wxChar character)
 	}
 
 	m_prefixSearch_prefix = newPrefix;
-	if (newPos == -1)
-	{
-		if (beep)
+	if (newPos == -1) {
+		if (beep) {
 			wxBell();
+		}
 		return;
 	}
 
-	while (item != -1)
-	{
+	while (item != -1) {
 		SetItemState(item, 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 		item = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	}
@@ -221,8 +228,7 @@ void wxListCtrlEx::HandlePrefixSearch(wxChar character)
 
 void wxListCtrlEx::OnKeyDown(wxKeyEvent& event)
 {
-	if (!m_prefixSearch_enabled)
-	{
+	if (!m_prefixSearch_enabled) {
 		event.Skip();
 		return;
 	}
