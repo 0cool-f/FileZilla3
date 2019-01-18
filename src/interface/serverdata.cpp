@@ -79,7 +79,7 @@ bool Site::operator==(Site const& s) const
 		return false;
 	}
 
-	if (data_ != s.data_) {
+	if (static_cast<bool>(data_) != static_cast<bool>(s.data_)) {
 		return false;
 	}
 
