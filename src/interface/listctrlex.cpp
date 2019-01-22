@@ -297,8 +297,7 @@ void wxListCtrlEx::OnKeyDown(wxKeyEvent& event)
 
 #if defined(__WXMSW__)
 
-	if (code >= 300 && code != WXK_NUMPAD_DECIMAL)
-	{
+	if (code >= 300 && code != WXK_NUMPAD_DECIMAL) {
 		event.Skip();
 		return;
 	}
@@ -311,36 +310,34 @@ void wxListCtrlEx::OnKeyDown(wxKeyEvent& event)
 	}
 	wxChar buffer[1];
 	int res = ToUnicode(event.GetRawKeyCode(), 0, state, buffer, 1, 0);
-	if (res != 1)
-	{
+	if (res != 1) {
 		event.Skip();
 		return;
 	}
 
 	key = buffer[0];
 
-	if (key < 32)
-	{
+	if (key < 32) {
 		event.Skip();
 		return;
 	}
-	if (key == 32 && event.HasModifiers())
-	{
+	if (key == 32 && event.HasModifiers()) {
 		event.Skip();
 		return;
 	}
 	HandlePrefixSearch(key);
 	return;
 #else
-	if (code > 32 && code < 300 && !event.HasModifiers())
-	{
+	if (code > 32 && code < 300 && !event.HasModifiers()) {
 		int unicodeKey = event.GetUnicodeKey();
-		if (unicodeKey)
+		if (unicodeKey) {
 			code = unicodeKey;
+		}
 		HandlePrefixSearch(code);
 	}
-	else
+	else {
 		event.Skip();
+	}
 #endif //defined(__WXMSW__)
 }
 
@@ -357,12 +354,12 @@ wxString wxListCtrlEx::OnGetItemText(long item, long column) const
 int wxListCtrlEx::FindItemWithPrefix(const wxString& searchPrefix, int start)
 {
 	const int count = GetItemCount();
-	for (int i = start; i < (count + start); i++)
-	{
+	for (int i = start; i < (count + start); ++i) {
 		int item = i % count;
 		wxString namePrefix = GetItemText(item, 0).Left(searchPrefix.Length());
-		if (!namePrefix.CmpNoCase(searchPrefix))
+		if (!namePrefix.CmpNoCase(searchPrefix)) {
 			return i % count;
+		}
 	}
 	return -1;
 }
@@ -370,11 +367,11 @@ int wxListCtrlEx::FindItemWithPrefix(const wxString& searchPrefix, int start)
 void wxListCtrlEx::SaveSetItemCount(long count)
 {
 #ifndef __WXMSW__
-	if (count < GetItemCount())
-	{
+	if (count < GetItemCount()) {
 		int focused = GetNextItem(count - 1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
-		if (focused != -1)
+		if (focused != -1) {
 			SetItemState(focused, 0, wxLIST_STATE_FOCUSED);
+		}
 	}
 #endif //__WXMSW__
 	SetItemCount(count);
@@ -387,44 +384,47 @@ void wxListCtrlEx::ResetSearchPrefix()
 
 void wxListCtrlEx::ShowColumn(unsigned int col, bool show)
 {
-	if (col >= m_columnInfo.size())
+	if (col >= m_columnInfo.size()) {
 		return;
+	}
 
-	if (m_columnInfo[col].shown == show)
+	if (m_columnInfo[col].shown == show) {
 		return;
+	}
 
 	m_columnInfo[col].shown = show;
 
-	if (show)
-	{
+	if (show) {
 		// Insert new column
 		int pos = 0;
-		for (unsigned int i = 0; i < m_columnInfo.size(); i++)
-		{
-			if (i == col)
+		for (unsigned int i = 0; i < m_columnInfo.size(); ++i) {
+			if (i == col) {
 				continue;
+			}
 			t_columnInfo& info = m_columnInfo[i];
-			if (info.shown && info.order < m_columnInfo[col].order)
-				pos++;
+			if (info.shown && info.order < m_columnInfo[col].order) {
+				++pos;
+			}
 		}
-		for (int i = GetColumnCount() - 1; i >= pos; i--)
+		for (int i = GetColumnCount() - 1; i >= pos; --i) {
 			m_pVisibleColumnMapping[i + 1] = m_pVisibleColumnMapping[i];
+		}
 		m_pVisibleColumnMapping[pos] = col;
 
 		t_columnInfo& info = m_columnInfo[col];
 		InsertColumn(pos, info.name, info.align, info.width);
 	}
-	else
-	{
+	else {
 		int i;
-		for (i = 0; i < GetColumnCount(); i++)
-		{
-			if (m_pVisibleColumnMapping[i] == col)
+		for (i = 0; i < GetColumnCount(); ++i) {
+			if (m_pVisibleColumnMapping[i] == col) {
 				break;
+			}
 		}
 		wxASSERT(m_columnInfo[col].order >= (unsigned int)i);
-		for (int j = i + 1; j < GetColumnCount(); j++)
+		for (int j = i + 1; j < GetColumnCount(); ++j) {
 			m_pVisibleColumnMapping[j - 1] = m_pVisibleColumnMapping[j];
+		}
 
 		wxASSERT(i < GetColumnCount());
 
@@ -437,8 +437,9 @@ void wxListCtrlEx::LoadColumnSettings(int widthsOptionId, int visibilityOptionId
 {
 	wxASSERT(!GetColumnCount());
 
-	if (widthsOptionId != -1)
+	if (widthsOptionId != -1) {
 		ReadColumnWidths(widthsOptionId);
+	}
 
 	delete [] m_pVisibleColumnMapping;
 	m_pVisibleColumnMapping = new unsigned int[m_columnInfo.size()];
@@ -447,8 +448,9 @@ void wxListCtrlEx::LoadColumnSettings(int widthsOptionId, int visibilityOptionId
 		wxString visibleColumns = COptions::Get()->GetOption(visibilityOptionId);
 		if (visibleColumns.Len() >= m_columnInfo.size()) {
 			for (unsigned int i = 0; i < m_columnInfo.size(); ++i) {
-				if (!m_columnInfo[i].fixed)
+				if (!m_columnInfo[i].fixed) {
 					m_columnInfo[i].shown = visibleColumns[i] == '1';
+				}
 			}
 		}
 	}
@@ -465,18 +467,21 @@ void wxListCtrlEx::LoadColumnSettings(int widthsOptionId, int visibilityOptionId
 
 			unsigned int i = 0;
 			while (tokens.HasMoreTokens()) {
-				if (!tokens.GetNextToken().ToULong(&order[i]))
+				if (!tokens.GetNextToken().ToULong(&order[i])) {
 					break;
-				if (order[i] >= count || order_set[order[i]])
+				}
+				if (order[i] >= count || order_set[order[i]]) {
 					break;
+				}
 				order_set[order[i]] = true;
-				i++;
+				++i;
 			}
 			if (i == count) {
 				bool valid = true;
 				for (size_t j = 0; j < m_columnInfo.size(); ++j) {
-					if (!m_columnInfo[j].fixed)
+					if (!m_columnInfo[j].fixed) {
 						continue;
+					}
 
 					if (j != order[j]) {
 						valid = false;
@@ -571,14 +576,16 @@ void wxListCtrlEx::SaveColumnWidths(unsigned int optionId)
 
 		bool found = false;
 		for (int j = 0; j < GetColumnCount(); ++j) {
-			if (m_pVisibleColumnMapping[j] != i)
+			if (m_pVisibleColumnMapping[j] != i) {
 				continue;
+			}
 
 			found = true;
 			width = GetColumnWidth(j);
 		}
-		if (!found)
+		if (!found) {
 			width = m_columnInfo[i].width;
+		}
 		widths += wxString::Format(_T("%d "), width);
 	}
 	widths.RemoveLast();
@@ -606,18 +613,22 @@ void wxListCtrlEx::AddColumn(const wxString& name, int align, int initialWidth, 
 // as well as shown columns
 void wxListCtrlEx::MoveColumn(unsigned int col, unsigned int before)
 {
-	if (m_columnInfo[col].order == before)
+	if (m_columnInfo[col].order == before) {
 		return;
+	}
 
 	for (unsigned int i = 0; i < m_columnInfo.size(); ++i) {
-		if (i == col)
+		if (i == col) {
 			continue;
+		}
 
 		t_columnInfo& info = m_columnInfo[i];
-		if (info.order > col)
+		if (info.order > col) {
 			--info.order;
-		if (info.order >= before)
+		}
+		if (info.order >= before) {
 			++info.order;
+		}
 	}
 
 	t_columnInfo& info = m_columnInfo[col];
@@ -626,11 +637,13 @@ void wxListCtrlEx::MoveColumn(unsigned int col, unsigned int before)
 		int icon = -1;
 		// Remove old column
 		for (unsigned int i = 0; i < (unsigned int)GetColumnCount(); ++i) {
-			if (m_pVisibleColumnMapping[i] != col)
+			if (m_pVisibleColumnMapping[i] != col) {
 				continue;
+			}
 
-			for (unsigned int j = i + 1; j < (unsigned int)GetColumnCount(); ++j)
+			for (unsigned int j = i + 1; j < (unsigned int)GetColumnCount(); ++j) {
 				m_pVisibleColumnMapping[j - 1] = m_pVisibleColumnMapping[j];
+			}
 			info.width = GetColumnWidth(i);
 
 			icon = GetHeaderSortIconIndex(i);
@@ -642,15 +655,17 @@ void wxListCtrlEx::MoveColumn(unsigned int col, unsigned int before)
 		// Insert new column
 		unsigned int pos = 0;
 		for (unsigned int i = 0; i < m_columnInfo.size(); ++i) {
-			if (i == col)
+			if (i == col) {
 				continue;
+			}
 			t_columnInfo& info2 = m_columnInfo[i];
 			if (info2.shown && info2.order < before) {
 				++pos;
 			}
 		}
-		for (unsigned int i = (int)GetColumnCount(); i > pos; --i)
+		for (unsigned int i = (int)GetColumnCount(); i > pos; --i) {
 			m_pVisibleColumnMapping[i] = m_pVisibleColumnMapping[i - 1];
+		}
 		m_pVisibleColumnMapping[pos] = col;
 
 		InsertColumn(pos, info.name, info.align, info.width);
@@ -667,11 +682,13 @@ void wxListCtrlEx::CreateVisibleColumnMapping()
 		for (unsigned int i = 0; i < m_columnInfo.size(); ++i) {
 			const t_columnInfo &column = m_columnInfo[i];
 
-			if (!column.shown)
+			if (!column.shown) {
 				continue;
+			}
 
-			if (column.order != j)
+			if (column.order != j) {
 				continue;
+			}
 
 			m_pVisibleColumnMapping[pos] = i;
 			InsertColumn(pos++, column.name, column.align, column.width);
@@ -690,8 +707,9 @@ protected:
 	{
 		wxCheckListBox* pListBox = XRCCTRL(*this, "ID_ACTIVE", wxCheckListBox);
 		int sel = pListBox->GetSelection();
-		if (sel < 2)
+		if (sel < 2) {
 			return;
+		}
 
 		int tmp;
 		tmp = m_order[sel - 1];
@@ -713,10 +731,12 @@ protected:
 	{
 		wxCheckListBox* pListBox = XRCCTRL(*this, "ID_ACTIVE", wxCheckListBox);
 		int sel = pListBox->GetSelection();
-		if (sel < 1)
+		if (sel < 1) {
 			return;
-		if (sel >= (int)pListBox->GetCount() - 1)
+		}
+		if (sel >= (int)pListBox->GetCount() - 1) {
 			return;
+		}
 
 		int tmp;
 		tmp = m_order[sel + 1];
@@ -744,8 +764,7 @@ protected:
 
 	void OnCheck(wxCommandEvent& event)
 	{
-		if (!event.GetSelection() && !event.IsChecked())
-		{
+		if (!event.GetSelection() && !event.IsChecked()) {
 			wxCheckListBox* pListBox = XRCCTRL(*this, "ID_ACTIVE", wxCheckListBox);
 			pListBox->Check(0);
 			wxMessageBoxEx(_("The filename column can neither be hidden nor moved."), _("Column properties"));
@@ -933,13 +952,13 @@ void wxListCtrlEx::RefreshListOnly(bool eraseBackground /*=true*/)
 void wxListCtrlEx::CancelLabelEdit()
 {
 #ifdef __WXMSW__
-	if (GetEditControl())
+	if (GetEditControl()) {
 		ListView_CancelEditLabel((HWND)GetHandle());
+	}
 #else
 	m_editing = false;
 	wxTextCtrl* pEdit = GetEditControl();
-	if (pEdit)
-	{
+	if (pEdit) {
 		wxKeyEvent evt(wxEVT_CHAR);
 		evt.m_keyCode = WXK_ESCAPE;
 		pEdit->GetEventHandler()->ProcessEvent(evt);
@@ -980,7 +999,7 @@ void wxListCtrlEx::OnEndLabelEdit(wxListEvent& event)
 		if (to < GetItemCount()) {
 			int from = item;
 			if (from) {
-				from--;
+				--from;
 			}
 			RefreshItems(from, to);
 		}
@@ -1086,8 +1105,9 @@ bool wxListCtrlEx::MSWOnNotify(int idCtrl, WXLPARAM lParam, WXLPARAM *result)
 				return false;
 			}
 		}
-		else
+		else {
 			return false;
+		}
 	case HDN_DIVIDERDBLCLICK:
 		{
 			auto event = new wxListEvent(wxEVT_LIST_COL_END_DRAG, GetId());
