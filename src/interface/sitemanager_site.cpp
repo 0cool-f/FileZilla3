@@ -598,7 +598,7 @@ bool CSiteManagerSite::Verify(bool predefined)
 	if (logon_type == LogonType::key) {
 		std::wstring keyFile = xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::GetValue).ToStdWstring();
 		if (keyFile.empty()) {
-			wxMessageBox(_("You have to enter a key file path"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
+			wxMessageBoxEx(_("You have to enter a key file path"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
 			xrc_call(*this, "ID_KEYFILE", &wxWindow::SetFocus);
 			return false;
 		}
@@ -623,7 +623,7 @@ bool CSiteManagerSite::Verify(bool predefined)
 		bool encrypted = !xrc_call(*this, "ID_PASS", &wxTextCtrl::GetHint).empty();
 		if (encrypted) {
 			if (pw.empty() != encryptionKey.empty()) {
-				wxMessageBox(_("You cannot change password and encryption key individually if using a master password."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
+				wxMessageBoxEx(_("You cannot change password and encryption key individually if using a master password."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
 				xrc_call(*this, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
 				return false;
 			}
@@ -632,7 +632,7 @@ bool CSiteManagerSite::Verify(bool predefined)
 		if (!encryptionKey.empty() || !encrypted) {
 			CStorjKeyInterface validator(this);
 			if (!validator.ValidateKey(encryptionKey, false)) {
-				wxMessageBox(_("You have to enter a valid encryption key"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
+				wxMessageBoxEx(_("You have to enter a valid encryption key"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
 				xrc_call(*this, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
 				return false;
 			}

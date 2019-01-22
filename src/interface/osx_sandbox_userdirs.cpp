@@ -119,7 +119,7 @@ void OSXSandboxUserdirs::Load()
 		error = _("Access to some local directories could not be restored:") + _T("\n") + error;
 		error += L"\n\n";
 		error += _("Please check the granted permissions and re-add any missing local directories you are working with in the dialog that follows.");
-		wxMessageBox(error, _("Could not restore directory access"), wxICON_EXCLAMATION);
+		wxMessageBoxEx(error, _("Could not restore directory access"), wxICON_EXCLAMATION);
 		OSXSandboxUserdirsDialog dlg;
 		dlg.Run(0);
 	}
@@ -166,7 +166,7 @@ bool OSXSandboxUserdirs::Add()
 	wxCFStringRef pathref(path);
 	wxCFRef<CFURLRef> url(CFURLCreateWithFileSystemPath(0, pathref.get(), kCFURLPOSIXPathStyle, true));
 	if (!url) {
-		wxMessageBox(wxString::Format(_("Could not create CFURL from path %s"), path));
+		wxMessageBoxEx(wxString::Format(_("Could not create CFURL from path %s"), path));
 		return false;
 	}
 
@@ -175,13 +175,13 @@ bool OSXSandboxUserdirs::Add()
 	if (!bookmark) {
 		wxString error;
 		append(error, errorRef, L"CFURLCreateBookmarkData");
-		wxMessageBox(_("Could not create security-scoped bookmark from URL:") + error);
+		wxMessageBoxEx(_("Could not create security-scoped bookmark from URL:") + error);
 		return false;
 	}
 
 	std::wstring actualPath = GetPath(url.get());
 	if (actualPath.empty()) {
-		wxMessageBox(_("Could not get path from URL"));
+		wxMessageBoxEx(_("Could not get path from URL"));
 		return false;
 	}
 
@@ -209,7 +209,7 @@ bool OSXSandboxUserdirs::AddFile(std::wstring const& file)
 	wxCFStringRef pathref(file);
 	wxCFRef<CFURLRef> url(CFURLCreateWithFileSystemPath(0, pathref.get(), kCFURLPOSIXPathStyle, true));
 	if (!url) {
-		wxMessageBox(wxString::Format(_("Could not create CFURL from path %s"), file));
+		wxMessageBoxEx(wxString::Format(_("Could not create CFURL from path %s"), file));
 		return false;
 	}
 
@@ -218,13 +218,13 @@ bool OSXSandboxUserdirs::AddFile(std::wstring const& file)
 	if (!bookmark) {
 		wxString error;
 		append(error, errorRef, L"CFURLCreateBookmarkData");
-		wxMessageBox(_("Could not create security-scoped bookmark from URL:") + error);
+		wxMessageBoxEx(_("Could not create security-scoped bookmark from URL:") + error);
 		return false;
 	}
 
 	std::wstring actualPath = GetPath(url.get());
 	if (actualPath.empty()) {
-		wxMessageBox(_("Could not get path from URL"));
+		wxMessageBoxEx(_("Could not get path from URL"));
 		return false;
 	}
 
@@ -277,7 +277,7 @@ void OSXSandboxUserdirsDialog::Run(wxWindow* parent, bool initial)
 
 	XRCCTRL(*this, "wxID_OK", wxButton)->Bind(wxEVT_BUTTON, [initial](wxCommandEvent& evt) {
 		if (initial && OSXSandboxUserdirs::Get().GetDirs().empty()) {
-			wxMessageBox(_("Please add at least one directory you want to download files into or to upload files from."), _("No directory added"));
+			wxMessageBoxEx(_("Please add at least one directory you want to download files into or to upload files from."), _("No directory added"));
 		}
 		else {
 			evt.Skip();

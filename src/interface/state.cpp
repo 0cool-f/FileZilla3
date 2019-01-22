@@ -1166,7 +1166,7 @@ bool CState::ChangeRemoteDir(CServerPath const& path, std::wstring const& subdir
 					}
 
 					if (!local_path.Exists(&error)) {
-						wxMessageBox(wxString::Format(_("The local directory '%s' could not be created."), local_path.GetPath()), _("Synchronized browsing"), wxICON_EXCLAMATION);
+						wxMessageBoxEx(wxString::Format(_("The local directory '%s' could not be created."), local_path.GetPath()), _("Synchronized browsing"), wxICON_EXCLAMATION);
 						return false;
 					}
 					m_changeDirFlags.syncbrowse = true;

@@ -80,7 +80,7 @@ bool COptionsPagePasswords::SavePage()
 		auto priv = fz::private_key::from_password(fz::to_utf8(newPw), fz::random_bytes(fz::private_key::salt_size));
 		auto pub = priv.pubkey();
 		if (!pub) {
-			wxMessageBox(_("Could not generate key"), _("Error"));
+			wxMessageBoxEx(_("Could not generate key"), _("Error"));
 		}
 		else {
 			m_pOptions->SetOption(OPTION_DEFAULT_KIOSKMODE, 0);

@@ -38,19 +38,19 @@ void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 		wxString pw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
 		wxString repeat = xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxTextCtrl::GetValue);
 		if (pw != repeat) {
-			wxMessageBox(_("The entered passwords are not the same."), _("Invalid input"));
+			wxMessageBoxEx(_("The entered passwords are not the same."), _("Invalid input"));
 			return;
 		}
 
 		if (pw.size() < 8) {
-			wxMessageBox(_("The master password needs to be at least 8 characters long."), _("Invalid input"));
+			wxMessageBoxEx(_("The master password needs to be at least 8 characters long."), _("Invalid input"));
 			return;
 		}
 
 		auto priv = fz::private_key::from_password(fz::to_utf8(pw), fz::random_bytes(fz::private_key::salt_size));
 		auto pub = priv.pubkey();
 		if (!pub) {
-			wxMessageBox(_("Could not generate key"), _("Error"));
+			wxMessageBoxEx(_("Could not generate key"), _("Error"));
 			return;
 		}
 		else {
