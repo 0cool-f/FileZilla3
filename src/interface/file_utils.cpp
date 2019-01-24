@@ -4,8 +4,8 @@
 
 #include <wx/stdpaths.h>
 #ifdef FZ_WINDOWS
-#include <wx/dynlib.h> // Used by GetDownloadDir
 #include <knownfolders.h>
+#include <shlobj.h>
 #else
 #include <wx/textfile.h>
 #include <wordexp.h>
@@ -348,11 +348,9 @@ bool RenameFile(wxWindow* parent, wxString dir, wxString from, wxString to)
 #endif
 }
 
-#ifdef __WXMSW__
-extern "C" typedef HRESULT (WINAPI *tSHGetKnownFolderPath)(const GUID& rfid, DWORD dwFlags, HANDLE hToken, PWSTR *ppszPath);
-#elif defined __WXMAC__
+#if defined __WXMAC__
 extern "C" char const* GetDownloadDirImpl();
-#else
+#elif !defined(__WXMSW__)
 wxString ShellUnescape(wxString const& path)
 {
 	wxString ret;
@@ -373,18 +371,12 @@ wxString ShellUnescape(wxString const& path)
 CLocalPath GetDownloadDir()
 {
 #ifdef __WXMSW__
-	// Unfortunately MinGW's import library lacks SHGetKnownFolderPath, even though it has it in its headers.
-	wxDynamicLibrary lib(_T("shell32.dll"));
-	if (lib.IsLoaded() && lib.HasSymbol(_T("SHGetKnownFolderPath"))) {
-		tSHGetKnownFolderPath pSHGetKnownFolderPath = (tSHGetKnownFolderPath)lib.GetSymbol(_T("SHGetKnownFolderPath"));
-
-		PWSTR path;
-		HRESULT result = pSHGetKnownFolderPath(FOLDERID_Downloads, 0, 0, &path);
-		if(result == S_OK) {
-			std::wstring dir = path;
-			CoTaskMemFree(path);
-			return CLocalPath(dir);
-		}
+	PWSTR path;
+	HRESULT result = SHGetKnownFolderPath(FOLDERID_Downloads, 0, 0, &path);
+	if(result == S_OK) {
+		std::wstring dir = path;
+		CoTaskMemFree(path);
+		return CLocalPath(dir);
 	}
 #elif defined(__WXMAC__)
 	CLocalPath ret;

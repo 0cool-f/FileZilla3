@@ -119,11 +119,11 @@ AX_CHECK_LINK_FLAG([-Wl,--nxcompat], [LDFLAGS="$LDFLAGS -Wl,--nxcompat"])
 # Set Windows-specific linker flags
 # ---------------------------------
 if echo $host_os | grep "cygwin\|mingw" > /dev/null 2>&1; then
-  # We currently require Vista minimum.
+  # We currently require 7 minimum.
   AX_CHECK_LINK_FLAG([-Wl,--major-subsystem-version -Wl,6], [LDFLAGS="$LDFLAGS -Wl,--major-subsystem-version -Wl,6"])
-  AX_CHECK_LINK_FLAG([-Wl,--minor-subsystem-version -Wl,0], [LDFLAGS="$LDFLAGS -Wl,--minor-subsystem-version -Wl,0"])
+  AX_CHECK_LINK_FLAG([-Wl,--minor-subsystem-version -Wl,1], [LDFLAGS="$LDFLAGS -Wl,--minor-subsystem-version -Wl,1"])
   AX_CHECK_LINK_FLAG([-Wl,--major-os-version -Wl,6], [LDFLAGS="$LDFLAGS -Wl,--major-os-version -Wl,6"])
-  AX_CHECK_LINK_FLAG([-Wl,--minor-os-version -Wl,0], [LDFLAGS="$LDFLAGS -Wl,--minor-os-version -Wl,0"])
+  AX_CHECK_LINK_FLAG([-Wl,--minor-os-version -Wl,1], [LDFLAGS="$LDFLAGS -Wl,--minor-os-version -Wl,1"])
 
   # Set the Large Address Aware flag on 32bit Windows
   if ! echo $host_cpu | grep "x86_64" > /dev/null 2>&1; then

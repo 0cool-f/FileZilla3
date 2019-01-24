@@ -17,15 +17,14 @@
 
 #include <wx/evtloop.h>
 
-#ifdef __WXMSW__
-#include <wx/dynlib.h>
-#endif
 #ifdef WITH_LIBDBUS
 #include <../dbus/session_manager.h>
 #endif
 
 #if defined(__WXMAC__) || defined(__UNIX__)
 #include <wx/stdpaths.h>
+#elif defined(__WXMSW__)
+#include <shobjidl.h>
 #endif
 
 #include "locale_initializer.h"
@@ -62,32 +61,6 @@ CFileZillaApp::~CFileZillaApp()
 
 #ifdef __WXMSW__
 namespace {
-extern "C"
-{
-	typedef HRESULT(WINAPI *t_SetCurrentProcessExplicitAppUserModelID)(PCWSTR AppID);
-}
-
-static void SetAppId()
-{
-	wxDynamicLibrary dll;
-	if (!dll.Load(_T("shell32.dll"))) {
-		return;
-	}
-
-	if (!dll.HasSymbol(_T("SetCurrentProcessExplicitAppUserModelID"))) {
-		return;
-	}
-
-	t_SetCurrentProcessExplicitAppUserModelID pSetCurrentProcessExplicitAppUserModelID =
-		(t_SetCurrentProcessExplicitAppUserModelID)dll.GetSymbol(_T("SetCurrentProcessExplicitAppUserModelID"));
-
-	if (!pSetCurrentProcessExplicitAppUserModelID) {
-		return;
-	}
-
-	pSetCurrentProcessExplicitAppUserModelID(_T("FileZilla.Client.AppID"));
-}
-
 static bool InitWinsock()
 {
 	WSADATA d{};
@@ -200,7 +173,7 @@ bool CFileZillaApp::OnInit()
 		return false;
 	}
 
-	SetAppId();
+	SetCurrentProcessExplicitAppUserModelID(L"FileZilla.Client.AppID");
 #endif
 
 	//wxSystemOptions is slow, if a value is not set, it keeps querying the environment
