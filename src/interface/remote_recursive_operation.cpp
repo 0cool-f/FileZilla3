@@ -47,10 +47,6 @@ CRemoteRecursiveOperation::CRemoteRecursiveOperation(CState &state)
 
 CRemoteRecursiveOperation::~CRemoteRecursiveOperation()
 {
-	if (m_pChmodDlg) {
-		m_pChmodDlg->Destroy();
-		m_pChmodDlg = 0;
-	}
 }
 
 void CRemoteRecursiveOperation::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2)
@@ -78,7 +74,7 @@ void CRemoteRecursiveOperation::StartRecursiveOperation(OperationMode mode, Acti
 	wxCHECK_RET(m_state.IsRemoteConnected(), _T("StartRecursiveOperation while disconnected"));
 	wxCHECK_RET(!finalDir.empty(), _T("Empty final dir in recursive operation"));
 
-	if (mode == recursive_chmod && !m_pChmodDlg) {
+	if (mode == recursive_chmod && !chmodData_) {
 		return;
 	}
 
@@ -368,15 +364,15 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 			}
 		}
 
-		if (m_operationMode == recursive_chmod && m_pChmodDlg) {
-			const int applyType = m_pChmodDlg->GetApplyType();
+		if (m_operationMode == recursive_chmod && chmodData_) {
+			const int applyType = chmodData_->GetApplyType();
 			if (!applyType ||
 				(!entry.is_dir() && applyType == 1) ||
 				(entry.is_dir() && applyType == 2))
 			{
 				char permissions[9];
-				bool res = m_pChmodDlg->ConvertPermissions(*entry.permissions, permissions);
-				std::wstring newPerms = m_pChmodDlg->GetPermissions(res ? permissions : 0, entry.is_dir()).ToStdWstring();
+				bool res = chmodData_->ConvertPermissions(*entry.permissions, permissions);
+				std::wstring newPerms = chmodData_->GetPermissions(res ? permissions : 0, entry.is_dir());
 				m_state.m_pCommandQueue->ProcessCommand(new CChmodCommand(pDirectoryListing->path, entry.name, newPerms), CCommandQueue::recursiveOperation);
 			}
 		}
@@ -394,14 +390,9 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 	NextOperation();
 }
 
-void CRemoteRecursiveOperation::SetChmodDialog(CChmodDialog* pChmodDialog)
+void CRemoteRecursiveOperation::SetChmodData(std::unique_ptr<ChmodData> && chmodData)
 {
-	wxASSERT(pChmodDialog);
-
-	if (m_pChmodDlg)
-		m_pChmodDlg->Destroy();
-
-	m_pChmodDlg = pChmodDialog;
+	chmodData_ = std::move(chmodData);
 }
 
 void CRemoteRecursiveOperation::StopRecursiveOperation()
@@ -413,10 +404,7 @@ void CRemoteRecursiveOperation::StopRecursiveOperation()
 	}
 	recursion_roots_.clear();
 
-	if (m_pChmodDlg) {
-		m_pChmodDlg->Destroy();
-		m_pChmodDlg = 0;
-	}
+	chmodData_.reset();
 
 	m_actionAfterBlocker.reset();
 }

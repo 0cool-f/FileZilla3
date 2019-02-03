@@ -969,7 +969,8 @@ void CRemoteTreeView::OnMenuChmod(wxCommandEvent&)
 
 	const bool hasParent = path.HasParent();
 
-	CChmodDialog* pChmodDlg = new CChmodDialog;
+	auto chmodData = std::make_unique<ChmodData>();
+	auto chmodDialog = std::make_unique<CChmodDialog>(*chmodData);
 
 	// Get current permissions of directory
 	std::wstring const name = GetItemText(m_contextMenuItem).ToStdWstring();
@@ -990,69 +991,65 @@ void CRemoteTreeView::OnMenuChmod(wxCommandEvent&)
 					continue;
 				}
 
-				pChmodDlg->ConvertPermissions(*entry.permissions, permissions);
+				chmodData->ConvertPermissions(*entry.permissions, permissions);
 			}
 		}
 	}
 
-	if (!pChmodDlg->Create(this, 0, 1, name, permissions)) {
-		pChmodDlg->Destroy();
-		pChmodDlg = 0;
+	if (!chmodDialog->Create(this, 0, 1, name, permissions)) {
 		return;
 	}
 
-	if (pChmodDlg->ShowModal() != wxID_OK) {
-		pChmodDlg->Destroy();
-		pChmodDlg = 0;
+	if (chmodDialog->ShowModal() != wxID_OK) {
 		return;
 	}
 
 	// State may have changed while chmod dialog was shown
 	if (!m_contextMenuItem || !m_state.IsRemoteConnected() || !m_state.IsRemoteIdle()) {
-		pChmodDlg->Destroy();
-		pChmodDlg = 0;
 		return;
 	}
 
-	const int applyType = pChmodDlg->GetApplyType();
+	int const applyType = chmodData->GetApplyType();
 
 	recursion_root root(hasParent ? path.GetParent() : path, !cached);
 	if (cached) { // Implies hasParent
 		// Change directory permissions
 		if (!applyType || applyType == 2) {
-			std::wstring const newPerms = pChmodDlg->GetPermissions(permissions, true).ToStdWstring();
+			std::wstring const newPerms = chmodData->GetPermissions(permissions, true);
 
 			m_state.m_pCommandQueue->ProcessCommand(new CChmodCommand(path.GetParent(), name, newPerms));
 		}
 
-		if (pChmodDlg->Recursive()) {
+		if (chmodDialog->Recursive()) {
 			// Start recursion
 			root.add_dir_to_visit(path, std::wstring(), CLocalPath());
 		}
 	}
 	else {
 		if (hasParent) {
-			root.add_dir_to_visit_restricted(path.GetParent(), name, pChmodDlg->Recursive());
+			root.add_dir_to_visit_restricted(path.GetParent(), name, chmodDialog->Recursive());
 		}
 		else {
-			root.add_dir_to_visit_restricted(path, std::wstring(), pChmodDlg->Recursive());
+			root.add_dir_to_visit_restricted(path, std::wstring(), chmodDialog->Recursive());
 		}
 	}
 
-	if (!cached || pChmodDlg->Recursive()) {
+	if (!cached || chmodDialog->Recursive()) {
 		CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
 		pRecursiveOperation->AddRecursionRoot(std::move(root));
-		pRecursiveOperation->SetChmodDialog(pChmodDlg);
+
+		chmodDialog.reset();
+		pRecursiveOperation->SetChmodData(std::move(chmodData));
 
 		CServerPath currentPath;
 		const wxTreeItemId selected = GetSelection();
-		if (selected)
+		if (selected) {
 			currentPath = GetPathFromItem(selected);
+		}
 		CFilterManager filter;
 		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod, filter.GetActiveFilters(), currentPath);
 	}
 	else {
-		pChmodDlg->Destroy();
 		const wxTreeItemId selected = GetSelection();
 		if (selected) {
 			CServerPath currentPath = GetPathFromItem(selected);

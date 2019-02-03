@@ -1798,7 +1798,7 @@ void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 		name = entry.name;
 
 		char file_perms[9];
-		if (CChmodDialog::ConvertPermissions(*entry.permissions, file_perms)) {
+		if (ChmodData::ConvertPermissions(*entry.permissions, file_perms)) {
 			for (int i = 0; i < 9; i++) {
 				if (!permissions[i] || permissions[i] == file_perms[i]) {
 					permissions[i] = file_perms[i];
@@ -1814,7 +1814,7 @@ void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 		return;
 	}
 
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < 9; ++i) {
 		if (permissions[i] == -1) {
 			permissions[i] = 0;
 		}
@@ -1838,25 +1838,24 @@ void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 
 void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 {
-	CChmodDialog* pChmodDlg = new CChmodDialog;
-	if (!pChmodDlg->Create(command.parentWindow, command.fileCount, command.dirCount, command.name, command.permissions)) {
-		pChmodDlg->Destroy();
+	auto chmodData = std::make_unique<ChmodData>();
+	auto chmodDialog = std::make_unique<CChmodDialog>(*chmodData);
+
+	if (!chmodDialog->Create(command.parentWindow, command.fileCount, command.dirCount, command.name, command.permissions)) {
 		return;
 	}
 
-	if (pChmodDlg->ShowModal() != wxID_OK) {
-		pChmodDlg->Destroy();
+	if (chmodDialog->ShowModal() != wxID_OK) {
 		return;
 	}
 
 	// State may have changed while chmod dialog was shown
 	if (!m_state.IsRemoteConnected() || !m_state.IsRemoteIdle()) {
-		pChmodDlg->Destroy();
 		wxBell();
 		return;
 	}
 
-	const int applyType = pChmodDlg->GetApplyType();
+	int const applyType = chmodData->GetApplyType();
 
 	CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
 	wxASSERT(pRecursiveOperation);
@@ -1870,15 +1869,11 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 		}
 
 		if (!item) {
-			pChmodDlg->Destroy();
-			pChmodDlg = 0;
 			return;
 		}
 
 		int index = GetItemIndex(item);
 		if (index == -1) {
-			pChmodDlg->Destroy();
-			pChmodDlg = 0;
 			return;
 		}
 		if (m_fileData[index].comparison_flags == fill) {
@@ -1892,19 +1887,20 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 			(entry.is_dir() && applyType == 2))
 		{
 			char newPermissions[9]{};
-			bool res = pChmodDlg->ConvertPermissions(*entry.permissions, newPermissions);
-			std::wstring const newPerms = pChmodDlg->GetPermissions(res ? newPermissions : 0, entry.is_dir()).ToStdWstring();
+			bool res = ChmodData::ConvertPermissions(*entry.permissions, newPermissions);
+			std::wstring const newPerms = chmodData->GetPermissions(res ? newPermissions : 0, entry.is_dir());
 
 			m_state.m_pCommandQueue->ProcessCommand(new CChmodCommand(m_pDirectoryListing->path, entry.name, newPerms));
 		}
 
-		if (pChmodDlg->Recursive() && entry.is_dir()) {
+		if (chmodDialog->Recursive() && entry.is_dir()) {
 			root.add_dir_to_visit(m_pDirectoryListing->path, entry.name);
 		}
 	}
 
-	if (pChmodDlg->Recursive()) {
-		pRecursiveOperation->SetChmodDialog(pChmodDlg);
+	if (chmodDialog->Recursive()) {
+		chmodDialog.reset();
+		pRecursiveOperation->SetChmodData(std::move(chmodData));
 		pRecursiveOperation->AddRecursionRoot(std::move(root));
 		CFilterManager filter;
 		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod,
@@ -1917,8 +1913,7 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 		}
 	}
 	else {
-		pChmodDlg->Destroy();
-		m_state.ChangeRemoteDir(m_pDirectoryListing->path, _T(""), 0, true);
+		m_state.ChangeRemoteDir(m_pDirectoryListing->path, std::wstring(), 0, true);
 	}
 
 }

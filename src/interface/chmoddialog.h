@@ -3,18 +3,10 @@
 
 #include "dialogex.h"
 
-class CChmodDialog final : public wxDialogEx
+class ChmodData
 {
 public:
-	CChmodDialog();
-
-	bool Create(wxWindow* parent, int fileCount, int dirCount,
-				const wxString& name, const char permissions[9]);
-
-	wxString GetPermissions(const char* previousPermissions, bool dir);
-
-	bool Recursive() const ;
-	int GetApplyType() const { return m_applyType; }
+	int GetApplyType() const { return applyType_; }
 
 	// Converts permission string into a series of chars
 	// The permissions parameter has to be able to hold at least
@@ -23,7 +15,27 @@ public:
 	//   drwxr--r-- gets converted into 222211211
 	//   0644 gets converted into 221211211
 	//   foo (0273) gets converted into 121222122
-	static bool ConvertPermissions(wxString rwx, char* permissions);
+	static bool ConvertPermissions(std::wstring const& rwx, char* permissions);
+
+	std::wstring GetPermissions(const char* previousPermissions, bool dir);
+
+	int applyType_{};
+	std::wstring numeric_;
+	char permissions_[9]{};
+
+private:
+	static bool DoConvertPermissions(std::wstring const& rwx, char* permissions);
+};
+
+class CChmodDialog final : public wxDialogEx
+{
+public:
+	CChmodDialog(ChmodData & data);
+
+	bool Create(wxWindow* parent, int fileCount, int dirCount,
+				const wxString& name, const char permissions[9]);
+
+	bool Recursive() const ;
 
 protected:
 
@@ -35,15 +47,15 @@ protected:
 	void OnCheckboxClick(wxCommandEvent&);
 	void OnNumericChanged(wxCommandEvent&);
 
+	ChmodData & data_;
+
 	wxCheckBox* m_checkBoxes[9];
-	char m_permissions[9];
 
 	bool m_noUserTextChange{};
 	wxString oldNumeric;
 	bool lastChangedNumeric{};
 
 	bool m_recursive{};
-	int m_applyType{};
 };
 
 #endif

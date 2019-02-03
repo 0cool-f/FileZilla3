@@ -5,7 +5,7 @@
 #include "recursive_operation.h"
 #include <libfilezilla/optional.hpp>
 
-class CChmodDialog;
+class ChmodData;
 
 class recursion_root final
 {
@@ -61,7 +61,7 @@ public:
 	void StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, CServerPath const& finalDir, bool immediate = true);
 
 	// Needed for recursive_chmod
-	void SetChmodDialog(CChmodDialog* pChmodDialog);
+	void SetChmodData(std::unique_ptr<ChmodData> && chmodData);
 
 	virtual void StopRecursiveOperation();
 
@@ -83,7 +83,7 @@ protected:
 	CServerPath m_finalDir;
 
 	// Needed for recursive_chmod
-	CChmodDialog* m_pChmodDlg{};
+	std::unique_ptr<ChmodData> chmodData_;
 
 	friend class CCommandQueue;
 };
