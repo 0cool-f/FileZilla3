@@ -336,7 +336,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::SortList(int column /*=
 			}
 		}
 		focused_item = GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
-		if (focused_item != -1) {
+		if (focused_item >= 0 && static_cast<size_t>(focused_item) < m_indexMapping.size()) {
 			focused_index = m_indexMapping[focused_item];
 		}
 	}
