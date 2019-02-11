@@ -98,7 +98,7 @@ void CNewBookmarkDialog::OnOK(wxCommandEvent&)
 				return;
 			}
 
-			m_site_path = CSiteManager::AddServer(*site);
+			m_site_path = CSiteManager::AddServer(*site_);
 			if (m_site_path.empty()) {
 				wxMessageBoxEx(_("Could not add connection to Site Manager"), _("New bookmark"), wxICON_EXCLAMATION, this);
 				EndModal(wxID_CANCEL);
