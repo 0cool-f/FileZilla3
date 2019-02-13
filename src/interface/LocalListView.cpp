@@ -1650,8 +1650,7 @@ void CLocalListView::StartComparison()
 
 	m_comparisonIndex = -1;
 
-	const CLocalFileData& last = m_fileData[m_fileData.size() - 1];
-	if (last.comparison_flags != fill) {
+	if (m_fileData.empty() || m_fileData.back().comparison_flags != fill) {
 		CLocalFileData data;
 		data.dir = false;
 		data.icon = -1;
