@@ -138,19 +138,23 @@ void CStatusLineCtrl::OnPaint(wxPaintEvent&)
 			m_last_elapsed_seconds = elapsed_milli_seconds / 1000;
 		}
 
-		if (COptions::Get()->GetOptionVal(OPTION_SPEED_DISPLAY))
+		if (COptions::Get()->GetOptionVal(OPTION_SPEED_DISPLAY)) {
 			rate = GetMomentarySpeed();
-		else
+		}
+		else {
 			rate = GetAverageSpeed(elapsed_milli_seconds);
+		}
 
 		if (status_.totalSize > 0 && elapsed_milli_seconds >= 1000 && rate > 0) {
 			wxFileOffset r = status_.totalSize - status_.currentOffset;
 			left = r / rate + 1;
-			if (r)
+			if (r) {
 				++left;
+			}
 
-			if (left < 0)
+			if (left < 0) {
 				left = 0;
+			}
 		}
 
 		if (m_last_left != left) {
@@ -161,16 +165,18 @@ void CStatusLineCtrl::OnPaint(wxPaintEvent&)
 		const wxString bytestr = CSizeFormat::Format(status_.currentOffset, true, CSizeFormat::bytes, COptions::Get()->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0, 0);
 		if (elapsed_milli_seconds >= 1000 && rate > -1) {
 			CSizeFormat::_format format = static_cast<CSizeFormat::_format>(COptions::Get()->GetOptionVal(OPTION_SIZE_FORMAT));
-			if (format == CSizeFormat::bytes)
+			if (format == CSizeFormat::bytes) {
 				format = CSizeFormat::iec;
+			}
 			const wxString ratestr = CSizeFormat::Format(rate, true,
 														 format,
 														 COptions::Get()->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0,
 														 COptions::Get()->GetOptionVal(OPTION_SIZE_DECIMALPLACES));
 			bytes_and_rate.Printf(_("%s (%s/s)"), bytestr, ratestr );
 		}
-		else
+		else {
 			bytes_and_rate.Printf(_("%s (? B/s)"), bytestr);
+		}
 
 		if (m_last_bytes_and_rate != bytes_and_rate) {
 			refresh |= 8;
@@ -230,8 +236,9 @@ void CStatusLineCtrl::OnPaint(wxPaintEvent&)
 		}
 		if (refresh & 4) {
 			m_mdc->DrawRectangle(m_fieldOffsets[2], 0, m_fieldOffsets[3] - m_fieldOffsets[2], rect.GetHeight() + 1);
-			if (bar_split != -1)
+			if (bar_split != -1) {
 				DrawProgressBar(*m_mdc, m_fieldOffsets[2], 1, rect.GetHeight() - 2, bar_split, permill);
+			}
 		}
 	}
 	dc.Blit(0, 0, rect.GetWidth(), rect.GetHeight(), m_mdc.get(), 0, 0);
@@ -297,8 +304,9 @@ void CStatusLineCtrl::OnTimer(wxTimerEvent&)
 	bool changed;
 	CTransferStatus status = m_pEngineData->pEngine->GetTransferStatus(changed);
 
-	if (status.empty())
+	if (status.empty()) {
 		ClearTransferStatus();
+	}
 	else if (changed) {
 		if (status.madeProgress && !status.list &&
 			m_pEngineData->pItem->GetType() == QueueItemType::File)
@@ -308,8 +316,9 @@ void CStatusLineCtrl::OnTimer(wxTimerEvent&)
 		}
 		SetTransferStatus(status);
 	}
-	else
+	else {
 		m_transferStatusTimer.Stop();
+	}
 }
 
 void CStatusLineCtrl::DrawRightAlignedText(wxDC& dc, wxString const& text, int x, int y)
@@ -406,23 +415,23 @@ wxFileOffset CStatusLineCtrl::GetMomentarySpeed()
 		return -1;
 	}
 
+	if (m_monentary_speed_data.last_offset < 0) {
+		m_monentary_speed_data.last_offset = status_.currentOffset;
+	}
+	
 	if (!m_monentary_speed_data.last_update) {
 		m_monentary_speed_data.last_update = fz::monotonic_clock::now();
-		m_monentary_speed_data.last_offset = status_.startOffset;
 		return -1;
 	}
 
 	fz::duration const time_diff = fz::monotonic_clock::now() - m_monentary_speed_data.last_update;
-	if (time_diff.get_seconds() < 2) {
+	if (time_diff.get_seconds() >= 2) {
+		m_monentary_speed_data.last_update = fz::monotonic_clock::now();
+	}
+	else if (m_monentary_speed_data.last_speed >= 0 || !time_diff) {
 		return m_monentary_speed_data.last_speed;
 	}
-
-	m_monentary_speed_data.last_update = fz::monotonic_clock::now();
-
-	if (m_monentary_speed_data.last_offset < 0) {
-		m_monentary_speed_data.last_offset = status_.startOffset;
-	}
-
+	
 	wxFileOffset const fileOffsetDiff = status_.currentOffset - m_monentary_speed_data.last_offset;
 	m_monentary_speed_data.last_offset = status_.currentOffset;
 	if (fileOffsetDiff >= 0) {
