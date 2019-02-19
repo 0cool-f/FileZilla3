@@ -475,10 +475,17 @@ bool CFilterConditionsDialog::ValidateFilter(wxString& error, bool allow_empty)
 			}
 
 			if (condition == 4) {
-				try {
-					std::wregex(controls.pValue->GetValue().ToStdWstring());
+				bool valid = false;
+				auto const v = controls.pValue->GetValue().ToStdWstring();
+				if (v.size() <= 2000) {
+					try {
+						std::wregex(v);
+						valid = true;
+					}
+					catch (std::regex_error const&) {
+					}
 				}
-				catch (std::regex_error const&) {
+				if (!valid) {
 					m_pListCtrl->SelectLine(i);
 					controls.pValue->SetFocus();
 					error = _("Invalid regular expression");

@@ -57,6 +57,9 @@ bool CFilterCondition::set(t_filterType t, std::wstring const& v, int c, bool ma
 	case filter_name:
 	case filter_path:
 		if (condition == 4) {
+			if (strValue.size() > 2000) {
+				return false;
+			}
 			try {
 				auto flags = std::regex_constants::ECMAScript;
 				if (!matchCase) {
