@@ -10,6 +10,15 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.4?.? (2019-??-??)
+
+- Fixed crash if adding a bookmark with the current connection not yet having a Site Manager entry
+- Fixed a rare crash if closing FileZilla while a recursive chmod operation is still in progress
+- Fixed a rare crash if starting directory comparison on an empty directory without logical parent
+- Fixed a rare crash on changing the file list sort order when the focused item index has previously become invalid
+- Restrict the maximum length of regular expressions in filter conditions due to bugs in some implementations of the C++ Standard Library causing crashes
+- OS X: Fix crash if the path of a file dropped on FileZilla cannot be obtained
+
 3.40.0 (2019-01-25)
 
 - Official binaries are now linked against GnuTLS 3.6.6
