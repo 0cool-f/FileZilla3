@@ -459,22 +459,6 @@ if test "$buildmain" = "yes"; then
   fi
   AC_SUBST(IDN_LIB)
 
-  # Binreloc
-  # --------
-
-  # Check if we should use BinReloc
-  AH_TEMPLATE(ENABLE_BINRELOC, [Define ENABLE_BINRELOC on systems where the executable
-                                location can be obtained using /proc/self/maps])
-  AC_MSG_CHECKING([whether to use BinReloc])
-  if echo $host_os | grep -i "cygwin\|mingw\|mac\|apple" > /dev/null 2>&1 ; then
-    use_binreloc=no
-  else
-    use_binreloc=yes
-    AC_DEFINE(ENABLE_BINRELOC)
-  fi
-
-  AC_MSG_RESULT([$use_binreloc])
-
   # Precompiled headers support
   # ---------------------------
 
@@ -780,7 +764,6 @@ AM_CONDITIONAL(USE_RESOURCEFILE, test "$use_resourcefile" = "true")
 AM_CONDITIONAL(MACAPPBUNDLE, [test "$macappbundle" = "yes"])
 AM_CONDITIONAL(USE_MAC_SANDBOX, [test "$use_mac_sandbox" = "yes"])
 AM_CONDITIONAL(MAKENSISSCRIPT, [test "$makensisscript" = "yes"])
-AM_CONDITIONAL(USE_BINRELOC, test "$use_binreloc" = "yes")
 AM_CONDITIONAL(ENABLE_PRECOMP, test "x$use_precomp" = "xyes")
 AM_CONDITIONAL(HAS_CPPUNIT, [test "$has_cppunit" = "yes"])
 AM_CONDITIONAL(HAVE_LIBPUGIXML, [test "x$with_pugixml" = "xsystem"])
