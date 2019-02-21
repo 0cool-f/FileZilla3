@@ -830,8 +830,9 @@ int CWrapEngine::GetWidthFromCache(const char* name)
 	}
 
 	wxString language = wxGetApp().GetCurrentLanguageCode();
-	if (language.empty())
+	if (language.empty()) {
 		language = _T("default");
+	}
 
 	auto xLanguage = FindElementWithAttribute(element, "Language", "id", language.mb_str());
 	if (!xLanguage) {
@@ -870,8 +871,9 @@ void CWrapEngine::SetWidthToCache(const char* name, int width)
 	}
 
 	wxString language = wxGetApp().GetCurrentLanguageCode();
-	if (language.empty())
+	if (language.empty()) {
 		language = _T("default");
+	}
 
 	auto xLanguage = FindElementWithAttribute(element, "Language", "id", language.mb_str());
 	if (!xLanguage) {
@@ -893,38 +895,38 @@ CWrapEngine::CWrapEngine()
 	CheckLanguage();
 }
 
-static wxString GetLocaleFile(wxString const& localesDir, wxString name)
+static std::wstring GetLocaleFile(std::wstring const& localesDir, std::wstring name)
 {
-	if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo"))) {
+	if (wxFileName::FileExists(localesDir + name + L"/filezilla.mo")) {
 		return name;
 	}
-	if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo"))) {
-		return name + _T("/LC_MESSAGES");
+	if (wxFileName::FileExists(localesDir + name + L"/LC_MESSAGES/filezilla.mo")) {
+		return name + L"/LC_MESSAGES";
 	}
 
-	size_t pos = name.Find('@');
-	if (pos > 0) {
-		name = name.Left(pos);
-		if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo"))) {
+	size_t pos = name.find('@');
+	if (pos != std::wstring::npos && pos > 0) {
+		name = name.substr(0, pos);
+		if (wxFileName::FileExists(localesDir + name + L"/filezilla.mo")) {
 			return name;
 		}
-		if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo"))) {
-			return name + _T("/LC_MESSAGES");
+		if (wxFileName::FileExists(localesDir + name + L"/LC_MESSAGES/filezilla.mo")) {
+			return name + L"/LC_MESSAGES";
 		}
 	}
 
-	pos = name.Find('_');
-	if (pos > 0) {
-		name = name.Left(pos);
-		if (wxFileName::FileExists(localesDir + name + _T("/filezilla.mo"))) {
+	pos = name.find('_');
+	if (pos != std::wstring::npos && pos > 0) {
+		name = name.substr(0, pos);
+		if (wxFileName::FileExists(localesDir + name + L"/filezilla.mo")) {
 			return name;
 		}
-		if (wxFileName::FileExists(localesDir + name + _T("/LC_MESSAGES/filezilla.mo"))) {
-			return name + _T("/LC_MESSAGES");
+		if (wxFileName::FileExists(localesDir + name + L"/LC_MESSAGES/filezilla.mo")) {
+			return name + L"/LC_MESSAGES";
 		}
 	}
 
-	return wxString();
+	return std::wstring();
 }
 
 bool CWrapEngine::LoadCache()
@@ -1053,25 +1055,28 @@ bool CWrapEngine::LoadCache()
 	pFrame->Destroy();
 
 	// Get language file
-	CLocalPath const localesDir = wxGetApp().GetLocalesDir();
-	wxString name = GetLocaleFile(localesDir.GetPath(), language);
+	if (language != L"default") {
+		CLocalPath const localesDir = wxGetApp().GetLocalesDir();
+		std::wstring name = GetLocaleFile(localesDir.GetPath(), language);
+		if (!name.empty()) {
+			fz::datetime const date = fz::local_filesys::get_modification_time(fz::to_native(localesDir.GetPath() + name + L"/filezilla.mo"));
+			std::wstring const ticks = std::to_wstring(date.get_time_t());
 
-	if (!name.empty()) {
-		fz::datetime const date = fz::local_filesys::get_modification_time(fz::to_native(localesDir.GetPath() + name + _T("/filezilla.mo")));
-		std::wstring const ticks = std::to_wstring(date.get_time_t());
-
-		std::wstring languageNodeDate = GetTextAttribute(languageElement, "date");
-		if (languageNodeDate.empty() || languageNodeDate != ticks) {
-			SetTextAttribute(languageElement, "date", ticks);
-			cacheValid = false;
+			std::wstring languageNodeDate = GetTextAttribute(languageElement, "date");
+			if (languageNodeDate.empty() || languageNodeDate != ticks) {
+				SetTextAttribute(languageElement, "date", ticks);
+				cacheValid = false;
+			}
+		}
+		else {
+			SetTextAttribute(languageElement, "date", "");
 		}
 	}
-	else
-		SetTextAttribute(languageElement, "date", "");
 	if (!cacheValid) {
 		pugi::xml_node dialog;
-		while ((dialog = languageElement.child("Dialog")))
+		while ((dialog = languageElement.child("Dialog"))) {
 			languageElement.remove_child(dialog);
+		}
 	}
 
 	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
