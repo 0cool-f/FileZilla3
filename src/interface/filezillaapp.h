@@ -45,7 +45,7 @@ public:
 	void AddStartupProfileRecord(std::string const& msg);
 
 protected:
-	void CheckExistsTool(std::wstring const& tool, std::vector<std::wstring> const& searchPaths, std::wstring const& env, int setting, wxString const& description);
+	void CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, std::wstring const& env, int setting, wxString const& description);
 
 	bool InitDefaultsDir();
 	bool LoadResourceFiles();
@@ -62,7 +62,7 @@ protected:
 	virtual void OnFatalException();
 #endif
 
-	CLocalPath GetDataDir(std::wstring fileToFind) const;
+	CLocalPath GetDataDir(std::wstring fileToFind, std::wstring const& prefixSub, bool searchSelfDir = true) const;
 
 	bool FileExists(std::wstring const& file) const;
 
