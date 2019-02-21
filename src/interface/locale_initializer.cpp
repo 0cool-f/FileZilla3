@@ -223,8 +223,8 @@ std::string CInitializer::GetDefaultsXmlFile()
 		if (!path.empty() && path.back() != '/') {
 			path += '/';
 		}
-		if (path.size() > 5 && fz::ends_with(path, std::string("/bin/"))) {
-			file = CheckPathForDefaults(path.substr(0, path.size() - 4), 0, "share/filezilla/fzdefaults.xml");
+		if (segment.size() > 5 && fz::ends_with(segment, std::string("/bin/"))) {
+			file = CheckPathForDefaults(segment.substr(0, segment.size() - 4), 0, "share/filezilla/fzdefaults.xml");
 			if (!file.empty()) {
 				return file;
 			}
