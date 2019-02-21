@@ -85,7 +85,7 @@ std::wstring GetOwnExecutableDir()
 #elif defined(ENABLE_BINRELOC)
 	const char* p = SELFPATH;
 	if (p && *p == '/') {
-		return fz::to_wstring(p);
+		return fz::to_wstring(std::string(p));
 	}
 #endif
 	return std::wstring();
