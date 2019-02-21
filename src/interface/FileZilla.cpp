@@ -43,7 +43,7 @@ IMPLEMENT_APP_NO_MAIN(CFileZillaApp)
   #error Please build wxWidgets with support for positional arguments.
 #endif
 
-// If non-emptry, always terminated by a separator
+// If non-empty, always terminated by a separator
 std::wstring GetOwnExecutableDir()
 {
 #ifdef FZ_WINDOWS
