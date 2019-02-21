@@ -55,6 +55,12 @@ std::wstring GetEnv(std::string const& name)
 
 	return ret;
 }
+
+#if FZ_WINDOWS
+std::wstring const PATH_SEP = L";";
+#else
+std::wstring const PATH_SEP = L":";
+#endif
 }
 
 // If non-empty, always terminated by a separator
@@ -449,13 +455,11 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 
 	// Now scan through the path
 	if (!prefixSub.empty()) {
-		wxPathList pathList;
-		pathList.AddEnvList(L"PATH");
+		std::wstring path = GetEnv("PATH");
+		auto const segments = fz::strtok(path, PATH_SEP);
 
-		// For each path, check for the resources
-		wxPathList::const_iterator node;
-		for (node = pathList.begin(); node != pathList.end(); ++node) {
-			auto const cur = CLocalPath(node->ToStdWstring()).GetPath();
+		for (auto const& segment : segments) {
+			auto const cur = CLocalPath(segment).GetPath();
 			if (cur.size() > 5 && fz::ends_with(cur, std::wstring(L"/bin/"))) {
 				std::wstring path = cur.substr(0, cur.size() - 4) + prefixSub + L"/";
 				if (FileExists(path + fileToFind)) {
@@ -616,14 +620,14 @@ CWrapEngine* CFileZillaApp::GetWrapEngine()
 void CFileZillaApp::CheckExistsFzsftp()
 {
 	AddStartupProfileRecord("FileZillaApp::CheckExistsFzsftp");
-	CheckExistsTool(L"fzsftp", L"../putty", "FZ_FZSFTP", OPTION_FZSFTP_EXECUTABLE, _("SFTP support"));
+	CheckExistsTool(L"fzsftp", L"../putty/", "FZ_FZSFTP", OPTION_FZSFTP_EXECUTABLE, _("SFTP support"));
 }
 
 #if ENABLE_STORJ
 void CFileZillaApp::CheckExistsFzstorj()
 {
 	AddStartupProfileRecord("FileZillaApp::CheckExistsFzstorj");
-	CheckExistsTool(L"fzstorj", L"../putty", "FZ_FZSTORJ", OPTION_FZSTORJ_EXECUTABLE, _("Storj support"));
+	CheckExistsTool(L"fzstorj", L"../storj/", "FZ_FZSTORJ", OPTION_FZSTORJ_EXECUTABLE, _("Storj support"));
 }
 #endif
 
@@ -659,25 +663,26 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 	}
 
 	if (!found) {
-		wxPathList pathList;
-
 		std::wstring path = GetOwnExecutableDir();
 		if (!path.empty()) {
-			pathList.Add(path);
-
-			// Check if running from build dir
-			if (path.size() > 7 && fz::ends_with(path, std::wstring(L"/.libs/"))) {
-				if (wxFileName::FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
-					pathList.Add(path + L"../" + buildRelPath);
-				}
-			}
-			else if (wxFileName::FileExists(path + L"Makefile")) {
-				pathList.Add(path + buildRelPath);
-			}
-
-			executable = pathList.FindAbsoluteValidPath(program).ToStdWstring();
-			if (!executable.empty()) {
+			executable = path + program;
+			if (wxFileName::FileExists(executable)) {
 				found = true;
+			}
+			else {
+				// Check if running from build dir
+				if (path.size() > 7 && fz::ends_with(path, std::wstring(L"/.libs/"))) {
+					if (wxFileName::FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
+						executable = path + L"../" + buildRelPath + program;
+					}
+				}
+				else if (wxFileName::FileExists(path + L"Makefile")) {
+					executable = path + buildRelPath + program;
+				}
+
+				if (wxFileName::FileExists(executable)) {
+					found = true;
+				}
 			}
 		}
 	}
@@ -702,11 +707,14 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 
 	if (!found) {
 		// Check PATH
-		wxPathList pathList;
-		pathList.AddEnvList(_T("PATH"));
-		executable = pathList.FindAbsoluteValidPath(program);
-		if (!executable.empty()) {
-			found = true;
+		std::wstring path = GetEnv("PATH");
+		auto const segments = fz::strtok(path, PATH_SEP);
+		for (auto const& segment : segments) {
+			auto const cur = CLocalPath(segment).GetPath();
+			executable = cur + program;
+			if (!cur.empty() && wxFileName::Exists(executable)) {
+				found = true;
+			}
 		}
 	}
 #endif
