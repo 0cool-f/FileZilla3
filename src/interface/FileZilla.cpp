@@ -33,11 +33,6 @@
 #include "osx_sandbox_userdirs.h"
 #endif
 
-#ifdef ENABLE_BINRELOC
-	#define BR_PTHREADS 0
-	#include "prefix.h"
-#endif
-
 #ifndef __WXGTK__
 IMPLEMENT_APP(CFileZillaApp)
 #else
@@ -48,7 +43,7 @@ IMPLEMENT_APP_NO_MAIN(CFileZillaApp)
   #error Please build wxWidgets with support for positional arguments.
 #endif
 
-namespace {
+// If non-emptry, always terminated by a separator
 std::wstring GetOwnExecutableDir()
 {
 #ifdef FZ_WINDOWS
@@ -63,33 +58,44 @@ std::wstring GetOwnExecutableDir()
 			return std::wstring();
 		}
 
-		if (res >= path.size() - 1) {
-			path.resize(path.size() * 2);
-			continue;
-		}
-		else {
+		if (res < path.size() - 1) {
 			path.resize(res);
+			break;
 		}
-		break;
+
+		path.resize(path.size() * 2 + 1);
 	}
-	size_t pos = path.rfind('\\');
+	size_t pos = path.find_last_of(_L"\\/");
 	if (pos != std::wstring::npos) {
-		return path.substr(0, pos);
+		return path.substr(0, pos + 1);
 	}
 #elif defined(FZ_MAC)
+	// Fixme: Remove wxDependency and move entire function to libfilezilla
 	std::wstring executable = wxStandardPaths::Get().GetExecutablePath().ToStdWString();
 	size_t pos = executable.rind('/');
 	if (pos != std::wstring::npos) {
-		return path.substr(0, pos);
+		return path.substr(0, pos + 1);
 	}
-#elif defined(ENABLE_BINRELOC)
-	const char* p = SELFPATH;
-	if (p && *p == '/') {
-		return fz::to_wstring(std::string(p));
+#else
+	std::string path;
+	path.resize(4095);
+	while (true) {
+		int res = readlink("/proc/self/exe", &path[0], path.size());
+		if (res < 0) {
+			return std::wstring();
+		}
+		if (static_cast<size_t>(res) < path.size()) {
+			path.resize(res);
+			break;
+		}
+		path.resize(path.size() * 2 + 1);
+	}
+	size_t pos = path.rfind('/');
+	if (pos != std::wstring::npos) {
+		return fz::to_wstring(path.substr(0, pos + 1));
 	}
 #endif
 	return std::wstring();
-}
 }
 
 CFileZillaApp::CFileZillaApp()
@@ -407,20 +413,20 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 
 	std::wstring selfDir = GetOwnExecutableDir();
 	if (!selfDir.empty()) {
-		if (searchSelfDir && FileExists(selfDir + L"/" + fileToFind)) {
+		if (searchSelfDir && FileExists(selfDir + fileToFind)) {
 			return CLocalPath(selfDir);
 		}
 
-		if (!prefixSub.empty() && selfDir.size() > 4 && fz::ends_with(selfDir, std::wstring(L"/bin"))) {
-			std::wstring path = selfDir.substr(0, selfDir.size() - 3) + prefixSub + L"/";
+		if (!prefixSub.empty() && selfDir.size() > 5 && fz::ends_with(selfDir, std::wstring(L"/bin/"))) {
+			std::wstring path = selfDir.substr(0, selfDir.size() - 4) + prefixSub + L"/";
 			if (FileExists(path + fileToFind)) {
 				return CLocalPath(path);
 			}
 		}
 
 		// Development paths
-		if (searchSelfDir && selfDir.size() > 6 && fz::ends_with(selfDir, std::wstring(L"/.libs"))) {
-			std::wstring path = selfDir.substr(0, selfDir.size() - 5);
+		if (searchSelfDir && selfDir.size() > 7 && fz::ends_with(selfDir, std::wstring(L"/.libs/"))) {
+			std::wstring path = selfDir.substr(0, selfDir.size() - 6);
 			if (FileExists(path + L"Makefile")) {
 				if (FileExists(path + fileToFind)) {
 					return CLocalPath(path);
@@ -437,9 +443,9 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 		// For each path, check for the resources
 		wxPathList::const_iterator node;
 		for (node = pathList.begin(); node != pathList.end(); ++node) {
-			auto const cur = node->ToStdWstring();
-			if (cur.size() > 4 && fz::ends_with(cur, std::wstring(L"/bin"))) {
-				std::wstring path = cur.substr(0, cur.size() - 3) + prefixSub + L"/";
+			auto const cur = CLocalPath(node->ToStdWstring()).GetPath();
+			if (cur.size() > 5 && fz::ends_with(cur, std::wstring(L"/bin/"))) {
+				std::wstring path = cur.substr(0, cur.size() - 4) + prefixSub + L"/";
 				if (FileExists(path + fileToFind)) {
 					return CLocalPath(path);
 				}
@@ -598,14 +604,14 @@ CWrapEngine* CFileZillaApp::GetWrapEngine()
 void CFileZillaApp::CheckExistsFzsftp()
 {
 	AddStartupProfileRecord("FileZillaApp::CheckExistsFzsftp");
-	CheckExistsTool(L"fzsftp", L"/../putty", L"FZ_FZSFTP", OPTION_FZSFTP_EXECUTABLE, _("SFTP support"));
+	CheckExistsTool(L"fzsftp", L"../putty", L"FZ_FZSFTP", OPTION_FZSFTP_EXECUTABLE, _("SFTP support"));
 }
 
 #if ENABLE_STORJ
 void CFileZillaApp::CheckExistsFzstorj()
 {
 	AddStartupProfileRecord("FileZillaApp::CheckExistsFzstorj");
-	CheckExistsTool(L"fzstorj", L"/../putty", L"FZ_FZSTORJ", OPTION_FZSTORJ_EXECUTABLE, _("Storj support"));
+	CheckExistsTool(L"fzstorj", L"../putty", L"FZ_FZSTORJ", OPTION_FZSTORJ_EXECUTABLE, _("Storj support"));
 }
 #endif
 
@@ -620,7 +626,7 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 	// On Mac we only look inside the bundle
 	std::wstring path = GetOwnExecutableDir();
 	if (!path.empty()) {
-		executable = path + '/' + tool;
+		executable = path + tool;
 		if (wxFileName::FileExists(executable.ToStdWstring())) {
 			found = true;
 		}
@@ -647,12 +653,12 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 			pathList.Add(path);
 
 			// Check if running from build dir
-			if (path.size() > 6 && fz::ends_with(path, std::wstring(L"/.libs"))) {
-				if (wxFileName::FileExists(path.substr(0, path.size() - 6) + L"/Makefile")) {
-					pathList.Add(path + L"/.." + buildRelPath);
+			if (path.size() > 7 && fz::ends_with(path, std::wstring(L"/.libs/"))) {
+				if (wxFileName::FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
+					pathList.Add(path + L"../" + buildRelPath);
 				}
 			}
-			else if (wxFileName::FileExists(path + L"/Makefile")) {
+			else if (wxFileName::FileExists(path + L"Makefile")) {
 				pathList.Add(path + buildRelPath);
 			}
 

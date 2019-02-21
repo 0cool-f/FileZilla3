@@ -132,10 +132,6 @@ filezilla_SOURCES = aboutdialog.cpp \
 		xrc_helper.cpp
 
 
-if USE_BINRELOC
-filezilla_SOURCES += prefix.cpp
-endif
-
 noinst_HEADERS = aboutdialog.h \
 		 asksavepassworddialog.h \
 		 asyncrequestqueue.h \
@@ -188,7 +184,6 @@ noinst_HEADERS = aboutdialog.h \
 		 netconfwizard.h \
 		 Options.h \
 		 power_management.h \
-		 prefix.h \
 		 queue.h \
 		 queue_storage.h \
 		 QueueView.h \
