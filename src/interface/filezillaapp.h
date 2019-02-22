@@ -62,7 +62,7 @@ protected:
 	virtual void OnFatalException();
 #endif
 
-	CLocalPath GetDataDir(std::wstring fileToFind, std::wstring const& prefixSub, bool searchSelfDir = true) const;
+	CLocalPath GetDataDir(std::vector<std::wstring> const& fileToFind, std::wstring const& prefixSub, bool searchSelfDir = true) const;
 
 	bool FileExists(std::wstring const& file) const;
 

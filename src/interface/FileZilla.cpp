@@ -399,7 +399,7 @@ bool CFileZillaApp::FileExists(std::wstring const& file) const
 	return fz::local_filesys::get_file_type(fz::to_native(file), true) == fz::local_filesys::file;
 }
 
-CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const& prefixSub, bool searchSelfDir) const
+CLocalPath CFileZillaApp::GetDataDir(std::vector<std::wstring> const& fileToFind, std::wstring const& prefixSub, bool searchSelfDir) const
 {
 	/*
 	 * Finding the resources in all cases is a difficult task,
@@ -411,6 +411,22 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 	 *
 	 * At least on OS X it's simple: All inside application bundle.
 	 */
+
+	CLocalPath ret;
+
+	auto testPath = [&](std::wstring const& path) {
+		if (path.empty()) {
+			return false;
+		}
+
+		for (auto const& file : fileToFind) {
+			if (FileExists(path + file)) {
+				ret = CLocalPath(path);
+				return true;
+			}
+		}
+		return false;
+	};
 
 #ifdef __WXMAC__
 	CLocalPath path(wxStandardPaths::Get().GetDataDir().ToStdWstring());
@@ -424,21 +440,21 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 	// First try the user specified data dir.
 	if (searchSelfDir) {
 		CLocalPath path(GetEnv("FZ_DATADIR"));
-		if (!path.empty() && FileExists(path.GetPath() + fileToFind)) {
-			return path;
+		if (testPath(path.GetPath())) {
+			return ret;
 		}
 	}
 
 	std::wstring selfDir = GetOwnExecutableDir();
 	if (!selfDir.empty()) {
-		if (searchSelfDir && FileExists(selfDir + fileToFind)) {
-			return CLocalPath(selfDir);
+		if (searchSelfDir && testPath(selfDir)) {
+			return ret;
 		}
 
 		if (!prefixSub.empty() && selfDir.size() > 5 && fz::ends_with(selfDir, std::wstring(L"/bin/"))) {
 			std::wstring path = selfDir.substr(0, selfDir.size() - 4) + prefixSub + L"/";
-			if (FileExists(path + fileToFind)) {
-				return CLocalPath(path);
+			if (testPath(path)) {
+				return ret;
 			}
 		}
 
@@ -446,8 +462,8 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 		if (searchSelfDir && selfDir.size() > 7 && fz::ends_with(selfDir, std::wstring(L"/.libs/"))) {
 			std::wstring path = selfDir.substr(0, selfDir.size() - 6);
 			if (FileExists(path + L"Makefile")) {
-				if (FileExists(path + fileToFind)) {
-					return CLocalPath(path);
+				if (testPath(path)) {
+					return ret;
 				}
 			}
 		}
@@ -462,21 +478,21 @@ CLocalPath CFileZillaApp::GetDataDir(std::wstring fileToFind, std::wstring const
 			auto const cur = CLocalPath(segment).GetPath();
 			if (cur.size() > 5 && fz::ends_with(cur, std::wstring(L"/bin/"))) {
 				std::wstring path = cur.substr(0, cur.size() - 4) + prefixSub + L"/";
-				if (FileExists(path + fileToFind)) {
-					return CLocalPath(path);
+				if (testPath(path)) {
+					return ret;
 				}
 			}
 		}
 	}
 
-	return CLocalPath();
+	return ret;
 #endif
 }
 
 bool CFileZillaApp::LoadResourceFiles()
 {
 	AddStartupProfileRecord("CFileZillaApp::LoadResourceFiles");
-	m_resourceDir = GetDataDir(L"resources/defaultfilters.xml", L"share/filezilla");
+	m_resourceDir = GetDataDir({L"resources/defaultfilters.xml"}, L"share/filezilla");
 
 	wxImage::AddHandler(new wxPNGHandler());
 
@@ -510,7 +526,7 @@ bool CFileZillaApp::InitDefaultsDir()
 
 #endif
 	if (m_defaultsDir.empty()) {
-		m_defaultsDir = GetDataDir(L"fzdefaults.xml", L"share/filezilla");
+		m_defaultsDir = GetDataDir({L"fzdefaults.xml"}, L"share/filezilla");
 	}
 
 	return !m_defaultsDir.empty();
@@ -519,16 +535,13 @@ bool CFileZillaApp::InitDefaultsDir()
 bool CFileZillaApp::LoadLocales()
 {
 	AddStartupProfileRecord("CFileZillaApp::LoadLocales");
-	m_localesDir = GetDataDir(L"locales/de/filezilla.mo", std::wstring());
+	m_localesDir = GetDataDir({L"locales/de/filezilla.mo"}, std::wstring());
 	if (!m_localesDir.empty()) {
 		m_localesDir.AddSegment(_T("locales"));
 	}
 #ifndef __WXMAC__
 	else {
-		m_localesDir = GetDataDir(L"de/filezilla.mo", L"share/locale", false);
-		if (m_localesDir.empty()) {
-			m_localesDir = GetDataDir(L"de/LC_MESSAGES/filezilla.mo", L"share/locale", false);
-		}
+		m_localesDir = GetDataDir({L"de/filezilla.mo", L"de/LC_MESSAGES/filezilla.mo"}, L"share/locale", false);
 	}
 #endif
 	if (!m_localesDir.empty()) {
