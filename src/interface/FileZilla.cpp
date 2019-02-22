@@ -91,7 +91,7 @@ std::wstring GetOwnExecutableDir()
 	}
 #elif defined(FZ_MAC)
 	// Fixme: Remove wxDependency and move entire function to libfilezilla
-	std::wstring executable = wxStandardPaths::Get().GetExecutablePath().ToStdWString();
+	std::wstring executable = wxStandardPaths::Get().GetExecutablePath().ToStdWstring();
 	size_t pos = executable.rind('/');
 	if (pos != std::wstring::npos) {
 		return path.substr(0, pos + 1);
