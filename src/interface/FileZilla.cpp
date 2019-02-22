@@ -499,9 +499,9 @@ bool CFileZillaApp::InitDefaultsDir()
 	AddStartupProfileRecord("InitDefaultsDir");
 #ifdef __WXGTK__
 	m_defaultsDir = COptions::GetUnadjustedSettingsDir();
-	if (m_defaultsDir.empty() || !wxFileName::FileExists(m_defaultsDir.GetPath() + _T("fzdefaults.xml"))) {
-		if (wxFileName::FileExists(_T("/etc/filezilla/fzdefaults.xml"))) {
-			m_defaultsDir.SetPath(_T("/etc/filezilla"));
+	if (m_defaultsDir.empty() || !FileExists(m_defaultsDir.GetPath() + L"fzdefaults.xml")) {
+		if (FileExists(L"/etc/filezilla/fzdefaults.xml")) {
+			m_defaultsDir.SetPath(L"/etc/filezilla");
 		}
 		else {
 			m_defaultsDir.clear();
@@ -643,7 +643,7 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 	std::wstring path = GetOwnExecutableDir();
 	if (!path.empty()) {
 		executable = path + tool;
-		if (wxFileName::FileExists(executable)) {
+		if (FileExists(executable)) {
 			found = true;
 		}
 	}
@@ -651,13 +651,13 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 
 	wxString program = tool;
 #ifdef __WXMSW__
-	program += _T(".exe");
+	program += L".exe";
 #endif
 
 	// First check the given environment variable
 	executable = GetEnv(env);
 	if (!executable.empty()) {
-		if (wxFileName::FileExists(executable)) {
+		if (FileExists(executable)) {
 			found = true;
 		}
 	}
@@ -666,44 +666,28 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 		std::wstring path = GetOwnExecutableDir();
 		if (!path.empty()) {
 			executable = path + program;
-			if (wxFileName::FileExists(executable)) {
+			if (FileExists(executable)) {
 				found = true;
 			}
 			else {
 				// Check if running from build dir
 				if (path.size() > 7 && fz::ends_with(path, std::wstring(L"/.libs/"))) {
-					if (wxFileName::FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
+					if (FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
 						executable = path + L"../" + buildRelPath + program;
+						if (FileExists(executable)) {
+							found = true;
+						}
 					}
 				}
-				else if (wxFileName::FileExists(path + L"Makefile")) {
+				else if (FileExists(path + L"Makefile")) {
 					executable = path + buildRelPath + program;
-				}
-
-				if (wxFileName::FileExists(executable)) {
-					found = true;
+					if (FileExists(executable)) {
+						found = true;
+					}
 				}
 			}
 		}
 	}
-
-#ifdef __UNIX__
-	if (!found) {
-		const wxString prefix = ((const wxStandardPaths&)wxStandardPaths::Get()).GetInstallPrefix();
-		if (prefix != _T("/usr/local")) {
-			// /usr/local is the fallback value. /usr/local/bin is most likely in the PATH
-			// environment variable already so we don't have to check it. Furthermore, other
-			// directories might be listed before it (For example a developer's own
-			// application prefix)
-			wxFileName fn(prefix + _T("/bin/"), program);
-			fn.Normalize();
-			if (fn.FileExists()) {
-				executable = fn.GetFullPath().ToStdWstring();
-				found = true;
-			}
-		}
-	}
-#endif
 
 	if (!found) {
 		// Check PATH
@@ -712,8 +696,9 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 		for (auto const& segment : segments) {
 			auto const cur = CLocalPath(segment).GetPath();
 			executable = cur + program;
-			if (!cur.empty() && wxFileName::Exists(executable)) {
+			if (!cur.empty() && FileExists(executable)) {
 				found = true;
+				break;
 			}
 		}
 	}
