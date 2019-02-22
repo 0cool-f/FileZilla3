@@ -85,7 +85,7 @@ std::wstring GetOwnExecutableDir()
 
 		path.resize(path.size() * 2 + 1);
 	}
-	size_t pos = path.find_last_of(_L"\\/");
+	size_t pos = path.find_last_of(L"\\/");
 	if (pos != std::wstring::npos) {
 		return path.substr(0, pos + 1);
 	}
