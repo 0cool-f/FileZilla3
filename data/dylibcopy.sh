@@ -14,12 +14,31 @@ frameworks="${bundle}/Contents/Frameworks"
 mkdir -p "$frameworks"
 rm -f ${frameworks}/*.processed
 
+absreadlink()
+{
+  if [ -L "$1" ]; then
+    local target=`readlink "$1"`
+    if [ "${target:0:1}" != "/" ]; then
+      local dir=`dirname "$1"`
+      target="$dir/$target"
+    fi
+    if [ -L "$target" ]; then
+      absreadlink "$target"
+    else
+      echo "$target"
+    fi
+  else
+    echo "$1"
+  fi
+}
 
 process_dylib()
 {
   local file="$1"
   local dylib="$2"
-  local name="${dylib##*/}"
+
+  local resolved=`absreadlink "$dylib"`
+  local name="${resolved##*/}"
 
   if [ ! -f "${frameworks}/$name" ] && [ ! -f "${frameworks}/$name.processed" ]; then
     touch "${frameworks}/$name.processed"
