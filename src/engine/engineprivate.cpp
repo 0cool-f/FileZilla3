@@ -580,11 +580,15 @@ void CFileZillaEnginePrivate::InvalidateCurrentWorkingDirs(const CServerPath& pa
 	CServer ownServer;
 	{
 		fz::scoped_lock lock(mutex_);
-		assert(controlSocket_);
-		ownServer = controlSocket_->GetCurrentServer();
+		if (controlSocket_) {
+			ownServer = controlSocket_->GetCurrentServer();
+		}
 	}
-	assert(ownServer);
-
+	if (!ownServer) {
+		// May happen during destruction
+		return;
+	}
+	
 	fz::scoped_lock lock(global_mutex_);
 	for (auto & engine : m_engineList) {
 		if (!engine || engine == this) {
