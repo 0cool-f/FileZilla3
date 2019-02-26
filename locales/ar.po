@@ -6,10 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FileZilla3\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-01-17 17:11+0100\n"
-"PO-Revision-Date: 2018-12-15 23:33+0300\n"
-"Last-Translator: awadh alghaamdi _ عوض الغامدي <awadh_al_ghaamdi@hotmail."
-"com>\n"
+"POT-Creation-Date: 2019-02-26 12:13+0100\n"
+"PO-Revision-Date: 2019-01-26 18:22+0300\n"
+"Last-Translator: Awadh alghaamdi <awadh_al_ghaamdi@hotmail.com>\n"
 "Language-Team: Awadh Al-Ghaamdi <awadh_al_ghaamdi@hotmail.com>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -17,18 +16,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural= n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #. @translator: This is a date/time formatting specifier. See https://wiki.filezilla-project.org/Date_and_Time_formatting
 #: ../../locales/../src/interface/statuslinectrl.cpp:59
-#: ../../locales/../src/interface/statuslinectrl.cpp:212
+#: ../../locales/../src/interface/statuslinectrl.cpp:218
 msgid "%H:%M:%S elapsed"
 msgstr "المنقضي %H:%M:%S"
 
 #. @translator: This is a date/time formatting specifier. See https://wiki.filezilla-project.org/Date_and_Time_formatting
 #: ../../locales/../src/interface/statuslinectrl.cpp:64
-#: ../../locales/../src/interface/statuslinectrl.cpp:218
+#: ../../locales/../src/interface/statuslinectrl.cpp:224
 msgid "%H:%M:%S left"
 msgstr "المتبقي %H:%M:%S"
 
@@ -144,12 +143,12 @@ msgstr[5] "%llu ملف"
 msgid "%p - Password"
 msgstr "%p - كلمة المرور"
 
-#: ../../locales/../src/interface/statuslinectrl.cpp:170
+#: ../../locales/../src/interface/statuslinectrl.cpp:175
 #, c-format
 msgid "%s (%s/s)"
 msgstr "%s (%s/ث)"
 
-#: ../../locales/../src/interface/statuslinectrl.cpp:173
+#: ../../locales/../src/interface/statuslinectrl.cpp:178
 #, c-format
 msgid "%s (? B/s)"
 msgstr "%s (? ب/ث)"
@@ -190,21 +189,7 @@ msgstr[3] "%s بايتات"
 msgstr[4] "%s بايت"
 msgstr[5] "%s بايت"
 
-#: ../../locales/../src/interface/FileZilla.cpp:637
-#, c-format
-msgid ""
-"%s could not be found. Without this component of FileZilla, %s will not "
-"work.\n"
-"\n"
-"Please download FileZilla again. If this problem persists, please submit a "
-"bug report."
-msgstr ""
-"لا يمكن العثور على %s . بدون هذا المكون لـ FileZilla فإن %s لن يعمل\n"
-"\n"
-"الرجاء تحميل FileZilla مرة ثانية . إذا أستمرت هذه المشكلة أرسل لنا تقرير عن "
-"الخطأ."
-
-#: ../../locales/../src/interface/FileZilla.cpp:727
+#: ../../locales/../src/interface/FileZilla.cpp:724
 #, c-format
 msgid ""
 "%s could not be found. Without this component of FileZilla, %s will not "
@@ -255,7 +240,7 @@ msgstr "معرف مفتاح ال&وصول:"
 #. @translator: Keep short
 #: ../../locales/../src/interface/sitemanager_site.cpp:302
 msgid "&Account ID:"
-msgstr "&معرف الحساب:"
+msgstr "ال&حساب:"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:2729
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:303
@@ -1307,7 +1292,7 @@ msgstr "(في %s/ث)"
 msgid "-"
 msgstr "-"
 
-#: ../../locales/../src/interface/statuslinectrl.cpp:221
+#: ../../locales/../src/interface/statuslinectrl.cpp:227
 msgid "--:--:-- left"
 msgstr "--:--:--المتبقي"
 
@@ -1405,7 +1390,7 @@ msgid ""
 "A file with that name is still being edited. Please close it and try again."
 msgstr "يتم الآن تعديل ملف بهذا الإسم . الرجاء إغلاقه ثم حاول مرة ثانية."
 
-#: ../../locales/../src/interface/FileZilla.cpp:603
+#: ../../locales/../src/interface/FileZilla.cpp:623
 msgid ""
 "A local filename could not be decoded.\n"
 "Please make sure the LC_CTYPE (or LC_ALL) environment variable is set "
@@ -1720,11 +1705,11 @@ msgstr "عملية أخرى مستمرة عن بعد ، لا يمكن تغيير
 msgid "Any changes made in the Site Manager could not be saved."
 msgstr "أي تغييرات تتم مع مدير الموقع قد لا يمكن حفظها."
 
-#: ../../locales/../src/interface/filter.cpp:962
+#: ../../locales/../src/interface/filter.cpp:965
 msgid "Any changes made to the filters could not be saved."
 msgstr "أي تغييرات تتم مع المرشحات قد لا يمكن حفظها."
 
-#: ../../locales/../src/interface/filter.cpp:871
+#: ../../locales/../src/interface/filter.cpp:874
 msgid "Any changes made to the filters will not be saved."
 msgstr "سوف لن يتم حفظ أي تغييرات تمت على المرشحات."
 
@@ -1735,7 +1720,7 @@ msgstr "ت&طبيق فقط على المجلدات"
 #. @translator: Keep short
 #: ../../locales/../src/interface/sitemanager_site.cpp:304
 msgid "Application &Key:"
-msgstr "مفتاح &التطبيق:"
+msgstr "مفتاح ال&تطبيق:"
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1393
 msgid "Apply"
@@ -2035,17 +2020,17 @@ msgstr "تعذر إنشاء مرشح جديد"
 
 #: ../../locales/../src/interface/edithandler.cpp:1663
 #: ../../locales/../src/interface/edithandler.cpp:1712
-#: ../../locales/../src/interface/LocalListView.cpp:1880
+#: ../../locales/../src/interface/LocalListView.cpp:1879
 #: ../../locales/../src/interface/search.cpp:1209
 #: ../../locales/../src/interface/search.cpp:1528
 msgid "Cannot edit file"
 msgstr "تعذر تحرير الملف"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1756
+#: ../../locales/../src/interface/LocalListView.cpp:1755
 msgid "Cannot edit file, not connected to any server."
 msgstr "تعذر تحرير الملف , غير متصل بأي خادم."
 
-#: ../../locales/../src/interface/LocalListView.cpp:1765
+#: ../../locales/../src/interface/LocalListView.cpp:1764
 msgid "Cannot edit file, remote path unknown."
 msgstr "لا يمكن تحرير الملف ، المسار البعيد غير معروف."
 
@@ -2080,12 +2065,12 @@ msgstr "تعذرت تسمية الملف"
 msgid "Cannot resolve hostname to IPv4 address for use with SOCKS4 proxy."
 msgstr "Cannot resolve hostname to IPv4 address for use with SOCKS4 proxy."
 
-#: ../../locales/../src/interface/filter.cpp:266
-#: ../../locales/../src/interface/filter.cpp:336
+#: ../../locales/../src/interface/filter.cpp:269
+#: ../../locales/../src/interface/filter.cpp:339
 msgid "Cannot save filterset"
 msgstr "تعذر حفظ مجموعة المرشح"
 
-#: ../../locales/../src/interface/filter.cpp:227
+#: ../../locales/../src/interface/filter.cpp:230
 msgid "Cannot select filter"
 msgstr "تعذر تحديد المرشح"
 
@@ -2160,7 +2145,7 @@ msgstr "تغيير أذونات الملف."
 msgid "Changing logfile settings requires restart of FileZilla."
 msgstr "التغيير لإعدادات ملف السجل يتطلب إعادة تشغيل FileZilla."
 
-#: ../../locales/../src/interface/FileZilla.cpp:603
+#: ../../locales/../src/interface/FileZilla.cpp:623
 msgid "Character encoding issue"
 msgstr "حالة ترميز الرمز"
 
@@ -2320,7 +2305,7 @@ msgstr "لإغلاق التبويب الحالي"
 msgid "Co&mments:"
 msgstr "تع&ليقات:"
 
-#: ../../locales/../src/interface/listctrlex.cpp:745
+#: ../../locales/../src/interface/listctrlex.cpp:770
 msgid "Column properties"
 msgstr "خصائص العامود"
 
@@ -2344,7 +2329,7 @@ msgid "Command not supported"
 msgstr "الأمر غير مدعوم"
 
 #: ../../locales/../src/engine/engineprivate.cpp:237
-#: ../../locales/../src/engine/engineprivate.cpp:679
+#: ../../locales/../src/engine/engineprivate.cpp:683
 msgid "Command not supported by this protocol"
 msgstr "الأمر غير مدعوم من قبل هذا البروتوكول"
 
@@ -2436,9 +2421,9 @@ msgstr "تأكيد الحذف"
 
 #: ../../locales/../src/interface/edithandler.cpp:1675
 #: ../../locales/../src/interface/file_utils.h:47
-#: ../../locales/../src/interface/LocalListView.cpp:1842
+#: ../../locales/../src/interface/LocalListView.cpp:1841
 #: ../../locales/../src/interface/RemoteListView.cpp:1495
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1120
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1117
 #: ../../locales/../src/interface/search.cpp:1221
 #: ../../locales/../src/interface/search.cpp:1488
 msgid "Confirmation needed"
@@ -2474,7 +2459,7 @@ msgid "Connecting"
 msgstr "اتصال"
 
 #: ../../locales/../src/interface/netconfwizard.cpp:220
-#: ../../locales/../src/interface/statuslinectrl.cpp:256
+#: ../../locales/../src/interface/statuslinectrl.cpp:263
 #, c-format
 msgid "Connecting to %s"
 msgstr "إتصال إلى %s"
@@ -2517,7 +2502,7 @@ msgid "Connection attempt failed with \"%s\"."
 msgstr "محاولة الإتصال فشلت مع \"%s\" ."
 
 #: ../../locales/../src/engine/ControlSocket.cpp:170
-#: ../../locales/../src/engine/engineprivate.cpp:724
+#: ../../locales/../src/engine/engineprivate.cpp:728
 msgid "Connection attempt interrupted by user"
 msgstr "تم إنهاء محاولة الإتصال من قبل المستخدم"
 
@@ -2679,8 +2664,8 @@ msgstr "تعذر تحويل الأمر إلى ترميز الخادم"
 msgid "Could not convert private key"
 msgstr "تعذر تحويل المفتاح الخاص"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2767
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1476
+#: ../../locales/../src/interface/RemoteListView.cpp:2761
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1473
 #: ../../locales/../src/interface/search.cpp:1419
 msgid "Could not copy URLs"
 msgstr "تعذر نسخ الروابط"
@@ -2718,7 +2703,7 @@ msgstr "تعذر إنشاء كائن مزامنة السجل: %s"
 msgid "Could not create security-scoped bookmark from URL:"
 msgstr "تعذر إنشاء المفضلة المؤمن عليها من عنوان الرابط:"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2407
+#: ../../locales/../src/interface/RemoteListView.cpp:2402
 #: ../../locales/../src/interface/RemoteTreeView.cpp:889
 msgid ""
 "Could not determine the target of the Drag&Drop operation.\n"
@@ -2732,12 +2717,12 @@ msgstr ""
 msgid "Could not establish connection to server"
 msgstr "تعذر تأسيس الإتصال مع الخادم"
 
-#: ../../locales/../src/interface/FileZilla.cpp:469
+#: ../../locales/../src/interface/FileZilla.cpp:498
+#, fuzzy
 msgid ""
 "Could not find the resource files for FileZilla, closing FileZilla.\n"
-"You can set the data directory of FileZilla using the '--datadir "
-"<custompath>' commandline option or by setting the FZ_DATADIR environment "
-"variable."
+"You can specify the data directory of FileZilla by setting the FZ_DATADIR "
+"environment variable."
 msgstr ""
 "تعذر العثور على ملفات الموارد لـ FileZilla ، إغلاق FileZilla\n"
 "يمكنك وضع مجلد البيانات لـ FileZilla باستعمال خيار سطر الأمر '--datadir "
@@ -2790,7 +2775,7 @@ msgstr "تعذر الحصول على الرد من fzputtygen."
 msgid "Could not get temporary directory to download file into."
 msgstr "تعذر الحصول على المجلد المؤقت لتحميل معلومات الملف."
 
-#: ../../locales/../src/interface/FileZilla.cpp:97
+#: ../../locales/../src/interface/FileZilla.cpp:139
 #, fuzzy, c-format
 msgid "Could not initialize Winsock (%d): %s"
 msgstr "تعذرت الكتابة إلى المقبس : %s"
@@ -2861,8 +2846,8 @@ msgid "Could not open '%s'"
 msgstr "تعذر فتح: '%s'"
 
 #: ../../locales/../src/interface/aboutdialog.cpp:220
-#: ../../locales/../src/interface/RemoteListView.cpp:2767
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1476
+#: ../../locales/../src/interface/RemoteListView.cpp:2761
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1473
 #: ../../locales/../src/interface/search.cpp:1419
 msgid "Could not open clipboard"
 msgstr "تعذرت فتح الحافظة"
@@ -3059,11 +3044,11 @@ msgstr "إنشاء مجلد و من ثم قم الدخول عليه"
 #: ../../locales/../src/interface/LocalListView.cpp:968
 #: ../../locales/../src/interface/LocalTreeView.cpp:1224
 #: ../../locales/../src/interface/RemoteListView.cpp:1393
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1316
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1313
 msgid "Create directory"
 msgstr "إنشاء مجلد"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2856
+#: ../../locales/../src/interface/RemoteListView.cpp:2850
 msgid "Create empty file"
 msgstr "إنشاء ملف فارغ"
 
@@ -3125,7 +3110,7 @@ msgstr "المنحنى:"
 msgid "Cus&tom"
 msgstr "&مخصص"
 
-#: ../../locales/../src/interface/filter.cpp:132
+#: ../../locales/../src/interface/filter.cpp:135
 msgid "Custom filter set"
 msgstr "مجموعة مرشحات من ضبط المستخدم"
 
@@ -3380,7 +3365,7 @@ msgstr "&مرشحات مجلد الاستماع..."
 msgid "Directory listing aborted by user"
 msgstr "تم إنهاء الرفع من قبل المستخدم"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2234
+#: ../../locales/../src/interface/RemoteListView.cpp:2229
 msgid "Directory listing failed"
 msgstr "فشل الرفع"
 
@@ -3434,7 +3419,7 @@ msgid "Disconnected from server: %s"
 msgstr "قطع الاتصال من الخادم : %s"
 
 #: ../../locales/../src/interface/queue.cpp:351
-#: ../../locales/../src/interface/statuslinectrl.cpp:250
+#: ../../locales/../src/interface/statuslinectrl.cpp:257
 msgid "Disconnecting from previous server"
 msgstr "قطع الاتصال من الخادم السابق"
 
@@ -3626,8 +3611,8 @@ msgstr "تحرير الملف بواسطة محرر سبق تكوينه و من 
 msgid "Editing directories is not supported"
 msgstr "تحرير المجلدات غير معتمد"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1756
-#: ../../locales/../src/interface/LocalListView.cpp:1765
+#: ../../locales/../src/interface/LocalListView.cpp:1755
+#: ../../locales/../src/interface/LocalListView.cpp:1764
 msgid "Editing failed"
 msgstr "فشل التحرير"
 
@@ -3647,7 +3632,7 @@ msgstr "أمر فارغ"
 msgid "Empty command."
 msgstr "أمر فارغ."
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2237
+#: ../../locales/../src/interface/RemoteListView.cpp:2232
 msgid "Empty directory listing"
 msgstr "قائمة مجلد فارغ"
 
@@ -3740,11 +3725,11 @@ msgstr "إدخال إسم المرشح"
 msgid "Enter master password"
 msgstr "أدخل كلمة المرور الرئيسية"
 
-#: ../../locales/../src/interface/filter.cpp:259
+#: ../../locales/../src/interface/filter.cpp:262
 msgid "Enter name for filterset"
 msgstr "إدخال إسم لمجموعة المرشحات"
 
-#: ../../locales/../src/interface/filter.cpp:323
+#: ../../locales/../src/interface/filter.cpp:326
 msgid "Enter new name for filterset"
 msgstr "إدخال إسم جديد لمجموعة الملف"
 
@@ -3831,8 +3816,8 @@ msgstr "خطأ في تحميل قائمة الإنتظار"
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:748
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:788
 #: ../../locales/../src/interface/bookmarks_dialog.cpp:841
-#: ../../locales/../src/interface/filter.cpp:872
-#: ../../locales/../src/interface/filter.cpp:963
+#: ../../locales/../src/interface/filter.cpp:875
+#: ../../locales/../src/interface/filter.cpp:966
 #: ../../locales/../src/interface/import.cpp:118
 #: ../../locales/../src/interface/import.cpp:309
 #: ../../locales/../src/interface/Options.cpp:253
@@ -3849,7 +3834,7 @@ msgstr "خطأ في تحميل قائمة الإنتظار"
 #: ../../locales/../src/interface/sitemanager.cpp:827
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:674
 #: ../../locales/../src/interface/sitemanager_dialog.cpp:737
-#: ../../locales/../src/interface/wrapengine.cpp:941
+#: ../../locales/../src/interface/wrapengine.cpp:943
 msgid "Error loading xml file"
 msgstr "خطأ في تحميل ملف xml"
 
@@ -3980,16 +3965,16 @@ msgstr "FTPS-FTP عبر TLS ضمني"
 #: ../../locales/../src/interface/LocalListView.cpp:542
 #: ../../locales/../src/interface/LocalListView.cpp:615
 #: ../../locales/../src/interface/LocalListView.cpp:955
-#: ../../locales/../src/interface/LocalListView.cpp:1963
+#: ../../locales/../src/interface/LocalListView.cpp:1962
 #: ../../locales/../src/interface/LocalTreeView.cpp:895
 #: ../../locales/../src/interface/LocalTreeView.cpp:1197
 #: ../../locales/../src/interface/viewheader.cpp:499
 msgid "Failed to change directory"
 msgstr "فشل في تغيير المجلد"
 
-#: ../../locales/../src/interface/FileZilla.cpp:151
-#: ../../locales/../src/interface/FileZilla.cpp:166
-#: ../../locales/../src/interface/FileZilla.cpp:169
+#: ../../locales/../src/interface/FileZilla.cpp:193
+#: ../../locales/../src/interface/FileZilla.cpp:208
+#: ../../locales/../src/interface/FileZilla.cpp:211
 msgid "Failed to change language"
 msgstr "فشل في تغيير اللغة"
 
@@ -4045,7 +4030,7 @@ msgstr "فشل في بدأ محرك FTP"
 msgid "Failed to initialize TLS."
 msgstr "فشل في تهيئة TLS."
 
-#: ../../locales/../src/interface/FileZilla.cpp:98
+#: ../../locales/../src/interface/FileZilla.cpp:140
 msgid "Failed to initialize networking"
 msgstr "فشل في تهيئة شبكة الاتصال"
 
@@ -4110,34 +4095,34 @@ msgstr "فشل في لإسترداد عنوان IP الخارجي."
 msgid "Failed to send command."
 msgstr "فشل في إرسال الأمر."
 
-#: ../../locales/../src/interface/FileZilla.cpp:166
+#: ../../locales/../src/interface/FileZilla.cpp:208
 #, c-format
 msgid "Failed to set language to %s (%s), using default system language"
 msgstr "فشل في وضع اللغة على %s (%s) إستخدام لغة النظام الافتراضية"
 
-#: ../../locales/../src/interface/FileZilla.cpp:143
+#: ../../locales/../src/interface/FileZilla.cpp:185
 #, c-format
 msgid ""
 "Failed to set language to %s (%s), using default system language (%s, %s)."
 msgstr ""
 "فشل في وضع اللغة على %s (%s) ، إستعمال لغة النظام الإفتراضية (%s, %s) ."
 
-#: ../../locales/../src/interface/FileZilla.cpp:130
+#: ../../locales/../src/interface/FileZilla.cpp:172
 #, c-format
 msgid "Failed to set language to %s (%s), using default system language."
 msgstr "فشل في وضع اللغة على %s (%s) ، إستعمال لغة النظام الإفتراضية."
 
-#: ../../locales/../src/interface/FileZilla.cpp:169
+#: ../../locales/../src/interface/FileZilla.cpp:211
 #, c-format
 msgid "Failed to set language to %s, using default system language"
 msgstr "يتم استخدام لغة النظام الافتراضية%s فشل في ضبط اللغة الى"
 
-#: ../../locales/../src/interface/FileZilla.cpp:138
+#: ../../locales/../src/interface/FileZilla.cpp:180
 #, c-format
 msgid "Failed to set language to %s, using default system language (%s, %s)."
 msgstr "فشل في وضع اللغة على %s ، إستعمال لغة النظام الإفتراضية (%s, %s) ."
 
-#: ../../locales/../src/interface/FileZilla.cpp:126
+#: ../../locales/../src/interface/FileZilla.cpp:168
 #, c-format
 msgid "Failed to set language to %s, using default system language."
 msgstr "فشل في وضع اللغة على %s ، إستعمال لغة النظام الإفتراضية."
@@ -4211,8 +4196,7 @@ msgstr "قوائم الملف"
 #: ../../locales/../src/engine/storj/resolve.cpp:111
 #: ../../locales/../src/engine/storj/resolve.cpp:174
 #: ../../locales/../src/interface/edithandler.cpp:1638
-#: ../../locales/../src/interface/FileZilla.cpp:638
-#: ../../locales/../src/interface/FileZilla.cpp:728
+#: ../../locales/../src/interface/FileZilla.cpp:725
 #: ../../locales/../src/interface/settings/optionspage_edit.cpp:124
 msgid "File not found"
 msgstr "الملف غير موجود"
@@ -4266,7 +4250,7 @@ msgstr "قد يرسل الملف بنوع بيانات ASCII."
 msgid "File would transfer with binary data type."
 msgstr "قد يرسل الملف بنوع بيانات ثنائية."
 
-#: ../../locales/../src/interface/FileZilla.cpp:470
+#: ../../locales/../src/interface/FileZilla.cpp:499
 #: ../../locales/../src/interface/quickconnectbar.cpp:102
 msgid "FileZilla Error"
 msgstr "خطأ FileZilla"
@@ -4399,8 +4383,8 @@ msgstr "فرز المواد التي لا تطابق مما يلي"
 msgid "Filter out items matching not all of the following"
 msgstr "فرز المواد الغير مطابقة لكل مما يلي"
 
-#: ../../locales/../src/interface/filter.cpp:282
-#: ../../locales/../src/interface/filter.cpp:342
+#: ../../locales/../src/interface/filter.cpp:285
+#: ../../locales/../src/interface/filter.cpp:345
 msgid "Filter set already exists"
 msgstr "مجموعة المرشح موجودة مسبقا"
 
@@ -4520,8 +4504,8 @@ msgstr "الحصول على عنوان IP خارجي من الرابط التا�
 msgid "Getting help"
 msgstr "الحصول على تعليمات"
 
-#: ../../locales/../src/interface/filter.cpp:282
-#: ../../locales/../src/interface/filter.cpp:342
+#: ../../locales/../src/interface/filter.cpp:285
+#: ../../locales/../src/interface/filter.cpp:345
 msgid "Given filterset name already exists, overwrite filter set?"
 msgstr "إسم مجموعة المرشحات المعطى موجود مسبقا ، الكتابة على مجموعة المرشحات ؟"
 
@@ -4757,9 +4741,9 @@ msgid ""
 "the server. If the time differs (e.g. different timezone), specify a time "
 "offset in the site manager."
 msgstr ""
-"اذا كنت تستخدم \"الكتابة على الملف إذا كان أحدث\" فيجب أن يتزامن وقت نظامك "
-"مع توقيت الخادم . إذا أختلف الوقت (نطاق زمنى مختلف) قم بتعييد فارق التوقيت "
-"من مدير المواقع."
+"اذا كنت تستخدم \"الكتابة على الملف إذا كان أحدث\" فيجب أن تقوم بمزامنة وقت "
+"نظامك مع الخادم . إذا أختلف الوقت (فارق الوقت مختلف) قم بتعييد فارق التوقيت "
+"في مدير المواقع."
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1635
 msgid ""
@@ -5051,7 +5035,7 @@ msgid ""
 msgstr ""
 "خادم الإستضافة غير صالح، بعد إغلاق القوس فقط النقطة و المنفذ قد يلي كلاحقة."
 
-#: ../../locales/../src/interface/filter_conditions_dialog.cpp:484
+#: ../../locales/../src/interface/filter_conditions_dialog.cpp:491
 msgid "Invalid regular expression"
 msgstr "تعبير اصطلاحي غير صالح"
 
@@ -5071,7 +5055,7 @@ msgstr "شروط بحث غير صالحة : %s"
 msgid "Invalid site path"
 msgstr "مسار موقع غير صالح"
 
-#: ../../locales/../src/interface/filter_conditions_dialog.cpp:499
+#: ../../locales/../src/interface/filter_conditions_dialog.cpp:506
 msgid "Invalid size in condition"
 msgstr "حجم غير صالح فى الشرط"
 
@@ -5561,7 +5545,7 @@ msgstr "علامة جديدة"
 
 #: ../../locales/../src/interface/LocalTreeView.cpp:1228
 #: ../../locales/../src/interface/RemoteListView.cpp:1406
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1329
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1326
 msgid "New directory"
 msgstr "مجلد جديد"
 
@@ -5630,8 +5614,8 @@ msgstr "لم يتم ادخال مضيف ، من فضلك ادخل عنوان م�
 msgid "No images available"
 msgstr "لا توجد صور متاحة"
 
-#: ../../locales/../src/interface/filter.cpp:266
-#: ../../locales/../src/interface/filter.cpp:336
+#: ../../locales/../src/interface/filter.cpp:269
+#: ../../locales/../src/interface/filter.cpp:339
 msgid "No name for the filterset given."
 msgstr "لم يتم وضع إسم لمجموعة المرشح."
 
@@ -5700,7 +5684,7 @@ msgstr "ليست كل المواد يمكن إعادة وضعها في قائم�
 msgid "Not connected"
 msgstr "غير متصل"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2231
+#: ../../locales/../src/interface/RemoteListView.cpp:2226
 msgid "Not connected to any server"
 msgstr "غير متصل بأي خادم"
 
@@ -5857,8 +5841,8 @@ msgstr "فتح بهيئة:"
 
 #: ../../locales/../src/interface/edithandler.cpp:1706
 #: ../../locales/../src/interface/edithandler.cpp:1825
-#: ../../locales/../src/interface/LocalListView.cpp:1875
-#: ../../locales/../src/interface/LocalListView.cpp:1888
+#: ../../locales/../src/interface/LocalListView.cpp:1874
+#: ../../locales/../src/interface/LocalListView.cpp:1887
 #: ../../locales/../src/interface/search.cpp:1523
 #: ../../locales/../src/interface/search.cpp:1536
 msgid "Opening failed"
@@ -6099,8 +6083,7 @@ msgid ""
 "Please add at least one directory you want to download files into or to "
 "upload files from."
 msgstr ""
-"الرجاء أضافه دليل واحد علي الأقل تريد تنزيل الملفات اليه أو تحميل الملفات "
-"منه."
+"الرجاء أضافه مجلد واحد علي الأقل تريد تنزيل الملفات اليه أو رفع الملفات منه."
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3991
 msgid "Please add the local directories you want to use FileZilla with."
@@ -6149,7 +6132,7 @@ msgstr "الرجاء إدخال تنسيق مخصص للتاريخ"
 msgid "Please enter a custom time format."
 msgstr "الرجاء إدخال تنسيق مخصص للوقت"
 
-#: ../../locales/../src/interface/filter_conditions_dialog.cpp:513
+#: ../../locales/../src/interface/filter_conditions_dialog.cpp:520
 msgid ""
 "Please enter a date of the form YYYY-MM-DD such as for example 2010-07-18."
 msgstr "الرجاء إدخال تاريخ بالتنسيق سنة-شهر-يوم مثال 2010-07-18"
@@ -6168,7 +6151,7 @@ msgstr "من فضلك أدخل أسم للمرشح الجديد"
 msgid "Please enter a new name for the copied filter."
 msgstr "من فضلك أدخل أسم جديد للمرشح المنسوخ"
 
-#: ../../locales/../src/interface/filter.cpp:321
+#: ../../locales/../src/interface/filter.cpp:324
 #, c-format
 msgid "Please enter a new name for the filter set \"%s\""
 msgstr "الرجاء إدخال إسم جديد لمجموعة المرشح \"%s\""
@@ -6205,7 +6188,7 @@ msgstr ""
 "الرجاء إدخل وقت إنقضاء المهلة بين 10 و 9999 ثانية أو 0 لتعطيل وقت إنقضاء "
 "المهلة"
 
-#: ../../locales/../src/interface/filter.cpp:259
+#: ../../locales/../src/interface/filter.cpp:262
 msgid "Please enter a unique name for this filter set"
 msgstr "من فضلك أدخل أسم مميز لمجموعة المرشح هذه"
 
@@ -6253,11 +6236,11 @@ msgstr ""
 #: ../../locales/../src/interface/LocalListView.cpp:968
 #: ../../locales/../src/interface/LocalTreeView.cpp:1224
 #: ../../locales/../src/interface/RemoteListView.cpp:1393
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1316
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1313
 msgid "Please enter the name of the directory which should be created:"
 msgstr "من فضلك أدخل اسم المجلد المراد إنشاؤه :"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2856
+#: ../../locales/../src/interface/RemoteListView.cpp:2850
 msgid "Please enter the name of the file which should be created:"
 msgstr "الرجاء ادخال إسم الملف المراد إنشاؤه:"
 
@@ -6305,7 +6288,7 @@ msgstr ""
 "الرجاء التأكد من أن FileZilla مسموح له بتأسيس إتصالات صادرة و من أنك كتبت "
 "العنوان بشكل صحيح"
 
-#: ../../locales/../src/interface/FileZilla.cpp:150
+#: ../../locales/../src/interface/FileZilla.cpp:192
 msgid "Please make sure the requested locale is installed on your system."
 msgstr "الرجاء تأكد من ملف اللغة المطلوب مثبت على نظامك"
 
@@ -6376,26 +6359,26 @@ msgstr "الرجاء تحديد الفئات المراد إستيرادها"
 msgid "Please select the default transfer mode you would like to use."
 msgstr "من فضلك قم باختيار نمط الإرسال الافتراضي المراد إستخدامه"
 
-#: ../../locales/../src/interface/chmoddialog.cpp:42
+#: ../../locales/../src/interface/chmoddialog.cpp:176
 #, c-format
 msgid "Please select the new attributes for the directory \"%s\"."
 msgstr "الرجاء تحديد الخواص الجديدة للمجلد \"%s\""
 
-#: ../../locales/../src/interface/chmoddialog.cpp:33
+#: ../../locales/../src/interface/chmoddialog.cpp:167
 #, c-format
 msgid "Please select the new attributes for the file \"%s\"."
 msgstr "الرجاء تحديد الخواص الجديدة للملف \"%s\""
 
-#: ../../locales/../src/interface/chmoddialog.cpp:45
+#: ../../locales/../src/interface/chmoddialog.cpp:179
 msgid "Please select the new attributes for the selected directories."
 msgstr "الرجاء تحديد الخواص الجديدة للمجلدات المحددة"
 
-#: ../../locales/../src/interface/chmoddialog.cpp:49
+#: ../../locales/../src/interface/chmoddialog.cpp:183
 msgid ""
 "Please select the new attributes for the selected files and directories."
 msgstr "الرجاء تحديد الخواص الجديدة للملفات المحددة و المجلدات"
 
-#: ../../locales/../src/interface/chmoddialog.cpp:36
+#: ../../locales/../src/interface/chmoddialog.cpp:170
 msgid "Please select the new attributes for the selected files."
 msgstr "الرجاء تحديد الخواص الجديدة للملفات المحددة"
 
@@ -6702,7 +6685,7 @@ msgstr[5] "هل تريد فعلا حذف %d ملف من الخادم؟"
 msgid "Really delete %s and %s from the server?"
 msgstr "هل تريد حذف فعلا %s و %s من الخادم؟"
 
-#: ../../locales/../src/interface/RemoteTreeView.cpp:1120
+#: ../../locales/../src/interface/RemoteTreeView.cpp:1117
 msgid "Really delete all selected files and/or directories from the server?"
 msgstr "هل تريد فهلا حذف كافة الملفات و/أو المجلدات المحددة من الخادم؟"
 
@@ -6938,7 +6921,7 @@ msgstr "Request rejected or failed"
 #: ../../locales/../src/engine/http/httpcontrolsocket.cpp:247
 #, c-format
 msgid "Requesting %s"
-msgstr "طلب %s"
+msgstr "الطلب %s"
 
 #: ../../locales/../src/interface/sitemanager_site.cpp:156
 msgid "Require explicit FTP over TLS"
@@ -7046,10 +7029,9 @@ msgstr "تصفح &متزامن"
 msgid "SFTP"
 msgstr "SFTP"
 
-#: ../../locales/../src/interface/FileZilla.cpp:614
-#, fuzzy
+#: ../../locales/../src/interface/FileZilla.cpp:634
 msgid "SFTP support"
-msgstr "دعم Storj"
+msgstr "دعم SFTP"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:730
 msgid "SOC&KS 4"
@@ -7295,9 +7277,9 @@ msgid "Selected %s and %s. Total size: %s"
 msgstr "المحددة %s و %s . الحجم الكلي : %s"
 
 #: ../../locales/../src/interface/filelist_statusbar.cpp:54
-#, c-format
+#, fuzzy, c-format
 msgid "Selected %s and %s. Total size: At least %s"
-msgstr "المحددة %s و %s . الحجم الكلي : على الأقل %s"
+msgstr "%s و %s . الحجم الكلي : على الأقل %s"
 
 #: ../../locales/../src/interface/edithandler.cpp:1556
 #: ../../locales/../src/interface/edithandler.cpp:1638
@@ -7322,7 +7304,7 @@ msgstr "الملف المحدد مفتوح مسبقا"
 msgid "Selected file is still being edited"
 msgstr "الملف المحدد لا يزال قيد التحرير"
 
-#: ../../locales/../src/interface/filter.cpp:227
+#: ../../locales/../src/interface/filter.cpp:230
 msgid "Selected filter only works for local files."
 msgstr "المرشح المحدد يعمل فقط من أجل الملفات المحلية"
 
@@ -7833,7 +7815,7 @@ msgstr "&حساب المخزن::"
 msgid "Storj - Decentralized Cloud Storage"
 msgstr "Storj - سحابه التخزين اللامركزية"
 
-#: ../../locales/../src/interface/FileZilla.cpp:621
+#: ../../locales/../src/interface/FileZilla.cpp:641
 msgid "Storj support"
 msgstr "دعم Storj"
 
@@ -7949,7 +7931,7 @@ msgstr "الملف المستهدف موجود اصلا"
 msgid "Target file:"
 msgstr "الملف الهدف :"
 
-#: ../../locales/../src/interface/RemoteListView.cpp:2874
+#: ../../locales/../src/interface/RemoteListView.cpp:2868
 msgid "Target filename already exists!"
 msgstr "الملف المستهدف موجود مسبقا"
 
@@ -8087,7 +8069,7 @@ msgstr ""
 "الرجاء إدخال إسم جديد :"
 
 #: ../../locales/../src/interface/edithandler.cpp:1711
-#: ../../locales/../src/interface/LocalListView.cpp:1879
+#: ../../locales/../src/interface/LocalListView.cpp:1878
 #: ../../locales/../src/interface/search.cpp:1527
 #, c-format
 msgid ""
@@ -8119,7 +8101,7 @@ msgid "The file '%s' could not be loaded."
 msgstr "لا يمكن تحميل الملف '%s'"
 
 #: ../../locales/../src/interface/edithandler.cpp:1706
-#: ../../locales/../src/interface/LocalListView.cpp:1875
+#: ../../locales/../src/interface/LocalListView.cpp:1874
 #: ../../locales/../src/interface/search.cpp:1523
 #, c-format
 msgid ""
@@ -8130,7 +8112,7 @@ msgstr ""
 "لا يوجد برنامج مشروك على نظامك مع نوع الملف هذا"
 
 #: ../../locales/../src/interface/edithandler.cpp:1825
-#: ../../locales/../src/interface/LocalListView.cpp:1888
+#: ../../locales/../src/interface/LocalListView.cpp:1887
 #: ../../locales/../src/interface/search.cpp:1536
 #, c-format
 msgid ""
@@ -8180,11 +8162,11 @@ msgstr ""
 "المستخدم و كلمة المرور\n"
 "الإستمرار مع الإستيراد ؟"
 
-#: ../../locales/../src/interface/listctrlex.cpp:745
+#: ../../locales/../src/interface/listctrlex.cpp:770
 msgid "The filename column can neither be hidden nor moved."
 msgstr "عامود إسم الملف لا يمكن إخفاؤه و لا تحريكه"
 
-#: ../../locales/../src/interface/listctrlex.cpp:795
+#: ../../locales/../src/interface/listctrlex.cpp:820
 msgid "The filename column cannot be hidden."
 msgstr "لا يمكن إخفاء عامود إسم الملف"
 
@@ -8398,11 +8380,11 @@ msgstr "لا يمكن إسترداد ملف الإحتياطي الصالح %s"
 msgid "Themes"
 msgstr "السمات"
 
-#: ../../locales/../src/interface/filter.cpp:379
+#: ../../locales/../src/interface/filter.cpp:382
 msgid "This filter set cannot be removed."
 msgstr "لا يمكن إزالة مجموعة المرشح هذه"
 
-#: ../../locales/../src/interface/filter.cpp:315
+#: ../../locales/../src/interface/filter.cpp:318
 msgid "This filter set cannot be renamed."
 msgstr "لا يمكن تسمية مجموعة المرشح هذه"
 
@@ -8411,8 +8393,8 @@ msgid ""
 "This may be the result of a downgrade attack, only continue after you have "
 "spoken to the server administrator or server hosting provider."
 msgstr ""
-"قد يكون هذا نتيجة لهجوم الانحدار ، فقط متابعه بعد التحدث إلى مسؤول الملقم أو "
-"موفر استضافه الملقم."
+"قد يكون هذا نتيجة لهجوم الانحدار ، فقط عليك المتابعه بعد التحدث إلى مسؤول "
+"الملقم أو موفر استضافه الملقم."
 
 #: ../../locales/../src/interface/netconfwizard.cpp:593
 msgid ""
@@ -8431,7 +8413,7 @@ msgstr ""
 
 #: ../../locales/../src/interface/verifycertdialog.cpp:754
 msgid "This server does not support FTP over TLS."
-msgstr "هذا الخادم ، لا يدعم FTP عبر TLS."
+msgstr "لا يعتمد هذا الملقم FTP عبر TLS."
 
 #: ../../locales/../src/interface/resources/xrc/netconfwizard.xrc:8
 msgid ""
@@ -8576,7 +8558,7 @@ msgid "Transferred data got tainted."
 msgstr "تلف البيانات المنقولة"
 
 #: ../../locales/../src/interface/queue.cpp:360
-#: ../../locales/../src/interface/statuslinectrl.cpp:259
+#: ../../locales/../src/interface/statuslinectrl.cpp:266
 msgid "Transferring"
 msgstr "إرسال"
 
@@ -8946,7 +8928,7 @@ msgstr "إنتظار الإتصال من أجل التصفح"
 msgid "Waiting for password"
 msgstr "إنتظار كلمة المرور"
 
-#: ../../locales/../src/interface/statuslinectrl.cpp:253
+#: ../../locales/../src/interface/statuslinectrl.cpp:260
 msgid "Waiting for transfer to be cancelled"
 msgstr "إنتظار إلغاء الإرسال"
 
@@ -8959,8 +8941,8 @@ msgid ""
 "Warning! You have previously connected to this server using FTP over TLS, "
 "yet the server has now rejected FTP over TLS."
 msgstr ""
-"تحذير! لقد قمت مسبقا بالاتصال بهذا الخادم باستخدام ftp عبر tls ، ولكن الخادم "
-"رفض الآن ftp عبر tls."
+"تحذير! لقد قمت مسبقا بالاتصال بهذا الخادم باستخدام ftp عبر tls ، لذا فإن "
+"الخادم رفض الآن ftp عبر tls."
 
 #: ../../locales/../src/interface/netconfwizard.cpp:979
 msgid "Warning, ignoring data connection from wrong IP."
@@ -9126,7 +9108,7 @@ msgid ""
 "continue?"
 msgstr "أنت قمت بتحديد أكثر من 10 ملفات للتحرير ، هل تريد فعلا الإستمرار؟"
 
-#: ../../locales/../src/interface/LocalListView.cpp:1843
+#: ../../locales/../src/interface/LocalListView.cpp:1842
 #: ../../locales/../src/interface/search.cpp:1489
 msgid ""
 "You have selected more than 10 files or directories to open, do you really "
@@ -9445,6 +9427,18 @@ msgstr "ملف قابل للكتابة للعام"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:890
 msgid "wxWidgets:"
 msgstr "wxWidgets:"
+
+#~ msgid ""
+#~ "%s could not be found. Without this component of FileZilla, %s will not "
+#~ "work.\n"
+#~ "\n"
+#~ "Please download FileZilla again. If this problem persists, please submit "
+#~ "a bug report."
+#~ msgstr ""
+#~ "لا يمكن العثور على %s . بدون هذا المكون لـ FileZilla فإن %s لن يعمل\n"
+#~ "\n"
+#~ "الرجاء تحميل FileZilla مرة ثانية . إذا أستمرت هذه المشكلة أرسل لنا تقرير "
+#~ "عن الخطأ."
 
 #~ msgid "Invalid regular expression in search conditions."
 #~ msgstr "تعبير إصطلاحي غير صالح في شروط البحث."
