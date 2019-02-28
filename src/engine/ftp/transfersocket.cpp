@@ -343,6 +343,19 @@ void CTransferSocket::OnReceive()
 			}
 		}
 	}
+	else {
+		char discard[1024];
+		int error;
+		int numread = m_pBackend->Read(discard, 1024, error);
+		if (numread > 0) {
+			controlSocket_.LogMessage(MessageType::Error, L"Received data from the server during an upload");
+			TransferEnd(TransferEndReason::transfer_failure);
+		}
+		else if (numread < 0 && error != EAGAIN) {
+			controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
+			TransferEnd(TransferEndReason::transfer_failure);
+		}
+	}
 }
 
 void CTransferSocket::OnSend()
@@ -630,6 +643,7 @@ bool CTransferSocket::CheckGetNextReadBuffer()
 					return false;
 				}
 			}
+			socket_->shutdown();
 			TransferEnd(TransferEndReason::successful);
 			return false;
 		}
