@@ -16,16 +16,6 @@ CTlsSocket::~CTlsSocket()
 	remove_handler();
 }
 
-bool CTlsSocket::Init()
-{
-	return impl_->Init();
-}
-
-void CTlsSocket::Uninit()
-{
-	return impl_->Uninit();
-}
-
 int CTlsSocket::Handshake(CTlsSocket const* pPrimarySocket, bool try_resume)
 {
 	return impl_->Handshake(pPrimarySocket ? pPrimarySocket->impl_.get() : nullptr, try_resume);

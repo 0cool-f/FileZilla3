@@ -22,9 +22,6 @@ public:
 	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket& pSocket, CControlSocket* pOwner);
 	virtual ~CTlsSocket();
 
-	bool Init();
-	void Uninit();
-
 	int Handshake(const CTlsSocket* pPrimarySocket = nullptr, bool try_resume = 0);
 
 	virtual int Read(void *buffer, unsigned int size, int& error) override;

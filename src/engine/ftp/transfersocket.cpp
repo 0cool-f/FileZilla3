@@ -711,12 +711,6 @@ bool CTransferSocket::InitTls(const CTlsSocket* pPrimaryTlsSocket)
 	assert(!m_pBackend);
 	m_pTlsSocket = new CTlsSocket(this, *socket_, &controlSocket_);
 
-	if (!m_pTlsSocket->Init()) {
-		delete m_pTlsSocket;
-		m_pTlsSocket = nullptr;
-		return false;
-	}
-
 	bool try_resume = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resume) != no;
 
 	int res = m_pTlsSocket->Handshake(pPrimaryTlsSocket, try_resume);

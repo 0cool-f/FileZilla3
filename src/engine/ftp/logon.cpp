@@ -253,11 +253,6 @@ int CFtpLogonOpData::ParseResponse()
 			controlSocket_.m_pTlsSocket = new CTlsSocket(&controlSocket_, *controlSocket_.socket_, &controlSocket_);
 			controlSocket_.m_pBackend = controlSocket_.m_pTlsSocket;
 
-			if (!controlSocket_.m_pTlsSocket->Init()) {
-				LogMessage(MessageType::Error, _("Failed to initialize TLS."));
-				return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
-			}
-
 			int res = controlSocket_.m_pTlsSocket->Handshake();
 			if (res & FZ_REPLY_ERROR) {
 				return res | FZ_REPLY_DISCONNECTED;

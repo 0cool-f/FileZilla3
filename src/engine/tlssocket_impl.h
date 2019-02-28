@@ -19,9 +19,6 @@ public:
 	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::socket& pSocket, CControlSocket* pOwner);
 	~CTlsSocketImpl();
 
-	bool Init();
-	void Uninit();
-
 	int Handshake(const CTlsSocketImpl* pPrimarySocket = nullptr, bool try_resume = 0);
 
 	int Read(void *buffer, unsigned int size, int& error);
@@ -49,6 +46,8 @@ public:
 	static std::wstring GetGnutlsVersion();
 
 protected:
+	bool Init();
+	void Uninit();
 
 	bool InitSession();
 	void UninitSession();
@@ -123,7 +122,7 @@ protected:
 
 	fz::buffer peekBuffer_;
 
-	gnutls_datum_t m_implicitTrustedCert;
+	gnutls_datum_t m_implicitTrustedCert{};
 
 	bool m_socket_eof{};
 	int m_socket_error{ECONNABORTED}; // Set in the push and pull functions if reading/writing fails fatally

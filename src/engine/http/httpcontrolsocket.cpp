@@ -205,12 +205,6 @@ void CHttpControlSocket::OnConnect()
 			m_pTlsSocket = new CTlsSocket(this, *socket_, this);
 			m_pBackend = m_pTlsSocket;
 
-			if (!m_pTlsSocket->Init()) {
-				LogMessage(MessageType::Error, _("Failed to initialize TLS."));
-				DoClose();
-				return;
-			}
-
 			int res = m_pTlsSocket->Handshake();
 			if (res == FZ_REPLY_ERROR) {
 				DoClose();

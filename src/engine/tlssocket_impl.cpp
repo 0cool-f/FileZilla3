@@ -144,8 +144,6 @@ CTlsSocketImpl::CTlsSocketImpl(CTlsSocket& tlsSocket, fz::socket& socket, CContr
 	, m_socket(socket)
 	, socketBackend_(std::make_unique<CSocketBackend>(static_cast<fz::event_handler*>(&tlsSocket_), m_socket, m_pOwner->GetEngine().GetRateLimiter()))
 {
-	m_implicitTrustedCert.data = nullptr;
-	m_implicitTrustedCert.size = 0;
 }
 
 CTlsSocketImpl::~CTlsSocketImpl()
@@ -156,36 +154,38 @@ CTlsSocketImpl::~CTlsSocketImpl()
 bool CTlsSocketImpl::Init()
 {
 	// This function initializes GnuTLS
-	m_initialized = true;
-	int res = gnutls_global_init();
-	if (res) {
-		LogError(res, L"gnutls_global_init");
-		Uninit();
-		return false;
-	}
+	if (!m_initialized) {
+		m_initialized = true;
+		int res = gnutls_global_init();
+		if (res) {
+			LogError(res, L"gnutls_global_init");
+			Uninit();
+			return false;
+		}
 
 #if TLSDEBUG
-	if (!pLoggingControlSocket) {
-		pLoggingControlSocket = m_pOwner;
-		gnutls_global_set_log_function(log_func);
-		gnutls_global_set_log_level(99);
-	}
+		if (!pLoggingControlSocket) {
+			pLoggingControlSocket = m_pOwner;
+			gnutls_global_set_log_function(log_func);
+			gnutls_global_set_log_level(99);
+		}
 #endif
-	res = gnutls_certificate_allocate_credentials(&m_certCredentials);
-	if (res < 0) {
-		LogError(res, L"gnutls_certificate_allocate_credentials");
-		Uninit();
-		return false;
+	}
+
+	if (!m_certCredentials) {
+		int res = gnutls_certificate_allocate_credentials(&m_certCredentials);
+		if (res < 0) {
+			LogError(res, L"gnutls_certificate_allocate_credentials");
+			Uninit();
+			return false;
+		}
 	}
 
 	if (!InitSession()) {
 		return false;
 	}
 
-	shutdown_requested_ = false;
-
 	// At this point, we can start shaking hands.
-
 	return true;
 }
 
@@ -559,8 +559,13 @@ bool CTlsSocketImpl::ResumedSession() const
 int CTlsSocketImpl::Handshake(const CTlsSocketImpl* pPrimarySocket, bool try_resume)
 {
 	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::Handshake()");
-	if (!m_session) {
-		m_pOwner->LogMessage(MessageType::Debug_Warning, L"Called CTlsSocketImpl::Handshake without session");
+
+	if (m_tlsState != CTlsSocket::TlsState::noconn) {
+		m_pOwner->LogMessage(MessageType::Debug_Warning, L"Called CTlsSocketImpl::Handshake on a socket that isn't idle");
+		return FZ_REPLY_ERROR;
+	}
+
+	if (!Init()) {
 		return FZ_REPLY_ERROR;
 	}
 
@@ -569,6 +574,7 @@ int CTlsSocketImpl::Handshake(const CTlsSocketImpl* pPrimarySocket, bool try_res
 	if (pPrimarySocket) {
 		if (!pPrimarySocket->m_session) {
 			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Primary socket has no session");
+			Uninit();
 			return FZ_REPLY_ERROR;
 		}
 
@@ -589,24 +595,18 @@ int CTlsSocketImpl::Handshake(const CTlsSocketImpl* pPrimarySocket, bool try_res
 		}
 
 		hostname_ = pPrimarySocket->m_socket.peer_host();
-
-		int port, tmp;
-		port = m_socket.remote_port(tmp);
-		if (port <= 0) {
-			return FZ_REPLY_ERROR;
-		}
-		port_ = port;
 	}
 	else {
 		hostname_ = m_socket.peer_host();
-
-		int port, tmp;
-		port = m_socket.remote_port(tmp);
-		if (port <= 0) {
-			return FZ_REPLY_ERROR;
-		}
-		port_ = port;
 	}
+
+	int port, tmp;
+	port = m_socket.remote_port(tmp);
+	if (port <= 0) {
+		Uninit();
+		return FZ_REPLY_ERROR;
+	}
+	port_ = port;
 
 	if (!hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown) {
 		auto const utf8 = fz::to_utf8(hostname_);
