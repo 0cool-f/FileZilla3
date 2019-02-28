@@ -95,10 +95,6 @@ std::wstring CTransferSocket::SetupActiveTransfer(std::string const& ip)
 
 void CTransferSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_flag t, int error)
 {
-	if (m_transferEndReason != TransferEndReason::none) {
-		return;
-	}
-
 	if (m_pProxyBackend) {
 		switch (t)
 		{
@@ -236,24 +232,57 @@ void CTransferSocket::OnReceive()
 		return;
 	}
 
-	if (m_transferMode == TransferMode::list) {
-		for (;;) {
-			char *pBuffer = new char[4096];
-			int error;
-			int numread = m_pBackend->Read(pBuffer, 4096, error);
-			if (numread < 0) {
-				delete [] pBuffer;
-				if (error != EAGAIN) {
-					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
-					TransferEnd(TransferEndReason::transfer_failure);
-				}
-				return;
-			}
-
-			if (numread > 0) {
-				if (!m_pDirectoryListingParser->AddData(pBuffer, numread)) {
-					TransferEnd(TransferEndReason::transfer_failure);
+	if (m_transferEndReason == TransferEndReason::none) {
+		if (m_transferMode == TransferMode::list) {
+			for (;;) {
+				char *pBuffer = new char[4096];
+				int error;
+				int numread = m_pBackend->Read(pBuffer, 4096, error);
+				if (numread < 0) {
+					delete [] pBuffer;
+					if (error != EAGAIN) {
+						controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
+						TransferEnd(TransferEndReason::transfer_failure);
+					}
 					return;
+				}
+
+				if (numread > 0) {
+					if (!m_pDirectoryListingParser->AddData(pBuffer, numread)) {
+						TransferEnd(TransferEndReason::transfer_failure);
+						return;
+					}
+
+					controlSocket_.SetActive(CFileZillaEngine::recv);
+					if (!m_madeProgress) {
+						m_madeProgress = 2;
+						engine_.transfer_status_.SetMadeProgress();
+					}
+					engine_.transfer_status_.Update(numread);
+				}
+				else {
+					delete [] pBuffer;
+					TransferEnd(TransferEndReason::successful);
+					return;
+				}
+			}
+			return;
+		}
+		else if (m_transferMode == TransferMode::download) {
+			int error;
+			int numread;
+
+			// Only do a certain number of iterations in one go to keep the event loop going.
+			// Otherwise this behaves like a livelock on very large files written to a very fast
+			// SSD downloaded from a very fast server.
+			for (int i = 0; i < 100; ++i) {
+				if (!CheckGetNextWriteBuffer()) {
+					return;
+				}
+
+				numread = m_pBackend->Read(m_pTransferBuffer, m_transferBufferLen, error);
+				if (numread <= 0) {
+					break;
 				}
 
 				controlSocket_.SetActive(CFileZillaEngine::recv);
@@ -262,91 +291,67 @@ void CTransferSocket::OnReceive()
 					engine_.transfer_status_.SetMadeProgress();
 				}
 				engine_.transfer_status_.Update(numread);
-			}
-			else {
-				delete [] pBuffer;
-				TransferEnd(TransferEndReason::successful);
-				return;
-			}
-		}
-	}
-	else if (m_transferMode == TransferMode::download) {
-		int error;
-		int numread;
 
-		// Only do a certain number of iterations in one go to keep the event loop going.
-		// Otherwise this behaves like a livelock on very large files written to a very fast
-		// SSD downloaded from a very fast server.
-		for (int i = 0; i < 100; ++i) {
-			if (!CheckGetNextWriteBuffer()) {
-				return;
+				m_pTransferBuffer += numread;
+				m_transferBufferLen -= numread;
 			}
 
-			numread = m_pBackend->Read(m_pTransferBuffer, m_transferBufferLen, error);
-			if (numread <= 0) {
-				break;
-			}
-
-			controlSocket_.SetActive(CFileZillaEngine::recv);
-			if (!m_madeProgress) {
-				m_madeProgress = 2;
-				engine_.transfer_status_.SetMadeProgress();
-			}
-			engine_.transfer_status_.Update(numread);
-
-			m_pTransferBuffer += numread;
-			m_transferBufferLen -= numread;
-		}
-
-		if (numread < 0) {
-			if (error != EAGAIN) {
-				controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
-				TransferEnd(TransferEndReason::transfer_failure);
-			}
-		}
-		else if (!numread) {
-			FinalizeWrite();
-		}
-		else {
-			send_event<fz::socket_event>(m_pBackend, fz::socket_event_flag::read, 0);
-		}
-	}
-	else if (m_transferMode == TransferMode::resumetest) {
-		for (;;) {
-			char buffer[2];
-			int error;
-			int numread = m_pBackend->Read(buffer, 2, error);
 			if (numread < 0) {
 				if (error != EAGAIN) {
 					controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 					TransferEnd(TransferEndReason::transfer_failure);
 				}
-				return;
 			}
-
-			if (!numread) {
-				if (m_transferBufferLen == 1) {
-					TransferEnd(TransferEndReason::successful);
+			else if (!numread) {
+				FinalizeWrite();
+			}
+			else {
+				send_event<fz::socket_event>(m_pBackend, fz::socket_event_flag::read, 0);
+			}
+			return;
+		}
+		else if (m_transferMode == TransferMode::resumetest) {
+			for (;;) {
+				char buffer[2];
+				int error;
+				int numread = m_pBackend->Read(buffer, 2, error);
+				if (numread < 0) {
+					if (error != EAGAIN) {
+						controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
+						TransferEnd(TransferEndReason::transfer_failure);
+					}
+					return;
 				}
-				else {
+
+				if (!numread) {
+					if (m_transferBufferLen == 1) {
+						TransferEnd(TransferEndReason::successful);
+					}
+					else {
+						controlSocket_.LogMessage(MessageType::Debug_Warning, L"Server incorrectly sent %d bytes", m_transferBufferLen);
+						TransferEnd(TransferEndReason::failed_resumetest);
+					}
+					return;
+				}
+				m_transferBufferLen += numread;
+
+				if (m_transferBufferLen > 1) {
 					controlSocket_.LogMessage(MessageType::Debug_Warning, L"Server incorrectly sent %d bytes", m_transferBufferLen);
 					TransferEnd(TransferEndReason::failed_resumetest);
+					return;
 				}
-				return;
 			}
-			m_transferBufferLen += numread;
-
-			if (m_transferBufferLen > 1) {
-				controlSocket_.LogMessage(MessageType::Debug_Warning, L"Server incorrectly sent %d bytes", m_transferBufferLen);
-				TransferEnd(TransferEndReason::failed_resumetest);
-				return;
-			}
+			return;
 		}
 	}
-	else {
-		char discard[1024];
-		int error;
-		int numread = m_pBackend->Read(discard, 1024, error);
+
+	char discard[1024];
+	int error;
+	int numread = m_pBackend->Read(discard, 1024, error);
+
+	if (m_transferEndReason == TransferEndReason::none) {
+		// If we get here we're uploading
+
 		if (numread > 0) {
 			controlSocket_.LogMessage(MessageType::Error, L"Received data from the server during an upload");
 			TransferEnd(TransferEndReason::transfer_failure);
@@ -354,6 +359,11 @@ void CTransferSocket::OnReceive()
 		else if (numread < 0 && error != EAGAIN) {
 			controlSocket_.LogMessage(MessageType::Error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
 			TransferEnd(TransferEndReason::transfer_failure);
+		}
+	}
+	else {
+		if (!numread || (numread < 0 && error != EAGAIN)) {
+			ResetSocket();
 		}
 	}
 }
@@ -371,7 +381,7 @@ void CTransferSocket::OnSend()
 		return;
 	}
 
-	if (m_transferMode != TransferMode::upload) {
+	if (m_transferMode != TransferMode::upload || m_transferEndReason != TransferEndReason::none) {
 		return;
 	}
 
@@ -529,7 +539,9 @@ void CTransferSocket::TransferEnd(TransferEndReason reason)
 	}
 	m_transferEndReason = reason;
 
-	ResetSocket();
+	if (reason != TransferEndReason::successful) {
+		ResetSocket();
+	}
 
 	controlSocket_.send_event<TransferEndEvent>();
 }
@@ -635,7 +647,7 @@ bool CTransferSocket::CheckGetNextReadBuffer()
 		}
 		else if (res == IO_Success) {
 			if (m_pTlsSocket) {
-				int error = m_pTlsSocket->Shutdown();
+				int error = m_pTlsSocket->Shutdown(true);
 				if (error != 0) {
 					if (error != EAGAIN) {
 						TransferEnd(TransferEndReason::transfer_failure);
