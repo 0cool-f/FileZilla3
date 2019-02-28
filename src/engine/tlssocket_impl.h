@@ -56,6 +56,7 @@ protected:
 
 	void OnRateAvailable(CRateLimiter::rate_direction direction);
 
+	void ContinueWrite();
 	int ContinueHandshake();
 	void ContinueShutdown();
 
@@ -104,9 +105,6 @@ protected:
 	bool m_canReadFromSocket{true};
 	bool m_canWriteToSocket{true};
 
-	bool m_canTriggerRead{false};
-	bool m_canTriggerWrite{true};
-
 	fz::socket& m_socket;
 	std::unique_ptr<CSocketBackend> socketBackend_;
 
@@ -118,8 +116,7 @@ protected:
 	// application.
 	// This avoids the rule to call it again with the -same- data after
 	// GNUTLS_E_AGAIN.
-	void CheckResumeFailedReadWrite();
-	bool m_lastReadFailed{true};
+	bool m_lastReadFailed{false};
 	bool m_lastWriteFailed{false};
 	unsigned int m_writeSkip{};
 
