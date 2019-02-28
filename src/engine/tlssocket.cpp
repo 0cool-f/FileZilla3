@@ -46,9 +46,9 @@ int CTlsSocket::Write(const void *buffer, unsigned int size, int& error)
 	return impl_->Write(buffer, size, error);
 }
 
-int CTlsSocket::Shutdown()
+int CTlsSocket::Shutdown(bool silenceReadErrors)
 {
-	return impl_->Shutdown();
+	return impl_->Shutdown(silenceReadErrors);
 }
 
 void CTlsSocket::TrustCurrentCert(bool trusted)

@@ -31,7 +31,7 @@ public:
 	virtual int Peek(void *buffer, unsigned int size, int& error) override;
 	virtual int Write(const void *buffer, unsigned int size, int& error) override;
 
-	int Shutdown();
+	int Shutdown(bool silenceReadErrors);
 
 	void TrustCurrentCert(bool trusted);
 

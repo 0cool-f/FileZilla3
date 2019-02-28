@@ -28,7 +28,7 @@ public:
 	int Peek(void *buffer, unsigned int size, int& error);
 	int Write(const void *buffer, unsigned int size, int& error);
 
-	int Shutdown();
+	int Shutdown(bool silenceReadErrors);
 
 	void TrustCurrentCert(bool trusted);
 
@@ -108,7 +108,8 @@ protected:
 	fz::socket& m_socket;
 	std::unique_ptr<CSocketBackend> socketBackend_;
 
-	bool m_shutdown_requested{};
+	bool shutdown_requested_{};
+	bool shutdown_silence_read_errors_{};
 
 	// Due to the strange gnutls_record_send semantics, call it again
 	// with 0 data and 0 length after GNUTLS_E_AGAIN and store the number

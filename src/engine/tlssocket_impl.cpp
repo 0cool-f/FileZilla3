@@ -182,7 +182,7 @@ bool CTlsSocketImpl::Init()
 		return false;
 	}
 
-	m_shutdown_requested = false;
+	shutdown_requested_ = false;
 
 	// At this point, we can start shaking hands.
 
@@ -288,6 +288,10 @@ void CTlsSocketImpl::UninitSession()
 
 void CTlsSocketImpl::LogError(int code, std::wstring const& function, MessageType logLevel)
 {
+	if (logLevel < MessageType::Debug_Warning && m_tlsState == CTlsSocket::TlsState::closed && shutdown_silence_read_errors_) {
+		logLevel = MessageType::Debug_Warning;
+	}
+
 	if (code == GNUTLS_E_WARNING_ALERT_RECEIVED || code == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 		PrintAlert(logLevel);
 	}
@@ -653,8 +657,8 @@ int CTlsSocketImpl::ContinueHandshake()
 			return res;
 		}
 
-		if (m_shutdown_requested) {
-			int error = Shutdown();
+		if (shutdown_requested_) {
+			int error = Shutdown(shutdown_silence_read_errors_);
 			if (!error || error != EAGAIN) {
 				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, error);
 			}
@@ -796,7 +800,9 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 #endif
 				)
 			{
-				m_pOwner->LogMessage(MessageType::Status, _("Server did not properly shut down TLS connection"));
+				if (m_tlsState != CTlsSocket::TlsState::closed || !shutdown_silence_read_errors_) {
+					m_pOwner->LogMessage(MessageType::Status, _("Server did not properly shut down TLS connection"));
+				}
 			}
 		}
 	}
@@ -839,7 +845,7 @@ int CTlsSocketImpl::Peek(void *buffer, unsigned int len, int& error)
 	return read;
 }
 
-int CTlsSocketImpl::Shutdown()
+int CTlsSocketImpl::Shutdown(bool silenceReadErrors)
 {
 	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::Shutdown()");
 
@@ -854,7 +860,8 @@ int CTlsSocketImpl::Shutdown()
 	if (m_tlsState == CTlsSocket::TlsState::handshake || m_tlsState == CTlsSocket::TlsState::verifycert) {
 		// Shutdown during handshake is not a good idea.
 		m_pOwner->LogMessage(MessageType::Debug_Verbose, L"Shutdown during handshake, postponing");
-		m_shutdown_requested = true;
+		shutdown_requested_ = true;
+		shutdown_silence_read_errors_ = silenceReadErrors;
 		return EAGAIN;
 	}
 
@@ -863,6 +870,7 @@ int CTlsSocketImpl::Shutdown()
 	}
 
 	m_tlsState = CTlsSocket::TlsState::closing;
+	shutdown_silence_read_errors_ = silenceReadErrors;
 
 	int res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
 	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
@@ -913,7 +921,9 @@ void CTlsSocketImpl::TrustCurrentCert(bool trusted)
 		m_tlsState = CTlsSocket::TlsState::conn;
 		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, 0);
 		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
-		tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
+		if (!shutdown_requested_) {
+			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
+		}
 
 		return;
 	}
