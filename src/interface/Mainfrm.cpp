@@ -2366,11 +2366,11 @@ void CMainFrame::OnToolbarComparison(wxCommandEvent&)
 				return;
 			}
 
-			if (controls->pLocalListSearchPanel->IsShown()) {
+			if (controls->pLocalListSearchPanel && controls->pLocalListSearchPanel->IsShown()) {
 				controls->pLocalListSearchPanel->Close();
 			}
 
-			if (controls->pRemoteListSearchPanel->IsShown()) {
+			if (controls->pRemoteListSearchPanel && controls->pRemoteListSearchPanel->IsShown()) {
 				controls->pRemoteListSearchPanel->Close();
 			}
 		}
