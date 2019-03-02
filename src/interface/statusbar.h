@@ -108,7 +108,7 @@ protected:
 
 	void ShowDataTypeMenu();
 
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(changed_options_t const& options) override;
 	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	void DoDisplayQueueSize();
