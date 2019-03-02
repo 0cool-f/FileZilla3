@@ -16,8 +16,6 @@ bool ChmodData::ConvertPermissions(std::wstring const& rwx, char* permissions)
 		return false;
 	}
 
-	wchar_t const* rwx_p = rwx.c_str();
-
 	size_t pos = rwx.find('(');
 	if (pos != std::wstring::npos && rwx.back() == ')') {
 		// MLSD permissions:
