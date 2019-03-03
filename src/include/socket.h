@@ -61,12 +61,12 @@ typedef simple_event<socket_event_type, socket_event_source*, socket_event_flag,
 struct hostaddress_event_type;
 
 /**
-* Whenever a hostname has been resolved to an IP address, this event is sent with the resolved IP address literal .
+* Whenever a hostname has been resolved to an IP address, this event is sent with the resolved IP address literal.
 */
 typedef simple_event<hostaddress_event_type, socket_event_source*, std::string> hostaddress_event;
 
 /**
- * \brief Remove all pendinmg socket events from source sent to handler.
+ * \brief Remove all pending socket events from source sent to handler.
  *
  * Useful e.g. if you want to destroy the handler but keep the source.
  * This function is called, through change_socket_event_handler, by socket::set_event_handler(0)
