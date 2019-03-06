@@ -542,6 +542,15 @@ void CTransferSocket::TransferEnd(TransferEndReason reason)
 	if (reason != TransferEndReason::successful) {
 		ResetSocket();
 	}
+	else {
+		// Here we ignore all errors.
+		if (m_pTlsSocket) {
+			m_pTlsSocket->Shutdown(true);
+		}
+		if (socket_) {
+			socket_->shutdown();
+		}
+	}
 
 	controlSocket_.send_event<TransferEndEvent>();
 }
