@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.41.0 (2019-03-06)
+
+- MSW: Fix an issue with failing uploads due to the operating system not gracefully closing TCP connections contrary to the documented behavior
+- MSW: Fix compilation flags for wxWidgets to no longer include useless XP compatibility
+
 3.41.0-rc1 (2019-02-26)
 
 - Fixed crash if adding a bookmark with the current connection not yet having a Site Manager entry
