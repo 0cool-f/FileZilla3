@@ -156,11 +156,7 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 	bookmarks->Append(XRCID("ID_BOOKMARK_MANAGE"), _("&Manage bookmarks..."))->SetAccel(&accel);
 
 	wxMenu * help = new wxMenu;
-#ifdef FZ_MAC
-	menubar->Append(help, _("?"));
-#else
 	menubar->Append(help, _("&Help"));
-#endif
 
 #if FZ_MANUALUPDATECHECK
 	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) == 0) {
