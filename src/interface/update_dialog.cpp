@@ -12,6 +12,7 @@
 
 #include <wx/animate.h>
 #include <wx/hyperlink.h>
+#include <wx/statline.h>
 
 BEGIN_EVENT_TABLE(CUpdateDialog, wxDialogEx)
 EVT_BUTTON(XRCID("ID_INSTALL"), CUpdateDialog::OnInstall)
@@ -60,10 +61,36 @@ int CUpdateDialog::ShowModal()
 		return wxID_CANCEL;
 	}
 
-	if (!Load(parent_, _T("ID_UPDATE_DIALOG"))) {
+	if (!Create(parent_, wxID_ANY, _("Check for Updates"))) {
 		return wxID_CANCEL;
 	}
 
+
+	auto const& lay = layout();
+	auto outer = new wxBoxSizer(wxVERTICAL);
+	SetSizer(outer);
+
+	auto main = lay.createFlex(1);
+	outer->Add(main, 1, wxALL|wxGROW, lay.border);
+
+	main->AddGrowableCol(0);
+	main->AddGrowableRow(0);
+
+	main->Add(new wxPanel(this, XRCID("ID_CONTENT")), 1, wxGROW);
+	main->Add(new wxStaticLine(this), lay.grow);
+
+	auto buttons = new wxBoxSizer(wxHORIZONTAL);
+	main->Add(buttons, 0, wxALIGN_RIGHT);
+
+	bool debug = false;
+	wxString v;
+	if (wxGetEnv(_T("FZDEBUG"), &v) && v == _T("1")) {
+		debug = true;
+	}
+	buttons->Add(new wxButton(this, XRCID("ID_DEBUGLOG"), L"show log"))->Show(debug);
+	buttons->Add(new wxButton(this, wxID_CANCEL, _("&Close")));
+
+	InitXrc();
 	LoadPanel(_T("ID_CHECKING_PANEL"));
 	LoadPanel(_T("ID_FAILURE_PANEL"));
 	LoadPanel(_T("ID_NEWVERSION_PANEL"));
@@ -73,12 +100,18 @@ int CUpdateDialog::ShowModal()
 	}
 
 	wxAnimation a = CThemeProvider::Get()->CreateAnimation(_T("ART_THROBBER"), wxSize(16,16));
-	XRCCTRL(*this, "ID_WAIT_CHECK", wxAnimationCtrl)->SetMinSize(a.GetSize());
-	XRCCTRL(*this, "ID_WAIT_CHECK", wxAnimationCtrl)->SetAnimation(a);
-	XRCCTRL(*this, "ID_WAIT_CHECK", wxAnimationCtrl)->Play();
-	XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl)->SetMinSize(a.GetSize());
-	XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl)->SetAnimation(a);
-	XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl)->Play();
+	auto ctrl = XRCCTRL(*this, "ID_WAIT_CHECK", wxAnimationCtrl);
+	if (ctrl) {
+		ctrl->SetMinSize(a.GetSize());
+		ctrl->SetAnimation(a);
+		ctrl->Play();
+	}
+	ctrl = XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl);
+	if (ctrl) {
+		ctrl->SetMinSize(a.GetSize());
+		ctrl->SetAnimation(a);
+		ctrl->Play();
+	}
 
 	InitFooter();
 
@@ -152,6 +185,10 @@ void CUpdateDialog::InitFooter()
 void CUpdateDialog::Wrap()
 {
 	wxPanel* parentPanel = XRCCTRL(*this, "ID_CONTENT", wxPanel);
+	if (!parentPanel) {
+		return;
+	}
+
 	wxSize canvas;
 	canvas.x = GetSize().x - parentPanel->GetSize().x;
 	canvas.y = GetSize().y - parentPanel->GetSize().y;
@@ -228,7 +265,7 @@ void CUpdateDialog::UpdaterStateChanged( UpdaterState s, build const& v )
 		panels_[pagenames::checking]->Show();
 	}
 	else if( s == UpdaterState::newversion || s == UpdaterState::newversion_ready || s == UpdaterState::newversion_downloading ) {
-		XRCCTRL(*this, "ID_VERSION", wxStaticText)->SetLabel(v.version_);
+		xrc_call(*this, "ID_VERSION", &wxStaticText::SetLabel, v.version_);
 
 		wxString news = updater_.GetChangelog();
 

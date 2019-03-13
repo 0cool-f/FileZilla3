@@ -1,48 +1,5 @@
 <?xml version="1.0"?>
 <resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
-  <object class="wxDialog" name="ID_UPDATE_DIALOG">
-    <title>Check for Updates</title>
-    <object class="wxBoxSizer">
-      <orient>wxVERTICAL</orient>
-      <object class="sizeritem">
-        <object class="wxFlexGridSizer">
-          <object class="sizeritem">
-            <object class="wxPanel" name="ID_CONTENT"/>
-            <option>1</option>
-            <flag>wxGROW</flag>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticLine"/>
-            <flag>wxGROW</flag>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <object class="sizeritem">
-                <object class="wxButton" name="ID_DEBUGLOG">
-                  <label>&lt;show log&gt;</label>
-                  <hidden>1</hidden>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <object class="wxButton" name="wxID_CANCEL">
-                  <label>&amp;Close</label>
-                </object>
-              </object>
-              <orient>wxHORIZONTAL</orient>
-            </object>
-            <flag>wxALIGN_RIGHT</flag>
-          </object>
-          <cols>1</cols>
-          <vgap>5</vgap>
-          <growablecols>0</growablecols>
-          <growablerows>0</growablerows>
-        </object>
-        <option>1</option>
-        <flag>wxALL|wxGROW</flag>
-        <border>7</border>
-      </object>
-    </object>
-  </object>
   <object class="wxPanel" name="ID_NEWVERSION_PANEL">
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
