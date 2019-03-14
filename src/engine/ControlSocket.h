@@ -150,7 +150,7 @@ enum class TransferEndReason
 	failed_resumetest
 };
 
-class CBackend;
+class SocketLayer;
 class CTransferStatus;
 class CControlSocket: public CLogging, public fz::event_handler
 {
@@ -270,10 +270,12 @@ protected:
 };
 
 class CProxySocket;
+class CSocketBackend;
+
 class CRealControlSocket : public CControlSocket
 {
 public:
-	CRealControlSocket(CFileZillaEnginePrivate & engine);
+	CRealControlSocket(CFileZillaEnginePrivate& engine);
 	virtual ~CRealControlSocket();
 
 	int DoConnect(std::wstring const& host, unsigned int port);
@@ -298,10 +300,10 @@ protected:
 		return Send(reinterpret_cast<unsigned char const*>(buffer), len);
 	}
 
-	fz::socket* socket_;
-
-	CBackend* m_pBackend;
-	CProxySocket* m_pProxyBackend{};
+	std::unique_ptr<fz::socket> socket_;
+	std::unique_ptr<CSocketBackend> ratelimit_layer_;
+	std::unique_ptr<CProxySocket> proxy_layer_;
+	SocketLayer* active_layer_{};
 
 	fz::buffer sendBuffer_;
 };

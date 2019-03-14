@@ -4,43 +4,48 @@
 #include "ratelimiter.h"
 #include "socket.h"
 
-class CBackend : public CRateLimiterObject, public fz::socket_event_source
+class SocketLayer : public fz::socket_interface
 {
 public:
-	explicit CBackend(fz::event_handler* pEvtHandler);
-	virtual ~CBackend();
+	explicit SocketLayer(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, bool event_passthrough);
+	virtual ~SocketLayer();
 
-	CBackend(CBackend const&) = delete;
-	CBackend& operator=(CBackend const&) = delete;
+	SocketLayer(SocketLayer const&) = delete;
+	SocketLayer& operator=(SocketLayer const&) = delete;
 
-	virtual int Read(void *buffer, unsigned int size, int& error) = 0;
-	virtual int Peek(void *buffer, unsigned int size, int& error) = 0;
-	virtual int Write(const void *buffer, unsigned int size, int& error) = 0;
+	virtual void set_event_handler(fz::event_handler* pEvtHandler) override;
 
-	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) = 0;
+	virtual fz::native_string peer_host() const override { return next_layer_.peer_host(); }
+	virtual int peer_port(int& error) const override { return next_layer_.peer_port(error); }
+
+	socket_interface & next() { return next_layer_; }
 
 protected:
-	fz::event_handler* const m_pEvtHandler;
+	void forward_event(fz::socket_event_source* source, fz::socket_event_flag t, int error);
+
+	void set_event_passthrough(bool passthrough);
+
+	fz::event_handler* m_pEvtHandler;
+	fz::socket_interface& next_layer_;
+	bool event_passthrough_{};
 };
 
 namespace fz {
 class CSocket;
 }
 
-class CSocketBackend final : public CBackend
+class CSocketBackend final : public SocketLayer, public CRateLimiterObject
 {
 public:
-	CSocketBackend(fz::event_handler* pEvtHandler, fz::socket & socket, CRateLimiter& rateLimiter);
+	CSocketBackend(fz::event_handler* pEvtHandler, fz::socket_interface& next_layer, CRateLimiter& rateLimiter);
 	virtual ~CSocketBackend();
-	// Backend definitions
-	virtual int Read(void *buffer, unsigned int size, int& error) override;
-	virtual int Peek(void *buffer, unsigned int size, int& error) override;
-	virtual int Write(const void *buffer, unsigned int size, int& error) override;
+
+	virtual int read(void *buffer, unsigned int size, int& error) override;
+	virtual int write(const void *buffer, unsigned int size, int& error) override;
 
 protected:
 	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) override;
 
-	fz::socket &socket_;
 	CRateLimiter& m_rateLimiter;
 };
 

@@ -51,8 +51,8 @@ void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface
 		}
 		else {
 			opState |= request_init;
-			if (controlSocket_.m_pBackend) {
-				controlSocket_.send_event<fz::socket_event>(controlSocket_.m_pBackend, fz::socket_event_flag::write, 0);
+			if (controlSocket_.active_layer_) {
+				controlSocket_.send_event<fz::socket_event>(controlSocket_.active_layer_, fz::socket_event_flag::write, 0);
 			}
 		}
 	}
@@ -231,7 +231,7 @@ int CHttpRequestOpData::Send()
 					}
 
 					int error;
-					int written = controlSocket_.m_pBackend->Write(controlSocket_.sendBuffer_.get(), controlSocket_.sendBuffer_.size(), error);
+					int written = controlSocket_.active_layer_->write(controlSocket_.sendBuffer_.get(), controlSocket_.sendBuffer_.size(), error);
 					if (written < 0) {
 						if (error != EAGAIN) {
 							LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
@@ -365,7 +365,7 @@ int CHttpRequestOpData::OnReceive()
 	while (controlSocket_.socket_) {
 		int error;
 		size_t const recv_size = 1024 * 64;
-		int read = controlSocket_.m_pBackend->Read(recv_buffer_.get(recv_size), recv_size, error);
+		int read = controlSocket_.active_layer_->read(recv_buffer_.get(recv_size), recv_size, error);
 		if (read <= -1) {
 			if (error != EAGAIN) {
 				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket_error_description(error));
@@ -759,8 +759,8 @@ int CHttpRequestOpData::Reset(int result)
 		controlSocket_.ResetSocket();
 	}
 	else {
-		if (controlSocket_.m_pBackend) {
-			controlSocket_.send_event<fz::socket_event>(controlSocket_.m_pBackend, fz::socket_event_flag::read, 0);
+		if (controlSocket_.active_layer_) {
+			controlSocket_.send_event<fz::socket_event>(controlSocket_.active_layer_, fz::socket_event_flag::read, 0);
 		}
 	}
 

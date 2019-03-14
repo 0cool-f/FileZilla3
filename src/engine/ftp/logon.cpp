@@ -99,7 +99,18 @@ int CFtpLogonOpData::Send()
 			}
 
 			opState = LOGON_WELCOME;
-			return controlSocket_.DoConnect(host_, port_);
+			int ret = controlSocket_.DoConnect(host_, port_);
+			if (ret == FZ_REPLY_WOULDBLOCK) {
+				// Enable TCP_NODELAY, speeds things up a bit.
+				controlSocket_.socket_->set_flags(fz::socket::flag_nodelay | fz::socket::flag_keepalive);
+
+				// Enable SO_KEEPALIVE, lots of clueless users have broken routers and
+				// firewalls which terminate the control connection on long transfers.
+				int v = engine_.GetOptions().GetOptionVal(OPTION_TCP_KEEPALIVE_INTERVAL);
+				if (v >= 1 && v < 10000) {
+					controlSocket_.socket_->set_keepalive_interval(fz::duration::from_minutes(v));
+				}
+			}
 	    }
 	case LOGON_AUTH_WAIT:
 		LogMessage(MessageType::Debug_Info, L"LogonSend() called during LOGON_AUTH_WAIT, ignoring");
@@ -247,13 +258,10 @@ int CFtpLogonOpData::ParseResponse()
 
 			LogMessage(MessageType::Status, _("Initializing TLS..."));
 
-			assert(!controlSocket_.m_pTlsSocket);
-			delete controlSocket_.m_pBackend;
+			controlSocket_.tls_layer_ = std::make_unique<CTlsSocket>(&controlSocket_, *controlSocket_.active_layer_, &controlSocket_);
+			controlSocket_.active_layer_ = controlSocket_.tls_layer_.get();
 
-			controlSocket_.m_pTlsSocket = new CTlsSocket(&controlSocket_, *controlSocket_.socket_, &controlSocket_);
-			controlSocket_.m_pBackend = controlSocket_.m_pTlsSocket;
-
-			int res = controlSocket_.m_pTlsSocket->Handshake();
+			int res = controlSocket_.tls_layer_->Handshake();
 			if (res & FZ_REPLY_ERROR) {
 				return res | FZ_REPLY_DISCONNECTED;
 			}

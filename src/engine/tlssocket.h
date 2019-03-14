@@ -6,33 +6,22 @@
 class CControlSocket;
 class CTlsSocketImpl;
 
-class CTlsSocket final : protected fz::event_handler, public CBackend
+class CTlsSocket final : protected fz::event_handler, public SocketLayer
 {
 public:
-	enum class TlsState
-	{
-		noconn,
-		handshake,
-		verifycert,
-		conn,
-		closing,
-		closed
-	};
-
-	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket& pSocket, CControlSocket* pOwner);
+	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface& layer, CControlSocket* pOwner);
 	virtual ~CTlsSocket();
 
 	int Handshake(const CTlsSocket* pPrimarySocket = nullptr, bool try_resume = 0);
 
-	virtual int Read(void *buffer, unsigned int size, int& error) override;
-	virtual int Peek(void *buffer, unsigned int size, int& error) override;
-	virtual int Write(const void *buffer, unsigned int size, int& error) override;
+	virtual int read(void *buffer, unsigned int size, int& error) override;
+	virtual int write(const void *buffer, unsigned int size, int& error) override;
 
 	int Shutdown(bool silenceReadErrors);
 
 	void TrustCurrentCert(bool trusted);
 
-	TlsState GetState() const;
+	fz::socket_state get_state() const;
 
 	std::wstring GetProtocolName();
 	std::wstring GetKeyExchange();
@@ -49,7 +38,6 @@ public:
 	static std::wstring GetGnutlsVersion();
 private:
 	virtual void operator()(fz::event_base const& ev) override;
-	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) override;
 
 	friend class CTlsSocketImpl;
 	std::unique_ptr<CTlsSocketImpl> impl_;

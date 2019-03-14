@@ -4,11 +4,12 @@
 #include "tlssocket.h"
 #include "tlssocket_impl.h"
 
-CTlsSocket::CTlsSocket(fz::event_handler* pEvtHandler, fz::socket& pSocket, CControlSocket* pOwner)
+CTlsSocket::CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner)
 	: event_handler(pOwner->event_loop_)
-	, CBackend(pEvtHandler)
+	, SocketLayer(pEvtHandler, next_layer, false)
 {
-	impl_ = std::make_unique<CTlsSocketImpl>(*this, pSocket, pOwner);
+	impl_ = std::make_unique<CTlsSocketImpl>(*this, pOwner);
+	next_layer.set_event_handler(this);
 }
 
 CTlsSocket::~CTlsSocket()
@@ -21,19 +22,14 @@ int CTlsSocket::Handshake(CTlsSocket const* pPrimarySocket, bool try_resume)
 	return impl_->Handshake(pPrimarySocket ? pPrimarySocket->impl_.get() : nullptr, try_resume);
 }
 
-int CTlsSocket::Read(void *buffer, unsigned int size, int& error)
+int CTlsSocket::read(void *buffer, unsigned int size, int& error)
 {
-	return impl_->Read(buffer, size, error);
+	return impl_->read(buffer, size, error);
 }
 
-int CTlsSocket::Peek(void *buffer, unsigned int size, int& error)
+int CTlsSocket::write(const void *buffer, unsigned int size, int& error)
 {
-	return impl_->Peek(buffer, size, error);
-}
-
-int CTlsSocket::Write(const void *buffer, unsigned int size, int& error)
-{
-	return impl_->Write(buffer, size, error);
+	return impl_->write(buffer, size, error);
 }
 
 int CTlsSocket::Shutdown(bool silenceReadErrors)
@@ -46,9 +42,9 @@ void CTlsSocket::TrustCurrentCert(bool trusted)
 	return impl_->TrustCurrentCert(trusted);
 }
 
-CTlsSocket::TlsState CTlsSocket::GetState() const
+fz::socket_state CTlsSocket::get_state() const
 {
-	return impl_->GetState();
+	return impl_->get_state();
 }
 
 std::wstring CTlsSocket::GetProtocolName()
@@ -94,11 +90,6 @@ bool CTlsSocket::SetClientCertificate(fz::native_string const& keyfile, fz::nati
 void CTlsSocket::operator()(fz::event_base const& ev)
 {
 	return impl_->operator()(ev);
-}
-
-void CTlsSocket::OnRateAvailable(CRateLimiter::rate_direction direction)
-{
-	return impl_->OnRateAvailable(direction);
 }
 
 std::wstring CTlsSocket::GetGnutlsVersion()

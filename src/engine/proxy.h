@@ -7,10 +7,10 @@
 #include <libfilezilla/buffer.hpp>
 
 class CControlSocket;
-class CProxySocket final : protected fz::event_handler, public CBackend
+class CProxySocket final : protected fz::event_handler, public SocketLayer
 {
 public:
-	CProxySocket(event_handler* pEvtHandler, fz::socket* pSocket, CControlSocket* pOwner);
+	CProxySocket(event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner);
 	virtual ~CProxySocket();
 
 	enum ProxyState {
@@ -29,31 +29,26 @@ public:
 	};
 	static std::wstring Name(ProxyType t);
 
-	int Handshake(ProxyType type, std::wstring const& host, unsigned int port, std::wstring const& user, std::wstring const& pass);
+	int Handshake(ProxyType type, fz::native_string const& host, unsigned int port, std::wstring const& user, std::wstring const& pass);
 
 	ProxyState GetState() const { return m_proxyState; }
 
-	// Past the initial handshake, proxies are transparent.
-	// Class users should detach socket and use a normal socket backend instead.
-	virtual void OnRateAvailable(CRateLimiter::rate_direction) override {};
-	virtual int Read(void *buffer, unsigned int size, int& error) override;
-	virtual int Peek(void *buffer, unsigned int size, int& error) override;
-	virtual int Write(const void *buffer, unsigned int size, int& error) override;
-
-	void Detach();
-	bool Detached() const { return socket_ == nullptr; }
+	virtual int read(void *buffer, unsigned int size, int& error) override;
+	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
 	ProxyType GetProxyType() const { return m_proxyType; }
 	std::wstring GetUser() const;
 	std::wstring GetPass() const;
 
+	virtual fz::native_string peer_host() const override;
+	virtual int peer_port(int& error)  const override;
+
 protected:
-	fz::socket* socket_;
 	CControlSocket* m_pOwner;
 
 	ProxyType m_proxyType{unknown};
-	std::wstring m_host;
-	int m_port{};
+	fz::native_string host_;
+	int port_{-1};
 	std::string m_user;
 	std::string m_pass;
 
@@ -62,10 +57,7 @@ protected:
 	int m_handshakeState{};
 
 	fz::buffer sendBuffer_;
-
-	char* m_pRecvBuffer{};
-	int m_recvBufferPos{};
-	int m_recvBufferLen{};
+	fz::buffer receiveBuffer_;
 
 	virtual void operator()(fz::event_base const& ev) override;
 	void OnSocketEvent(socket_event_source* source, fz::socket_event_flag t, int error);

@@ -277,7 +277,7 @@ bool CFtpRawTransferOpData::ParseEpsvResponse()
 
 	port_ = port;
 
-	if (controlSocket_.m_pProxyBackend) {
+	if (controlSocket_.proxy_layer_) {
 		host_ = currentServer_.GetHost();
 	}
 	else {
@@ -327,7 +327,7 @@ bool CFtpRawTransferOpData::ParsePasvResponse()
 	host_ = host_.substr(0, i);
 	fz::replace_substrings(host_, L",", L".");
 
-	if (controlSocket_.m_pProxyBackend) {
+	if (controlSocket_.proxy_layer_) {
 		// We do not have any information about the proxy's inner workings
 		return true;
 	}
@@ -360,7 +360,7 @@ std::wstring CFtpRawTransferOpData::GetPassiveCommand()
 	assert(bPasv);
 	bTriedPasv = true;
 
-	if (controlSocket_.m_pProxyBackend) {
+	if (controlSocket_.proxy_layer_) {
 		// We don't actually know the address family the other end of the proxy uses to reach the server. Hence prefer EPSV
 		// if the server supports it.
 		if (CServerCapabilities::GetCapability(currentServer_, epsv_command) == yes) {

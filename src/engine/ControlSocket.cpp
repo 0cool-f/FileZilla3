@@ -678,33 +678,21 @@ void CControlSocket::SendAsyncRequest(CAsyncRequestNotification* pNotification)
 CRealControlSocket::CRealControlSocket(CFileZillaEnginePrivate & engine)
 	: CControlSocket(engine)
 {
-	socket_ = new fz::socket(engine.GetThreadPool(), this);
-
-	m_pBackend = new CSocketBackend(this, *socket_, engine_.GetRateLimiter());
 }
 
 CRealControlSocket::~CRealControlSocket()
 {
-	if (socket_) {
-		socket_->close();
-	}
-	if (m_pProxyBackend && m_pProxyBackend != m_pBackend) {
-		delete m_pProxyBackend;
-	}
-	delete m_pBackend;
-	m_pBackend = nullptr;
-
-	delete socket_;
+	ResetSocket();
 }
 
 bool CRealControlSocket::Connected() const
 {
-	return socket_ ? (socket_->get_state() == fz::socket::connected) : false;
+	return socket_ ? socket_->is_connected() : false;
 }
 
 int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 {
-	if (!m_pBackend) {
+	if (!active_layer_) {
 		LogMessage(MessageType::Debug_Warning, L"Called internal CRealControlSocket::Send without m_pBackend");
 		return FZ_REPLY_INTERNALERROR;
 	}
@@ -715,7 +703,7 @@ int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 	}
 	else {
 		int error;
-		int written = m_pBackend->Write(buffer, len, error);
+		int written = active_layer_->write(buffer, len, error);
 		if (written < 0) {
 			if (error != EAGAIN) {
 				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
@@ -747,9 +735,9 @@ void CRealControlSocket::operator()(fz::event_base const& ev)
 	}
 }
 
-void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_flag t, int error)
+void CRealControlSocket::OnSocketEvent(fz::socket_event_source* source, fz::socket_event_flag t, int error)
 {
-	if (!m_pBackend) {
+	if (!active_layer_) {
 		return;
 	}
 
@@ -767,10 +755,6 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 			OnSocketError(error);
 		}
 		else {
-			if (m_pProxyBackend && !m_pProxyBackend->Detached()) {
-				m_pProxyBackend->Detach();
-				m_pBackend = new CSocketBackend(this, *socket_, engine_.GetRateLimiter());
-			}
 			OnConnect();
 		}
 		break;
@@ -798,7 +782,7 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 
 void CRealControlSocket::OnHostAddress(fz::socket_event_source*, std::string const& address)
 {
-	if (!m_pBackend) {
+	if (!active_layer_) {
 		return;
 	}
 
@@ -817,7 +801,7 @@ int CRealControlSocket::OnSend()
 {
 	while (sendBuffer_) {
 		int error;
-		int written = m_pBackend->Write(sendBuffer_.get(), sendBuffer_.size(), error);
+		int written = active_layer_->write(sendBuffer_.get(), sendBuffer_.size(), error);
 		if (written < 0) {
 			if (error != EAGAIN) {
 				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
@@ -863,6 +847,11 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 	std::wstring real_host;
 	unsigned int real_port = 0;
 
+	ResetSocket();
+	socket_ = std::make_unique<fz::socket>(engine_.GetThreadPool(), nullptr);
+	ratelimit_layer_ = std::make_unique<CSocketBackend>(this, *socket_, engine_.GetRateLimiter());
+	active_layer_ = ratelimit_layer_.get();
+
 	const int proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
 	if (proxy_type > CProxySocket::unknown && proxy_type < CProxySocket::proxytype_count && !currentServer_.GetBypassProxy()) {
 		LogMessage(MessageType::Status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<CProxySocket::ProxyType>(proxy_type)));
@@ -870,10 +859,9 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 		real_host = engine_.GetOptions().GetOption(OPTION_PROXY_HOST);
 		real_port = engine_.GetOptions().GetOptionVal(OPTION_PROXY_PORT);
 
-		delete m_pBackend;
-		m_pProxyBackend = new CProxySocket(this, socket_, this);
-		m_pBackend = m_pProxyBackend;
-		int res = m_pProxyBackend->Handshake(static_cast<CProxySocket::ProxyType>(proxy_type),
+		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, this);
+		active_layer_ = proxy_layer_.get();
+		int res = proxy_layer_->Handshake(static_cast<CProxySocket::ProxyType>(proxy_type),
 											ConvertDomainName(host), port,
 											engine_.GetOptions().GetOption(OPTION_PROXY_USER),
 											engine_.GetOptions().GetOption(OPTION_PROXY_PASS));
@@ -915,18 +903,12 @@ int CRealControlSocket::DoClose(int nErrorCode)
 
 void CRealControlSocket::ResetSocket()
 {
-	socket_->close();
+	active_layer_ = nullptr;
 
-	sendBuffer_.clear();
-
-	if (m_pProxyBackend) {
-		if (m_pProxyBackend != m_pBackend) {
-			delete m_pProxyBackend;
-		}
-		m_pProxyBackend = nullptr;
-	}
-	delete m_pBackend;
-	m_pBackend = nullptr;
+	// Destroy in reverse order
+	proxy_layer_.reset();
+	ratelimit_layer_.reset();
+	socket_.reset();
 }
 
 bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNotification)

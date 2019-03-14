@@ -16,20 +16,21 @@ class CTlsSocket;
 class CTlsSocketImpl final
 {
 public:
-	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::socket& pSocket, CControlSocket* pOwner);
+	CTlsSocketImpl(CTlsSocket& tlsSocket, CControlSocket* pOwner);
 	~CTlsSocketImpl();
 
 	int Handshake(const CTlsSocketImpl* pPrimarySocket = nullptr, bool try_resume = 0);
 
-	int Read(void *buffer, unsigned int size, int& error);
-	int Peek(void *buffer, unsigned int size, int& error);
-	int Write(const void *buffer, unsigned int size, int& error);
+	int read(void *buffer, unsigned int size, int& error);
+	int write(const void *buffer, unsigned int size, int& error);
 
 	int Shutdown(bool silenceReadErrors);
 
 	void TrustCurrentCert(bool trusted);
 
-	CTlsSocket::TlsState GetState() const { return m_tlsState; }
+	fz::socket_state get_state() const {
+		return state_;
+	}
 
 	std::wstring GetProtocolName();
 	std::wstring GetKeyExchange();
@@ -45,15 +46,13 @@ public:
 
 	static std::wstring GetGnutlsVersion();
 
-protected:
+private:
 	bool Init();
 	void Uninit();
 
 	bool InitSession();
 	void UninitSession();
 	bool CopySessionData(CTlsSocketImpl const* pPrimarySocket);
-
-	void OnRateAvailable(CRateLimiter::rate_direction direction);
 
 	void ContinueWrite();
 	int ContinueHandshake();
@@ -92,7 +91,7 @@ protected:
 
 	CTlsSocket& tlsSocket_;
 
-	CTlsSocket::TlsState m_tlsState{ CTlsSocket::TlsState::noconn };
+	fz::socket_state state_{};
 
 	CControlSocket* m_pOwner{};
 
@@ -100,14 +99,11 @@ protected:
 	gnutls_session_t m_session{};
 
 	gnutls_certificate_credentials_t m_certCredentials{};
+	bool handshake_successful_{};
 
-	bool m_canReadFromSocket{true};
-	bool m_canWriteToSocket{true};
+	bool m_canReadFromSocket{false};
+	bool m_canWriteToSocket{false};
 
-	fz::socket& m_socket;
-	std::unique_ptr<CSocketBackend> socketBackend_;
-
-	bool shutdown_requested_{};
 	bool shutdown_silence_read_errors_{};
 
 	// Due to the strange gnutls_record_send semantics, call it again
@@ -116,11 +112,8 @@ protected:
 	// application.
 	// This avoids the rule to call it again with the -same- data after
 	// GNUTLS_E_AGAIN.
-	bool m_lastReadFailed{false};
 	bool m_lastWriteFailed{false};
 	unsigned int m_writeSkip{};
-
-	fz::buffer peekBuffer_;
 
 	gnutls_datum_t m_implicitTrustedCert{};
 
@@ -131,8 +124,6 @@ protected:
 	friend class CTlsSocketCallbacks;
 
 	fz::native_string hostname_;
-	unsigned int port_{};
-
 };
 
 #endif

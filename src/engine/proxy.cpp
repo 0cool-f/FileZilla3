@@ -26,29 +26,21 @@ enum handshake_state
 	socks5_method,
 	socks5_auth,
 	socks5_request,
-	socks5_request_addrtype,
-	socks5_request_address,
 
 	socks4_handshake
 };
 
-CProxySocket::CProxySocket(fz::event_handler* pEvtHandler, fz::socket* pSocket, CControlSocket* pOwner)
+CProxySocket::CProxySocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner)
 	: fz::event_handler(pOwner->event_loop_)
-	, CBackend(pEvtHandler)
-	, socket_(pSocket)
+	, SocketLayer(pEvtHandler, next_layer, false)
 	, m_pOwner(pOwner)
 {
-	socket_->set_event_handler(this);
+	next_layer_.set_event_handler(this);
 }
 
 CProxySocket::~CProxySocket()
 {
 	remove_handler();
-
-	if (socket_) {
-		socket_->set_event_handler(nullptr);
-	}
-	delete [] m_pRecvBuffer;
 }
 
 std::wstring CProxySocket::Name(ProxyType t)
@@ -65,7 +57,7 @@ std::wstring CProxySocket::Name(ProxyType t)
 	}
 }
 
-int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& host, unsigned int port, std::wstring const& user, std::wstring const& pass)
+int CProxySocket::Handshake(CProxySocket::ProxyType type, fz::native_string const& host, unsigned int port, std::wstring const& user, std::wstring const& pass)
 {
 	if (type == CProxySocket::unknown || host.empty() || port < 1 || port > 65535) {
 		return EINVAL;
@@ -81,8 +73,8 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& ho
 
 	m_user = fz::to_utf8(user);
 	m_pass = fz::to_utf8(pass);
-	m_host = host;
-	m_port = port;
+	host_ = host;
+	port_ = static_cast<int>(port);
 	m_proxyType = type;
 
 	m_proxyState = handshake;
@@ -104,20 +96,16 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& ho
 			host_raw, port,
 			auth,
 			fz::replaced_substrings(PACKAGE_STRING, " ", "/")));
-
-		m_pRecvBuffer = new char[4096];
-		m_recvBufferLen = 4096;
-		m_recvBufferPos = 0;
 	}
 	else if (type == SOCKS4) {
 		std::string ip;
-		auto const addressType = fz::get_address_type(m_host);
+		auto const addressType = fz::get_address_type(host_);
 		if (addressType == fz::address_type::ipv6) {
 			m_pOwner->LogMessage(MessageType::Error, _("IPv6 addresses are not supported with SOCKS4 proxy"));
 			return EINVAL;
 		}
 		else if (addressType == fz::address_type::ipv4) {
-			ip = fz::to_string(m_host);
+			ip = fz::to_string(host_);
 		}
 		else {
 			addrinfo hints{};
@@ -125,7 +113,7 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& ho
 			hints.ai_socktype = SOCK_STREAM;
 
 			addrinfo * result{};
-			int res = getaddrinfo(fz::to_string(m_host).c_str(), nullptr, &hints, &result);
+			int res = getaddrinfo(fz::to_string(host_).c_str(), nullptr, &hints, &result);
 			if (!res && result) {
 				if (result->ai_family == AF_INET) {
 					ip = fz::socket::address_to_string(result->ai_addr, result->ai_addrlen, false);
@@ -144,8 +132,8 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& ho
 		unsigned char* out = sendBuffer_.get(9);
 		out[0] = 4; // Protocol version
 		out[1] = 1; // Stream mode
-		out[2] = (m_port >> 8) & 0xFF; // Port in network order
-		out[3] = m_port & 0xFF;
+		out[2] = (port_ >> 8) & 0xFF; // Port in network order
+		out[3] = port_ & 0xFF;
 		int i = 0;
 		memset(out + 4, 0, 5);
 		for (auto p = ip.c_str(); *p && i < 4; ++p) {
@@ -159,9 +147,6 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& ho
 		}
 		sendBuffer_.add(9);
 
-		m_pRecvBuffer = new char[8];
-		m_recvBufferLen = 8;
-		m_recvBufferPos = 0;
 		m_handshakeState = socks4_handshake;
 	}
 	else {
@@ -184,10 +169,6 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, std::wstring const& ho
 			sendBuffer_.add(3);
 		}
 
-		m_pRecvBuffer = new char[1024];
-		m_recvBufferLen = 2;
-		m_recvBufferPos = 0;
-
 		m_handshakeState = socks5_method;
 	}
 
@@ -201,22 +182,20 @@ void CProxySocket::operator()(fz::event_base const& ev)
 		&CProxySocket::OnHostAddress);
 }
 
-void CProxySocket::OnSocketEvent(socket_event_source*, fz::socket_event_flag t, int error)
+void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t, int error)
 {
 	if (m_proxyState != handshake) {
 		return;
 	}
 
 	if (t == fz::socket_event_flag::connection_next) {
-		if (error) {
-			m_pOwner->LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket_error_description(error));
-		}
+		forward_event(s, t, error);
 		return;
 	}
 
 	if (error) {
 		m_proxyState = noconn;
-		m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
+		forward_event(s, t, error);
 		return;
 	}
 
@@ -240,16 +219,6 @@ void CProxySocket::OnHostAddress(socket_event_source*, std::string const& addres
 	m_pOwner->LogMessage(MessageType::Status, _("Connecting to %s..."), address);
 }
 
-void CProxySocket::Detach()
-{
-	if (!socket_) {
-		return;
-	}
-
-	socket_->set_event_handler(nullptr);
-	socket_ = nullptr;
-}
-
 void CProxySocket::OnReceive()
 {
 	m_can_read = true;
@@ -258,206 +227,163 @@ void CProxySocket::OnReceive()
 		return;
 	}
 
-	switch (m_handshakeState)
-	{
-	case http_wait:
-		for (;;) {
-			int error;
-			int do_read = m_recvBufferLen - m_recvBufferPos - 1;
-			char* end = nullptr;
-			for (int i = 0; i < 2; ++i) {
-				int read;
-				if (!i) {
-					read = socket_->peek(m_pRecvBuffer + m_recvBufferPos, do_read, error);
-				}
-				else {
-					read = socket_->read(m_pRecvBuffer + m_recvBufferPos, do_read, error);
-				}
-				if (read == -1) {
-					if (error != EAGAIN) {
-						m_proxyState = noconn;
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
-					}
-					else {
-						m_can_read = false;
-					}
-					return;
-				}
-				if (!read) {
-					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
-					return;
-				}
-				if (sendBuffer_) {
-					m_proxyState = noconn;
-					m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming data before request fully sent");
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
-					return;
-				}
+	while (m_can_read) {
+		loop:
+		int to_read = 1024;
+		unsigned char* buf = receiveBuffer_.get(to_read);
 
-				if (!i) {
-					// Response ends with strstr
-					m_pRecvBuffer[m_recvBufferPos + read] = 0;
-					end = strstr(m_pRecvBuffer, "\r\n\r\n");
-					if (!end) {
-						if (m_recvBufferPos + read + 1 == m_recvBufferLen) {
-							m_proxyState = noconn;
-							m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming header too large");
-							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
-							return;
-						}
-						do_read = read;
-					}
-					else {
-						do_read = end - m_pRecvBuffer + 4 - m_recvBufferPos;
-					}
-				}
-				else {
-					if (read != do_read) {
-						m_proxyState = noconn;
-						m_pOwner->LogMessage(MessageType::Debug_Warning, "Could not read what got peeked");
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
-						return;
-					}
-					m_recvBufferPos += read;
-				}
-			}
+		int error;
+		int read = next_layer_.read(buf, to_read, error);
 
-			if (!end) {
-				continue;
-			}
-
-			end = strchr(m_pRecvBuffer, '\r'); // Never fails as old value of end exists and starts with CR, we just look for an earlier case.
-			*end = 0;
-			std::wstring const reply = fz::to_wstring_from_utf8(m_pRecvBuffer);
-			m_pOwner->LogMessage(MessageType::Response, _("Proxy reply: %s"), reply);
-
-			if (reply.substr(0, 10) != L"HTTP/1.1 2" && reply.substr(0, 10) != L"HTTP/1.0 2") {
+		if (read < 0) {
+			if (error != EAGAIN) {
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNRESET);
-				return;
-			}
-
-			m_proxyState = conn;
-			m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
-			return;
-		}
-	case socks4_handshake:
-		while (m_recvBufferLen && m_can_read && m_proxyState == handshake) {
-			int read_error;
-			int read = socket_->read(m_pRecvBuffer + m_recvBufferPos, m_recvBufferLen, read_error);
-			if (read == -1) {
-				if (read_error != EAGAIN) {
-					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, read_error);
-				}
-				else {
-					m_can_read = false;
-				}
-				return;
-			}
-
-			if (!read) {
-				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
-				return;
-			}
-			m_recvBufferPos += read;
-			m_recvBufferLen -= read;
-
-			if (m_recvBufferLen) {
-				continue;
-			}
-
-			m_recvBufferPos = 0;
-
-			if (m_pRecvBuffer[1] != 0x5A) {
-				std::wstring error;
-				switch (m_pRecvBuffer[1]) {
-					case 0x5B:
-						error = _("Request rejected or failed");
-						break;
-					case 0x5C:
-						error = _("Request failed - client is not running identd (or not reachable from server)");
-						break;
-					case 0x5D:
-						error = _("Request failed - client's identd could not confirm the user ID string");
-						break;
-					default:
-						error = fz::sprintf(_("Unassigned error code %d"), (int)(unsigned char)m_pRecvBuffer[1]);
-						break;
-				}
-				m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: %s"), error);
-				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
-				return;
-			}
-			m_proxyState = conn;
-			m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
-		}
-		return;
-	case socks5_method:
-	case socks5_auth:
-	case socks5_request:
-	case socks5_request_addrtype:
-	case socks5_request_address:
-		if (sendBuffer_) {
-			return;
-		}
-		while (m_recvBufferLen && m_can_read && m_proxyState == handshake) {
-			int error;
-			int read = socket_->read(m_pRecvBuffer + m_recvBufferPos, m_recvBufferLen, error);
-			if (read == -1) {
-				if (error != EAGAIN) {
-					m_proxyState = noconn;
+				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 				}
+			}
+			else {
+				m_can_read = false;
+			}
+			return;
+		}
+		if (!read) {
+			m_proxyState = noconn;
+			if (m_pEvtHandler) {
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+			}
+			return;
+		}
+		receiveBuffer_.add(read);
+
+		switch (m_handshakeState) {
+		case http_wait:
+			{
+				// Look for \r\n\r\n
+				buf = receiveBuffer_.get();
+				size_t i = 0;
+				for (i = 0; i + 4 <= receiveBuffer_.size(); ++i) {
+					if (buf[i] == '\r' && buf[i + 1] == '\n' && buf[i + 2] == 'r' && buf[i + 3] == '\n') {
+						break;
+					}
+				}
+				if (i + 4 > receiveBuffer_.size()) {
+					// Not found yet
+					if (receiveBuffer_.size() >= 2048) {
+						m_proxyState = noconn;
+						m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming header too large");
+						if (m_pEvtHandler) {
+							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
+						}
+						return;
+					}
+					break;
+				}
+
+				// Found end of header
+				unsigned char* eol = reinterpret_cast<unsigned char*>(strchr(reinterpret_cast<char*>(buf), '\r')); // Never fails as old buf ends on CRLFCRLF
+				*eol = 0;
+				std::wstring const reply = fz::to_wstring_from_utf8(std::string(reinterpret_cast<char*>(buf))); // Terminate at first emedded null
+				m_pOwner->LogMessage(MessageType::Response, _("Proxy reply: %s"), reply);
+
+				if (reply.substr(0, 10) != L"HTTP/1.1 2" && reply.substr(0, 10) != L"HTTP/1.0 2") {
+					m_proxyState = noconn;
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNRESET);
+					}
+				}
 				else {
-					m_can_read = false;
+					m_proxyState = conn;
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
+					}
+					receiveBuffer_.consume(i + 4);
+					set_event_passthrough(true);
 				}
 				return;
 			}
-			if (!read) {
-				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+		case socks4_handshake:
+			{
+				if (receiveBuffer_.size() < 8) {
+					break;
+				}
+
+				unsigned char const* const buf = receiveBuffer_.get();
+				if (buf[1] != 0x5A) {
+					std::wstring error;
+					switch (buf[1]) {
+						case 0x5B:
+							error = _("Request rejected or failed");
+							break;
+						case 0x5C:
+							error = _("Request failed - client is not running identd (or not reachable from server)");
+							break;
+						case 0x5D:
+							error = _("Request failed - client's identd could not confirm the user ID string");
+							break;
+						default:
+							error = fz::sprintf(_("Unassigned error code %d"), (int)buf[1]);
+							break;
+					}
+					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: %s"), error);
+					m_proxyState = noconn;
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					}
+				}
+				else {
+					m_proxyState = conn;
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
+					}
+					receiveBuffer_.consume(8);
+					set_event_passthrough(true);
+				}
 				return;
 			}
-			m_recvBufferPos += read;
-			m_recvBufferLen -= read;
-
-			if (m_recvBufferLen) {
-				continue;
+		case socks5_method:
+		case socks5_auth:
+		case socks5_request:
+			if (sendBuffer_) {
+				m_pOwner->LogMessage(MessageType::Error, _("Proxy sent data while we haven't sent out request yet"));
+				m_proxyState = noconn;
+				if (m_pEvtHandler) {
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+				}
+				return;
 			}
-
-			m_recvBufferPos = 0;
-
+			
 			// All data got read, parse it
 			switch (m_handshakeState) {
 			default:
-				if (m_pRecvBuffer[0] != 5) {
-					m_pOwner->LogMessage(MessageType::Error, _("Unknown SOCKS protocol version: %d"), (int)m_pRecvBuffer[0]);
+				if (receiveBuffer_[0] != 5) {
+					m_pOwner->LogMessage(MessageType::Error, _("Unknown SOCKS protocol version: %d"), (int)receiveBuffer_[0]);
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					}
 					return;
 				}
 				break;
 			case socks5_auth:
-				if (m_pRecvBuffer[0] != 1) {
-					m_pOwner->LogMessage(MessageType::Error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), (int)m_pRecvBuffer[0]);
+				if (receiveBuffer_[0] != 1) {
+					m_pOwner->LogMessage(MessageType::Error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), receiveBuffer_[0]);
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					}
 					return;
 				}
 				break;
-			case socks5_request_address:
-			case socks5_request_addrtype:
-				// Nothing to do
-				break;
 			}
+
 			switch (m_handshakeState) {
-			case socks5_method:
+				case socks5_method:
 				{
-					const char method = m_pRecvBuffer[1];
+					if (receiveBuffer_.size() < 2) {
+						goto loop;
+					}
+					char const method = receiveBuffer_[1];
 					switch (method)
 					{
 					case 0:
@@ -469,24 +395,36 @@ void CProxySocket::OnReceive()
 					default:
 						m_pOwner->LogMessage(MessageType::Error, _("No supported SOCKS5 auth method"));
 						m_proxyState = noconn;
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+						if (m_pEvtHandler) {
+							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+						}
 						return;
 					}
+					receiveBuffer_.consume(2);
 				}
 				break;
 			case socks5_auth:
-				if (m_pRecvBuffer[1] != 0) {
+				if (receiveBuffer_.size() < 2) {
+					goto loop;
+				}
+				if (receiveBuffer_[1] != 0) {
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy authentication failed"));
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					}
 					return;
 				}
 				m_handshakeState = socks5_request;
+				receiveBuffer_.consume(2);
 				break;
 			case socks5_request:
-				if (m_pRecvBuffer[1]) {
+				if (receiveBuffer_.size() < 2) {
+					goto loop;
+				}
+				if (receiveBuffer_[1]) {
 					std::wstring errorMsg;
-					switch (m_pRecvBuffer[1])
+					switch (receiveBuffer_[1])
 					{
 					case 1:
 						errorMsg = _("General SOCKS server failure");
@@ -513,48 +451,64 @@ void CProxySocket::OnReceive()
 						errorMsg = _("Address type not supported");
 						break;
 					default:
-						errorMsg = fz::sprintf(_("Unassigned error code %d"), (int)(unsigned char)m_pRecvBuffer[1]);
+						errorMsg = fz::sprintf(_("Unassigned error code %d"), receiveBuffer_[1]);
 						break;
 					}
 
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed. Reply from proxy: %s"), errorMsg);
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					}
 					return;
 				}
-				m_handshakeState = socks5_request_addrtype;
-				m_recvBufferLen = 3;
-				break;
-			case socks5_request_addrtype:
+
 				// We need to parse the returned address type to determine the length of the address that follows.
 				// Unfortunately the information in the type and address is useless, many proxies just return
 				// syntactically valid bogus values
-				switch (m_pRecvBuffer[1])
+				if (receiveBuffer_.size() < 4) {
+					goto loop;
+				}
+				switch (receiveBuffer_[3])
 				{
 				case 1:
-					m_recvBufferLen = 5;
+					// syntactically valid bogus values
+					if (receiveBuffer_.size() < 10) {
+						goto loop;
+					}
+					receiveBuffer_.consume(10);
 					break;
 				case 3:
-					m_recvBufferLen = m_pRecvBuffer[2] + 2;
+					if (receiveBuffer_.size() < 5) {
+						goto loop;
+					}
+					if (receiveBuffer_.size() < receiveBuffer_[4] + 7) {
+						goto loop;
+					}
+					receiveBuffer_.consume(receiveBuffer_[4] + 7);
 					break;
 				case 4:
-					m_recvBufferLen = 17;
+					if (receiveBuffer_.size() < 22) {
+						goto loop;
+					}
+					receiveBuffer_.consume(22);
 					break;
 				default:
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: Unknown address type in CONNECT reply"));
 					m_proxyState = noconn;
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (m_pEvtHandler) {
+						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					}
 					return;
 				}
-				m_handshakeState = socks5_request_address;
-				break;
-			case socks5_request_address:
-				{
-					// We're done
-					m_proxyState = conn;
+
+				// We're done
+				m_proxyState = conn;
+				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
-					return;
 				}
+				set_event_passthrough(true);
+				return;
 			default:
 				assert(false);
 				break;
@@ -573,12 +527,11 @@ void CProxySocket::OnReceive()
 					out[ulen + 2] = plen;
 					memcpy(out + ulen + 3, m_pass.c_str(), plen);
 					sendBuffer_.add(ulen + plen + 3);
-					m_recvBufferLen = 2;
 				}
 				break;
 			case socks5_request:
 				{
-					std::string host = fz::to_utf8(m_host);
+					std::string host = fz::to_utf8(host_);
 					size_t addrlen = std::max(host.size(), size_t(16));
 
 					unsigned char * out = sendBuffer_.get(7 + addrlen);
@@ -622,16 +575,11 @@ void CProxySocket::OnReceive()
 						addrlen = hlen + 1;
 					}
 
-					out[addrlen + 4] = (m_port >> 8) & 0xFF; // Port in network order
-					out[addrlen + 5] = m_port & 0xFF;
+					out[addrlen + 4] = (port_ >> 8) & 0xFF; // Port in network order
+					out[addrlen + 5] = port_ & 0xFF;
 
 					sendBuffer_.add(6 + addrlen);
-					m_recvBufferLen = 2;
 				}
-				break;
-			case socks5_request_addrtype:
-			case socks5_request_address:
-				// Nothing to send, we simply need to wait for more data
 				break;
 			default:
 				assert(false);
@@ -640,13 +588,15 @@ void CProxySocket::OnReceive()
 			if (sendBuffer_ && m_can_write) {
 				OnSend();
 			}
+			break;
+		default:
+			m_proxyState = noconn;
+			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Unhandled handshake state %d", m_handshakeState);
+			if (m_pEvtHandler) {
+				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+			}
+			return;
 		}
-		break;
-	default:
-		m_proxyState = noconn;
-		m_pOwner->LogMessage(MessageType::Debug_Warning, L"Unhandled handshake state %d", m_handshakeState);
-		m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
-		return;
 	}
 }
 
@@ -659,11 +609,13 @@ void CProxySocket::OnSend()
 
 	for (;;) {
 		int error;
-		int written = socket_->write(sendBuffer_.get(), sendBuffer_.size(), error);
+		int written = next_layer_.write(sendBuffer_.get(), sendBuffer_.size(), error);
 		if (written == -1) {
 			if (error != EAGAIN) {
 				m_proxyState = noconn;
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
+				if (m_pEvtHandler) {
+					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
+				}
 			}
 			else {
 				m_can_write = false;
@@ -682,22 +634,22 @@ void CProxySocket::OnSend()
 	}
 }
 
-int CProxySocket::Read(void *, unsigned int, int& error)
+int CProxySocket::read(void * buffer, unsigned int size, int& error)
 {
-	error = EAGAIN;
-	return -1;
+	if (receiveBuffer_) {
+		if (size > receiveBuffer_.size()) {
+			size = receiveBuffer_.size();
+		}
+		memcpy(buffer, receiveBuffer_.get(), size);
+		receiveBuffer_.consume(size);
+		return size;
+	}
+	return next_layer_.read(buffer, size, error);
 }
 
-int CProxySocket::Peek(void *, unsigned int, int& error)
+int CProxySocket::write(void const* buffer, unsigned int size, int& error)
 {
-	error = EAGAIN;
-	return -1;
-}
-
-int CProxySocket::Write(const void *, unsigned int, int& error)
-{
-	error = EAGAIN;
-	return -1;
+	return next_layer_.write(buffer, size, error);
 }
 
 std::wstring CProxySocket::GetUser() const
@@ -708,4 +660,17 @@ std::wstring CProxySocket::GetUser() const
 std::wstring CProxySocket::GetPass() const
 {
 	return fz::to_wstring_from_utf8(m_pass);
+}
+
+fz::native_string CProxySocket::peer_host() const
+{
+	return host_;
+}
+
+int CProxySocket::peer_port(int& error)  const
+{
+	if (port_ < 0) {
+		error = ENOTCONN;
+	}
+	return port_;
 }

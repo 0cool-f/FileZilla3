@@ -35,6 +35,22 @@ class socket_event_source
 {
 public:
 	virtual ~socket_event_source() = default;
+
+	/** \brief Gets the root source
+	 *
+	 * In a layered stack of sources this would be the socket itself.
+	 */
+	socket_event_source* root() const {
+		return root_;
+	}
+
+protected:
+	socket_event_source() = default;
+	explicit socket_event_source(socket_event_source* root)
+		: root_(root)
+	{}
+
+	socket_event_source* const root_{};
 };
 
 /// \private
@@ -89,9 +105,10 @@ void change_socket_event_handler(event_handler * old_handler, event_handler * ne
 class socket_thread;
 
 /// \private
-class socket_base : public socket_event_source
+class socket_base
 {
 public:
+	virtual ~socket_base() = default;
 	enum
 	{
 		/// flag_nodelay disables Nagle's algorithm
@@ -140,14 +157,22 @@ public:
 	static std::string address_to_string(sockaddr const* addr, int addr_len, bool with_port = true, bool strip_zone_index = false);
 	static std::string address_to_string(char const* buf, int buf_len);
 
-	int close();
-
-	void set_event_handler(event_handler* pEvtHandler);
+	/**
+	 * \brief Bind socket to the specific local IP
+	 *
+	 * Undefined after having called connect/listen
+	 */
+	bool bind(std::string const& address);
 
 protected:
+	int close();
+
+protected:
+	void do_set_event_handler(event_handler* pEvtHandler);
+
 	friend class socket_thread;
 
-	socket_base(thread_pool& pool, event_handler* evt_handler);
+	socket_base(thread_pool& pool, event_handler* evt_handler, socket_event_source* ev_source);
 
 	// Note: Unlocks the lock.
 	void detach_thread(scoped_lock & l);
@@ -168,13 +193,23 @@ protected:
 
 	int buffer_sizes_[2];
 
-	int state_{};
+	socket_event_source * const ev_source_{};
 };
 
 class socket;
 
-class listen_socket final : public socket_base
+enum class listen_socket_state
 {
+	/// How the socket is initially
+	none,
+
+	/// Only in listening state you can get a connection event.
+	listening,
+};
+
+class listen_socket final : public socket_base, public socket_event_source
+{
+	friend class socket_base;
 	friend class socket_thread;
 public:
 	listen_socket(thread_pool& pool, event_handler* evt_handler);
@@ -186,15 +221,65 @@ public:
 	int listen(address_type family, int port = 0);
 	socket* accept(int& error);
 
-	enum listen_socket_state
-	{
-		// How the socket is initially
-		none,
-
-		// Only in listening state you can get a connection event.
-		listening
-	};
 	listen_socket_state get_state();
+
+	void set_event_handler(event_handler* pEvtHandler) {
+		do_set_event_handler(pEvtHandler);
+	}
+
+private:
+	listen_socket_state state_{};
+};
+
+class socket_interface : public socket_event_source
+{
+public:
+	socket_interface(socket_interface const&) = delete;
+	socket_interface& operator=(socket_interface const&) = delete;
+
+
+	virtual int read(void* buffer, unsigned int size, int& error) = 0;
+	virtual int write(const void* buffer, unsigned int size, int& error) = 0;
+
+	virtual void set_event_handler(event_handler* pEvtHandler) = 0;
+
+	virtual native_string peer_host() const = 0;
+	virtual int peer_port(int& error) const = 0;
+
+protected:
+	socket_interface() = default;
+	
+	explicit socket_interface(socket_event_source * root)
+		: socket_event_source(root)
+	{}
+};
+
+/// State transitions are monotonically increasing
+enum class socket_state
+{
+	/// How the socket is initially
+	none,
+
+	/// Only in connecting state you can get a connection event.
+	/// After sending the event, socket is in connected or failed state
+	/// depending whether error value is set in the event.
+	connecting,
+
+	/// Socket is in its normal working state. You can get send and receive events
+	connected,
+
+	/// Shutting down of the write side. Transitions to
+	/// shutdown with a single write event.
+	shutting_down,
+
+	/// Write side has finished shutting down. Receive still working normally.
+	shut_down,
+
+	/// Socket has been closed. Further events disabled.
+	closed,
+
+	/// Socket has failed. Further events disabled.
+	failed
 };
 
 /**
@@ -205,7 +290,7 @@ public:
  * Error codes are the same as used by the POSIX socket functions,
  * see 'man 2 socket', 'man 2 connect', ...
  */
-class socket final : public socket_base
+class socket final : public socket_base, public socket_interface
 {
 	friend class socket_thread;
 public:
@@ -215,21 +300,11 @@ public:
 	socket(socket const&) = delete;
 	socket& operator=(socket const&) = delete;
 
-	enum socket_state
-	{
-		// How the socket is initially
-		none,
-
-		// Only in connecting state you can get a connection event.
-		// After sending the event, socket is in connected state
-		connecting,
-
-		// Only in this state you can get send or receive events
-		connected,
-
-		closed
+	socket_state get_state() const;
+	bool is_connected() const {
+		socket_state s = get_state();
+		return s == socket_state::connected || s == socket_state::shutting_down || s == socket_state::shut_down;
 	};
-	socket_state get_state();
 
 	// Connects to the given host, given as name, IPv4 or IPv6 address.
 	// Returns 0 on success, else an error code. Note: EINPROGRESS is
@@ -240,13 +315,12 @@ public:
 	// Once connections got established or establishment fails, a connection
 	// event gets sent, with the error parameter indicating success or failur.
 	// connection could not be established, a connection event with an error event gets sent.
-	int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown, std::string const& bind = std::string());
+	int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown);
 
 	// After receiving a send or receive event, you can call these functions
 	// as long as their return value is positive.
-	int read(void *buffer, unsigned int size, int& error);
-	int peek(void *buffer, unsigned int size, int& error);
-	int write(const void *buffer, unsigned int size, int& error);
+	virtual int read(void *buffer, unsigned int size, int& error) override;
+	virtual int write(const void *buffer, unsigned int size, int& error) override;
 
 	/**
 	* \brief Returns remote address of a connected socket
@@ -255,15 +329,15 @@ public:
 	*/
 	std::string peer_ip(bool strip_zone_index = false) const;
 
-	/// Returns the hostname passed to Connect()
-	native_string peer_host() const;
+	/// Returns the hostname passed to connect()
+	virtual native_string peer_host() const override;
 
 	/**
 	* \brief Returns remote port of a connected socket
 	*
 	* \return -1 on error
 	*/
-	int remote_port(int& error);
+	virtual int peer_port(int& error) const override;
 
 	/**
 	 * On a connected socket, gets the ideal send buffer size or
@@ -286,9 +360,14 @@ public:
 	 */
 	int shutdown();
 
+	virtual void set_event_handler(event_handler* pEvtHandler) override;
+
 private:
+	friend class socket_base;
 	friend class listen_socket;
 	native_string host_;
+
+	socket_state state_{};
 };
 
 #ifdef FZ_WINDOWS

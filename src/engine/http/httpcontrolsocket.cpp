@@ -137,13 +137,13 @@ bool CHttpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 		break;
 	case reqId_certificate:
 		{
-			if (!m_pTlsSocket || m_pTlsSocket->GetState() != CTlsSocket::TlsState::verifycert) {
+			if (!tls_layer_ || tls_layer_->get_state() != fz::socket_state::connecting) {
 				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
 				return false;
 			}
 
 			CCertificateNotification* pCertificateNotification = static_cast<CCertificateNotification *>(pNotification);
-			m_pTlsSocket->TrustCurrentCert(pCertificateNotification->m_trusted);
+			tls_layer_->TrustCurrentCert(pCertificateNotification->m_trusted);
 		}
 		break;
 	default:
@@ -161,7 +161,7 @@ void CHttpControlSocket::OnReceive()
 	if (operations_.empty() || operations_.back()->opId != PrivCommand::http_request) {
 		uint8_t buffer;
 		int error{};
-		int read = m_pBackend->Read(&buffer, 1, error);
+		int read = active_layer_->read(&buffer, 1, error);
 		if (!read) {
 			LogMessage(MessageType::Debug_Warning, L"Idle socket got closed");
 			ResetSocket();
@@ -198,14 +198,13 @@ void CHttpControlSocket::OnConnect()
 	auto & data = static_cast<CHttpInternalConnectOpData &>(*operations_.back());
 
 	if (data.tls_) {
-		if (!m_pTlsSocket) {
+		if (!tls_layer_) {
 			LogMessage(MessageType::Status, _("Connection established, initializing TLS..."));
 
-			delete m_pBackend;
-			m_pTlsSocket = new CTlsSocket(this, *socket_, this);
-			m_pBackend = m_pTlsSocket;
+			tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, this);
+			active_layer_ = tls_layer_.get();
 
-			int res = m_pTlsSocket->Handshake();
+			int res = tls_layer_->Handshake();
 			if (res == FZ_REPLY_ERROR) {
 				DoClose();
 			}
@@ -270,7 +269,7 @@ int CHttpControlSocket::InternalConnect(std::wstring const& host, unsigned short
 		return FZ_REPLY_INTERNALERROR;
 	}
 
-	if (m_pBackend) {
+	if (active_layer_) {
 		if (host == connected_host_ && port == connected_port_ && tls == connected_tls_) {
 			LogMessage(MessageType::Debug_Verbose, L"Reusing an existing connection");
 			return FZ_REPLY_OK;
@@ -306,12 +305,10 @@ void CHttpControlSocket::OnSocketError(int error)
 void CHttpControlSocket::ResetSocket()
 {
 	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::ResetSocket()");
-	if (m_pTlsSocket) {
-		if (m_pTlsSocket != m_pBackend) {
-			delete m_pTlsSocket;
-		}
-		m_pTlsSocket = nullptr;
-	}
+
+	active_layer_ = nullptr;
+
+	tls_layer_.reset();
 
 	CRealControlSocket::ResetSocket();
 }

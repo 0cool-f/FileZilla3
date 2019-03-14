@@ -52,11 +52,12 @@ protected:
 	virtual void Chmod(CChmodCommand const& command) override;
 	void Transfer(std::wstring const& cmd, CFtpTransferOpData* oldData);
 
-
 	void TransferEnd();
 
 	virtual void OnConnect() override;
 	virtual void OnReceive() override;
+
+	virtual void ResetSocket() override;
 
 	int SendCommand(std::wstring const& str, bool maskArgs = false, bool measureRTT = true);
 
@@ -93,7 +94,7 @@ protected:
 
 	std::unique_ptr<CExternalIPResolver> m_pIPResolver;
 
-	CTlsSocket* m_pTlsSocket{};
+	std::unique_ptr<CTlsSocket> tls_layer_;
 	bool m_protectDataChannel{};
 
 	int m_lastTypeBinary{-1};
