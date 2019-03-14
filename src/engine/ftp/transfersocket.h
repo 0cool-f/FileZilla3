@@ -45,7 +45,7 @@ protected:
 
 	void TransferEnd(TransferEndReason reason);
 
-	bool InitLayers(bool active, std::string & ip, int port);
+	bool InitLayers(bool active, std::string const& ip, int port);
 	bool InitTls();
 
 	void ResetSocket();

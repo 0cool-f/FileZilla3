@@ -844,45 +844,36 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 		LogMessage(MessageType::Debug_Info, L"Using custom encoding: %s", currentServer_.GetCustomEncoding());
 	}
 
-	std::wstring real_host;
-	unsigned int real_port = 0;
-
 	ResetSocket();
 	socket_ = std::make_unique<fz::socket>(engine_.GetThreadPool(), nullptr);
 	ratelimit_layer_ = std::make_unique<CSocketBackend>(this, *socket_, engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
 	const int proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
-	if (proxy_type > CProxySocket::unknown && proxy_type < CProxySocket::proxytype_count && !currentServer_.GetBypassProxy()) {
-		LogMessage(MessageType::Status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<CProxySocket::ProxyType>(proxy_type)));
+	if (proxy_type > static_cast<int>(ProxyType::NONE) && proxy_type < static_cast<int>(ProxyType::count) && !currentServer_.GetBypassProxy()) {
+		LogMessage(MessageType::Status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<ProxyType>(proxy_type)));
 
-		real_host = engine_.GetOptions().GetOption(OPTION_PROXY_HOST);
-		real_port = engine_.GetOptions().GetOptionVal(OPTION_PROXY_PORT);
+		std::wstring proxy_host = engine_.GetOptions().GetOption(OPTION_PROXY_HOST);
 
-		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, this);
+		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, this, static_cast<ProxyType>(proxy_type),
+			proxy_host, engine_.GetOptions().GetOptionVal(OPTION_PROXY_PORT),
+			engine_.GetOptions().GetOption(OPTION_PROXY_USER),
+			engine_.GetOptions().GetOption(OPTION_PROXY_PASS));
 		active_layer_ = proxy_layer_.get();
-		int res = proxy_layer_->Handshake(static_cast<CProxySocket::ProxyType>(proxy_type),
-											ConvertDomainName(host), port,
-											engine_.GetOptions().GetOption(OPTION_PROXY_USER),
-											engine_.GetOptions().GetOption(OPTION_PROXY_PASS));
 
-		if (res != EINPROGRESS) {
-			LogMessage(MessageType::Error, _("Could not start proxy handshake: %s"), fz::socket_error_description(res));
-			return FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR;
+		if (fz::get_address_type(proxy_host) == fz::address_type::unknown) {
+			LogMessage(MessageType::Status, _("Resolving address of %s"), proxy_host);
 		}
 	}
 	else {
-		real_host = host;
-		real_port = port;
-	}
-	if (fz::get_address_type(host) == fz::address_type::unknown) {
-		LogMessage(MessageType::Status, _("Resolving address of %s"), real_host);
+		if (fz::get_address_type(host) == fz::address_type::unknown) {
+			LogMessage(MessageType::Status, _("Resolving address of %s"), host);
+		}
 	}
 
 	m_closed = false;
 
-	real_host = ConvertDomainName(real_host);
-	int res = socket_->connect(fz::to_native(real_host), real_port);
+	int res = active_layer_->connect(fz::to_native(ConvertDomainName(host)), port);
 
 	// Treat success same as EINPROGRESS, we wait for connect notification in any case
 	if (res && res != EINPROGRESS) {

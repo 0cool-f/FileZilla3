@@ -43,6 +43,14 @@ public:
 	virtual int read(void *buffer, unsigned int size, int& error) override;
 	virtual int write(const void *buffer, unsigned int size, int& error) override;
 
+	virtual fz::socket_state get_state() const override {
+		return next_layer_.get_state();
+	}
+
+	virtual int connect(fz::native_string const& host, unsigned int port, fz::address_type family = fz::address_type::unknown) override{
+		return next_layer_.connect(host, port, family);
+	}
+
 protected:
 	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) override;
 

@@ -44,7 +44,7 @@ int CFtpLogonOpData::Send()
 	    {
 			// Do not use FTP proxy if generic proxy is set
 			int const generic_proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
-			if ((generic_proxy_type <= CProxySocket::unknown || generic_proxy_type >= CProxySocket::proxytype_count) && !currentServer_.GetBypassProxy()) {
+			if ((generic_proxy_type <= static_cast<int>(ProxyType::NONE) || generic_proxy_type >= static_cast<int>(ProxyType::count)) && !currentServer_.GetBypassProxy()) {
 				ftp_proxy_type_ = engine_.GetOptions().GetOptionVal(OPTION_FTP_PROXY_TYPE);
 			}
 		

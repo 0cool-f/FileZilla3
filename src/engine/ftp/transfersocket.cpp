@@ -471,35 +471,29 @@ bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
 	return true;
 }
 
-bool CTransferSocket::InitLayers(bool active, std::string & ip, int port)
+bool CTransferSocket::InitLayers(bool active, std::string const& ip, int port)
 {
 	ratelimit_layer_ = std::make_unique<CSocketBackend>(nullptr, *socket_, engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
 	if (controlSocket_.proxy_layer_ && !active) {
-		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, &controlSocket_);
-		active_layer_ = proxy_layer_.get();
-
-		int res = proxy_layer_->Handshake(controlSocket_.proxy_layer_->GetProxyType(),
-											 fz::to_native(ip), port,
-											 controlSocket_.proxy_layer_->GetUser(), controlSocket_.proxy_layer_->GetPass());
-
-		if (res != EINPROGRESS) {
-			return false;
-		}
+		fz::native_string proxy_host = controlSocket_.proxy_layer_->next().peer_host();
 		int error;
-		ip = controlSocket_.socket_->peer_ip();
-		port = controlSocket_.socket_->peer_port(error);
-		if (ip.empty() || port < 1) {
+		int proxy_port = controlSocket_.proxy_layer_->next().peer_port(error);
+
+		if (proxy_host.empty() || proxy_port < 1) {
 			controlSocket_.LogMessage(MessageType::Debug_Warning, L"Could not get peer address of control connection.");
 			return false;
 		}
+
+		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, &controlSocket_, controlSocket_.proxy_layer_->GetProxyType(), proxy_host, proxy_port, controlSocket_.proxy_layer_->GetUser(), controlSocket_.proxy_layer_->GetPass());
+		active_layer_ = proxy_layer_.get();
 	}
 	else {
 		ratelimit_layer_->set_event_handler(this);
 	}
 	
-	int res = socket_->connect(fz::to_native(ip), port, fz::address_type::unknown);
+	int res = active_layer_->connect(fz::to_native(ip), port, fz::address_type::unknown);
 	if (res && res != EINPROGRESS) {
 		return false;
 	}

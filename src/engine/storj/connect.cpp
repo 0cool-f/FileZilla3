@@ -44,13 +44,13 @@ int CStorjConnectOpData::Send()
 			case 0:
 				opState = connect_host;
 				return FZ_REPLY_CONTINUE;
-			case CProxySocket::HTTP:
+			case static_cast<int>(ProxyType::HTTP):
 				proxy_uri.scheme_ = "http";
 				break;
-			case CProxySocket::SOCKS5:
+			case static_cast<int>(ProxyType::SOCKS5):
 				proxy_uri.scheme_ = "socks5h";
 				break;
-			case CProxySocket::SOCKS4:
+			case static_cast<int>(ProxyType::SOCKS4):
 				proxy_uri.scheme_ = "socks4a";
 				break;
 			default:

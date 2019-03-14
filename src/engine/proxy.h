@@ -6,37 +6,33 @@
 
 #include <libfilezilla/buffer.hpp>
 
+enum class ProxyType {
+	NONE,
+	HTTP,
+	SOCKS5,
+	SOCKS4,
+
+	count
+};
+
 class CControlSocket;
 class CProxySocket final : protected fz::event_handler, public SocketLayer
 {
 public:
-	CProxySocket(event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner);
+	CProxySocket(event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner,
+		ProxyType t, fz::native_string const& proxy_host, unsigned int proxy_port, std::wstring const& user, std::wstring const& pass);
 	virtual ~CProxySocket();
 
-	enum ProxyState {
-		noconn,
-		handshake,
-		conn
-	};
-
-	enum ProxyType {
-		unknown,
-		HTTP,
-		SOCKS5,
-		SOCKS4,
-
-		proxytype_count
-	};
 	static std::wstring Name(ProxyType t);
 
-	int Handshake(ProxyType type, fz::native_string const& host, unsigned int port, std::wstring const& user, std::wstring const& pass);
+	virtual int connect(fz::native_string const& host, unsigned int port, fz::address_type family = fz::address_type::unknown) override;
 
-	ProxyState GetState() const { return m_proxyState; }
+	fz::socket_state get_state() const override { return state_; }
 
 	virtual int read(void *buffer, unsigned int size, int& error) override;
 	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
-	ProxyType GetProxyType() const { return m_proxyType; }
+	ProxyType GetProxyType() const { return type_; }
 	std::wstring GetUser() const;
 	std::wstring GetPass() const;
 
@@ -46,13 +42,17 @@ public:
 protected:
 	CControlSocket* m_pOwner;
 
-	ProxyType m_proxyType{unknown};
-	fz::native_string host_;
-	int port_{-1};
-	std::string m_user;
-	std::string m_pass;
+	ProxyType type_{};
+	fz::native_string proxy_host_;
+	unsigned int proxy_port_{};
+	std::string user_;
+	std::string pass_;
 
-	ProxyState m_proxyState{noconn};
+	fz::native_string host_;
+	unsigned int port_{};
+	fz::address_type family_{};
+
+	fz::socket_state state_{};
 
 	int m_handshakeState{};
 

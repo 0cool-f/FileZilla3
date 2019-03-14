@@ -41,13 +41,13 @@ int CSftpConnectOpData::Send()
 			int type;
 			switch (engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE))
 			{
-			case CProxySocket::HTTP:
+			case static_cast<int>(ProxyType::HTTP):
 				type = 1;
 				break;
-			case CProxySocket::SOCKS5:
+			case static_cast<int>(ProxyType::SOCKS5):
 				type = 2;
 				break;
-			case CProxySocket::SOCKS4:
+			case static_cast<int>(ProxyType::SOCKS4):
 				type = 3;
 				break;
 			default:

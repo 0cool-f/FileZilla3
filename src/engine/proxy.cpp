@@ -30,10 +30,15 @@ enum handshake_state
 	socks4_handshake
 };
 
-CProxySocket::CProxySocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner)
+CProxySocket::CProxySocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner, ProxyType t, fz::native_string const& proxy_host, unsigned int proxy_port, std::wstring const& user, std::wstring const& pass)
 	: fz::event_handler(pOwner->event_loop_)
 	, SocketLayer(pEvtHandler, next_layer, false)
 	, m_pOwner(pOwner)
+	, type_(t)
+	, proxy_host_(proxy_host)
+	, proxy_port_(proxy_port)
+	, user_(fz::to_utf8(user))
+	, pass_(fz::to_utf8(pass))
 {
 	next_layer_.set_event_handler(this);
 }
@@ -46,46 +51,65 @@ CProxySocket::~CProxySocket()
 std::wstring CProxySocket::Name(ProxyType t)
 {
 	switch (t) {
-	case HTTP:
+	case ProxyType::HTTP:
 		return L"HTTP";
-	case SOCKS4:
+	case ProxyType::SOCKS4:
 		return L"SOCKS4";
-	case SOCKS5:
+	case ProxyType::SOCKS5:
 		return L"SOCKS5";
 	default:
 		return _("unknown");
 	}
 }
 
-int CProxySocket::Handshake(CProxySocket::ProxyType type, fz::native_string const& host, unsigned int port, std::wstring const& user, std::wstring const& pass)
+int CProxySocket::connect(fz::native_string const& host, unsigned int port, fz::address_type family)
 {
-	if (type == CProxySocket::unknown || host.empty() || port < 1 || port > 65535) {
+	if (state_ != fz::socket_state::none) {
+		if (state_ == fz::socket_state::failed) {
+			return EINVAL;
+		}
+		else {
+			return EALREADY;
+		}
+	}
+
+	if (next_layer_.get_state() != fz::socket_state::none && next_layer_.get_state() != fz::socket_state::connecting) {
+		state_ = fz::socket_state::failed;
 		return EINVAL;
 	}
 
-	if (m_proxyState != noconn) {
+	host_ = host;
+	port_ = port;
+	family_ = family;
+
+	if (type_ == ProxyType::NONE || proxy_host_.empty() || proxy_port_ < 1 || proxy_port_ > 65535) {
+		state_ = fz::socket_state::failed;
+		return EINVAL;
+	}
+
+	if (host.empty() || port < 1 || port > 65535) {
+		state_ = fz::socket_state::failed;
+		return EINVAL;
+	}
+
+	if (state_ != fz::socket_state::none) {
 		return EALREADY;
 	}
 
-	if (type != HTTP && type != SOCKS5 && type != SOCKS4) {
+	if (type_ != ProxyType::HTTP && type_ != ProxyType::SOCKS5 && type_ != ProxyType::SOCKS4) {
+		state_ = fz::socket_state::failed;
 		return EPROTONOSUPPORT;
 	}
 
-	m_user = fz::to_utf8(user);
-	m_pass = fz::to_utf8(pass);
-	host_ = host;
-	port_ = static_cast<int>(port);
-	m_proxyType = type;
+	state_ = fz::socket_state::connecting;
 
-	m_proxyState = handshake;
-
-	if (type == HTTP) {
+	if (type_ == ProxyType::HTTP) {
 		m_handshakeState = http_wait;
 
 		std::string auth;
-		if (!user.empty()) {
+		if (!user_.empty()) {
 			auth = "Proxy-Authorization: Basic ";
-			auth += fz::base64_encode(m_user + ":" + m_pass);
+			auth += fz::base64_encode(user_ + ":" + pass_);
 			auth += "\r\n";
 		}
 
@@ -97,7 +121,7 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, fz::native_string cons
 			auth,
 			fz::replaced_substrings(PACKAGE_STRING, " ", "/")));
 	}
-	else if (type == SOCKS4) {
+	else if (type_ == ProxyType::SOCKS4) {
 		std::string ip;
 		auto const addressType = fz::get_address_type(host_);
 		if (addressType == fz::address_type::ipv6) {
@@ -150,14 +174,14 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, fz::native_string cons
 		m_handshakeState = socks4_handshake;
 	}
 	else {
-		if (m_user.size() > 255 || m_pass.size() > 255) {
+		if (user_.size() > 255 || pass_.size() > 255) {
 			m_pOwner->LogMessage(MessageType::Status, _("SOCKS5 does not support usernames or passwords longer than 255 characters."));
 			return EINVAL;
 		}
 
 		unsigned char* out = sendBuffer_.get(4);
 		out[0] = 5; // Protocol version
-		if (!user.empty()) {
+		if (!user_.empty()) {
 			out[1] = 2; // # auth methods supported
 			out[2] = 0; // Method: No auth
 			out[3] = 2; // Method: Username and password
@@ -172,6 +196,19 @@ int CProxySocket::Handshake(CProxySocket::ProxyType type, fz::native_string cons
 		m_handshakeState = socks5_method;
 	}
 
+	if (next_layer_.get_state() == fz::socket_state::none) {
+		int ret = next_layer_.connect(proxy_host_, proxy_port_);
+
+		if (ret && ret != EINPROGRESS) {
+			state_ = fz::socket_state::failed;
+			return ret;
+		}
+	}
+	else {
+		if (m_can_write) {
+			OnSend();
+		}
+	}
 	return EINPROGRESS;
 }
 
@@ -184,7 +221,7 @@ void CProxySocket::operator()(fz::event_base const& ev)
 
 void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t, int error)
 {
-	if (m_proxyState != handshake) {
+	if (state_ != fz::socket_state::connecting) {
 		return;
 	}
 
@@ -194,7 +231,7 @@ void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t
 	}
 
 	if (error) {
-		m_proxyState = noconn;
+		state_ = fz::socket_state::failed;
 		forward_event(s, t, error);
 		return;
 	}
@@ -223,7 +260,7 @@ void CProxySocket::OnReceive()
 {
 	m_can_read = true;
 
-	if (m_proxyState != handshake) {
+	if (state_ != fz::socket_state::connecting) {
 		return;
 	}
 
@@ -237,7 +274,7 @@ void CProxySocket::OnReceive()
 
 		if (read < 0) {
 			if (error != EAGAIN) {
-				m_proxyState = noconn;
+				state_ = fz::socket_state::failed;
 				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 				}
@@ -248,7 +285,7 @@ void CProxySocket::OnReceive()
 			return;
 		}
 		if (!read) {
-			m_proxyState = noconn;
+			state_ = fz::socket_state::failed;
 			if (m_pEvtHandler) {
 				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 			}
@@ -270,7 +307,7 @@ void CProxySocket::OnReceive()
 				if (i + 4 > receiveBuffer_.size()) {
 					// Not found yet
 					if (receiveBuffer_.size() >= 2048) {
-						m_proxyState = noconn;
+						state_ = fz::socket_state::failed;
 						m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming header too large");
 						if (m_pEvtHandler) {
 							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
@@ -287,13 +324,13 @@ void CProxySocket::OnReceive()
 				m_pOwner->LogMessage(MessageType::Response, _("Proxy reply: %s"), reply);
 
 				if (reply.substr(0, 10) != L"HTTP/1.1 2" && reply.substr(0, 10) != L"HTTP/1.0 2") {
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNRESET);
 					}
 				}
 				else {
-					m_proxyState = conn;
+					state_ = fz::socket_state::connected;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 					}
@@ -326,13 +363,13 @@ void CProxySocket::OnReceive()
 							break;
 					}
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: %s"), error);
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 				}
 				else {
-					m_proxyState = conn;
+					state_ = fz::socket_state::connected;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 					}
@@ -346,7 +383,7 @@ void CProxySocket::OnReceive()
 		case socks5_request:
 			if (sendBuffer_) {
 				m_pOwner->LogMessage(MessageType::Error, _("Proxy sent data while we haven't sent out request yet"));
-				m_proxyState = noconn;
+				state_ = fz::socket_state::failed;
 				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 				}
@@ -358,7 +395,7 @@ void CProxySocket::OnReceive()
 			default:
 				if (receiveBuffer_[0] != 5) {
 					m_pOwner->LogMessage(MessageType::Error, _("Unknown SOCKS protocol version: %d"), (int)receiveBuffer_[0]);
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
@@ -368,7 +405,7 @@ void CProxySocket::OnReceive()
 			case socks5_auth:
 				if (receiveBuffer_[0] != 1) {
 					m_pOwner->LogMessage(MessageType::Error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), receiveBuffer_[0]);
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
@@ -394,7 +431,7 @@ void CProxySocket::OnReceive()
 						break;
 					default:
 						m_pOwner->LogMessage(MessageType::Error, _("No supported SOCKS5 auth method"));
-						m_proxyState = noconn;
+						state_ = fz::socket_state::failed;
 						if (m_pEvtHandler) {
 							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 						}
@@ -409,7 +446,7 @@ void CProxySocket::OnReceive()
 				}
 				if (receiveBuffer_[1] != 0) {
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy authentication failed"));
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
@@ -456,7 +493,7 @@ void CProxySocket::OnReceive()
 					}
 
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed. Reply from proxy: %s"), errorMsg);
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
@@ -495,7 +532,7 @@ void CProxySocket::OnReceive()
 					break;
 				default:
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: Unknown address type in CONNECT reply"));
-					m_proxyState = noconn;
+					state_ = fz::socket_state::failed;
 					if (m_pEvtHandler) {
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
@@ -503,7 +540,7 @@ void CProxySocket::OnReceive()
 				}
 
 				// We're done
-				m_proxyState = conn;
+				state_ = fz::socket_state::connected;
 				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 				}
@@ -518,14 +555,14 @@ void CProxySocket::OnReceive()
 			{
 			case socks5_auth:
 				{
-					auto ulen = static_cast<unsigned char>(std::min(m_user.size(), size_t(255)));
-					auto plen = static_cast<unsigned char>(std::min(m_pass.size(), size_t(255)));
+					auto ulen = static_cast<unsigned char>(std::min(user_.size(), size_t(255)));
+					auto plen = static_cast<unsigned char>(std::min(pass_.size(), size_t(255)));
 					unsigned char* out = sendBuffer_.get(ulen + plen + 3);
 					out[0] = 1;
 					out[1] = ulen;
-					memcpy(out + 2, m_user.c_str(), ulen);
+					memcpy(out + 2, user_.c_str(), ulen);
 					out[ulen + 2] = plen;
-					memcpy(out + ulen + 3, m_pass.c_str(), plen);
+					memcpy(out + ulen + 3, pass_.c_str(), plen);
 					sendBuffer_.add(ulen + plen + 3);
 				}
 				break;
@@ -590,7 +627,7 @@ void CProxySocket::OnReceive()
 			}
 			break;
 		default:
-			m_proxyState = noconn;
+			state_ = fz::socket_state::failed;
 			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Unhandled handshake state %d", m_handshakeState);
 			if (m_pEvtHandler) {
 				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -603,7 +640,7 @@ void CProxySocket::OnReceive()
 void CProxySocket::OnSend()
 {
 	m_can_write = true;
-	if (m_proxyState != handshake || !sendBuffer_) {
+	if (state_ != fz::socket_state::connecting || !sendBuffer_) {
 		return;
 	}
 
@@ -612,7 +649,7 @@ void CProxySocket::OnSend()
 		int written = next_layer_.write(sendBuffer_.get(), sendBuffer_.size(), error);
 		if (written == -1) {
 			if (error != EAGAIN) {
-				m_proxyState = noconn;
+				state_ = fz::socket_state::failed;
 				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 				}
@@ -654,12 +691,12 @@ int CProxySocket::write(void const* buffer, unsigned int size, int& error)
 
 std::wstring CProxySocket::GetUser() const
 {
-	return fz::to_wstring_from_utf8(m_user);
+	return fz::to_wstring_from_utf8(user_);
 }
 
 std::wstring CProxySocket::GetPass() const
 {
-	return fz::to_wstring_from_utf8(m_pass);
+	return fz::to_wstring_from_utf8(pass_);
 }
 
 fz::native_string CProxySocket::peer_host() const

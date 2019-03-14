@@ -231,28 +231,6 @@ private:
 	listen_socket_state state_{};
 };
 
-class socket_interface : public socket_event_source
-{
-public:
-	socket_interface(socket_interface const&) = delete;
-	socket_interface& operator=(socket_interface const&) = delete;
-
-
-	virtual int read(void* buffer, unsigned int size, int& error) = 0;
-	virtual int write(const void* buffer, unsigned int size, int& error) = 0;
-
-	virtual void set_event_handler(event_handler* pEvtHandler) = 0;
-
-	virtual native_string peer_host() const = 0;
-	virtual int peer_port(int& error) const = 0;
-
-protected:
-	socket_interface() = default;
-	
-	explicit socket_interface(socket_event_source * root)
-		: socket_event_source(root)
-	{}
-};
 
 /// State transitions are monotonically increasing
 enum class socket_state
@@ -282,6 +260,33 @@ enum class socket_state
 	failed
 };
 
+class socket_interface : public socket_event_source
+{
+public:
+	socket_interface(socket_interface const&) = delete;
+	socket_interface& operator=(socket_interface const&) = delete;
+
+
+	virtual int read(void* buffer, unsigned int size, int& error) = 0;
+	virtual int write(const void* buffer, unsigned int size, int& error) = 0;
+
+	virtual void set_event_handler(event_handler* pEvtHandler) = 0;
+
+	virtual native_string peer_host() const = 0;
+	virtual int peer_port(int& error) const = 0;
+
+	virtual int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown) { return EINVAL; }
+
+	virtual fz::socket_state get_state() const = 0;
+	
+protected:
+	socket_interface() = default;
+	
+	explicit socket_interface(socket_event_source * root)
+		: socket_event_source(root)
+	{}
+};
+
 /**
  * \brief IPv6 capable, non-blocking socket class
  *
@@ -300,7 +305,7 @@ public:
 	socket(socket const&) = delete;
 	socket& operator=(socket const&) = delete;
 
-	socket_state get_state() const;
+	socket_state get_state() const override;
 	bool is_connected() const {
 		socket_state s = get_state();
 		return s == socket_state::connected || s == socket_state::shutting_down || s == socket_state::shut_down;
@@ -315,7 +320,7 @@ public:
 	// Once connections got established or establishment fails, a connection
 	// event gets sent, with the error parameter indicating success or failur.
 	// connection could not be established, a connection event with an error event gets sent.
-	int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown);
+	virtual int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown) override;
 
 	// After receiving a send or receive event, you can call these functions
 	// as long as their return value is positive.
