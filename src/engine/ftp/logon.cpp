@@ -261,9 +261,8 @@ int CFtpLogonOpData::ParseResponse()
 			controlSocket_.tls_layer_ = std::make_unique<CTlsSocket>(&controlSocket_, *controlSocket_.active_layer_, &controlSocket_);
 			controlSocket_.active_layer_ = controlSocket_.tls_layer_.get();
 
-			int res = controlSocket_.tls_layer_->Handshake();
-			if (res & FZ_REPLY_ERROR) {
-				return res | FZ_REPLY_DISCONNECTED;
+			if (!controlSocket_.tls_layer_->client_handshake()) {
+				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 
 			neededCommands[LOGON_AUTH_SSL] = 0;

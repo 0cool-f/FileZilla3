@@ -32,7 +32,7 @@ char const ciphers[] = "@SYSTEM";
 #if TLSDEBUG
 // This is quite ugly
 CControlSocket* pLoggingControlSocket;
-void log_func(int level, const char* msg)
+void log_func(int level, char const* msg)
 {
 	if (!msg || !pLoggingControlSocket) {
 		return;
@@ -262,9 +262,6 @@ void CTlsSocketImpl::Uninit()
 
 	state_ = fz::socket_state::failed;
 
-	delete [] m_implicitTrustedCert.data;
-	m_implicitTrustedCert.data = nullptr;
-
 #if TLSDEBUG
 	if (pLoggingControlSocket == m_pOwner) {
 		pLoggingControlSocket = nullptr;
@@ -308,7 +305,7 @@ void CTlsSocketImpl::LogError(int code, std::wstring const& function, MessageTyp
 		}
 	}
 	else {
-		const char* error = gnutls_strerror(code);
+		char const* error = gnutls_strerror(code);
 		if (error) {
 			if (function.empty()) {
 				m_pOwner->LogMessage(logLevel, _("GnuTLS error %d: %s"), code, error);
@@ -331,7 +328,7 @@ void CTlsSocketImpl::LogError(int code, std::wstring const& function, MessageTyp
 void CTlsSocketImpl::PrintAlert(MessageType logLevel)
 {
 	gnutls_alert_description_t last_alert = gnutls_alert_get(m_session);
-	const char* alert = gnutls_alert_get_name(last_alert);
+	char const* alert = gnutls_alert_get_name(last_alert);
 	if (alert) {
 		m_pOwner->LogMessage(logLevel, _("Received TLS alert from the server: %s (%d)"), alert, last_alert);
 	}
@@ -350,7 +347,7 @@ ssize_t CTlsSocketImpl::PullFunction(gnutls_transport_ptr_t ptr, void* data, siz
 	return ((CTlsSocketImpl*)ptr)->PullFunction(data, len);
 }
 
-ssize_t CTlsSocketImpl::PushFunction(const void* data, size_t len)
+ssize_t CTlsSocketImpl::PushFunction(void const* data, size_t len)
 {
 #if TLSDEBUG
 	m_pOwner->LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::PushFunction(%d)", len);
@@ -449,6 +446,10 @@ void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source* s, fz::socket_event_
 	case fz::socket_event_flag::write:
 		OnSend();
 		break;
+	case fz::socket_event_flag::connection:
+		if (hostname_.empty()) {
+			set_hostname(tlsSocket_.next_layer_.peer_host());
+		}
 	default:
 		break;
 	}
@@ -529,87 +530,39 @@ void CTlsSocketImpl::ContinueWrite()
 	}
 }
 
-bool CTlsSocketImpl::CopySessionData(const CTlsSocketImpl* pPrimarySocket)
-{
-	datum_holder d;
-	int res = gnutls_session_get_data2(pPrimarySocket->m_session, &d);
-	if (res) {
-		m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_session_get_data2 on primary socket failed: %d", res);
-		return true;
-	}
-
-	// Set session data
-	res = gnutls_session_set_data(m_session, d.data, d.size );
-	if (res) {
-		m_pOwner->LogMessage(MessageType::Debug_Info, L"gnutls_session_set_data failed: %d. Going to reinitialize session.", res);
-		UninitSession();
-		if (!InitSession()) {
-			return false;
-		}
-	}
-	else {
-		m_pOwner->LogMessage(MessageType::Debug_Info, L"Trying to resume existing TLS session.");
-	}
-
-	return true;
-}
-
 bool CTlsSocketImpl::ResumedSession() const
 {
 	return gnutls_session_is_resumed(m_session) != 0;
 }
 
-int CTlsSocketImpl::Handshake(const CTlsSocketImpl* pPrimarySocket, bool try_resume)
+bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate)
 {
-	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::Handshake()");
+	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::client_handshake()");
 
 	if (state_ != fz::socket_state::none) {
-		m_pOwner->LogMessage(MessageType::Debug_Warning, L"Called CTlsSocketImpl::Handshake on a socket that isn't idle");
-		return FZ_REPLY_ERROR;
+		m_pOwner->LogMessage(MessageType::Debug_Warning, L"Called CTlsSocketImpl::client_handshake on a socket that isn't idle");
+		return false;
 	}
 
 	if (!Init()) {
-		return FZ_REPLY_ERROR;
+		return false;
 	}
 
 	state_ = fz::socket_state::connecting;
 
-	if (pPrimarySocket) {
-		if (!pPrimarySocket->m_session) {
-			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Primary socket has no session");
-			Uninit();
-			return FZ_REPLY_ERROR;
-		}
+	required_certificate_ = required_certificate;
 
-		// Implicitly trust certificate of primary socket
-		unsigned int cert_list_size;
-		const gnutls_datum_t* const cert_list = gnutls_certificate_get_peers(pPrimarySocket->m_session, &cert_list_size);
-		if (cert_list && cert_list_size) {
-			delete [] m_implicitTrustedCert.data;
-			m_implicitTrustedCert.data = new unsigned char[cert_list[0].size];
-			memcpy(m_implicitTrustedCert.data, cert_list[0].data, cert_list[0].size);
-			m_implicitTrustedCert.size = cert_list[0].size;
-		}
-
-		if (try_resume) {
-			if (!CopySessionData(pPrimarySocket)) {
-				return FZ_REPLY_ERROR;
+	if (!session_to_resume.empty()) {
+		int res = gnutls_session_set_data(m_session, session_to_resume.data(), session_to_resume.size());
+		if (res) {
+			m_pOwner->LogMessage(MessageType::Debug_Info, L"gnutls_session_set_data failed: %d. Going to reinitialize session.", res);
+			UninitSession();
+			if (!InitSession()) {
+				return false;
 			}
 		}
-
-		hostname_ = pPrimarySocket->tlsSocket_.peer_host();
-	}
-	else {
-		hostname_ = tlsSocket_.peer_host();
-	}
-
-	if (!hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown) {
-		auto const utf8 = fz::to_utf8(hostname_);
-		if (!utf8.empty()) {
-			int res = gnutls_server_name_set(m_session, GNUTLS_NAME_DNS, utf8.c_str(), utf8.size());
-			if (res) {
-				LogError(res, L"gnutls_server_name_set", MessageType::Debug_Warning);
-			}
+		else {
+			m_pOwner->LogMessage(MessageType::Debug_Info, L"Trying to resume existing TLS session.");
 		}
 	}
 
@@ -617,7 +570,12 @@ int CTlsSocketImpl::Handshake(const CTlsSocketImpl* pPrimarySocket, bool try_res
 		gnutls_handshake_set_hook_function(m_session, GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_BOTH, &handshake_hook_func);
 	}
 
-	return ContinueHandshake();
+	if (tlsSocket_.next_layer_.get_state() != fz::socket_state::connected) {
+		return true;
+	}
+
+	set_hostname(tlsSocket_.next_layer_.peer_host());
+	return ContinueHandshake() == FZ_REPLY_WOULDBLOCK;
 }
 
 int CTlsSocketImpl::ContinueHandshake()
@@ -695,7 +653,7 @@ int CTlsSocketImpl::read(void *buffer, unsigned int len, int& error)
 	return -1;
 }
 
-int CTlsSocketImpl::write(const void *buffer, unsigned int len, int& error)
+int CTlsSocketImpl::write(void const* buffer, unsigned int len, int& error)
 {
 	if (state_ == fz::socket_state::connecting) {
 		error = EAGAIN;
@@ -878,7 +836,7 @@ void CTlsSocketImpl::TrustCurrentCert(bool trusted)
 	Failure(0, true);
 }
 
-static std::wstring bin2hex(const unsigned char* in, size_t size)
+static std::wstring bin2hex(unsigned char const* in, size_t size)
 {
 	std::wstring str;
 	str.reserve(size * 3);
@@ -913,7 +871,7 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, CCertificate& ou
 	int pkAlgo = gnutls_x509_crt_get_pk_algorithm(cert, &pkBits);
 	std::wstring pkAlgoName;
 	if (pkAlgo >= 0) {
-		const char* pAlgo = gnutls_pk_algorithm_get_name((gnutls_pk_algorithm_t)pkAlgo);
+		char const* pAlgo = gnutls_pk_algorithm_get_name((gnutls_pk_algorithm_t)pkAlgo);
 		if (pAlgo) {
 			pkAlgoName = fz::to_wstring_from_utf8(pAlgo);
 		}
@@ -922,7 +880,7 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, CCertificate& ou
 	int signAlgo = gnutls_x509_crt_get_signature_algorithm(cert);
 	std::wstring signAlgoName;
 	if (signAlgo >= 0) {
-		const char* pAlgo = gnutls_sign_algorithm_get_name((gnutls_sign_algorithm_t)signAlgo);
+		char const* pAlgo = gnutls_sign_algorithm_get_name((gnutls_sign_algorithm_t)signAlgo);
 		if (pAlgo) {
 			signAlgoName = fz::to_wstring_from_utf8(pAlgo);
 		}
@@ -1334,11 +1292,11 @@ int CTlsSocketImpl::VerifyCertificate()
 		return FZ_REPLY_ERROR;
 	}
 
-	if (m_implicitTrustedCert.data) {
-		if (m_implicitTrustedCert.size != cert_der.size ||
-			memcmp(m_implicitTrustedCert.data, cert_der.data, cert_der.size))
+	if (!required_certificate_.empty()) {
+		if (required_certificate_.size() != cert_der.size ||
+			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
 		{
-			m_pOwner->LogMessage(MessageType::Error, _("Primary connection and data connection certificates don't match."));
+			m_pOwner->LogMessage(MessageType::Error, _("Certificate of connection does not match expected certificate."));
 			Failure(0, true);
 			return FZ_REPLY_ERROR;
 		}
@@ -1403,7 +1361,7 @@ std::wstring CTlsSocketImpl::GetProtocolName()
 {
 	std::wstring ret;
 
-	const char* s = gnutls_protocol_get_name( gnutls_protocol_get_version( m_session ) );
+	char const* s = gnutls_protocol_get_name( gnutls_protocol_get_version( m_session ) );
 	if (s && *s) {
 		ret = fz::to_wstring_from_utf8(s);
 	}
@@ -1419,7 +1377,7 @@ std::wstring CTlsSocketImpl::GetKeyExchange()
 {
 	std::wstring ret;
 
-	const char* s = gnutls_kx_get_name( gnutls_kx_get( m_session ) );
+	char const* s = gnutls_kx_get_name( gnutls_kx_get( m_session ) );
 	if (s && *s) {
 		ret = fz::to_wstring_from_utf8(s);
 	}
@@ -1435,7 +1393,7 @@ std::wstring CTlsSocketImpl::GetCipherName()
 {
 	std::wstring ret;
 
-	const char* cipher = gnutls_cipher_get_name(gnutls_cipher_get(m_session));
+	char const* cipher = gnutls_cipher_get_name(gnutls_cipher_get(m_session));
 	if (cipher && *cipher) {
 		ret = fz::to_wstring_from_utf8(cipher);
 	}
@@ -1451,7 +1409,7 @@ std::wstring CTlsSocketImpl::GetMacName()
 {
 	std::wstring ret;
 
-	const char* mac = gnutls_mac_get_name(gnutls_mac_get(m_session));
+	char const* mac = gnutls_mac_get_name(gnutls_mac_get(m_session));
 	if (mac && *mac) {
 		ret = fz::to_wstring_from_utf8(mac);
 	}
@@ -1472,7 +1430,7 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 	auto list = fz::sprintf("Ciphers for %s:\n", priority);
 
 	gnutls_priority_t pcache;
-	const char *err = nullptr;
+	char const* err = nullptr;
 	int ret = gnutls_priority_init(&pcache, priority.c_str(), &err);
 	if (ret < 0) {
 		list += fz::sprintf("gnutls_priority_init failed with code %d: %s", ret, err ? err : "Unknown error");
@@ -1491,7 +1449,7 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 
 			gnutls_protocol_t version;
 			unsigned char id[2];
-			const char* name = gnutls_cipher_suite_info(idx, id, nullptr, nullptr, nullptr, &version);
+			char const* name = gnutls_cipher_suite_info(idx, id, nullptr, nullptr, nullptr, &version);
 
 			if (name != nullptr) {
 				list += fz::sprintf(
@@ -1510,7 +1468,7 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
 {
 	ssize_t res = gnutls_record_recv(m_session, data, len);
-	while( (res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) && m_canReadFromSocket && !gnutls_record_get_direction(m_session)) {
+	while ((res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) && m_canReadFromSocket && !gnutls_record_get_direction(m_session)) {
 		// Spurious EAGAIN. Can happen if GnuTLS gets a partial
 		// record and the socket got closed.
 		// The unexpected close is being ignored in this case, unless
@@ -1526,10 +1484,61 @@ int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
 
 std::wstring CTlsSocketImpl::GetGnutlsVersion()
 {
-	const char* v = gnutls_check_version(nullptr);
+	char const* v = gnutls_check_version(nullptr);
 	if (!v || !*v) {
 		return L"unknown";
 	}
 
 	return fz::to_wstring(v);
+}
+
+void CTlsSocketImpl::set_hostname(fz::native_string const& host)
+{
+	hostname_ = host;
+	if (!hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown) {
+		auto const utf8 = fz::to_utf8(hostname_);
+		if (!utf8.empty()) {
+			int res = gnutls_server_name_set(m_session, GNUTLS_NAME_DNS, utf8.c_str(), utf8.size());
+			if (res) {
+				LogError(res, L"gnutls_server_name_set", MessageType::Debug_Warning);
+			}
+		}
+	}
+}
+
+int CTlsSocketImpl::connect(fz::native_string const& host, unsigned int port, fz::address_type family)
+{
+	set_hostname(host);
+
+	return tlsSocket_.next_layer_.connect(host, port, family);
+}
+
+std::vector<uint8_t> CTlsSocketImpl::get_session_parameters() const
+{
+	std::vector<uint8_t> ret;
+
+	datum_holder d;
+	int res = gnutls_session_get_data2(m_session, &d);
+	if (res) {
+		m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_session_get_data2 failed: %d", res);
+	}
+	else {
+		ret.assign(d.data, d.data + d.size);
+	}
+	
+	return ret;
+}
+
+std::vector<uint8_t> CTlsSocketImpl::get_raw_certificate() const
+{
+	std::vector<uint8_t> ret;
+
+	// Implicitly trust certificate of primary socket
+	unsigned int cert_list_size;
+	gnutls_datum_t const* const cert_list = gnutls_certificate_get_peers(m_session, &cert_list_size);
+	if (cert_list && cert_list_size) {
+		ret.assign(cert_list[0].data, cert_list[0].data + cert_list[0].size);
+	}
+
+	return ret;
 }

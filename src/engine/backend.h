@@ -41,7 +41,7 @@ public:
 	virtual ~CSocketBackend();
 
 	virtual int read(void *buffer, unsigned int size, int& error) override;
-	virtual int write(const void *buffer, unsigned int size, int& error) override;
+	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
 	virtual fz::socket_state get_state() const override {
 		return next_layer_.get_state();

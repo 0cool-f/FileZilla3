@@ -268,14 +268,14 @@ public:
 
 
 	virtual int read(void* buffer, unsigned int size, int& error) = 0;
-	virtual int write(const void* buffer, unsigned int size, int& error) = 0;
+	virtual int write(void const* buffer, unsigned int size, int& error) = 0;
 
 	virtual void set_event_handler(event_handler* pEvtHandler) = 0;
 
 	virtual native_string peer_host() const = 0;
 	virtual int peer_port(int& error) const = 0;
 
-	virtual int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown) { return EINVAL; }
+	virtual int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown) = 0;
 
 	virtual fz::socket_state get_state() const = 0;
 	
@@ -325,7 +325,7 @@ public:
 	// After receiving a send or receive event, you can call these functions
 	// as long as their return value is positive.
 	virtual int read(void *buffer, unsigned int size, int& error) override;
-	virtual int write(const void *buffer, unsigned int size, int& error) override;
+	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
 	/**
 	* \brief Returns remote address of a connected socket

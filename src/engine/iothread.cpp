@@ -399,7 +399,7 @@ bool CIOThread::WriteToFile(char* pBuffer, int64_t len)
 #endif
 }
 
-bool CIOThread::DoWrite(const char* pBuffer, int64_t len)
+bool CIOThread::DoWrite(char const* pBuffer, int64_t len)
 {
 	auto written = m_pFile->write(pBuffer, len);
 	if (written == len) {

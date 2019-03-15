@@ -19,10 +19,12 @@ public:
 	CTlsSocketImpl(CTlsSocket& tlsSocket, CControlSocket* pOwner);
 	~CTlsSocketImpl();
 
-	int Handshake(const CTlsSocketImpl* pPrimarySocket = nullptr, bool try_resume = 0);
+	bool client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate);
+
+	int connect(fz::native_string const& host, unsigned int port, fz::address_type family);
 
 	int read(void *buffer, unsigned int size, int& error);
-	int write(const void *buffer, unsigned int size, int& error);
+	int write(void const* buffer, unsigned int size, int& error);
 
 	int Shutdown(bool silenceReadErrors);
 
@@ -31,6 +33,9 @@ public:
 	fz::socket_state get_state() const {
 		return state_;
 	}
+
+	std::vector<uint8_t> get_session_parameters() const;
+	std::vector<uint8_t> get_raw_certificate() const;
 
 	std::wstring GetProtocolName();
 	std::wstring GetKeyExchange();
@@ -52,8 +57,7 @@ private:
 
 	bool InitSession();
 	void UninitSession();
-	bool CopySessionData(CTlsSocketImpl const* pPrimarySocket);
-
+	
 	void ContinueWrite();
 	int ContinueHandshake();
 	void ContinueShutdown();
@@ -69,12 +73,10 @@ private:
 
 	static ssize_t PushFunction(gnutls_transport_ptr_t ptr, const void* data, size_t len);
 	static ssize_t PullFunction(gnutls_transport_ptr_t ptr, void* data, size_t len);
-	ssize_t PushFunction(const void* data, size_t len);
+	ssize_t PushFunction(void const* data, size_t len);
 	ssize_t PullFunction(void* data, size_t len);
 
 	int DoCallGnutlsRecordRecv(void* data, size_t len);
-
-	void TriggerEvents();
 
 	void operator()(fz::event_base const& ev);
 	void OnSocketEvent(fz::socket_event_source* source, fz::socket_event_flag t, int error);
@@ -88,6 +90,8 @@ private:
 	std::vector<CCertificate::SubjectName> GetCertSubjectAltNames(gnutls_x509_crt_t cert);
 
 	void PrintVerificationError(int status);
+
+	void set_hostname(fz::native_string const& host);
 
 	CTlsSocket& tlsSocket_;
 
@@ -115,7 +119,7 @@ private:
 	bool m_lastWriteFailed{false};
 	unsigned int m_writeSkip{};
 
-	gnutls_datum_t m_implicitTrustedCert{};
+	std::vector<uint8_t> required_certificate_;
 
 	bool m_socket_eof{};
 	int m_socket_error{ECONNABORTED}; // Set in the push and pull functions if reading/writing fails fatally

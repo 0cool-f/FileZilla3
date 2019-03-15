@@ -29,9 +29,6 @@ enum capabilityNames
 	rest_stream, // supports REST+STOR in addition to APPE
 	epsv_command,
 
-	// FTPS and HTTPS
-	tls_resume, // Does the server support resuming of TLS sessions?
-
 	// Server timezone offset. If using FTP, LIST details are unspecified and
 	// can return different times than the UTC based times using the MLST or
 	// MDTM commands.

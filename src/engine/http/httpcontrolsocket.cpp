@@ -204,8 +204,7 @@ void CHttpControlSocket::OnConnect()
 			tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, this);
 			active_layer_ = tls_layer_.get();
 
-			int res = tls_layer_->Handshake();
-			if (res == FZ_REPLY_ERROR) {
+			if (!tls_layer_->client_handshake()) {
 				DoClose();
 			}
 		}

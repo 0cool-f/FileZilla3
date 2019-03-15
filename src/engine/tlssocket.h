@@ -12,10 +12,28 @@ public:
 	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface& layer, CControlSocket* pOwner);
 	virtual ~CTlsSocket();
 
-	int Handshake(const CTlsSocket* pPrimarySocket = nullptr, bool try_resume = 0);
+	/**
+	 * \brief Starts shaking hand for a new TLS session as client.
+	 *
+	 * Returns true if the handshake has started, false on error.
+	 *
+	 * If the handshake is started, wait for a connection event for the result.
+	 *
+	 * If a required certificate is passed, either in DER or PEM, the session's certificate
+	 * must match the passed certificate or the handshake will fail.
+	 */
+	bool client_handshake(std::vector<uint8_t> const& session_to_resume = std::vector<uint8_t>(), std::vector<uint8_t> const& required_certificate = std::vector<uint8_t>());
+
+	/// Gets session parameters for resumption
+	std::vector<uint8_t> get_session_parameters() const;
+
+	/// Gets the session's certificate in DER
+	std::vector<uint8_t> get_raw_certificate() const;
+
+	virtual int connect(fz::native_string const& host, unsigned int port, fz::address_type family = fz::address_type::unknown) override;
 
 	virtual int read(void *buffer, unsigned int size, int& error) override;
-	virtual int write(const void *buffer, unsigned int size, int& error) override;
+	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
 	int Shutdown(bool silenceReadErrors);
 

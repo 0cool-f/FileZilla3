@@ -17,9 +17,9 @@ CTlsSocket::~CTlsSocket()
 	remove_handler();
 }
 
-int CTlsSocket::Handshake(CTlsSocket const* pPrimarySocket, bool try_resume)
+bool CTlsSocket::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate)
 {
-	return impl_->Handshake(pPrimarySocket ? pPrimarySocket->impl_.get() : nullptr, try_resume);
+	return impl_->client_handshake(session_to_resume, required_certificate);
 }
 
 int CTlsSocket::read(void *buffer, unsigned int size, int& error)
@@ -27,7 +27,7 @@ int CTlsSocket::read(void *buffer, unsigned int size, int& error)
 	return impl_->read(buffer, size, error);
 }
 
-int CTlsSocket::write(const void *buffer, unsigned int size, int& error)
+int CTlsSocket::write(void const* buffer, unsigned int size, int& error)
 {
 	return impl_->write(buffer, size, error);
 }
@@ -95,4 +95,19 @@ void CTlsSocket::operator()(fz::event_base const& ev)
 std::wstring CTlsSocket::GetGnutlsVersion()
 {
 	return CTlsSocketImpl::GetGnutlsVersion();
+}
+
+std::vector<uint8_t> CTlsSocket::get_session_parameters() const
+{
+	return impl_->get_session_parameters();
+}
+
+std::vector<uint8_t> CTlsSocket::get_raw_certificate() const
+{
+	return impl_->get_raw_certificate();
+}
+
+int CTlsSocket::connect(fz::native_string const& host, unsigned int port, fz::address_type family)
+{
+	return impl_->connect(host, port, family);
 }

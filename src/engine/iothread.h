@@ -65,7 +65,7 @@ private:
 
 	int64_t ReadFromFile(char* pBuffer, int64_t maxLen);
 	bool WriteToFile(char* pBuffer, int64_t len);
-	bool DoWrite(const char* pBuffer, int64_t len);
+	bool DoWrite(char const* pBuffer, int64_t len);
 
 	fz::event_handler* m_evtHandler{};
 

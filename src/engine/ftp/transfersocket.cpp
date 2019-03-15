@@ -163,16 +163,12 @@ void CTransferSocket::OnAccept(int error)
 	}
 	socketServer_.reset();
 
-	ratelimit_layer_ = std::make_unique<CSocketBackend>(nullptr, *socket_, engine_.GetRateLimiter());
-	active_layer_ = ratelimit_layer_.get();
-
-	if (controlSocket_.m_protectDataChannel) {
-		if (!InitTls()) {
-			TransferEnd(TransferEndReason::transfer_failure);
-			return;
-		}
+	if (!InitLayers(true)) {
+		TransferEnd(TransferEndReason::transfer_failure);
+		return;
 	}
-	else {
+
+	if (active_layer_->get_state() == fz::socket_state::connected) {
 		OnConnect();
 	}
 }
@@ -190,9 +186,6 @@ void CTransferSocket::OnConnect()
 	if (tls_layer_) {
 		// Re-enable Nagle algorithm
 		socket_->set_flags(socket_->flags() & (~fz::socket::flag_nodelay));
-		if (CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resume) == unknown)	{
-			CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resume, tls_layer_->ResumedSession() ? yes : no);
-		}
 	}
 
 #ifdef FZ_WINDOWS
@@ -463,7 +456,13 @@ bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
 		}
 	}
 
-	if (!InitLayers(false, ip, port)) {
+	if (!InitLayers(false)) {
+		ResetSocket();
+		return false;
+	}
+
+	int res = active_layer_->connect(fz::to_native(ip), port, fz::address_type::unknown);
+	if (res && res != EINPROGRESS) {
 		ResetSocket();
 		return false;
 	}
@@ -471,7 +470,7 @@ bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
 	return true;
 }
 
-bool CTransferSocket::InitLayers(bool active, std::string const& ip, int port)
+bool CTransferSocket::InitLayers(bool active)
 {
 	ratelimit_layer_ = std::make_unique<CSocketBackend>(nullptr, *socket_, engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
@@ -492,14 +491,15 @@ bool CTransferSocket::InitLayers(bool active, std::string const& ip, int port)
 	else {
 		ratelimit_layer_->set_event_handler(this);
 	}
-	
-	int res = active_layer_->connect(fz::to_native(ip), port, fz::address_type::unknown);
-	if (res && res != EINPROGRESS) {
-		return false;
-	}
 
 	if (controlSocket_.m_protectDataChannel) {
-		if (!InitTls()) {
+		// Disable Nagle's algorithm during TLS handshake
+		socket_->set_flags(socket_->flags() | fz::socket::flag_nodelay);
+
+		tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, &controlSocket_);
+		active_layer_ = tls_layer_.get();
+
+		if (!tls_layer_->client_handshake(controlSocket_.tls_layer_->get_session_parameters(), controlSocket_.tls_layer_->get_raw_certificate())) {
 			return false;
 		}
 	}
@@ -708,24 +708,6 @@ void CTransferSocket::FinalizeWrite()
 		}
 		TransferEnd(TransferEndReason::transfer_failure_critical);
 	}
-}
-
-bool CTransferSocket::InitTls()
-{
-	// Disable Nagle's algorithm during TLS handshake
-	socket_->set_flags(socket_->flags() | fz::socket::flag_nodelay);
-
-	tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, &controlSocket_);
-	active_layer_ = tls_layer_.get();
-
-	bool try_resume = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resume) != no;
-
-	int res = tls_layer_->Handshake(controlSocket_.tls_layer_.get(), try_resume);
-	if (res && res != FZ_REPLY_WOULDBLOCK) {
-		return false;
-	}
-
-	return true;
 }
 
 void CTransferSocket::TriggerPostponedEvents()

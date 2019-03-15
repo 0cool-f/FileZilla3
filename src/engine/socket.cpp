@@ -1437,7 +1437,7 @@ int socket::read(void* buffer, unsigned int size, int& error)
 	return res;
 }
 
-int socket::write(const void* buffer, unsigned int size, int& error)
+int socket::write(void const* buffer, unsigned int size, int& error)
 {
 #ifdef MSG_NOSIGNAL
 	const int flags = MSG_NOSIGNAL;
