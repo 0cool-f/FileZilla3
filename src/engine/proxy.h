@@ -61,7 +61,6 @@ protected:
 
 	virtual void operator()(fz::event_base const& ev) override;
 	void OnSocketEvent(socket_event_source* source, fz::socket_event_flag t, int error);
-	void OnHostAddress(socket_event_source* source, std::string const& address);
 
 	void OnReceive();
 	void OnSend();

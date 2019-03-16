@@ -853,7 +853,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 	if (proxy_type > static_cast<int>(ProxyType::NONE) && proxy_type < static_cast<int>(ProxyType::count) && !currentServer_.GetBypassProxy()) {
 		LogMessage(MessageType::Status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<ProxyType>(proxy_type)));
 
-		std::wstring proxy_host = engine_.GetOptions().GetOption(OPTION_PROXY_HOST);
+		fz::native_string proxy_host = fz::to_native(engine_.GetOptions().GetOption(OPTION_PROXY_HOST));
 
 		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, this, static_cast<ProxyType>(proxy_type),
 			proxy_host, engine_.GetOptions().GetOptionVal(OPTION_PROXY_PORT),

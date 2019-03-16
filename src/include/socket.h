@@ -104,23 +104,10 @@ void change_socket_event_handler(event_handler * old_handler, event_handler * ne
 /// \private
 class socket_thread;
 
-/// \private
+/// Common base clase for fz::socket and fz::listen_socket
 class socket_base
 {
 public:
-	virtual ~socket_base() = default;
-	enum
-	{
-		/// flag_nodelay disables Nagle's algorithm
-		flag_nodelay = 0x01,
-
-		/// flag_keepalive enables TCP keepalive.
-		flag_keepalive = 0x02
-	};
-
-	int flags() const { return flags_; }
-	void set_flags(int flags);
-
 	/**
 	 * \brief Sets socket buffer sizes.
 	 *
@@ -129,13 +116,6 @@ public:
 	 * If called on listen socket, sizes will be inherited by accepted sockets.
 	 */
 	int set_buffer_sizes(int size_receive, int size_send);
-
-	/**
-	 * Sets the interval between TCP keepalive packets.
-	 *
-	 * Duration must not be smaller than 5 minutes. The default interval is 2 hours.
-	 */
-	void set_keepalive_interval(duration const& d);
 
 	/// If connected, either ipv4 or ipv6, unknown otherwise
 	address_type address_family() const;
@@ -165,14 +145,14 @@ public:
 	bool bind(std::string const& address);
 
 protected:
-	int close();
-
-protected:
-	void do_set_event_handler(event_handler* pEvtHandler);
-
 	friend class socket_thread;
 
 	socket_base(thread_pool& pool, event_handler* evt_handler, socket_event_source* ev_source);
+	virtual ~socket_base() = default;
+
+	int close();
+
+	void do_set_event_handler(event_handler* pEvtHandler);
 
 	// Note: Unlocks the lock.
 	void detach_thread(scoped_lock & l);
@@ -187,9 +167,6 @@ protected:
 	unsigned int port_{};
 
 	int family_;
-
-	int flags_{};
-	duration keepalive_interval_;
 
 	int buffer_sizes_[2];
 
@@ -367,12 +344,34 @@ public:
 
 	virtual void set_event_handler(event_handler* pEvtHandler) override;
 
+	enum
+	{
+		/// flag_nodelay disables Nagle's algorithm
+		flag_nodelay = 0x01,
+
+		/// flag_keepalive enables TCP keepalive.
+		flag_keepalive = 0x02
+	};
+
+	int flags() const { return flags_; }
+	void set_flags(int flags);
+
+	/**
+	 * Sets the interval between TCP keepalive packets.
+	 *
+	 * Duration must not be smaller than 5 minutes. The default interval is 2 hours.
+	 */
+	void set_keepalive_interval(duration const& d);
+
 private:
 	friend class socket_base;
 	friend class listen_socket;
 	native_string host_;
 
 	socket_state state_{};
+
+	int flags_{};
+	duration keepalive_interval_;
 };
 
 #ifdef FZ_WINDOWS

@@ -21,7 +21,8 @@ public:
 	socket_interface & next() { return next_layer_; }
 
 protected:
-	void forward_event(fz::socket_event_source* source, fz::socket_event_flag t, int error);
+	void forward_socket_event(fz::socket_event_source* source, fz::socket_event_flag t, int error);
+	void forward_hostaddress_event(fz::socket_event_source* source, std::string const& address);
 
 	void set_event_passthrough(bool passthrough);
 

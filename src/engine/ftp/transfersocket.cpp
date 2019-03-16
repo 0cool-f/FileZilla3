@@ -485,24 +485,23 @@ bool CTransferSocket::InitLayers(bool active)
 			return false;
 		}
 
-		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, &controlSocket_, controlSocket_.proxy_layer_->GetProxyType(), proxy_host, proxy_port, controlSocket_.proxy_layer_->GetUser(), controlSocket_.proxy_layer_->GetPass());
+		proxy_layer_ = std::make_unique<CProxySocket>(nullptr, *active_layer_, &controlSocket_, controlSocket_.proxy_layer_->GetProxyType(), proxy_host, proxy_port, controlSocket_.proxy_layer_->GetUser(), controlSocket_.proxy_layer_->GetPass());
 		active_layer_ = proxy_layer_.get();
-	}
-	else {
-		ratelimit_layer_->set_event_handler(this);
 	}
 
 	if (controlSocket_.m_protectDataChannel) {
 		// Disable Nagle's algorithm during TLS handshake
 		socket_->set_flags(socket_->flags() | fz::socket::flag_nodelay);
 
-		tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, &controlSocket_);
+		tls_layer_ = std::make_unique<CTlsSocket>(nullptr, *active_layer_, &controlSocket_);
 		active_layer_ = tls_layer_.get();
 
 		if (!tls_layer_->client_handshake(controlSocket_.tls_layer_->get_session_parameters(), controlSocket_.tls_layer_->get_raw_certificate())) {
 			return false;
 		}
 	}
+
+	active_layer_->set_event_handler(this);
 
 	return true;
 }

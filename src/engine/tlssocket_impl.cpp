@@ -417,7 +417,14 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 
 void CTlsSocketImpl::operator()(fz::event_base const& ev)
 {
-	fz::dispatch<fz::socket_event>(ev, this, &CTlsSocketImpl::OnSocketEvent);
+	fz::dispatch<fz::socket_event, fz::hostaddress_event>(ev, this
+		, &CTlsSocketImpl::OnSocketEvent
+		, &CTlsSocketImpl::forward_hostaddress_event);
+}
+
+void CTlsSocketImpl::forward_hostaddress_event(fz::socket_event_source* source, std::string const& address)
+{
+	tlsSocket_.forward_hostaddress_event(source, address);
 }
 
 void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source* s, fz::socket_event_flag t, int error)
@@ -427,14 +434,14 @@ void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source* s, fz::socket_event_
 	}
 
 	if (t == fz::socket_event_flag::connection_next) {
-		tlsSocket_.forward_event(s, t, error);
+		tlsSocket_.forward_socket_event(s, t, error);
 		return;
 	}
 
 	if (error) {
 		m_socket_error = error;
 		Uninit();
-		tlsSocket_.forward_event(s, t, error);
+		tlsSocket_.forward_socket_event(s, t, error);
 		return;
 	}
 

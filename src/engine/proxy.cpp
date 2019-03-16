@@ -216,7 +216,7 @@ void CProxySocket::operator()(fz::event_base const& ev)
 {
 	fz::dispatch<fz::socket_event, fz::hostaddress_event>(ev, this,
 		&CProxySocket::OnSocketEvent,
-		&CProxySocket::OnHostAddress);
+		&CProxySocket::forward_hostaddress_event);
 }
 
 void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t, int error)
@@ -226,13 +226,13 @@ void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t
 	}
 
 	if (t == fz::socket_event_flag::connection_next) {
-		forward_event(s, t, error);
+		forward_socket_event(s, t, error);
 		return;
 	}
 
 	if (error) {
 		state_ = fz::socket_state::failed;
-		forward_event(s, t, error);
+		forward_socket_event(s, t, error);
 		return;
 	}
 
@@ -249,11 +249,6 @@ void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t
 	default:
 		break;
 	}
-}
-
-void CProxySocket::OnHostAddress(socket_event_source*, std::string const& address)
-{
-	m_pOwner->LogMessage(MessageType::Status, _("Connecting to %s..."), address);
 }
 
 void CProxySocket::OnReceive()
@@ -519,10 +514,10 @@ void CProxySocket::OnReceive()
 					if (receiveBuffer_.size() < 5) {
 						goto loop;
 					}
-					if (receiveBuffer_.size() < receiveBuffer_[4] + 7) {
+					if (receiveBuffer_.size() < receiveBuffer_[4] + 7u) {
 						goto loop;
 					}
-					receiveBuffer_.consume(receiveBuffer_[4] + 7);
+					receiveBuffer_.consume(receiveBuffer_[4] + 7u);
 					break;
 				case 4:
 					if (receiveBuffer_.size() < 22) {

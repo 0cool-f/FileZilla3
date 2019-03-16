@@ -32,10 +32,17 @@ void SocketLayer::set_event_handler(fz::event_handler* pEvtHandler)
 	}
 }
 
-void SocketLayer::forward_event(fz::socket_event_source* source, fz::socket_event_flag t, int error)
+void SocketLayer::forward_socket_event(fz::socket_event_source* source, fz::socket_event_flag t, int error)
 {
 	if (m_pEvtHandler) {
 		(*m_pEvtHandler)(fz::socket_event(source, t, error));
+	}
+}
+
+void SocketLayer::forward_hostaddress_event(fz::socket_event_source* source, std::string const& address)
+{
+	if (m_pEvtHandler) {
+		(*m_pEvtHandler)(fz::hostaddress_event(source, address));
 	}
 }
 

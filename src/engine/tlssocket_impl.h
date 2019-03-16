@@ -80,6 +80,7 @@ private:
 
 	void operator()(fz::event_base const& ev);
 	void OnSocketEvent(fz::socket_event_source* source, fz::socket_event_flag t, int error);
+	void forward_hostaddress_event(fz::socket_event_source* source, std::string const& address);
 
 	void OnRead();
 	void OnSend();

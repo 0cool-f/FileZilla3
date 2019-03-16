@@ -469,7 +469,8 @@ protected:
 			(void)::bind(fd, &bindAddr.sockaddr_, sizeof(bindAddr));
 		}
 
-		do_set_flags(fd, socket_->flags_, socket_->flags_, socket_->keepalive_interval_);
+		auto* s = static_cast<socket*>(socket_);
+		do_set_flags(fd, s->flags_, s->flags_, s->keepalive_interval_);
 		do_set_buffer_sizes(fd, socket_->buffer_sizes_[0], socket_->buffer_sizes_[1]);
 
 		int res = ::connect(fd, addr.ai_addr, addr.ai_addrlen);
@@ -924,7 +925,6 @@ socket_base::socket_base(thread_pool& pool, event_handler* evt_handler, socket_e
 	: thread_pool_(pool)
 	, evt_handler_(evt_handler)
 	, socket_thread_(new socket_thread(this))
-	, keepalive_interval_(duration::from_hours(2))
 	, ev_source_(ev_source)
 {
 	family_ = AF_UNSPEC;
@@ -1126,20 +1126,6 @@ int socket_base::local_port(int& error)
 	return -1;
 }
 
-void socket_base::set_flags(int flags)
-{
-	if (!socket_thread_) {
-		return;
-	}
-
-	scoped_lock l(socket_thread_->mutex_);
-	
-	if (fd_ != -1) {
-		do_set_flags(fd_, flags, flags ^ flags_, keepalive_interval_);
-	}
-	flags_ = flags;
-}
-
 int socket_base::set_buffer_sizes(int size_receive, int size_send)
 {
 	if (!socket_thread_) {
@@ -1159,24 +1145,6 @@ int socket_base::set_buffer_sizes(int size_receive, int size_send)
 	return do_set_buffer_sizes(fd_, size_receive, size_send);
 }
 
-void socket_base::set_keepalive_interval(duration const& d)
-{
-	if (!socket_thread_) {
-		return;
-	}
-
-	if (d < duration::from_minutes(1)) {
-		return;
-	}
-
-	scoped_lock l(socket_thread_->mutex_);
-
-	keepalive_interval_ = d;
-	if (fd_ != -1) {
-		do_set_flags(fd_, flags_, flag_keepalive, keepalive_interval_);
-	}
-}
-
 bool socket_base::bind(std::string const& address)
 {
 	scoped_lock l(socket_thread_->mutex_);
@@ -1191,6 +1159,7 @@ bool socket_base::bind(std::string const& address)
 
 listen_socket::listen_socket(thread_pool & pool, event_handler* evt_handler)
 	: socket_base(pool, evt_handler, this)
+	, socket_event_source(this)
 {
 }
 
@@ -1323,8 +1292,10 @@ socket* listen_socket::accept(int &error)
 		delete pSocket;
 		return nullptr;
 	}
+
 	pSocket->state_ = socket_state::connected;
 	pSocket->fd_ = fd;
+	pSocket->host_ = to_native(pSocket->peer_ip());
 	pSocket->socket_thread_->waiting_ = WAIT_READ | WAIT_WRITE;
 	pSocket->socket_thread_->start();
 
@@ -1345,6 +1316,8 @@ listen_socket_state listen_socket::get_state()
 
 socket::socket(thread_pool & pool, event_handler* evt_handler)
 	: socket_base(pool, evt_handler, this)
+	, socket_interface(this)
+	, keepalive_interval_(duration::from_hours(2))
 {
 }
 
@@ -1615,6 +1588,38 @@ void socket::set_event_handler(event_handler* pEvtHandler)
 			pEvtHandler->send_event<socket_event>(ev_source_, socket_event_flag::read, 0);
 		}
 	}
+}
+
+void socket::set_keepalive_interval(duration const& d)
+{
+	if (!socket_thread_) {
+		return;
+	}
+
+	if (d < duration::from_minutes(1)) {
+		return;
+	}
+
+	scoped_lock l(socket_thread_->mutex_);
+
+	keepalive_interval_ = d;
+	if (fd_ != -1) {
+		do_set_flags(fd_, flags_, flag_keepalive, keepalive_interval_);
+	}
+}
+
+void socket::set_flags(int flags)
+{
+	if (!socket_thread_) {
+		return;
+	}
+
+	scoped_lock l(socket_thread_->mutex_);
+
+	if (fd_ != -1) {
+		do_set_flags(fd_, flags, flags ^ flags_, keepalive_interval_);
+	}
+	flags_ = flags;
 }
 
 }
