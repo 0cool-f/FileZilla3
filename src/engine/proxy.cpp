@@ -199,7 +199,7 @@ int CProxySocket::connect(fz::native_string const& host, unsigned int port, fz::
 	if (next_layer_.get_state() == fz::socket_state::none) {
 		int ret = next_layer_.connect(proxy_host_, proxy_port_);
 
-		if (ret && ret != EINPROGRESS) {
+		if (ret) {
 			state_ = fz::socket_state::failed;
 			return ret;
 		}
@@ -209,7 +209,7 @@ int CProxySocket::connect(fz::native_string const& host, unsigned int port, fz::
 			OnSend();
 		}
 	}
-	return EINPROGRESS;
+	return 0;
 }
 
 void CProxySocket::operator()(fz::event_base const& ev)

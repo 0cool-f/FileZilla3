@@ -462,7 +462,7 @@ bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
 	}
 
 	int res = active_layer_->connect(fz::to_native(ip), port, fz::address_type::unknown);
-	if (res && res != EINPROGRESS) {
+	if (res) {
 		ResetSocket();
 		return false;
 	}

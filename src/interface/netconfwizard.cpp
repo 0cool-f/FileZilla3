@@ -222,7 +222,7 @@ void CNetConfWizard::OnPageChanging(wxWizardEvent& event)
 		m_recvBufferPos = 0;
 
 		int res = m_socket->connect(fzT("probe.filezilla-project.org"), 21);
-		if (res && res != EINPROGRESS) {
+		if (res) {
 			PrintMessage(wxString::Format(_("Connect failed: %s"), fz::socket_error_description(res)), 1);
 			CloseSocket();
 		}

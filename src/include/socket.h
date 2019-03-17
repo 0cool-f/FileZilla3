@@ -144,6 +144,12 @@ public:
 	 */
 	bool bind(std::string const& address);
 
+#if FZ_WINDOWS
+	typedef intptr_t socket_t;
+#else
+	typedef int socket_t;
+#endif
+
 protected:
 	friend class socket_thread;
 
@@ -160,7 +166,7 @@ protected:
 	thread_pool & thread_pool_;
 	event_handler* evt_handler_;
 
-	int fd_{-1};
+	socket_t fd_{-1};
 
 	socket_thread* socket_thread_{};
 
@@ -288,20 +294,53 @@ public:
 		return s == socket_state::connected || s == socket_state::shutting_down || s == socket_state::shut_down;
 	};
 
-	// Connects to the given host, given as name, IPv4 or IPv6 address.
-	// Returns 0 on success, else an error code. Note: EINPROGRESS is
-	// not really an error. On success, you should still wait for the
-	// connection event.
-	// If host is a name that can be resolved, a hostaddress socket event gets
-	// sent.
-	// Once connections got established or establishment fails, a connection
-	// event gets sent, with the error parameter indicating success or failur.
-	// connection could not be established, a connection event with an error event gets sent.
+	/**
+	 * \brief Starts connecting to the given host, given as name, IPv4 or IPv6 address.
+	 *
+	 * Returns 0 on success, else an error code.
+	 *
+	 * Success only means that the establishing of the connection
+	 * has started. Once the connection gets fully established or
+	 * establishment fails, a connection event gets sent, with the error
+	 * parameter indicating success or failure.
+	 *
+	 * If host is a name that can be resolved, a hostaddress socket event gets
+	 * sent during establishment.
+	 */
 	virtual int connect(native_string const& host, unsigned int port, address_type family = address_type::unknown) override;
 
-	// After receiving a send or receive event, you can call these functions
-	// as long as their return value is positive.
+	/**
+	 * \brief Read data from socket
+	 *
+	 * Reads data from socket, returns the number of octets read or -1 on error.
+	 *
+	 * May return fewer  octets than requested. Return of 0 bytes read indicates EOF.
+	 *
+	 * Can be called after having receiving a socket event with the read
+	 * flag and can thenceforth be called until until it returns an error.
+	 *
+	 * If the error is EAGAIN, wait for the next read event. On other errors
+	 * the socket has failed and should be closed.
+	 *
+	 * Takes care of EINTR internally.
+	 */
 	virtual int read(void *buffer, unsigned int size, int& error) override;
+
+	/**
+	 * \brief Write data to socket
+	 *
+	 * Writes data to the socket, returns the number of octets written or -1 on error.
+	 *
+	 * May return fewer octets than requested.
+	 *
+	 * Can be called after having receiving a socket event with the write
+	 * flag and can thenceforth be called until until it returns an error.
+	 *
+	 * If the error is EAGAIN, wait for the next write event. On other errors
+	 * the socket has failed and should be closed.
+	 *
+	 * Takes care of EINTR internally.
+	 */
 	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
 	/**

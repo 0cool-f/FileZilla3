@@ -87,7 +87,7 @@ void CExternalIPResolver::GetExternalIP(std::wstring const& address, fz::address
 	socket_ = new fz::socket(thread_pool_, this);
 
 	int res = socket_->connect(fz::to_native(host), m_port, protocol);
-	if (res && res != EINPROGRESS) {
+	if (res) {
 		Close(false);
 		return;
 	}

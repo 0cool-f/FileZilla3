@@ -875,8 +875,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 
 	int res = active_layer_->connect(fz::to_native(ConvertDomainName(host)), port);
 
-	// Treat success same as EINPROGRESS, we wait for connect notification in any case
-	if (res && res != EINPROGRESS) {
+	if (res) {
 		LogMessage(MessageType::Error, _("Could not connect to server: %s"), fz::socket_error_description(res));
 		return FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR; 
 	}

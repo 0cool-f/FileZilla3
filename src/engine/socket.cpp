@@ -193,7 +193,7 @@ int last_socket_error()
 inline int last_socket_error() { return errno; }
 #endif
 
-int set_nonblocking(int fd)
+int set_nonblocking(socket::socket_t fd)
 {
 	// Set socket to non-blocking.
 #ifdef FZ_WINDOWS
@@ -218,7 +218,7 @@ int set_nonblocking(int fd)
 #endif
 }
 
-int do_set_flags(int fd, int flags, int flags_mask, duration const& keepalive_interval)
+int do_set_flags(socket::socket_t fd, int flags, int flags_mask, duration const& keepalive_interval)
 {
 	if (flags_mask & socket::flag_nodelay) {
 		const int value = (flags & socket::flag_nodelay) ? 1 : 0;
@@ -257,7 +257,7 @@ int do_set_flags(int fd, int flags, int flags_mask, duration const& keepalive_in
 	return 0;
 }
 
-int do_set_buffer_sizes(int fd, int size_read, int size_write)
+int do_set_buffer_sizes(socket::socket_t fd, int size_read, int size_write)
 {
 	int ret = 0;
 	if (size_read != -1) {
@@ -415,9 +415,9 @@ public:
 	}
 
 protected:
-	static int create_socket_fd(addrinfo const& addr)
+	static socket::socket_t create_socket_fd(addrinfo const& addr)
 	{
-		int fd;
+		socket::socket_t fd;
 #if defined(SOCK_CLOEXEC) && !defined(FZ_WINDOWS)
 		fd = ::socket(addr.ai_family, addr.ai_socktype | SOCK_CLOEXEC, addr.ai_protocol);
 		if (fd == -1 && errno == EINVAL)
@@ -438,7 +438,7 @@ protected:
 		return fd;
 	}
 
-	static void close_socket_fd(int& fd)
+	static void close_socket_fd(socket::socket_t& fd)
 	{
 		if (fd != -1) {
 	#ifdef FZ_WINDOWS
@@ -456,7 +456,7 @@ protected:
 			socket_->evt_handler_->send_event<hostaddress_event>(socket_->ev_source_, socket::address_to_string(addr.ai_addr, addr.ai_addrlen));
 		}
 
-		int fd = create_socket_fd(addr);
+		socket::socket_t fd = create_socket_fd(addr);
 		if (fd == -1) {
 			if (socket_->evt_handler_) {
 				socket_->evt_handler_->send_event<socket_event>(socket_->ev_source_, addr.ai_next ? socket_event_flag::connection_next : socket_event_flag::connection, last_socket_error());
@@ -489,7 +489,7 @@ protected:
 #endif
 		}
 
-		if (res == EINPROGRESS) {
+		while (res == EINPROGRESS) {
 
 			socket_->fd_ = fd;
 
@@ -987,7 +987,7 @@ int socket_base::close()
 	}
 
 	scoped_lock l(socket_thread_->mutex_);
-	int fd = fd_;
+	socket_t fd = fd_;
 	fd_ = -1;
 
 	socket_thread_->host_.clear();
@@ -1270,7 +1270,7 @@ socket* listen_socket::accept(int &error)
 	}
 
 	// TODO: accept4 for SOCK_CLOEXEC
-	int fd = ::accept(fd_, nullptr, nullptr);
+	socket_t fd = ::accept(fd_, nullptr, nullptr);
 	if (fd == -1) {
 		error = last_socket_error();
 		return nullptr;
@@ -1371,7 +1371,7 @@ int socket::connect(native_string const& host, unsigned int port, address_type f
 		return res;
 	}
 
-	return EINPROGRESS;
+	return 0;
 }
 
 socket_state socket::get_state() const
