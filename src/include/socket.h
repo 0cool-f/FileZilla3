@@ -190,6 +190,13 @@ enum class listen_socket_state
 	listening,
 };
 
+/**
+ * /brief Simple Listen socket
+ *
+ * When a client connects, a socket event with the connection flag is send.
+ * 
+ * Call accept to accept.
+ */
 class listen_socket final : public socket_base, public socket_event_source
 {
 	friend class socket_base;
@@ -201,7 +208,17 @@ public:
 	listen_socket(listen_socket const&) = delete;
 	listen_socket& operator=(listen_socket const&) = delete;
 
+	/**
+	 * \brief Starts listening
+	 *
+	 * If no port is given, let the operating system devcide on a port. Can use local_port to query it afterwards.
+	 *
+	 * The address type, if not fz::address_type::unknown, must may the type of the address passed to bind()
+	 */
+
 	int listen(address_type family, int port = 0);
+
+	/// Accepts incoming connection. If no socket is returned, error contains the reason
 	socket* accept(int& error);
 
 	listen_socket_state get_state();
@@ -243,12 +260,16 @@ enum class socket_state
 	failed
 };
 
+/**
+ * \brief Interface for sockets
+ *
+ * Can be used for layers, see fz::socket for the expexted semantics.
+ */
 class socket_interface : public socket_event_source
 {
 public:
 	socket_interface(socket_interface const&) = delete;
 	socket_interface& operator=(socket_interface const&) = delete;
-
 
 	virtual int read(void* buffer, unsigned int size, int& error) = 0;
 	virtual int write(void const* buffer, unsigned int size, int& error) = 0;
@@ -377,7 +398,8 @@ public:
 	/**
 	 * \brief Signals peers that we want to close the connections.
 	 *
-	 * Implicitly done through close.
+	 * Only disallowes further sends, does not affect reading frmo the
+	 * socket.
 	 */
 	int shutdown();
 

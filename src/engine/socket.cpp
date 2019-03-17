@@ -1263,14 +1263,17 @@ socket* listen_socket::accept(int &error)
 		return nullptr;
 	}
 
+	socket_t fd;
+
 	{
 		scoped_lock l(socket_thread_->mutex_);
 		socket_thread_->waiting_ |= WAIT_ACCEPT;
 		socket_thread_->wakeup_thread(l);
+
+		// TODO: accept4 for SOCK_CLOEXEC
+		fd = ::accept(fd_, nullptr, nullptr);
 	}
 
-	// TODO: accept4 for SOCK_CLOEXEC
-	socket_t fd = ::accept(fd_, nullptr, nullptr);
 	if (fd == -1) {
 		error = last_socket_error();
 		return nullptr;
