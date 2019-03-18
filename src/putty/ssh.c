@@ -7442,6 +7442,18 @@ static void do_ssh2_transport(Ssh ssh, const void *vin, int inlen,
          */
         {
             int klen = ssh_rsakex_klen(s->rsakey);
+
+            int minlen = (strcmp(ssh->kex->name, "rsa1024-sha1") != 0) ? 2048 : 1024;
+
+            if (klen < minlen) {
+                sfree(s->rsakeydata);
+                bombout(("Server sent %d-bit RSA key, "
+                        "less than the minimum size %d for %s "
+                        "key exchange", klen, minlen,
+                        ssh->kex->name));
+                crStopV;
+            }
+
             int nbits = klen - (2*ssh->kex->hash->hlen*8 + 49);
             int i, byte = 0;
             unsigned char *kstr1, *kstr2, *outstr;
