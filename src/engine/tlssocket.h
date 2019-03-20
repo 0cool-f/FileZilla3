@@ -35,7 +35,7 @@ public:
 	virtual int read(void *buffer, unsigned int size, int& error) override;
 	virtual int write(void const* buffer, unsigned int size, int& error) override;
 
-	int Shutdown(bool silenceReadErrors);
+	virtual int shutdown() override;
 
 	void TrustCurrentCert(bool trusted);
 

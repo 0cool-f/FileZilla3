@@ -540,13 +540,7 @@ void CTransferSocket::TransferEnd(TransferEndReason reason)
 		ResetSocket();
 	}
 	else {
-		// Here we ignore all errors.
-		if (tls_layer_) {
-			tls_layer_->Shutdown(true);
-		}
-		if (socket_) {
-			socket_->shutdown();
-		}
+		active_layer_->shutdown();
 	}
 
 	controlSocket_.send_event<TransferEndEvent>();
@@ -652,16 +646,11 @@ bool CTransferSocket::CheckGetNextReadBuffer()
 			return false;
 		}
 		else if (res == IO_Success) {
-			if (tls_layer_) {
-				int error = tls_layer_->Shutdown(true);
-				if (error != 0) {
-					if (error != EAGAIN) {
-						TransferEnd(TransferEndReason::transfer_failure);
-					}
-					return false;
-				}
+			int res = active_layer_->shutdown();
+			if (res && res != EAGAIN) {
+				TransferEnd(TransferEndReason::transfer_failure);
+				return false;
 			}
-			socket_->shutdown();
 			TransferEnd(TransferEndReason::successful);
 			return false;
 		}

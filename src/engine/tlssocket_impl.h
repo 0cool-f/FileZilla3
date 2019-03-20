@@ -26,7 +26,7 @@ public:
 	int read(void *buffer, unsigned int size, int& error);
 	int write(void const* buffer, unsigned int size, int& error);
 
-	int Shutdown(bool silenceReadErrors);
+	int shutdown();
 
 	void TrustCurrentCert(bool trusted);
 
@@ -60,7 +60,7 @@ private:
 	
 	void ContinueWrite();
 	int ContinueHandshake();
-	void ContinueShutdown();
+	int ContinueShutdown();
 
 	int VerifyCertificate();
 	bool CertificateIsBlacklisted(std::vector<CCertificate> const& certificates);
@@ -105,11 +105,12 @@ private:
 
 	gnutls_certificate_credentials_t m_certCredentials{};
 	bool handshake_successful_{};
+	bool sent_closure_alert_{};
 
 	bool m_canReadFromSocket{false};
 	bool m_canWriteToSocket{false};
 
-	bool shutdown_silence_read_errors_{};
+	bool shutdown_silence_read_errors_{true};
 
 	// Due to the strange gnutls_record_send semantics, call it again
 	// with 0 data and 0 length after GNUTLS_E_AGAIN and store the number

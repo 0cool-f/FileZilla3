@@ -1545,7 +1545,7 @@ void socket::retrigger(socket_event_flag event)
 	scoped_lock l(socket_thread_->mutex_);
 
 	auto s = state_;
-	if (s != socket_state::connected && s != socket_state::shut_down) {
+	if (s != socket_state::connected && (s != socket_state::shut_down || event == socket_event_flag::write)) {
 		return;
 	}
 
@@ -1574,6 +1574,8 @@ int socket::shutdown()
 	if (state_ == socket_state::connected) {
 		state_ = socket_state::shut_down;
 	}
+	socket_thread_->waiting_ &= ~WAIT_WRITE;
+	socket_thread_->triggered_ &= ~WAIT_WRITE;
 
 	return 0;
 }

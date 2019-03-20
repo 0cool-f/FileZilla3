@@ -52,6 +52,10 @@ public:
 		return next_layer_.connect(host, port, family);
 	}
 
+	virtual int shutdown() override {
+		return next_layer_.shutdown();
+	}
+
 protected:
 	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) override;
 

@@ -12,7 +12,7 @@ Legend:
 
 3.41.2 (2019-03-18)
 
-! Backport a security from PuTTY 0.71 affecting SFTP connections: Fix an integer overflow in the RSA key exchange preceeding host key verification
+! Backport a security fix from PuTTY 0.71 affecting SFTP connections: Fix an integer overflow in the RSA key exchange preceeding host key verification
 
 3.41.1 (2019-03-06)
 

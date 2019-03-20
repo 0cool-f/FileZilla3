@@ -39,6 +39,8 @@ public:
 	virtual fz::native_string peer_host() const override;
 	virtual int peer_port(int& error)  const override;
 
+	virtual int shutdown() override;
+
 protected:
 	CControlSocket* m_pOwner;
 

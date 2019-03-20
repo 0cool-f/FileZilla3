@@ -706,3 +706,29 @@ int CProxySocket::peer_port(int& error)  const
 	}
 	return port_;
 }
+
+int CProxySocket::shutdown()
+{
+	if (state_ == fz::socket_state::shut_down) {
+		return 0;
+	}
+	else if (state_ == fz::socket_state::shutting_down) {
+		return EAGAIN;
+	}
+	else if (state_ != fz::socket_state::connected) {
+		return ENOTCONN;
+	}
+	
+	int res = next_layer_.shutdown();
+	if (!res) {
+		state_ = fz::socket_state::shut_down;
+	}
+	else if (res != EAGAIN) {
+		state_ = fz::socket_state::failed;
+	}
+	else {
+		state_ == fz::socket_state::shutting_down;
+	}
+
+	return res;
+}

@@ -283,6 +283,14 @@ public:
 
 	virtual fz::socket_state get_state() const = 0;
 	
+	/**
+	 * \brief Signals peers that we want to close the connections.
+	 *
+	 * Only disallows further sends, does not affect reading from the
+	 * socket.
+	 */
+	virtual int shutdown() = 0;
+
 protected:
 	socket_interface() = default;
 	
@@ -395,13 +403,7 @@ public:
 	 */
 	void retrigger(socket_event_flag event);
 
-	/**
-	 * \brief Signals peers that we want to close the connections.
-	 *
-	 * Only disallowes further sends, does not affect reading frmo the
-	 * socket.
-	 */
-	int shutdown();
+	virtual int shutdown() override;
 
 	virtual void set_event_handler(event_handler* pEvtHandler) override;
 

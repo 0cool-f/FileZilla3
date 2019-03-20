@@ -505,9 +505,14 @@ void CTlsSocketImpl::OnSend()
 		ContinueHandshake();
 	}
 	else if (state_ == fz::socket_state::shutting_down) {
-		ContinueShutdown();
+		int res = ContinueShutdown();
+		if (res != EAGAIN) {
+			if (tlsSocket_.m_pEvtHandler) {
+				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, res);
+			}
+		}
 	}
-	else if (state_ == fz::socket_state::connected ) {
+	else if (state_ == fz::socket_state::connected) {
 		ContinueWrite();
 	}
 }
@@ -582,7 +587,7 @@ bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_res
 	}
 
 	set_hostname(tlsSocket_.next_layer_.peer_host());
-	return ContinueHandshake() == FZ_REPLY_WOULDBLOCK;
+	return ContinueHandshake() == EAGAIN;
 }
 
 int CTlsSocketImpl::ContinueHandshake()
@@ -616,12 +621,12 @@ int CTlsSocketImpl::ContinueHandshake()
 		return VerifyCertificate();
 	}
 	else if (res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) {
-		return FZ_REPLY_WOULDBLOCK;
+		return EAGAIN;
 	}
 
 	Failure(res, true);
 
-	return FZ_REPLY_ERROR;
+	return m_socket_error ? m_socket_error : ECONNABORTED;
 }
 
 int CTlsSocketImpl::read(void *buffer, unsigned int len, int& error)
@@ -758,7 +763,7 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 	}
 }
 
-int CTlsSocketImpl::Shutdown(bool silenceReadErrors)
+int CTlsSocketImpl::shutdown()
 {
 	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::Shutdown()");
 
@@ -770,50 +775,45 @@ int CTlsSocketImpl::Shutdown(bool silenceReadErrors)
 	}
 	else if (state_ != fz::socket_state::connected) {
 		return ENOTCONN;
-		// Shutdown during handshake is not a good idea.
 	}
 
 	state_ = fz::socket_state::shutting_down;
-	shutdown_silence_read_errors_ = silenceReadErrors;
 
-	int res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
-	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
-		res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
-	}
-	if (!res) {
-		state_ = fz::socket_state::shut_down;
-		return 0;
-	}
-
-	if (res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) {
-		return EAGAIN;
-	}
-
-	Failure(res, false);
-	return m_socket_error;
+	return ContinueShutdown();
 }
 
-void CTlsSocketImpl::ContinueShutdown()
+int CTlsSocketImpl::ContinueShutdown()
 {
 	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::ContinueShutdown()");
 
-	int res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
-	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
-		res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
+	if (!sent_closure_alert_) {
+		int res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
+		while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
+			res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
+		}
+		if (res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) {
+			return EAGAIN;
+		}
+		else if (res) {
+			Failure(res, false, L"gnutls_bye");
+			return m_socket_error ? m_socket_error : ECONNABORTED;
+		}
+		sent_closure_alert_ = true;
 	}
+	
+	int res = tlsSocket_.next_layer_.shutdown();
+	if (res == EAGAIN) {
+		return EAGAIN;
+	}
+
 	if (!res) {
 		state_ = fz::socket_state::shut_down;
-
-		if (tlsSocket_.m_pEvtHandler) {
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
-		}
-
-		return;
 	}
-
-	if (res != GNUTLS_E_INTERRUPTED && res != GNUTLS_E_AGAIN) {
-		Failure(res, true);
+	else {
+		m_socket_error = res;
+		Failure(0, false);
 	}
+	return res;
 }
 
 void CTlsSocketImpl::TrustCurrentCert(bool trusted)
@@ -1179,19 +1179,19 @@ int CTlsSocketImpl::VerifyCertificate()
 {
 	if (state_ != fz::socket_state::connecting) {
 		m_pOwner->LogMessage(MessageType::Debug_Warning, L"VerifyCertificate called at wrong time");
-		return FZ_REPLY_ERROR;
+		return ENOTCONN;
 	}
 
 	if (gnutls_certificate_type_get(m_session) != GNUTLS_CRT_X509) {
 		m_pOwner->LogMessage(MessageType::Error, _("Unsupported certificate type"));
 		Failure(0, true);
-		return FZ_REPLY_ERROR;
+		return EOPNOTSUPP;
 	}
 
 	cert_list_holder certs;
 	if (!GetSortedPeerCertificates(certs.certs, certs.certs_size)) {
 		Failure(0, true);
-		return FZ_REPLY_ERROR;
+		return EINVAL;
 	}
 
 	bool const uses_hostname = !hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown;
@@ -1228,7 +1228,7 @@ int CTlsSocketImpl::VerifyCertificate()
 				m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
 				m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
 				Failure(0, true);
-				return FZ_REPLY_ERROR;
+				return EINVAL;
 			}
 
 			if (!status) {
@@ -1252,7 +1252,7 @@ int CTlsSocketImpl::VerifyCertificate()
 		if (!root) {
 			m_pOwner->LogMessage(MessageType::Error, _("Could not copy certificate"));
 			Failure(0, true);
-			return FZ_REPLY_ERROR;
+			return ECONNABORTED;
 		}
 
 		gnutls_x509_trust_list_t tlist;
@@ -1260,7 +1260,7 @@ int CTlsSocketImpl::VerifyCertificate()
 		if (gnutls_x509_trust_list_add_cas(tlist, &root, 1, 0) != 1) {
 			m_pOwner->LogMessage(MessageType::Error, _("Could not add certificate to temporary trust list"));
 			Failure(0, true);
-			return FZ_REPLY_ERROR;
+			return ECONNABORTED;
 		}
 
 		// 2. Also disable time checks. We allow expired/not yet valid certificates, though only
@@ -1274,14 +1274,14 @@ int CTlsSocketImpl::VerifyCertificate()
 			m_pOwner->LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
 			m_pOwner->LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
 			Failure(0, true);
-			return FZ_REPLY_ERROR;
+			return EINVAL;
 		}
 
 		if (status != 0) {
 			PrintVerificationError(status);
 
 			Failure(0, true);
-			return FZ_REPLY_ERROR;
+			return EINVAL;
 		}
 
 		// 3. Hostname mismatch
@@ -1296,7 +1296,7 @@ int CTlsSocketImpl::VerifyCertificate()
 	datum_holder cert_der{};
 	if (gnutls_x509_crt_export2(certs.certs[0], GNUTLS_X509_FMT_DER, &cert_der) != GNUTLS_E_SUCCESS) {
 		Failure(0, true);
-		return FZ_REPLY_ERROR;
+		return ECONNABORTED;
 	}
 
 	if (!required_certificate_.empty()) {
@@ -1305,15 +1305,15 @@ int CTlsSocketImpl::VerifyCertificate()
 		{
 			m_pOwner->LogMessage(MessageType::Error, _("Certificate of connection does not match expected certificate."));
 			Failure(0, true);
-			return FZ_REPLY_ERROR;
+			return EINVAL;
 		}
 
 		TrustCurrentCert(true);
 
 		if (state_ != fz::socket_state::connected && state_ != fz::socket_state::shutting_down && state_ != fz::socket_state::shut_down) {
-			return FZ_REPLY_ERROR;
+			return ECONNABORTED;
 		}
-		return FZ_REPLY_OK;
+		return 0;
 	}
 
 	m_pOwner->LogMessage(MessageType::Status, _("Verifying certificate..."));
@@ -1327,13 +1327,13 @@ int CTlsSocketImpl::VerifyCertificate()
 		}
 		else {
 			Failure(0, true);
-			return FZ_REPLY_ERROR;
+			return ECONNABORTED;
 		}
 	}
 
 	if (CertificateIsBlacklisted(certificates)) {
 		Failure(0, true);
-		return FZ_REPLY_ERROR;
+		return EINVAL;
 	}
 
 	int const algorithmWarnings = GetAlgorithmWarnings();
@@ -1343,7 +1343,7 @@ int CTlsSocketImpl::VerifyCertificate()
 	if (port == -1) {
 		m_socket_error = error;
 		Failure(0, true);
-		return FZ_REPLY_ERROR;
+		return ECONNABORTED;
 	}
 
 	CCertificateNotification *pNotification = new CCertificateNotification(
@@ -1361,7 +1361,7 @@ int CTlsSocketImpl::VerifyCertificate()
 	// Finally, ask user to verify the certificate chain
 	m_pOwner->SendAsyncRequest(pNotification);
 
-	return FZ_REPLY_WOULDBLOCK;
+	return EAGAIN;
 }
 
 std::wstring CTlsSocketImpl::GetProtocolName()
