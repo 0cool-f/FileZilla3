@@ -46,12 +46,10 @@ void SocketLayer::forward_hostaddress_event(fz::socket_event_source* source, std
 	}
 }
 
-void SocketLayer::set_event_passthrough(bool event_passthrough)
+void SocketLayer::set_event_passthrough()
 {
-	event_passthrough_ = event_passthrough;
-	if (event_passthrough) {
-		next_layer_.set_event_handler(m_pEvtHandler);
-	}
+	event_passthrough_ = true;
+	next_layer_.set_event_handler(m_pEvtHandler);
 }
 
 CSocketBackend::CSocketBackend(fz::event_handler* pEvtHandler, fz::socket_interface& next_layer, CRateLimiter& rateLimiter)

@@ -24,7 +24,7 @@ protected:
 	void forward_socket_event(fz::socket_event_source* source, fz::socket_event_flag t, int error);
 	void forward_hostaddress_event(fz::socket_event_source* source, std::string const& address);
 
-	void set_event_passthrough(bool passthrough);
+	void set_event_passthrough();
 
 	fz::event_handler* m_pEvtHandler;
 	fz::socket_interface& next_layer_;

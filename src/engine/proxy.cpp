@@ -330,7 +330,7 @@ void CProxySocket::OnReceive()
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 					}
 					receiveBuffer_.consume(i + 4);
-					set_event_passthrough(true);
+					set_event_passthrough();
 				}
 				return;
 			}
@@ -369,7 +369,7 @@ void CProxySocket::OnReceive()
 						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 					}
 					receiveBuffer_.consume(8);
-					set_event_passthrough(true);
+					set_event_passthrough();
 				}
 				return;
 			}
@@ -539,7 +539,7 @@ void CProxySocket::OnReceive()
 				if (m_pEvtHandler) {
 					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 				}
-				set_event_passthrough(true);
+				set_event_passthrough();
 				return;
 			default:
 				assert(false);
@@ -712,13 +712,12 @@ int CProxySocket::shutdown()
 	if (state_ == fz::socket_state::shut_down) {
 		return 0;
 	}
-	else if (state_ == fz::socket_state::shutting_down) {
-		return EAGAIN;
-	}
-	else if (state_ != fz::socket_state::connected) {
+
+	if (state_ != fz::socket_state::connected && state_ != fz::socket_state::shutting_down) {
 		return ENOTCONN;
 	}
-	
+
+	state_ = fz::socket_state::shutting_down;
 	int res = next_layer_.shutdown();
 	if (!res) {
 		state_ = fz::socket_state::shut_down;
@@ -726,9 +725,5 @@ int CProxySocket::shutdown()
 	else if (res != EAGAIN) {
 		state_ = fz::socket_state::failed;
 	}
-	else {
-		state_ == fz::socket_state::shutting_down;
-	}
-
 	return res;
 }
