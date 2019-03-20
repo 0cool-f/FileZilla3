@@ -198,7 +198,7 @@ int last_socket_error()
 		err = EAGAIN;
 	}
 #endif
-	return errno;
+	return err;
 }
 #endif
 
