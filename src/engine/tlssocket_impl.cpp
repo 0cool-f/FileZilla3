@@ -473,11 +473,6 @@ void CTlsSocketImpl::OnRead()
 	}
 
 	if (state_ == fz::socket_state::connecting) {
-		int const direction = gnutls_record_get_direction(m_session);
-		if (direction) {
-			m_pOwner->LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::Postponing read");
-			return;
-		}
 		ContinueHandshake();
 	}
 	else if (state_ == fz::socket_state::connected || state_ == fz::socket_state::shutting_down || state_ == fz::socket_state::shut_down) {
@@ -498,10 +493,6 @@ void CTlsSocketImpl::OnSend()
 	}
 
 	if (state_ == fz::socket_state::connecting) {
-		int const direction = gnutls_record_get_direction(m_session);
-		if (!direction) {
-			return;
-		}
 		ContinueHandshake();
 	}
 	else if (state_ == fz::socket_state::shutting_down) {
