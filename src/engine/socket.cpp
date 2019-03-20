@@ -190,7 +190,16 @@ int last_socket_error()
 	return convert_msw_error_code(WSAGetLastError());
 }
 #else
-inline int last_socket_error() { return errno; }
+int last_socket_error()
+{
+	int err = errno;
+#if EWOULDBLOCK != EAGAIN
+	if (err == EWOULDBLOCK) {
+		err = EAGAIN;
+	}
+#endif
+	return errno;
+}
 #endif
 
 int set_nonblocking(socket::socket_t fd)
