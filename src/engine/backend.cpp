@@ -1,8 +1,6 @@
 #include <filezilla.h>
 
 #include "backend.h"
-#include "socket.h"
-#include <errno.h>
 
 SocketLayer::SocketLayer(fz::event_handler* pEvtHandler, fz::socket_interface& next_layer, bool event_passthrough)
 	: socket_interface(next_layer.root()) 

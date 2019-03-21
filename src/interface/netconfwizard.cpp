@@ -33,7 +33,7 @@ fztranslate_mark("< &Back");
 CNetConfWizard::CNetConfWizard(wxWindow* parent, COptions* pOptions, CFileZillaEngineContext & engine_context)
 	: fz::event_handler(engine_context.GetEventLoop())
 	, engine_context_(engine_context)
-	, m_parent(parent), m_pOptions(pOptions), m_pSocketServer(0)
+	, m_parent(parent), m_pOptions(pOptions)
 {
 	m_timer.SetOwner(this);
 
@@ -44,11 +44,11 @@ CNetConfWizard::~CNetConfWizard()
 {
 	remove_handler();
 
-	delete m_socket;
+	socket_.reset();
 	delete m_pIPResolver;
 	delete [] m_pSendBuffer;
-	delete m_pSocketServer;
-	delete m_pDataSocket;
+	listen_socket_.reset();
+	data_socket_.reset();
 }
 
 bool CNetConfWizard::Load()
@@ -218,10 +218,10 @@ void CNetConfWizard::OnPageChanging(wxWizardEvent& event)
 		event.Veto();
 
 		PrintMessage(wxString::Format(_("Connecting to %s"), _T("probe.filezilla-project.org")), 0);
-		m_socket = new fz::socket(engine_context_.GetThreadPool(), this);
+		socket_ = std::make_unique<fz::socket>(engine_context_.GetThreadPool(), static_cast<fz::event_handler*>(this));
 		m_recvBufferPos = 0;
 
-		int res = m_socket->connect(fzT("probe.filezilla-project.org"), 21);
+		int res = socket_->connect(fzT("probe.filezilla-project.org"), 21);
 		if (res) {
 			PrintMessage(wxString::Format(_("Connect failed: %s"), fz::socket_error_description(res)), 1);
 			CloseSocket();
@@ -252,7 +252,7 @@ void CNetConfWizard::OnPageChanged(wxWizardEvent& event)
 
 void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_event_flag t, int error)
 {
-	if (s == m_socket) {
+	if (s == socket_.get()) {
 		if (error) {
 			OnClose();
 			return;
@@ -272,7 +272,7 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 			break;
 		}
 	}
-	else if (s == m_pSocketServer) {
+	else if (s == listen_socket_.get()) {
 		if (error) {
 			PrintMessage(_("Listen socket closed"), 1);
 			CloseSocket();
@@ -286,7 +286,7 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 			break;
 		}
 	}
-	else if (s == m_pDataSocket) {
+	else if (s == data_socket_.get()) {
 		if (error) {
 			OnDataClose();
 			return;
@@ -305,15 +305,17 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 
 void CNetConfWizard::OnSend()
 {
-	if (!m_pSendBuffer)
+	if (!m_pSendBuffer) {
 		return;
+	}
 
-	if (!m_socket)
+	if (!socket_) {
 		return;
+	}
 
 	int error;
 	int const len = strlen(m_pSendBuffer);
-	int const written = m_socket->write(m_pSendBuffer, len, error);
+	int const written = socket_->write(m_pSendBuffer, len, error);
 	if (written < 0) {
 		if (error != EAGAIN) {
 			PrintMessage(_("Failed to send command."), 1);
@@ -325,8 +327,9 @@ void CNetConfWizard::OnSend()
 		delete [] m_pSendBuffer;
 		m_pSendBuffer = 0;
 	}
-	else
+	else {
 		memmove(m_pSendBuffer, m_pSendBuffer + written, len - written + 1);
+	}
 }
 
 void CNetConfWizard::OnClose()
@@ -344,7 +347,7 @@ void CNetConfWizard::OnReceive()
 {
 	while (true) {
 		int error;
-		int const read = m_socket->read(m_recvBuffer + m_recvBufferPos, NETCONFBUFFERSIZE - m_recvBufferPos, error);
+		int const read = socket_->read(m_recvBuffer + m_recvBufferPos, NETCONFBUFFERSIZE - m_recvBufferPos, error);
 		if (read < 0) {
 			if (error != EAGAIN) {
 				PrintMessage(_("Could not receive data from server."), 1);
@@ -390,7 +393,7 @@ void CNetConfWizard::OnReceive()
 
 			ParseResponse(m_recvBuffer);
 
-			if (!m_socket)
+			if (!socket_)
 				return;
 
 			memmove(m_recvBuffer, m_recvBuffer + i + 2, m_recvBufferPos - i - 2);
@@ -517,7 +520,7 @@ void CNetConfWizard::ParseResponse(const char* line)
 			CloseSocket();
 			return;
 		}
-		if (m_pDataSocket)
+		if (data_socket_)
 		{
 			if (gotListReply)
 			{
@@ -552,7 +555,7 @@ void CNetConfWizard::PrintMessage(const wxString& msg, int)
 
 void CNetConfWizard::CloseSocket()
 {
-	if (!m_socket)
+	if (!socket_)
 		return;
 
 	PrintMessage(_("Connection closed"), 0);
@@ -658,28 +661,26 @@ void CNetConfWizard::CloseSocket()
 	// Focus one so enter key hits finish and not the restart button by default
 	XRCCTRL(*this, "ID_SUMMARY1", wxStaticText)->SetFocus();
 
-	delete m_socket;
-	m_socket = 0;
+	socket_.reset();
 
 	delete [] m_pSendBuffer;
 	m_pSendBuffer = 0;
 
-	delete m_pSocketServer;
-	m_pSocketServer = 0;
+	listen_socket_.reset();
+	data_socket_.reset();
 
-	delete m_pDataSocket;
-	m_pDataSocket = 0;
-
-	if (m_timer.IsRunning())
+	if (m_timer.IsRunning()) {
 		m_timer.Stop();
+	}
 }
 
 bool CNetConfWizard::Send(wxString cmd)
 {
 	wxASSERT(!m_pSendBuffer);
 
-	if (!m_socket)
+	if (!socket_) {
 		return false;
+	}
 
 	PrintMessage(cmd, 2);
 
@@ -692,18 +693,18 @@ bool CNetConfWizard::Send(wxString cmd)
 	m_timer.Start(15000, true);
 	OnSend();
 
-	return m_socket != 0;
+	return socket_ != 0;
 }
 
 wxString CNetConfWizard::GetExternalIPAddress()
 {
 	wxString ret;
 
-	wxASSERT(m_socket);
+	wxASSERT(socket_);
 
 	int mode = XRCCTRL(*this, "ID_ACTIVEMODE1", wxRadioButton)->GetValue() ? 0 : (XRCCTRL(*this, "ID_ACTIVEMODE2", wxRadioButton)->GetValue() ? 1 : 2);
 	if (!mode) {
-		ret = m_socket->local_ip();
+		ret = socket_->local_ip();
 		if (ret.empty()) {
 			PrintMessage(_("Failed to retrieve local IP address, aborting."), 1);
 			CloseSocket();
@@ -887,15 +888,14 @@ void CNetConfWizard::OnFinish(wxWizardEvent&)
 
 int CNetConfWizard::CreateListenSocket()
 {
-	if (m_pSocketServer)
+	if (listen_socket_) {
 		return 0;
+	}
 
-	if (XRCCTRL(*this, "ID_ACTIVE_PORTMODE1", wxRadioButton)->GetValue())
-	{
+	if (XRCCTRL(*this, "ID_ACTIVE_PORTMODE1", wxRadioButton)->GetValue()) {
 		return CreateListenSocket(0);
 	}
-	else
-	{
+	else {
 		long low;
 		long high;
 		XRCCTRL(*this, "ID_ACTIVE_PORTMIN", wxTextCtrl)->GetValue().ToLong(&low);
@@ -904,12 +904,16 @@ int CNetConfWizard::CreateListenSocket()
 		int mid = fz::random_number(low, high);
 		wxASSERT(mid >= low && mid <= high);
 
-		for (int port = mid; port <= high; port++)
-			if (CreateListenSocket(port))
+		for (int port = mid; port <= high; ++port) {
+			if (CreateListenSocket(port)) {
 				return port;
-		for (int port = low; port < mid; port++)
-			if (CreateListenSocket(port))
+			}
+		}
+		for (int port = low; port < mid; ++port) {
+			if (CreateListenSocket(port)) {
 				return port;
+			}
+		}
 
 		return 0;
 	}
@@ -917,12 +921,11 @@ int CNetConfWizard::CreateListenSocket()
 
 int CNetConfWizard::CreateListenSocket(unsigned int port)
 {
-	m_pSocketServer = new fz::listen_socket(engine_context_.GetThreadPool(), this);
-	int res = m_pSocketServer->listen(m_socket ? m_socket->address_family() : fz::address_type::unknown, port);
+	listen_socket_ = std::make_unique<fz::listen_socket>(engine_context_.GetThreadPool(), static_cast<fz::event_handler*>(this));
+	int res = listen_socket_->listen(socket_ ? socket_->address_family() : fz::address_type::unknown, port);
 
 	if (res < 0) {
-		delete m_pSocketServer;
-		m_pSocketServer = 0;
+		listen_socket_.reset();
 		return 0;
 	}
 
@@ -932,10 +935,9 @@ int CNetConfWizard::CreateListenSocket(unsigned int port)
 
 	// Get port number from socket
 	int error;
-	res = m_pSocketServer->local_port(error);
+	res = listen_socket_->local_port(error);
 	if (res <= 0) {
-		delete m_pSocketServer;
-		m_pSocketServer = 0;
+		listen_socket_.reset();
 		return 0;
 	}
 	return static_cast<unsigned int>(port);
@@ -943,51 +945,47 @@ int CNetConfWizard::CreateListenSocket(unsigned int port)
 
 void CNetConfWizard::OnAccept()
 {
-	if (!m_socket || !m_pSocketServer) {
+	if (!socket_ || !listen_socket_) {
 		return;
 	}
-	if (m_pDataSocket) {
+	if (data_socket_) {
 		return;
 	}
 
 	int error;
-	m_pDataSocket = m_pSocketServer->accept(error);
-	if (!m_pDataSocket) {
+	data_socket_ = listen_socket_->accept(error);
+	if (!data_socket_) {
 		return;
 	}
-	m_pDataSocket->set_event_handler(this);
+	data_socket_->set_event_handler(this);
 
-	std::string peerAddr = m_socket->peer_ip();
-	std::string dataPeerAddr = m_pDataSocket->peer_ip();
+	std::string peerAddr = socket_->peer_ip();
+	std::string dataPeerAddr = data_socket_->peer_ip();
 	if (peerAddr.empty()) {
-		delete m_pDataSocket;
-		m_pDataSocket = 0;
+		data_socket_.reset();
 		PrintMessage(_("Failed to get peer address of control connection, connection closed."), 1);
 		CloseSocket();
 		return;
 	}
 	if (dataPeerAddr.empty()) {
-		delete m_pDataSocket;
-		m_pDataSocket = 0;
+		data_socket_.reset();
 		PrintMessage(_("Failed to get peer address of data connection, connection closed."), 1);
 		CloseSocket();
 		return;
 	}
 	if (peerAddr != dataPeerAddr) {
-		delete m_pDataSocket;
-		m_pDataSocket = 0;
+		data_socket_.reset();
 		PrintMessage(_("Warning, ignoring data connection from wrong IP."), 0);
 		return;
 	}
-	delete m_pSocketServer;
-	m_pSocketServer = 0;
+	listen_socket_.reset();
 }
 
 void CNetConfWizard::OnDataReceive()
 {
 	char buffer[100];
 	int error;
-	int const read = m_pDataSocket->read(buffer, 99, error);
+	int const read = data_socket_->read(buffer, 99, error);
 	if (!read) {
 		PrintMessage(_("Data socket closed too early."), 1);
 		CloseSocket();
@@ -1041,8 +1039,7 @@ void CNetConfWizard::OnDataReceive()
 		return;
 	}
 
-	delete m_pDataSocket;
-	m_pDataSocket = 0;
+	data_socket_.reset();
 
 	if (gotListReply) {
 		m_state++;
@@ -1053,13 +1050,12 @@ void CNetConfWizard::OnDataReceive()
 void CNetConfWizard::OnDataClose()
 {
 	OnDataReceive();
-	if (m_pDataSocket) {
+	if (data_socket_) {
 		PrintMessage(_("Data socket closed too early."), 0);
 		CloseSocket();
 		return;
 	}
-	delete m_pDataSocket;
-	m_pDataSocket = 0;
+	data_socket_.reset();
 
 	if (gotListReply) {
 		m_state++;

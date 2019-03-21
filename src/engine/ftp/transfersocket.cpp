@@ -150,7 +150,7 @@ void CTransferSocket::OnAccept(int error)
 		return;
 	}
 
-	socket_.reset(socketServer_->accept(error));
+	socket_ = socketServer_->accept(error);
 	if (!socket_) {
 		if (error == EAGAIN) {
 			controlSocket_.LogMessage(MessageType::Debug_Verbose, L"No pending connection");

@@ -5,7 +5,8 @@
 #include "wrapengine.h"
 #include "externalipresolver.h"
 #include <wx/timer.h>
-#include "socket.h"
+
+#include <libfilezilla/socket.hpp>
 
 #define NETCONFBUFFERSIZE 200
 
@@ -69,7 +70,7 @@ protected:
 	wxString m_nextLabelText;
 
 	// Test data
-	fz::socket* m_socket{};
+	std::unique_ptr<fz::socket> socket_;
 	int m_state;
 
 	char m_recvBuffer[NETCONFBUFFERSIZE];
@@ -92,8 +93,8 @@ protected:
 	CExternalIPResolver* m_pIPResolver{};
 	wxString m_externalIP;
 
-	fz::listen_socket* m_pSocketServer{};
-	fz::socket* m_pDataSocket{};
+	std::unique_ptr<fz::listen_socket> listen_socket_;
+	std::unique_ptr<fz::socket> data_socket_;
 	int m_listenPort{};
 	bool gotListReply{};
 	int m_data{};

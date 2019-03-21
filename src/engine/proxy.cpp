@@ -1,12 +1,3 @@
-#include <libfilezilla/libfilezilla.hpp>
-#ifdef FZ_WINDOWS
-  #include <libfilezilla/private/windows.hpp>
-  #include <winsock2.h>
-  #include <ws2tcpip.h>
-#else
-  #include <sys/socket.h>
-  #include <netdb.h>
-#endif
 #include <filezilla.h>
 #include "engineprivate.h"
 #include "proxy.h"
@@ -132,23 +123,8 @@ int CProxySocket::connect(fz::native_string const& host, unsigned int port, fz::
 			ip = fz::to_string(host_);
 		}
 		else {
-			addrinfo hints{};
-			hints.ai_family = AF_INET;
-			hints.ai_socktype = SOCK_STREAM;
-
-			addrinfo * result{};
-			int res = getaddrinfo(fz::to_string(host_).c_str(), nullptr, &hints, &result);
-			if (!res && result) {
-				if (result->ai_family == AF_INET) {
-					ip = fz::socket::address_to_string(result->ai_addr, result->ai_addrlen, false);
-				}
-				freeaddrinfo(result);
-			}
-
-			if (ip.empty()) {
-				m_pOwner->LogMessage(MessageType::Error, _("Cannot resolve hostname to IPv4 address for use with SOCKS4 proxy."));
-				return EINVAL;
-			}
+			m_pOwner->LogMessage(MessageType::Error, L"Cannot use hostnames for use with SOCKS4 proxy.");
+			return EINVAL;
 		}
 
 		m_pOwner->LogMessage(MessageType::Status, _("SOCKS4 proxy will connect to: %s"), ip);

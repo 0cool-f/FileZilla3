@@ -2,7 +2,8 @@
 #define FILEZILLA_ENGINE_BACKEND_HEADER
 
 #include "ratelimiter.h"
-#include "socket.h"
+
+#include <libfilezilla/socket.hpp>
 
 class SocketLayer : public fz::socket_interface
 {

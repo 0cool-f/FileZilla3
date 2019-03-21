@@ -7,7 +7,7 @@
 #endif
 #include <filezilla.h>
 #include <libfilezilla/format.hpp>
-#include "socket.h"
+#include <libfilezilla/socket.hpp>
 #ifndef FZ_WINDOWS
 #include <netdb.h>
 #endif
@@ -114,7 +114,7 @@ std::string socket_error_string(int error)
 		return error_table[i].name;
 	}
 
-	return sprintf("%d", error);
+	return fz::to_string(error);
 }
 
 native_string socket_error_description(int error)

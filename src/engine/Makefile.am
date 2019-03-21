@@ -61,7 +61,6 @@ libengine_a_SOURCES = \
 		sftp/rmd.cpp \
 		sftp/sftpcontrolsocket.cpp \
 		sizeformatting_base.cpp \
-		socket.cpp \
 		socket_errors.cpp \
 		tlssocket.cpp \
 		tlssocket_impl.cpp \

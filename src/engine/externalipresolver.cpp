@@ -1,6 +1,5 @@
 #include <filezilla.h>
 #include "externalipresolver.h"
-#include "socket.h"
 #include "misc.h"
 
 #include <libfilezilla/format.hpp>

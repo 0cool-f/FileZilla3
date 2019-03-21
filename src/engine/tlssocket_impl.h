@@ -7,9 +7,9 @@ typedef std::make_signed_t<size_t> ssize_t;
 
 #include <gnutls/gnutls.h>
 #include "backend.h"
-#include "socket.h"
 
 #include <libfilezilla/buffer.hpp>
+#include <libfilezilla/socket.hpp>
 
 class CControlSocket;
 class CTlsSocket;

@@ -1,10 +1,10 @@
 #ifndef FILEZILLA_ENGINE_CONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_CONTROLSOCKET_HEADER
 
-#include "socket.h"
 #include "logging_private.h"
 
 #include <libfilezilla/buffer.hpp>
+#include <libfilezilla/socket.hpp>
 
 #include "oplock_manager.h"
 

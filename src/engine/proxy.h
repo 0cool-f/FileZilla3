@@ -2,9 +2,9 @@
 #define FILEZILLA_ENGINE_PROXY_HEADER
 
 #include "backend.h"
-#include "socket.h"
 
 #include <libfilezilla/buffer.hpp>
+#include <libfilezilla/socket.hpp>
 
 enum class ProxyType {
 	NONE,

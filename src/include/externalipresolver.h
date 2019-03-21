@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_EXTERNALIPRESOLVER_HEADER
 #define FILEZILLA_ENGINE_EXTERNALIPRESOLVER_HEADER
 
-#include "socket.h"
+#include <libfilezilla/socket.hpp>
 
 struct external_ip_resolve_event_type;
 typedef fz::simple_event<external_ip_resolve_event_type> CExternalIPResolveEvent;
