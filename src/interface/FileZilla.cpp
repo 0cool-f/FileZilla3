@@ -128,30 +128,6 @@ CFileZillaApp::~CFileZillaApp()
 	COptions::Destroy();
 }
 
-#ifdef __WXMSW__
-namespace {
-static bool InitWinsock()
-{
-	WSADATA d{};
-	int res = WSAStartup((2 << 8) | 8, &d);
-	if (res != 0) {
-		int err = WSAGetLastError();
-		wxString msg = wxString::Format(_("Could not initialize Winsock (%d): %s"), err, wxSysErrorMsg(err));
-		wxMessageBoxEx(msg, _("Failed to initialize networking"), wxICON_EXCLAMATION);
-		return false;
-	}
-
-	return true;
-}
-
-static void UninitWinsock()
-{
-	WSACleanup();
-}
-}
-
-#endif //__WXMSW__
-
 void CFileZillaApp::InitLocale()
 {
 	wxString language = COptions::Get()->GetOption(OPTION_LANGUAGE);
@@ -238,10 +214,6 @@ bool CFileZillaApp::OnInit()
 	fz::set_translators(translator, translator_pf);
 
 #ifdef __WXMSW__
-	if (!InitWinsock()) {
-		return false;
-	}
-
 	SetCurrentProcessExplicitAppUserModelID(L"FileZilla.Client.AppID");
 #endif
 
@@ -387,9 +359,6 @@ int CFileZillaApp::OnExit()
 		_exit(0);
 	}
 
-#ifdef __WXMSW__
-	UninitWinsock();
-#endif
 	return wxApp::OnExit();
 }
 
