@@ -29,6 +29,8 @@ DEALINGS IN THE SOFTWARE.
 #include <poll.h>
 #include <pthread.h>
 
+#include <libfilezilla/glue/unix.hpp>
+
 // Define WITH_LIBDBUS to 1 (e.g. from configure) if you are using
 // libdbus < 1.2 that does not have dbus_watch_get_unix_fd yet.
 #ifndef WITH_LIBDBUS
@@ -106,16 +108,13 @@ DBusThread::DBusThread(wxThreadKind kind, wxDBusConnection * parent, int ID, DBu
 
 bool DBusThread::Init()
 {
-	if (pipe(m_wakeup_pipe) == -1)
-	{
-		// Just to be sure
-		m_wakeup_pipe[0] = -1;
-		m_wakeup_pipe[1] = -1;
+	if (!fz::create_pipe(m_wakeup_pipe)) {
 		return false;
 	}
 
-	if (Create() != wxTHREAD_NO_ERROR)
+	if (Create() != wxTHREAD_NO_ERROR) {
 		return false;
+	}
 
 	int res;
 	do {
