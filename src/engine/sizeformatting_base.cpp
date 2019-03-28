@@ -57,9 +57,8 @@ std::wstring ToString(int64_t n, wchar_t const* const sepBegin = nullptr, wchar_
 std::wstring CSizeFormatBase::Format(COptionsBase* pOptions, int64_t size, bool add_bytes_suffix, CSizeFormatBase::_format format, bool thousands_separator, int num_decimal_places)
 {
 	assert(format != formats_count);
-	assert(size >= 0);
 	if (size < 0) {
-		size = 0;
+		return _("Unknown");
 	}
 
 	if (format == bytes) {
