@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <limits>
 
 #include <string.h>
 
@@ -226,11 +227,16 @@ public:
 		switch (base) {
 		default:
 		case decimal:
-			if (m_number == -1) {
+			if (m_number == std::numeric_limits<int64_t>::min()) {
+				constexpr int max = (std::numeric_limits<int64_t>::max() - 9) / 10;
 				if (IsNumeric() || IsLeftNumeric()) {
 					m_number = 0;
 					for (unsigned int i = 0; i < m_len; ++i) {
 						if (m_pToken[i] < '0' || m_pToken[i] > '9') {
+							break;
+						}
+						if (m_number > max) {
+							m_number = -1;
 							break;
 						}
 						m_number *= 10;
@@ -244,6 +250,10 @@ public:
 						--start;
 					}
 					for (unsigned int i = start; i < m_len; ++i) {
+						if (m_number > max) {
+							m_number = -1;
+							break;
+						}
 						m_number *= 10;
 						m_number += m_pToken[i] - '0';
 					}
@@ -252,8 +262,12 @@ public:
 			return m_number;
 		case hex:
 			{
+				constexpr int max = (std::numeric_limits<int64_t>::max() - 15) / 16;
 				int64_t number = 0;
 				for (unsigned int i = 0; i < m_len; ++i) {
+					if (number > max) {
+						return -1;
+					}
 					const wchar_t& c = m_pToken[i];
 					if (c >= '0' && c <= '9') {
 						number *= 16;
@@ -277,7 +291,7 @@ public:
 	}
 
 protected:
-	int64_t m_number{-1};
+	int64_t m_number{std::numeric_limits<int64_t>::min()};
 
 	wchar_t const* m_pToken{};
 
@@ -1222,7 +1236,9 @@ bool CDirectoryListingParser::ParseUnixDateTime(CLine & line, int &index, CDiren
 
 		// Some servers use times only for files newer than 6 months
 		if (year <= 0) {
-			assert(month != -1 && day != -1);
+			if (month == -1 || day == -1) {
+				return false;
+			}
 			tm const t = fz::datetime::now().get_tm(fz::datetime::utc);
 			year = t.tm_year + 1900;
 			int const currentDayOfYear = t.tm_mday + 31 * t.tm_mon;
@@ -1451,9 +1467,9 @@ bool CDirectoryListingParser::ParseShortDate(CToken &token, CDirentry &entry, bo
 		gotYear = true;
 	}
 
-	assert(gotYear);
-	assert(gotMonth);
-	assert(gotDay);
+	if (!gotYear || !gotMonth || !gotDay) {
+		return false;
+	}
 
 	if (!entry.time.set(fz::datetime::utc, year, month, day)) {
 		return false;
