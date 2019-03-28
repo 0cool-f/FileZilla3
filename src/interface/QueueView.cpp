@@ -1149,7 +1149,6 @@ bool CQueueView::RemoveItem(CQueueItem* item, bool destroy, bool updateItemCount
 			if (updateItemCount) {
 				DisplayQueueSize();
 			}
-			wxASSERT(m_totalQueueSize >= 0);
 		}
 	}
 
@@ -2438,13 +2437,7 @@ void CQueueView::UpdateItemSize(CFileItem* pItem, int64_t size)
 		}
 	}
 	else {
-		wxASSERT(m_totalQueueSize >= oldSize);
-		if (m_totalQueueSize > oldSize) {
-			m_totalQueueSize -= oldSize;
-		}
-		else {
-			m_totalQueueSize = 0;
-		}
+		m_totalQueueSize -= oldSize;
 	}
 
 	if (size < 0) {
