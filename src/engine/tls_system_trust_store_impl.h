@@ -23,13 +23,11 @@ public:
 	std::tuple<gnutls_certificate_credentials_t, fz::scoped_lock> lease();
 
 private:
-	bool initialized_{};
-	fz::mutex mtx_{ false };
+	fz::mutex mtx_{false};
 	fz::condition cond_;
 
 	gnutls_certificate_credentials_t credentials_{};
 
-	fz::thread_pool& pool_;
 	fz::async_task task_;
 };
 

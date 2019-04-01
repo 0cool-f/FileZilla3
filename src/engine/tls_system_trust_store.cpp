@@ -4,10 +4,8 @@
 #include "tls_system_trust_store_impl.h"
 
 TlsSystemTrustStoreImpl::TlsSystemTrustStoreImpl(fz::thread_pool & pool)
-	: pool_(pool)
 {
-	fz::scoped_lock l(mtx_);
-	task_ = pool_.spawn([this]() {
+	task_ = pool.spawn([this]() {
 		gnutls_certificate_credentials_t cred{};
 
 		if (gnutls_certificate_allocate_credentials(&cred) >= 0) {
@@ -18,7 +16,6 @@ TlsSystemTrustStoreImpl::TlsSystemTrustStoreImpl(fz::thread_pool & pool)
 		}
 
 		fz::scoped_lock l(mtx_);
-		initialized_ = true;
 		credentials_ = cred;
 		cond_.signal(l);
 	});
@@ -34,7 +31,7 @@ TlsSystemTrustStoreImpl::~TlsSystemTrustStoreImpl()
 std::tuple<gnutls_certificate_credentials_t, fz::scoped_lock> TlsSystemTrustStoreImpl::lease()
 {
 	fz::scoped_lock l(mtx_);
-	if (!initialized_) {
+	if (task_) {
 		cond_.wait(l);
 		task_.join();
 	}
