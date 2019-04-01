@@ -228,7 +228,7 @@ public:
 		default:
 		case decimal:
 			if (m_number == std::numeric_limits<int64_t>::min()) {
-				constexpr int max = (std::numeric_limits<int64_t>::max() - 9) / 10;
+				constexpr int64_t max = (std::numeric_limits<int64_t>::max() - 9) / 10;
 				if (IsNumeric() || IsLeftNumeric()) {
 					m_number = 0;
 					for (unsigned int i = 0; i < m_len; ++i) {
@@ -262,7 +262,7 @@ public:
 			return m_number;
 		case hex:
 			{
-				constexpr int max = (std::numeric_limits<int64_t>::max() - 15) / 16;
+				constexpr int64_t max = (std::numeric_limits<int64_t>::max() - 15) / 16;
 				int64_t number = 0;
 				for (unsigned int i = 0; i < m_len; ++i) {
 					if (number > max) {
