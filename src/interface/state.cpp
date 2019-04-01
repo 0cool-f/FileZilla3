@@ -212,7 +212,8 @@ void CContextManager::ProcessDirectoryListing(CServer const& server, std::shared
 }
 
 CState::CState(CMainFrame &mainFrame)
-	: m_mainFrame(mainFrame)
+	: pool_(mainFrame.GetEngineContext().GetThreadPool())
+	, m_mainFrame(mainFrame)
 {
 	m_title = _("Not connected");
 

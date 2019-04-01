@@ -214,6 +214,8 @@ public:
 
 	CStateFilterManager& GetStateFilterManager() { return m_stateFilterManager; }
 
+	fz::thread_pool & pool_;
+
 protected:
 	void SetSite(Site const& site, CServerPath const& path = CServerPath());
 

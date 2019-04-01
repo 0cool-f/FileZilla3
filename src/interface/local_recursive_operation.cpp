@@ -24,7 +24,7 @@ CLocalRecursiveOperation::CLocalRecursiveOperation(CState& state)
 
 CLocalRecursiveOperation::~CLocalRecursiveOperation()
 {
-	join();
+	thread_.join();
 }
 
 void CLocalRecursiveOperation::AddRecursionRoot(local_recursion_root && root)
@@ -82,7 +82,8 @@ bool CLocalRecursiveOperation::DoStartRecursiveOperation(OperationMode mode, Act
 
 		m_filters = filters;
 
-		if (!run()) {
+		thread_ = m_state.pool_.spawn([this] {entry(); });
+		if (!thread_) {
 			m_operationMode = recursive_none;
 			return false;
 		}
@@ -113,7 +114,7 @@ void CLocalRecursiveOperation::StopRecursiveOperation()
 
 	}
 
-	join();
+	thread_.join();
 	m_listedDirectories.clear();
 
 	m_state.NotifyHandlers(STATECHANGE_LOCAL_RECURSION_STATUS);

@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_VOLUME_ENUMERATOR_HEADER
 #define FILEZILLA_VOLUME_ENUMERATOR_HEADER
 
-#include <libfilezilla/thread.hpp>
+#include <libfilezilla/thread_pool.hpp>
 
 // Class to enumerate volume labels of volumes assigned
 // a drive letter under MSW.
@@ -23,11 +23,11 @@
 DECLARE_EVENT_TYPE(fzEVT_VOLUMEENUMERATED, -1)
 DECLARE_EVENT_TYPE(fzEVT_VOLUMESENUMERATED, -1)
 
-class CVolumeDescriptionEnumeratorThread final : protected fz::thread
+class CVolumeDescriptionEnumeratorThread final
 {
 public:
-	CVolumeDescriptionEnumeratorThread(wxEvtHandler* pEvtHandler);
-	virtual ~CVolumeDescriptionEnumeratorThread();
+	CVolumeDescriptionEnumeratorThread(wxEvtHandler* pEvtHandler, fz::thread_pool & pool);
+	~CVolumeDescriptionEnumeratorThread();
 
 	bool Failed() const { return m_failure; }
 
@@ -52,7 +52,7 @@ protected:
 	void ProcessDrive(std::wstring const& drive);
 	bool GetDriveLabel(std::wstring const& drive);
 	bool GetDriveIcon(std::wstring const& drive);
-	virtual void entry();
+	void entry();
 
 	wxEvtHandler* m_pEvtHandler;
 
@@ -61,6 +61,7 @@ protected:
 
 	std::vector<t_VolumeInfo> m_volumeInfo;
 
+	fz::async_task thread_;
 	fz::mutex sync_{false};
 
 	long drivesToHide_{};

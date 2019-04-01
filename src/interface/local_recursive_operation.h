@@ -3,7 +3,7 @@
 
 #include "recursive_operation.h"
 
-#include <libfilezilla/thread.hpp>
+#include <libfilezilla/thread_pool.hpp>
 
 #include <set>
 
@@ -30,7 +30,7 @@ private:
 	std::deque<new_dir> m_dirsToVisit;
 };
 
-class CLocalRecursiveOperation final : public CRecursiveOperation, private fz::thread, public wxEvtHandler
+class CLocalRecursiveOperation final : public CRecursiveOperation, public wxEvtHandler
 {
 public:
 	class listing final
@@ -64,12 +64,13 @@ protected:
 
 	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2) override;
 
-	virtual void entry();
+	void entry();
 
 	void EnqueueEnumeratedListing(fz::scoped_lock& l, listing&& d);
 
 	std::deque<local_recursion_root> recursion_roots_;
 
+	fz::async_task thread_;
 	fz::mutex mutex_;
 
 	std::deque<listing> m_listedDirectories;

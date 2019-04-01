@@ -649,7 +649,7 @@ void CLocalListView::DisplayDrives()
 	}
 
 	if (!volumeEnumeratorThread_) {
-		volumeEnumeratorThread_ = std::make_unique<CVolumeDescriptionEnumeratorThread>(this);
+		volumeEnumeratorThread_ = std::make_unique<CVolumeDescriptionEnumeratorThread>(this, m_state.pool_);
 		if (volumeEnumeratorThread_->Failed()) {
 			volumeEnumeratorThread_.reset();
 		}

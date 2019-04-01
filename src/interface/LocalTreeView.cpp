@@ -429,7 +429,7 @@ bool CLocalTreeView::DisplayDrives(wxTreeItemId parent)
 
 	std::vector<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
 
-	m_pVolumeEnumeratorThread = new CVolumeDescriptionEnumeratorThread(this);
+	m_pVolumeEnumeratorThread = new CVolumeDescriptionEnumeratorThread(this, m_state.pool_);
 	if (m_pVolumeEnumeratorThread->Failed()) {
 		delete m_pVolumeEnumeratorThread;
 		m_pVolumeEnumeratorThread = 0;

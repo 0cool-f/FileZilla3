@@ -8,12 +8,14 @@
 DEFINE_EVENT_TYPE(fzEVT_VOLUMEENUMERATED)
 DEFINE_EVENT_TYPE(fzEVT_VOLUMESENUMERATED)
 
-CVolumeDescriptionEnumeratorThread::CVolumeDescriptionEnumeratorThread(wxEvtHandler* pEvtHandler)
+CVolumeDescriptionEnumeratorThread::CVolumeDescriptionEnumeratorThread(wxEvtHandler* pEvtHandler, fz::thread_pool & pool)
 	: m_pEvtHandler(pEvtHandler)
 {
 	if (pEvtHandler) {
 		drivesToHide_ = GetDrivesToHide();
-		if (!run()) {
+
+		thread_ = pool.spawn([this] { entry(); });
+		if (!thread_) {
 			m_failure = true;
 		}
 	}
@@ -22,7 +24,7 @@ CVolumeDescriptionEnumeratorThread::CVolumeDescriptionEnumeratorThread(wxEvtHand
 CVolumeDescriptionEnumeratorThread::~CVolumeDescriptionEnumeratorThread()
 {
 	m_stop = true;
-	join();
+	thread_.join();
 	m_volumeInfo.clear();
 }
 
