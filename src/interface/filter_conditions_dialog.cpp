@@ -479,7 +479,8 @@ bool CFilterConditionsDialog::ValidateFilter(wxString& error, bool allow_empty)
 				auto const v = controls.pValue->GetValue().ToStdWstring();
 				if (v.size() <= 2000) {
 					try {
-						std::wregex(v);
+						std::wregex r(v);
+						(void)r;
 						valid = true;
 					}
 					catch (std::regex_error const&) {
