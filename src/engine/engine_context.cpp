@@ -63,7 +63,7 @@ public:
 	}
 
 	fz::thread_pool pool_;
-	fz::event_loop loop_;
+	fz::event_loop loop_{pool_};
 	CRateLimiter limiter_;
 	CDirectoryCache directory_cache_;
 	CPathCache path_cache_;
