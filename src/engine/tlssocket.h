@@ -39,7 +39,7 @@ public:
 
 	void TrustCurrentCert(bool trusted);
 
-	fz::socket_state get_state() const;
+	virtual fz::socket_state get_state() const override;
 
 	std::wstring GetProtocolName();
 	std::wstring GetKeyExchange();
