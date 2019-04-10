@@ -7,7 +7,7 @@ void const* PowerManagmentImpl_SetBusy()
 	return CFBridgingRetain(activity);
 }
 
-void PowerManagmentImpl_SetIdle(void* activity)
+void PowerManagmentImpl_SetIdle(void const* activity)
 {
 	if (activity) {
 		id<NSObject> activityId = CFBridgingRelease(activity);

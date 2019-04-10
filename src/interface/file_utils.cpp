@@ -349,7 +349,7 @@ bool RenameFile(wxWindow* parent, wxString dir, wxString from, wxString to)
 }
 
 #if defined __WXMAC__
-extern "C" char const* GetDownloadDirImpl();
+char const* GetDownloadDirImpl();
 #elif !defined(__WXMSW__)
 wxString ShellUnescape(wxString const& path)
 {

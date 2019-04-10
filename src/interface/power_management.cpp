@@ -10,10 +10,8 @@
 CPowerManagement* CPowerManagement::m_pPowerManagement = 0;
 
 #ifdef __WXMAC__
-extern "C" {
-	void const* PowerManagmentImpl_SetBusy();
-	void PowerManagmentImpl_SetIdle(void const* activity);
-}
+void const* PowerManagmentImpl_SetBusy();
+void PowerManagmentImpl_SetIdle(void const* activity);
 #endif
 
 void CPowerManagement::Create(CMainFrame* pMainFrame)

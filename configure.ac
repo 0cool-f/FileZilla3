@@ -2,7 +2,7 @@ AC_INIT([FileZilla],[3.41.2],[tim.kosse@filezilla-project.org],[],[https://filez
 AC_CONFIG_HEADERS([src/include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE([dist-bzip2])
+AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip])
 
 AC_CANONICAL_HOST
 
@@ -14,7 +14,7 @@ LT_INIT
 LT_LANG([C++])
 
 # Todo: Use sub-configure for OSX specific code
-_AM_DEPENDENCIES(OBJC)
+_AM_DEPENDENCIES(OBJCXX)
 
 AC_CACHE_SAVE
 
@@ -59,7 +59,7 @@ if ! test "$localesonly" = "yes"; then
   ])
 
   # Check for C++14 support
-  CXX_COMPILE_STDCXX_14([],[mandatory])
+  CXX_COMPILE_STDCXX_14([noext],[mandatory])
   CHECK_LIBCXX
 
   # libstdc++ as shipped with GCC 4.7 lacks std::map::emplace
@@ -403,7 +403,7 @@ if test "$buildmain" = "yes"; then
   AC_SUBST(CFBUNDLEIDSUFFIX)
 
   if test "$macappbundle" = "yes"; then
-    AC_PROG_OBJC
+    AC_PROG_OBJCXX
   fi
 
   # Installer creation under Windows
