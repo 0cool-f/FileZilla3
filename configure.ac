@@ -7,14 +7,12 @@ AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip])
 AC_CANONICAL_HOST
 
 AC_PROG_CXX
+AC_PROG_OBJCXX
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 
 LT_INIT
 LT_LANG([C++])
-
-# Todo: Use sub-configure for OSX specific code
-_AM_DEPENDENCIES(OBJCXX)
 
 AC_CACHE_SAVE
 
@@ -401,10 +399,6 @@ if test "$buildmain" = "yes"; then
     CFBUNDLEIDSUFFIX=""
   fi
   AC_SUBST(CFBUNDLEIDSUFFIX)
-
-  if test "$macappbundle" = "yes"; then
-    AC_PROG_OBJCXX
-  fi
 
   # Installer creation under Windows
   # --------------------------------
