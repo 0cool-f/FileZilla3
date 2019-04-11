@@ -334,7 +334,7 @@ bool CImportDialog::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exi
 			continue;
 		}
 
-		std::wstring newName = name;
+		std::wstring newName = name.substr(0, 255);
 		int i = 2;
 		pugi::xml_node folder;
 		while (!(folder = GetFolderWithName(existingSites, newName))) {
@@ -354,7 +354,7 @@ bool CImportDialog::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exi
 		}
 
 		// Find free name
-		std::wstring newName = name;
+		std::wstring newName = name.substr(0, 255);
 		int i = 2;
 		while (HasEntryWithName(existingSites, newName)) {
 			newName = fz::sprintf(L"%s %d", name, i++);

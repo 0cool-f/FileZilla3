@@ -968,6 +968,7 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 	}
 
 	wxString name = event.GetLabel();
+	name = name.substr(0, 255);
 
 	wxTreeItemId parent = pTree->GetItemParent(item);
 
@@ -983,6 +984,9 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 		}
 	}
 
+	// Always veto and manually change name so that the sorting works
+	event.Veto();
+	pTree->SetItemText(item, name);
 	pTree->SortChildren(parent);
 }
 

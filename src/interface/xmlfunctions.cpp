@@ -430,10 +430,10 @@ bool GetServer(pugi::xml_node node, Site & site)
 	}
 
 	site.server.SetBypassProxy(GetTextElementInt(node, "BypassProxy", false) == 1);
-	site.server.SetName(GetTextElement_Trimmed(node, "Name"));
+	site.server.SetName(GetTextElement_Trimmed(node, "Name").substr(0, 255));
 
 	if (site.server.GetName().empty()) {
-		site.server.SetName(GetTextElement_Trimmed(node));
+		site.server.SetName(GetTextElement_Trimmed(node).substr(0, 255));
 	}
 
 	for (auto parameter = node.child("Parameter"); parameter; parameter = parameter.next_sibling("Parameter")) {

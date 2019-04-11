@@ -259,7 +259,7 @@ void CFilterDialog::OnFilterSelect(wxCommandEvent& event)
 void CFilterDialog::OnSaveAs(wxCommandEvent&)
 {
 	CInputDialog dlg;
-	dlg.Create(this, _("Enter name for filterset"), _("Please enter a unique name for this filter set"));
+	dlg.Create(this, _("Enter name for filterset"), _("Please enter a unique name for this filter set"), 255);
 	if (dlg.ShowModal() != wxID_OK) {
 		return;
 	}
@@ -323,7 +323,7 @@ void CFilterDialog::OnRename(wxCommandEvent&)
 
 	wxString msg = wxString::Format(_("Please enter a new name for the filter set \"%s\""), pChoice->GetStringSelection());
 
-	dlg.Create(this, _("Enter new name for filterset"), msg);
+	dlg.Create(this, _("Enter new name for filterset"), msg, 255);
 	if (dlg.ShowModal() != wxID_OK) {
 		return;
 	}
@@ -790,7 +790,7 @@ bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstrin
 
 bool CFilterManager::LoadFilter(pugi::xml_node& element, CFilter& filter)
 {
-	filter.name = GetTextElement(element, "Name");
+	filter.name = GetTextElement(element, "Name").substr(0, 255);
 	filter.filterFiles = GetTextElement(element, "ApplyToFiles") == L"1";
 	filter.filterDirs = GetTextElement(element, "ApplyToDirs") == L"1";
 
@@ -928,7 +928,7 @@ void CFilterManager::LoadFilters(pugi::xml_node& element)
 				}
 
 				if (!m_globalFilterSets.empty()) {
-					set.name = GetTextElement(xSet, "Name");
+					set.name = GetTextElement(xSet, "Name").substr(0, 255);
 					if (set.name.empty()) {
 						continue;
 					}

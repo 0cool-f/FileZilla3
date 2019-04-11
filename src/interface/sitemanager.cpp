@@ -58,7 +58,7 @@ bool CSiteManager::Load(pugi::xml_node element, CSiteManagerXmlHandler& handler)
 			}
 
 			const bool expand = GetTextAttribute(child, "expanded") != _T("0");
-			if (!handler.AddFolder(name, expand)) {
+			if (!handler.AddFolder(name.substr(0, 255), expand)) {
 				return false;
 			}
 			Load(child, handler);
@@ -120,7 +120,7 @@ std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
 
 		Bookmark bookmarkData;
 		if (ReadBookmarkElement(bookmarkData, bookmark)) {
-			bookmarkData.m_name = name;
+			bookmarkData.m_name = name.substr(0, 255);
 			data->m_bookmarks.push_back(bookmarkData);
 		}
 	}

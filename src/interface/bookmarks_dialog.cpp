@@ -720,6 +720,7 @@ void CBookmarksDialog::OnEndLabelEdit(wxTreeEvent& event)
 	}
 
 	wxString name = event.GetLabel();
+	name = name.substr(0, 255);
 
 	wxTreeItemId parent = m_pTree->GetItemParent(item);
 
@@ -735,6 +736,9 @@ void CBookmarksDialog::OnEndLabelEdit(wxTreeEvent& event)
 		}
 	}
 
+	// Always veto and manually change name so that the sorting works
+	event.Veto();
+	m_pTree->SetItemText(item, name);
 	m_pTree->SortChildren(parent);
 }
 

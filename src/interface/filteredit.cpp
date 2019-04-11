@@ -196,6 +196,7 @@ void CFilterEditDialog::OnRename(wxCommandEvent&)
 {
 	const wxString& oldName = XRCCTRL(*this, "ID_NAME", wxTextCtrl)->GetValue();
 	wxTextEntryDialog *pDlg = new wxTextEntryDialog(this, _("Please enter a new name for the filter."), _("Enter filter name"), oldName);
+	pDlg->SetMaxLength(255);
 	if (pDlg->ShowModal() != wxID_OK) {
 		delete pDlg;
 		return;

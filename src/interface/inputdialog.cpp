@@ -14,7 +14,7 @@ CInputDialog::CInputDialog()
 {
 }
 
-bool CInputDialog::Create(wxWindow* parent, const wxString& title, wxString text)
+bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len)
 {
 	m_allowEmpty = false;
 	SetParent(parent);
@@ -25,30 +25,41 @@ bool CInputDialog::Create(wxWindow* parent, const wxString& title, wxString text
 
 	SetTitle(title);
 
-	if (!XRCCTRL(*this, "wxID_OK", wxButton))
+	if (!XRCCTRL(*this, "wxID_OK", wxButton)) {
 		return false;
+	}
 
-	if (!XRCCTRL(*this, "wxID_CANCEL", wxButton))
+	if (!XRCCTRL(*this, "wxID_CANCEL", wxButton)) {
 		return false;
+	}
 
 	m_pTextCtrl = XRCCTRL(*this, "ID_STRING", wxTextCtrl);
-	if (!m_pTextCtrl)
+	if (!m_pTextCtrl) {
 		return false;
+	}
 
-	if (!XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl))
+	if (!XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl)) {
 		return false;
+	}
 
 	wxStaticText* pText = XRCCTRL(*this, "ID_TEXT", wxStaticText);
-	if (!pText)
+	if (!pText) {
 		return false;
+	}
 
 	WrapRecursive(this, 2.0);
+
 	pText->SetLabel(text);
 
 	GetSizer()->Fit(this);
 	GetSizer()->SetSizeHints(this);
 
 	XRCCTRL(*this, "ID_STRING", wxTextCtrl)->SetFocus();
+
+	if (max_len != -1) {
+		XRCCTRL(*this, "ID_STRING", wxTextCtrl)->SetMaxLength(max_len);
+		XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl)->SetMaxLength(max_len);
+	}
 
 	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(false);
 
@@ -67,7 +78,7 @@ void CInputDialog::OnValueChanged(wxCommandEvent&)
 	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(m_allowEmpty ? true : !value.empty());
 }
 
-void CInputDialog::SetValue(const wxString& value)
+void CInputDialog::SetValue(wxString const& value)
 {
 	m_pTextCtrl->SetValue(value);
 }
@@ -99,14 +110,12 @@ void CInputDialog::OnCancel(wxCommandEvent&)
 
 bool CInputDialog::SetPasswordMode(bool password)
 {
-	if (password)
-	{
+	if (password) {
 		m_pTextCtrl = XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl);
 		m_pTextCtrl->Show();
 		XRCCTRL(*this, "ID_STRING", wxTextCtrl)->Hide();
 	}
-	else
-	{
+	else {
 		m_pTextCtrl = XRCCTRL(*this, "ID_STRING", wxTextCtrl);
 		m_pTextCtrl->Show();
 		XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl)->Hide();

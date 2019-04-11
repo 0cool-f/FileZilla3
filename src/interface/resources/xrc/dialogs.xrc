@@ -1473,12 +1473,17 @@
                     <flag>wxALIGN_CENTRE_VERTICAL</flag>
                   </object>
                   <object class="sizeritem">
-                    <object class="wxTextCtrl" name="ID_NAME"/>
+                    <object class="wxTextCtrl" name="ID_NAME">
+                      <maxlength>255</maxlength>
+                    </object>
+                    <flag>wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
                     <minsize>200,-1</minsize>
                   </object>
                   <cols>2</cols>
                   <hgap>5</hgap>
+                  <growablecols>1</growablecols>
                 </object>
+                <flag>wxGROW</flag>
               </object>
               <object class="sizeritem">
                 <object class="wxFlexGridSizer">
@@ -2872,7 +2877,9 @@
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
-                    <object class="wxTextCtrl" name="ID_NAME"/>
+                    <object class="wxTextCtrl" name="ID_NAME">
+                      <maxlength>255</maxlength>
+                    </object>
                     <option>1</option>
                     <flag>wxALIGN_CENTRE_VERTICAL</flag>
                   </object>

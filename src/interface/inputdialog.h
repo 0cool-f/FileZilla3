@@ -9,12 +9,12 @@ public:
 	CInputDialog();
 	virtual ~CInputDialog() {}
 
-	bool Create(wxWindow* parent, const wxString& title, wxString text);
+	bool Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len = -1);
 
 	bool SetPasswordMode(bool password);
 	void AllowEmpty(bool allowEmpty);
 
-	void SetValue(const wxString& value);
+	void SetValue(wxString const& value);
 	wxString GetValue() const;
 
 	bool SelectText(int start, int end);
