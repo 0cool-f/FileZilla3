@@ -18,7 +18,7 @@ int wxMessageBoxEx(wxString const& message, wxString const& caption
 	std::wstring const chars({ ' ', '\n', '\t', 0x200b /*0-width space*/ });
 	wxString out;
 
-	size_t const max = 3;
+	size_t const max = 200;
 	if (message.size() > max) {
 		out.reserve(message.size() + 10);
 	}
