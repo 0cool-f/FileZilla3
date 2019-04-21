@@ -10,6 +10,16 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.42.0-beta1 (2019-04-21)
+
+- Building and running FileZilla now depends on libfilezilla >= 0.16.0 (https://lib.filezilla-project.org/)
+- Limit the maximum length of site, bookmark and filter names to prevent display issues and crashes due to some operating systems badly handling long texts
+- When displaying message boxes, insert zero-width spaces into long unbroken words to prevent display issues and crashes due to some operating systems badly handling long texts
+- Fix crash in the external IP address resolver
+- Fix some assertions if a server sends bad file sizes
+- Large refactoring of the socket code
+- The thread pool from libfilezilla is now used for all worker threads
+
 3.41.2 (2019-03-18)
 
 ! Backport a security fix from PuTTY 0.71 affecting SFTP connections: Fix an integer overflow in the RSA key exchange preceeding host key verification
