@@ -518,15 +518,16 @@ void CExternalIPResolver::OnChunkedData()
 					m_chunkData.size += *q - '0';
 				}
 				else if (*q >= 'A' && *q <= 'F') {
-					m_chunkData.size *= 10;
+					m_chunkData.size *= 16;
 					m_chunkData.size += *q - 'A' + 10;
 				}
 				else if (*q >= 'a' && *q <= 'f') {
-					m_chunkData.size *= 10;
+					m_chunkData.size *= 16;
 					m_chunkData.size += *q - 'a' + 10;
 				}
-				else if (*q == ';' || *q == ' ')
+				else if (*q == ';' || *q == ' ') {
 					break;
+				}
 				else {
 					// Invalid size
 					Close(false);
