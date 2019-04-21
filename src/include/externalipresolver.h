@@ -74,7 +74,7 @@ protected:
 	struct t_chunkData {
 		bool getTrailer{};
 		bool terminateChunk{};
-		int64_t size{};
+		uint64_t size{};
 	} m_chunkData;
 
 	bool m_finished{};
