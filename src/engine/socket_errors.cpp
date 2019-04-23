@@ -90,6 +90,9 @@ static Error_table const error_table[] =
 #ifdef EAI_SYSTEM
 	ERRORDECL(EAI_SYSTEM, fztranslate_mark("Other system error"))
 #endif
+#ifdef EAI_IDN_ENCODE
+	ERRORDECL(EAI_IDN_ENCODE, fztranslate_mark("Invalid characters in hostname"))
+#endif
 
 	// Codes that have no POSIX equivalence
 #ifdef FZ_WINDOWS
