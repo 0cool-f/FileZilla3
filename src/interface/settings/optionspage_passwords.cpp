@@ -63,14 +63,16 @@ bool COptionsPagePasswords::SavePage()
 	auto oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
 	wxString const newPw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
 
-	bool useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
+	bool const save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
+	bool const useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
+	bool const forget = !save && !useMaster;
 	if (useMaster && newPw.empty()) {
 		// Keeping existing master password
 		return true;
 	}
 
 	CLoginManager loginManager;
-	if (oldPub) {
+	if (oldPub && !forget) {
 		if (!loginManager.AskDecryptor(oldPub, true, true)) {
 			return true;
 		}
@@ -88,7 +90,6 @@ bool COptionsPagePasswords::SavePage()
 		}
 	}
 	else {
-		bool save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
 		m_pOptions->SetOption(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
 		m_pOptions->SetOption(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
 	}
@@ -96,9 +97,12 @@ bool COptionsPagePasswords::SavePage()
 	// Now actually change stored passwords
 	{
 		auto recentServers = CRecentServerList::GetMostRecentServers();
-		for (auto & site : recentServers) {
-			loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
-			site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
+		for (auto& site : recentServers) {
+			if (!forget) {
+				loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
+				site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
+			}
+			site.credentials.Protect();
 		}
 		CRecentServerList::SetMostRecentServers(recentServers);
 	}
@@ -106,8 +110,11 @@ bool COptionsPagePasswords::SavePage()
 	for (auto state : *CContextManager::Get()->GetAllStates()) {
 		auto site = state->GetLastSite();
 		auto path = state->GetLastServerPath();
-		loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
-		site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
+		if (!forget) {
+			loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
+			site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
+		}
+		site.credentials.Protect();
 		state->SetLastSite(site, path);
 	}
 

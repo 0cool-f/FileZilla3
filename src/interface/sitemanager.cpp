@@ -799,6 +799,7 @@ wxString CSiteManager::GetColourName(int i)
 
 void CSiteManager::Rewrite(CLoginManager & loginManager, pugi::xml_node element, bool on_failure_set_to_ask)
 {
+	bool const forget = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
 	for (auto child = element.first_child(); child; child = child.next_sibling()) {
 		if (!strcmp(child.name(), "Folder")) {
 			Rewrite(loginManager, child, on_failure_set_to_ask);
@@ -806,8 +807,11 @@ void CSiteManager::Rewrite(CLoginManager & loginManager, pugi::xml_node element,
 		else if (!strcmp(child.name(), "Server")) {
 			auto site = ReadServerElement(child);
 			if (site) {
-				loginManager.AskDecryptor(site->credentials.encrypted_, true, false);
-				site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), on_failure_set_to_ask);
+				if (!forget) {
+					loginManager.AskDecryptor(site->credentials.encrypted_, true, false);
+					site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), on_failure_set_to_ask);
+				}
+				site->credentials.Protect();
 				Save(child, *site);
 			}
 		}

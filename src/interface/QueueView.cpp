@@ -3189,27 +3189,30 @@ void CQueueView::OnStateChange(CState*, t_statechange_notifications notification
 			return;
 		}
 
-
+		bool const forget = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
 		for (auto it = m_serverList.begin(); it != m_serverList.end(); ) {
 			Site site = (*it)->GetSite();
-			loginManager->AskDecryptor(site.credentials.encrypted_, true, false);
+			if (!forget) {
+				loginManager->AskDecryptor(site.credentials.encrypted_, true, false);
 
-			// Since the queue may be running and AskDecryptor uses the GUI, re-find matching server item
-			for (it = m_serverList.begin(); it != m_serverList.end(); ++it) {
-				if ((*it)->GetSite() == site) {
-					site = (*it)->GetSite(); // Credentials aren't in ==
-					site.credentials.Unprotect(loginManager->GetDecryptor(site.credentials.encrypted_), true);
-					(*it)->GetCredentials() = site.credentials;
-					break;
+				// Since the queue may be running and AskDecryptor uses the GUI, re-find matching server item
+				for (it = m_serverList.begin(); it != m_serverList.end(); ++it) {
+					if ((*it)->GetSite() == site) {
+						site = (*it)->GetSite(); // Credentials aren't in ==
+						site.credentials.Unprotect(loginManager->GetDecryptor(site.credentials.encrypted_), true);
+						(*it)->GetCredentials() = site.credentials;
+						break;
+					}
+				}
+				if (it == m_serverList.end()) {
+					// Server has vanished, start over.
+					it = m_serverList.begin();
+					continue;
 				}
 			}
-			if (it == m_serverList.end()) {
-				// Server has vanished, start over.
-				it = m_serverList.begin();
-			}
-			else {
-				++it;
-			}
+
+			(*it)->GetCredentials().Protect();
+			++it;
 		}
 	}
 	else if (notification == STATECHANGE_QUITNOW) {
