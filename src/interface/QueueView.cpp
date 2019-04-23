@@ -1719,7 +1719,7 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 						continue;
 					}
 
-					// CServerPath and wxString are reference counted.
+					// CServerPath and CLocalPath are reference counted.
 					// Save some memory here by re-using the old copy
 					if (localPath != previousLocalPath) {
 						previousLocalPath = localPath;
@@ -1748,10 +1748,11 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 				bool download = GetTextElementInt(folder, "Download") != 0;
 				if (download) {
 					std::wstring localFile = GetTextElement(folder, "LocalFile");
-					if (localFile.empty()) {
+					CLocalPath localPath(localFile);
+					if (localPath.empty()) {
 						continue;
 					}
-					folderItem = new CFolderItem(pServerItem, true, CLocalPath(localFile));
+					folderItem = new CFolderItem(pServerItem, true, localPath);
 				}
 				else {
 					std::wstring remoteFile = GetTextElement(folder, "RemoteFile");
