@@ -8,8 +8,6 @@
 #include <sys/stat.h>
 #endif
 
-#include <deque>
-
 #include <assert.h>
 
 #ifdef FZ_WINDOWS
@@ -41,7 +39,7 @@ bool CLocalPath::SetPath(std::wstring const& path, std::wstring* file)
 	}
 #endif
 
-	std::deque<wchar_t*> segments; // List to store the beginnings of segments
+	std::vector<wchar_t*> segments; // List to store the beginnings of segments
 
 	wchar_t const* in = path.c_str();
 
