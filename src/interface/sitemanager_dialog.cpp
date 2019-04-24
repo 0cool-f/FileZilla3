@@ -231,8 +231,9 @@ public:
 
 	void ClearDropHighlight()
 	{
-		if (m_dropHighlight == wxTreeItemId())
+		if (m_dropHighlight == wxTreeItemId()) {
 			return;
+		}
 
 		wxTreeCtrl *pTree = XRCCTRL(*m_pSiteManager, "ID_SITETREE", wxTreeCtrl);
 		pTree->SetItemDropHighlight(m_dropHighlight, false);
@@ -515,7 +516,6 @@ public:
 		}
 		m_lastSelectionIt = m_lastSelection.cbegin();
 
-		m_wrong_sel_depth = 0;
 		m_kiosk = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE);
 	}
 
@@ -560,9 +560,10 @@ public:
 			// Clear saved password
 			data->SetLogonType(LogonType::ask);
 			data->credentials.SetPass(std::wstring());
+			data->credentials.encrypted_ = fz::public_key();
 		}
 
-		const wxString name(data->server.GetName());
+		std::wstring const name = data->server.GetName();
 
 		CSiteManagerItemData* pData = new CSiteManagerItemData(std::move(data));
 		wxTreeItemId newItem = m_pTree->AppendItem(m_item, name, 2, 2, pData);
@@ -615,38 +616,41 @@ public:
 		if (!m_expand.empty()) {
 			const bool expand = m_expand.back();
 			m_expand.pop_back();
-			if (expand)
+			if (expand) {
 				m_pTree->Expand(m_item);
+			}
 		}
 		m_pTree->SortChildren(m_item);
 
 		wxTreeItemId parent = m_pTree->GetItemParent(m_item);
-		if (!parent)
+		if (!parent) {
 			return false;
+		}
 
 		m_item = parent;
 		return true;
 	}
 
 protected:
-	wxTreeCtrlEx* m_pTree;
+	wxTreeCtrlEx * const m_pTree;
 	wxTreeItemId m_item;
 
 	std::vector<std::wstring> m_lastSelection;
 	std::vector<std::wstring>::const_iterator m_lastSelectionIt;
-	int m_wrong_sel_depth;
+	int m_wrong_sel_depth{};
 
 	std::vector<bool> m_expand;
 
-	bool m_predefined;
-	int m_kiosk;
+	bool const m_predefined{};
+	int m_kiosk{};
 };
 
 bool CSiteManagerDialog::Load()
 {
 	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree)
+	if (!pTree) {
 		return false;
+	}
 
 	pTree->DeleteAllItems();
 
@@ -717,12 +721,14 @@ bool CSiteManagerDialog::Load()
 
 bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 {
-	if (!m_pSiteManagerMutex)
+	if (!m_pSiteManagerMutex) {
 		return false;
+	}
 
 	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree)
+	if (!pTree) {
 		return false;
+	}
 
 	if (!element || !treeId) {
 		// We have to synchronize access to sitemanager.xml so that multiple processed don't write
@@ -746,14 +752,16 @@ bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 		}
 		element = document.append_child("Servers");
 
-		if (!element)
+		if (!element) {
 			return true;
+		}
 
 		bool res = Save(element, m_ownSites);
 
 		if (!xml.Save(false)) {
-			if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2)
+			if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
 				return res;
+			}
 			wxString msg = wxString::Format(_("Could not write \"%s\", any changes to the Site Manager could not be saved: %s"), xml.GetFileName(), xml.GetError());
 			wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
 		}
@@ -831,8 +839,9 @@ void CSiteManagerDialog::OnNewFolder(wxCommandEvent&)
 		return;
 	}
 
-	while (pTree->GetItemData(item))
+	while (pTree->GetItemData(item)) {
 		item = pTree->GetItemParent(item);
+	}
 
 	if (!Verify()) {
 		return;
@@ -993,12 +1002,14 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 void CSiteManagerDialog::OnRename(wxCommandEvent&)
 {
 	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree)
+	if (!pTree) {
 		return;
+	}
 
 	wxTreeItemId item = pTree->GetSelection();
-	if (!item.IsOk() || item == pTree->GetRootItem() || item == m_ownSites || IsPredefinedItem(item))
+	if (!item.IsOk() || item == pTree->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
 		return;
+	}
 
 	pTree->EditLabel(item);
 }
@@ -1595,8 +1606,9 @@ bool CSiteManagerDialog::MoveItems(wxTreeItemId source, wxTreeItemId target, boo
 			pTree->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
 			pTree->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
 
-			if (pTree->IsExpanded(pair.source))
+			if (pTree->IsExpanded(pair.source)) {
 				expand.push_back(newItem);
+			}
 		}
 		else if (data->m_site) {
 			CSiteManagerItemData* newData = new CSiteManagerItemData;
@@ -1684,8 +1696,9 @@ wxString CSiteManagerDialog::FindFirstFreeName(const wxTreeItemId &parent, const
 
 			child = pTree->GetNextChild(parent, cookie);
 		}
-		if (!found)
+		if (!found) {
 			break;
+		}
 
 		newName = name + wxString::Format(_T(" %d"), ++index);
 	}
@@ -1724,8 +1737,9 @@ void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, Site const& site, bool 
 void CSiteManagerDialog::AddNewBookmark(wxTreeItemId parent)
 {
 	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree)
+	if (!pTree) {
 		return;
+	}
 
 	wxString name = FindFirstFreeName(parent, _("New bookmark"));
 

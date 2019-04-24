@@ -342,6 +342,7 @@ void ProtectedCredentials::Protect(fz::public_key const& key)
 {
 	if (logonType_ != LogonType::normal && logonType_ != LogonType::account) {
 		password_.clear();
+		encrypted_ = fz::public_key();
 		return;
 	}
 
