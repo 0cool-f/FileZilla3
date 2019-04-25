@@ -2,6 +2,10 @@
  * Unix networking abstraction.
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -217,6 +221,9 @@ SockAddr sk_namelookup(const char *host, char **canonicalname, int address_famil
 
 #ifndef NO_IPV6
     hints.ai_flags = AI_CANONNAME;
+#ifdef AI_IDN
+    hints.ai_flags |= AI_IDN;
+#endif
     hints.ai_family = (address_family == ADDRTYPE_IPV4 ? AF_INET :
 		       address_family == ADDRTYPE_IPV6 ? AF_INET6 :
 		       AF_UNSPEC);
