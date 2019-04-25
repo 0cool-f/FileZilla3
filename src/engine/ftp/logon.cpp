@@ -6,7 +6,7 @@
 #include "../tlssocket.h"
 
 CFtpLogonOpData::CFtpLogonOpData(CFtpControlSocket& controlSocket, Credentials const& credentials)
-    : COpData(Command::connect, L"CFtpLogonOpData")
+	: COpData(Command::connect, L"CFtpLogonOpData")
 	, CFtpOpData(controlSocket)
 	, credentials_(credentials)
 {
@@ -41,7 +41,7 @@ int CFtpLogonOpData::Send()
 	switch (opState)
 	{
 	case LOGON_CONNECT:
-	    {
+		{
 			// Do not use FTP proxy if generic proxy is set
 			int const generic_proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
 			if ((generic_proxy_type <= static_cast<int>(ProxyType::NONE) || generic_proxy_type >= static_cast<int>(ProxyType::count)) && !currentServer_.GetBypassProxy()) {
@@ -111,7 +111,8 @@ int CFtpLogonOpData::Send()
 					controlSocket_.socket_->set_keepalive_interval(fz::duration::from_minutes(v));
 				}
 			}
-	    }
+			return ret;
+		}
 	case LOGON_AUTH_WAIT:
 		LogMessage(MessageType::Debug_Info, L"LogonSend() called during LOGON_AUTH_WAIT, ignoring");
 		return FZ_REPLY_WOULDBLOCK;
@@ -122,8 +123,8 @@ int CFtpLogonOpData::Send()
 	case LOGON_SYST:
 		return controlSocket_.SendCommand(L"SYST");
 	case LOGON_LOGON:
-	    {
-		    t_loginCommand cmd = loginSequence.front();
+		{
+			t_loginCommand cmd = loginSequence.front();
 			switch (cmd.type)
 			{
 			case loginCommandType::user:
@@ -179,7 +180,7 @@ int CFtpLogonOpData::Send()
 			default:
 				return FZ_REPLY_INTERNALERROR;
 			}
-	    }
+		}
 		break;
 	case LOGON_FEAT:
 		return controlSocket_.SendCommand(L"FEAT");
@@ -208,11 +209,11 @@ int CFtpLogonOpData::Send()
 		}
 		return controlSocket_.SendCommand(currentServer_.GetPostLoginCommands()[customCommandIndex]);
 	case LOGON_OPTSMLST:
-	    {
-		    std::wstring args;
+		{
+			std::wstring args;
 			CServerCapabilities::GetCapability(currentServer_, opst_mlst_command, &args);
 			return controlSocket_.SendCommand(L"OPTS MLST " + args);
-	    }
+		}
 		break;
 	default:
 		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
