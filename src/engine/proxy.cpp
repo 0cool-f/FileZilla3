@@ -675,12 +675,13 @@ fz::native_string CProxySocket::peer_host() const
 	return host_;
 }
 
-int CProxySocket::peer_port(int& error)  const
+int CProxySocket::peer_port(int& error) const
 {
-	if (port_ < 0) {
+	if (!port_) {
 		error = ENOTCONN;
+		return -1;
 	}
-	return port_;
+	return static_cast<int>(port_);
 }
 
 int CProxySocket::shutdown()
