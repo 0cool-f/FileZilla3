@@ -1359,7 +1359,7 @@ void CSiteManagerDialog::OnCopySite(wxCommandEvent&)
 		parent = pTree->GetItemParent(item);
 	}
 
-	wxString const name = pTree->GetItemText(item);
+	wxString const name = pTree->GetItemText(item).substr(0, 230);
 	wxString newName = wxString::Format(_("Copy of %s"), name);
 	int index = 2;
 	for (;;) {

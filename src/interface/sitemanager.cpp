@@ -100,10 +100,10 @@ std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
 {
 	auto data = std::make_unique<Site>();
 	if (!::GetServer(element, *data)) {
-		return 0;
+		return nullptr;
 	}
 	if (data->server.GetName().empty()) {
-		return 0;
+		return nullptr;
 	}
 
 	data->comments_ = GetTextElement(element, "Comments");
@@ -590,7 +590,7 @@ pugi::xml_node CSiteManager::GetElementByPath(pugi::xml_node node, std::vector<s
 				continue;
 			}
 
-			wxString name = GetTextElement_Trimmed(child, "Name");
+			std::wstring name = GetTextElement_Trimmed(child, "Name");
 			if (name.empty()) {
 				name = GetTextElement_Trimmed(child);
 			}
@@ -875,4 +875,128 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 		AddTextElementUtf8(node, "SyncBrowsing", bookmark.m_sync ? "1" : "0");
 		AddTextElementUtf8(node, "DirectoryComparison", bookmark.m_comparison ? "1" : "0");
 	}
+}
+
+namespace {
+bool HasEntryWithName(pugi::xml_node element, std::wstring const& name)
+{
+	pugi::xml_node child;
+	for (child = element.child("Server"); child; child = child.next_sibling("Server")) {
+		std::wstring childName = GetTextElement_Trimmed(child, "Name");
+		if (childName.empty()) {
+			childName = GetTextElement_Trimmed(child);
+		}
+		if (!fz::stricmp(name, childName)) {
+			return true;
+		}
+	}
+	for (child = element.child("Folder"); child; child = child.next_sibling("Folder")) {
+		std::wstring childName = GetTextElement_Trimmed(child, "Name");
+		if (childName.empty()) {
+			childName = GetTextElement_Trimmed(child);
+		}
+		if (!fz::stricmp(name, childName)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+pugi::xml_node GetOrCreateFolderWithName(pugi::xml_node element, std::wstring const& name)
+{
+	pugi::xml_node child;
+	for (child = element.child("Server"); child; child = child.next_sibling("Server")) {
+		std::wstring childName = GetTextElement_Trimmed(child);
+		if (!fz::stricmp(name, childName)) {
+			// We do not allow servers and directories to share the same name
+			return pugi::xml_node();
+		}
+	}
+
+	for (child = element.child("Folder"); child; child = child.next_sibling("Folder")) {
+		std::wstring childName = GetTextElement_Trimmed(child);
+		if (!fz::stricmp(name, childName)) {
+			return child;
+		}
+	}
+
+	child = element.append_child("Folder");
+	AddTextElement(child, name);
+
+	return child;
+}
+}
+bool CSiteManager::ImportSites(pugi::xml_node sites)
+{
+	CInterProcessMutex mutex(MUTEX_SITEMANAGER);
+
+	CXmlFile file(wxGetApp().GetSettingsFile(_T("sitemanager")));
+	auto element = file.Load();
+	if (!element) {
+		wxString msg = wxString::Format(_("Could not load \"%s\", please make sure the file is valid and can be accessed.\nAny changes made in the Site Manager will not be saved."), file.GetFileName());
+		wxMessageBoxEx(msg, _("Error loading xml file"), wxICON_ERROR);
+
+		return false;
+	}
+
+	auto currentSites = element.child("Servers");
+	if (!currentSites) {
+		currentSites = element.append_child("Servers");
+	}
+
+	if (!ImportSites(sites, currentSites)) {
+		return false;
+	}
+
+	return file.Save(true);
+}
+
+bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node existingSites)
+{
+	for (auto importFolder = sitesToImport.child("Folder"); importFolder; importFolder = importFolder.next_sibling("Folder")) {
+		std::wstring name = GetTextElement_Trimmed(importFolder, "Name").substr(0, 255);
+		if (name.empty()) {
+			name = GetTextElement_Trimmed(importFolder);
+		}
+		if (name.empty()) {
+			continue;
+		}
+
+		std::wstring newName = name.substr(0, 240);
+		int i = 2;
+		pugi::xml_node folder;
+		while (!(folder = GetOrCreateFolderWithName(existingSites, newName))) {
+			newName = fz::sprintf(L"%s %d", name.substr(0, 240), i++);
+		}
+
+		ImportSites(importFolder, folder);
+	}
+
+	bool const forget = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+	auto & loginManager = CLoginManager::Get();
+
+	for (auto importSite = sitesToImport.child("Server"); importSite; importSite = importSite.next_sibling("Server")) {
+		auto site = ReadServerElement(importSite);
+		if (!site) {
+			continue;
+		}
+			
+		// Find free name
+		auto const name = site->server.GetName();
+		std::wstring newName = name;
+		int i = 2;
+		while (HasEntryWithName(existingSites, newName)) {
+			newName = fz::sprintf(L"%s %d", name.substr(0, 240), i++);
+		}
+		site->server.SetName(newName);
+
+		site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), false);
+		site->credentials.Protect();
+
+		auto xsite = existingSites.append_child("Server");
+		Save(xsite, *site);
+	}
+
+	return true;
 }

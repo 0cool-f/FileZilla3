@@ -49,7 +49,11 @@ public:
 	static int GetColourIndex(wxColour const& c);
 	static wxString GetColourName(int i);
 
+	static bool ImportSites(pugi::xml_node sites);
+
 protected:
+	static bool ImportSites(pugi::xml_node sitesToImport, pugi::xml_node existingSites);
+
 	static void Rewrite(CLoginManager & loginManager, pugi::xml_node element, bool on_failure_set_to_ask);
 	static void Save(pugi::xml_node element, Site const& site);
 
