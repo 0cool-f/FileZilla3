@@ -878,55 +878,39 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 }
 
 namespace {
-bool HasEntryWithName(pugi::xml_node element, std::wstring const& name)
+pugi::xml_node GetChildWithName(pugi::xml_node element, std::wstring const& name)
 {
 	pugi::xml_node child;
-	for (child = element.child("Server"); child; child = child.next_sibling("Server")) {
+	for (child = element.first_child(); child; child = child.next_sibling()) {
 		std::wstring childName = GetTextElement_Trimmed(child, "Name");
 		if (childName.empty()) {
 			childName = GetTextElement_Trimmed(child);
 		}
-		if (!fz::stricmp(name, childName)) {
-			return true;
-		}
-	}
-	for (child = element.child("Folder"); child; child = child.next_sibling("Folder")) {
-		std::wstring childName = GetTextElement_Trimmed(child, "Name");
-		if (childName.empty()) {
-			childName = GetTextElement_Trimmed(child);
-		}
-		if (!fz::stricmp(name, childName)) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-pugi::xml_node GetOrCreateFolderWithName(pugi::xml_node element, std::wstring const& name)
-{
-	pugi::xml_node child;
-	for (child = element.child("Server"); child; child = child.next_sibling("Server")) {
-		std::wstring childName = GetTextElement_Trimmed(child);
-		if (!fz::stricmp(name, childName)) {
-			// We do not allow servers and directories to share the same name
-			return pugi::xml_node();
-		}
-	}
-
-	for (child = element.child("Folder"); child; child = child.next_sibling("Folder")) {
-		std::wstring childName = GetTextElement_Trimmed(child);
 		if (!fz::stricmp(name, childName)) {
 			return child;
 		}
 	}
+	
+	return pugi::xml_node();
+}
 
-	child = element.append_child("Folder");
-	AddTextElement(child, name);
-
+pugi::xml_node GetOrCreateFolderWithName(pugi::xml_node element, std::wstring const& name)
+{
+	pugi::xml_node child = GetChildWithName(element, name);
+	if (child) {
+		if (strcmp(child.name(), "Folder")) {
+			// We do not allow servers and directories to share the same name
+			child = pugi::xml_node();
+		}
+	}
+	else {
+		child = element.append_child("Folder");
+		AddTextElement(child, name);
+	}
 	return child;
 }
 }
+
 bool CSiteManager::ImportSites(pugi::xml_node sites)
 {
 	CInterProcessMutex mutex(MUTEX_SITEMANAGER);
@@ -986,7 +970,7 @@ bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exis
 		auto const name = site->server.GetName();
 		std::wstring newName = name;
 		int i = 2;
-		while (HasEntryWithName(existingSites, newName)) {
+		while (GetChildWithName(existingSites, newName)) {
 			newName = fz::sprintf(L"%s %d", name.substr(0, 240), i++);
 		}
 		site->server.SetName(newName);
