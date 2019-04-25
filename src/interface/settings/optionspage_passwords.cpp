@@ -55,21 +55,34 @@ bool COptionsPagePasswords::LoadPage()
 
 bool COptionsPagePasswords::SavePage()
 {
-	bool const disabledByDefault = m_pOptions->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+	int const old_kiosk_mode = m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE);
+	auto const oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+
+	bool const disabledByDefault = m_pOptions->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && old_kiosk_mode != 0;
 	if (disabledByDefault || m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return true;
 	}
 
-	auto oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
 	wxString const newPw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
 
 	bool const save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
 	bool const useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
 	bool const forget = !save && !useMaster;
-	if (useMaster && newPw.empty()) {
+
+	if (save && !old_kiosk_mode && !oldPub) {
+		// Not changing mode
+		return true;
+	}
+	else if (forget && old_kiosk_mode) {
+		// Not changing mode
+		return true;
+	}
+	else if (useMaster && newPw.empty()) {
 		// Keeping existing master password
 		return true;
 	}
+	
+	// Something is being changed
 
 	CLoginManager loginManager;
 	if (oldPub && !forget) {
