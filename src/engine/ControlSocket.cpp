@@ -735,7 +735,7 @@ void CRealControlSocket::operator()(fz::event_base const& ev)
 	}
 }
 
-void CRealControlSocket::OnSocketEvent(fz::socket_event_source* source, fz::socket_event_flag t, int error)
+void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_event_flag t, int error)
 {
 	if (!active_layer_) {
 		return;
