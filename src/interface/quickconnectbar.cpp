@@ -206,7 +206,7 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 			iter != m_recentServers.end();
 			++iter, ++i)
 		{
-			wxString name(LabelEscape(iter->Format(ServerFormat::with_user_and_optional_port)));
+			std::wstring name = LabelEscape(iter->Format(ServerFormat::with_user_and_optional_port)).substr(0, 255);
 			pMenu->Append(10 + i, name);
 		}
 	}
