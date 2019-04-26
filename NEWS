@@ -10,6 +10,14 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.24.0-rc1 (2019-04-26)
+
+- Switching from using a master password to not saving passwords at all no longer requires entering the master password
+- *nix: Fixed support for internationalized domain names on systems having AI_IDN when using SFTP
+- Fixed an assertion after importing a manipulated queue file
+- When importing sites, any imported passwords are now immediately protected/deleted depending on the password protection settings
+- The ability to import Sitem Manager entries from antique FileZilla 2, last updated over a dozen years ago, has been removed
+
 3.42.0-beta1 (2019-04-21)
 
 - Building and running FileZilla now depends on libfilezilla >= 0.16.0 (https://lib.filezilla-project.org/)
