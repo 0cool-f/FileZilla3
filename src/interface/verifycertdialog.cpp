@@ -11,7 +11,6 @@
 
 #include <wx/scrolwin.h>
 #include <wx/statbox.h>
-#include <wx/tokenzr.h>
 
 CertStore::CertStore()
 	: m_xmlFile(wxGetApp().GetSettingsFile(L"trustedcerts"))
@@ -421,7 +420,7 @@ bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
 	if (!altNames.empty()) {
 		wxString str;
 		for (auto const& altName : altNames) {
-			str += altName.name + L"\n";
+			str += LabelEscape(altName.name) + L"\n";
 		}
 		str.RemoveLast();
 		m_pSubjectSizer->Add(new wxStaticText(subjectPanel, wxID_ANY, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
@@ -507,10 +506,10 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 
 	if (notification.MismatchedHostname()) {
 		xrc_call(*m_pDlg, "ID_HOST", &wxWindow::SetForegroundColour, wxColour(255, 0, 0));
-		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(_("%s:%d - Hostname does not match certificate"), notification.GetHost(), notification.GetPort()));
+		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(_("%s:%d - Hostname does not match certificate"), LabelEscape(notification.GetHost()), notification.GetPort()));
 	}
 	else {
-		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(L"%s:%d", notification.GetHost(), notification.GetPort()));
+		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(L"%s:%d", LabelEscape(notification.GetHost()), notification.GetPort()));
 	}
 
 	line_height_ = XRCCTRL(*m_pDlg, "ID_SUBJECT_DUMMY", wxStaticText)->GetSize().y;
@@ -579,143 +578,120 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 	m_pDlg = 0;
 }
 
-void CVerifyCertDialog::ParseDN(wxWindow* parent, const wxString& dn, wxSizer* pSizer)
+namespace {
+std::vector<std::pair<std::wstring, std::wstring>> dn_split(std::wstring const& dn)
+{
+	std::vector<std::pair<std::wstring, std::wstring>> ret;
+
+	std::wstring type;
+	std::wstring value;
+
+	int escaping{};
+	bool phase{};
+
+	for (auto const& c : dn) {
+		auto& out = phase ? value : type;
+		if (escaping) {
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+				--escaping;
+			}
+			else {
+				escaping = 0;
+			}
+			out += c;
+		}
+		else if (!phase && c == '=') {
+			phase = true;
+		}
+		else if (c == '+' || c == ',') {
+			if (!type.empty() && !value.empty()) {
+				ret.emplace_back(type, value);
+			}
+			type.clear();
+			value.clear();
+			phase = false;
+		}
+		else if (c == '\\') {
+			out += c;
+			escaping = 2;
+		}
+		else {
+			out += c;
+		}
+	}
+
+	if (!type.empty() && !value.empty()) {
+		ret.emplace_back(type, value);
+	}
+
+	return ret;
+}
+}
+
+
+void CVerifyCertDialog::ParseDN(wxWindow* parent, std::wstring const& dn, wxSizer* pSizer)
 {
 	pSizer->Clear(true);
 
-	wxStringTokenizer tokens(dn, L",");
+	auto tokens = dn_split(dn);
 
-	std::list<wxString> tokenlist;
-	while (tokens.HasMoreTokens()) {
-		tokenlist.push_back(tokens.GetNextToken());
-	}
+	ParseDN_by_prefix(parent, tokens, L"CN", _("Common name:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"O", _("Organization:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"businessCategory", _("Business category:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"OU", _("Unit:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"title", _("Title:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"C", _("Country:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"ST", _("State or province:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"L", _("Locality:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"postalCode", _("Postal code:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"street", _("Street:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"EMAIL", _("E-Mail:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"serialNumber", _("Serial number:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"telephoneNumber", _("Telephone number:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"name", _("Name:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"jurisdictionOfIncorporationCountryName", _("Jurisdiction country:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"jurisdictionOfIncorporationStateOrProvinceName", _("Jurisdiction state or province:"), pSizer);
+	ParseDN_by_prefix(parent, tokens, L"jurisdictionOfIncorporationLocalityName", _("Jurisdiction locality:"), pSizer);
 
-	ParseDN_by_prefix(parent, tokenlist, L"CN", _("Common name:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"O", _("Organization:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"2.5.4.15", _("Business category:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, L"OU", _("Unit:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"T", _("Title:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"C", _("Country:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"ST", _("State or province:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"L", _("Locality:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"2.5.4.17", _("Postal code:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, L"postalCode", _("Postal code:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, L"STREET", _("Street:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"EMAIL", _("E-Mail:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"serialNumber", _("Serial number:"), pSizer);
-	ParseDN_by_prefix(parent, tokenlist, L"1.3.6.1.4.1.311.60.2.1.3", _("Jurisdiction country:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, L"1.3.6.1.4.1.311.60.2.1.2", _("Jurisdiction state or province:"), pSizer, true);
-	ParseDN_by_prefix(parent, tokenlist, L"1.3.6.1.4.1.311.60.2.1.1", _("Jurisdiction locality:"), pSizer, true);
-
-	if (!tokenlist.empty()) {
-		wxString value = tokenlist.front();
-		for (auto iter = ++tokenlist.cbegin(); iter != tokenlist.cend(); ++iter) {
-			value += L"," + *iter;
+	if (!tokens.empty()) {
+		std::wstring other;
+		for (auto const& pair : tokens) {
+			if (!other.empty()) {
+				other += ',';
+			}
+			other += pair.first;
+			other += '=';
+			other += pair.second;
 		}
 
 		pSizer->Add(new wxStaticText(parent, wxID_ANY, _("Other:")));
-		pSizer->Add(new wxStaticText(parent, wxID_ANY, value));
+		pSizer->Add(new wxStaticText(parent, wxID_ANY, LabelEscape(other)));
 	}
 }
 
-void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::list<wxString>& tokens, wxString prefix, const wxString& name, wxSizer* pSizer, bool decode)
+void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::vector<std::pair<std::wstring, std::wstring>> & tokens, std::wstring const& prefix, wxString const& name, wxSizer* pSizer)
 {
-	prefix += L"=";
-	int len = prefix.Length();
+	std::wstring value;
 
-	wxString value;
-
-	bool append = false;
-
-	auto iter = tokens.begin();
-	while (iter != tokens.end()) {
-		if (!append) {
-			if (iter->Left(len) != prefix) {
-				++iter;
-				continue;
-			}
-
-			if (!value.empty()) {
-				value += L"\n";
-			}
-		}
-		else {
-			append = false;
-			value += L",";
+	for (auto it = tokens.cbegin(); it != tokens.cend(); ) {
+		auto& pair = *it;
+		if (!fz::equal_insensitive_ascii(pair.first, prefix)) {
+			++it;
+			continue;
 		}
 
-		value += iter->Mid(len);
-
-		if (iter->Last() == '\\') {
-			value.RemoveLast();
-			append = true;
-			len = 0;
+		if (!value.empty()) {
+			value += '\n';
 		}
+		value += pair.second;
 
-		auto remove = iter++;
-		tokens.erase(remove);
-	}
-
-	if (decode) {
-		value = DecodeValue(value);
+		it = tokens.erase(it);
 	}
 
 	if (!value.empty()) {
 		pSizer->Add(new wxStaticText(parent, wxID_ANY, name));
-		pSizer->Add(new wxStaticText(parent, wxID_ANY, value));
+		pSizer->Add(new wxStaticText(parent, wxID_ANY, LabelEscape(value)));
 	}
-}
-
-wxString CVerifyCertDialog::DecodeValue(const wxString& value)
-{
-	// Decodes string in hex notation
-	// #xxxx466F6F626172 -> Foobar
-	// First two encoded bytes are ignored, some weird type information I don't care about
-	// Only accepts ASCII for now.
-	if (value.empty() || value[0] != '#') {
-		return value;
-	}
-
-	unsigned int len = value.Len();
-
-	wxString out;
-
-	for (unsigned int i = 5; i + 1 < len; i += 2) {
-		wxChar c = value[i];
-		wxChar d = value[i + 1];
-		if (c >= '0' && c <= '9') {
-			c -= '0';
-		}
-		else if (c >= 'a' && c <= 'z') {
-			c -= 'a' - 10;
-		}
-		else if (c >= 'A' && c <= 'Z') {
-			c -= 'A' - 10;
-		}
-		else {
-			continue;
-		}
-		if (d >= '0' && d <= '9') {
-			d -= '0';
-		}
-		else if (d >= 'a' && d <= 'z') {
-			d -= 'a' - 10;
-		}
-		else if (d >= 'A' && d <= 'Z') {
-			d -= 'A' - 10;
-		}
-		else {
-			continue;
-		}
-
-		c = c * 16 + d;
-		if (c > 127 || c < 32) {
-			continue;
-		}
-		out += c;
-	}
-
-	return out;
 }
 
 void CVerifyCertDialog::OnCertificateChoice(wxCommandEvent& event)
@@ -759,7 +735,7 @@ void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & 
 	auto flex = lay.createFlex(2);
 	main->Add(flex, 0, wxALL, lay.border);
 	flex->Add(new wxStaticText(&dlg, -1, _("Host:")), lay.valign);
-	flex->Add(new wxStaticText(&dlg, -1, notification.server_.GetHost()), lay.valign);
+	flex->Add(new wxStaticText(&dlg, -1, LabelEscape(notification.server_.GetHost())), lay.valign);
 	flex->Add(new wxStaticText(&dlg, -1, _("Port:")), lay.valign);
 	flex->Add(new wxStaticText(&dlg, -1, fz::to_wstring(notification.server_.GetPort())), lay.valign);
 

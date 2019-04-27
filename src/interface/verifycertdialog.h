@@ -54,10 +54,8 @@ private:
 
 	bool DisplayCert(wxDialogEx* pDlg, const CCertificate& cert);
 
-	void ParseDN(wxWindow* parent, const wxString& dn, wxSizer* pSizer);
-	void ParseDN_by_prefix(wxWindow* parent, std::list<wxString>& tokens, wxString prefix, const wxString& name, wxSizer* pSizer, bool decode = false);
-
-	wxString DecodeValue(const wxString& value);
+	void ParseDN(wxWindow* parent, std::wstring const& dn, wxSizer* pSizer);
+	void ParseDN_by_prefix(wxWindow* parent, std::vector<std::pair<std::wstring, std::wstring>>& tokens, std::wstring const& prefix, wxString const& name, wxSizer* pSizer);
 
 	std::vector<CCertificate> m_certificates;
 	wxDialogEx* m_pDlg{};
