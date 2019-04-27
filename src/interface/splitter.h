@@ -5,9 +5,9 @@ class CSplitterWindowEx final : public wxSplitterWindow
 {
 public:
 	CSplitterWindowEx();
-	CSplitterWindowEx(wxWindow* parent, wxWindowID id, const wxPoint& point = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSP_3D, const wxString& name = _T("splitterWindow"));
+	CSplitterWindowEx(wxWindow* parent, wxWindowID id, wxPoint const& point = wxDefaultPosition, wxSize const& size = wxDefaultSize, long style = wxSP_3D, wxString const& name = _T("splitterWindow"));
 
-	bool Create(wxWindow* parent, wxWindowID id, const wxPoint& point = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxSP_3D, const wxString& name = _T("splitterWindow"));
+	bool Create(wxWindow* parent, wxWindowID id, wxPoint const& point = wxDefaultPosition, wxSize const& size = wxDefaultSize, long style = wxSP_3D, wxString const& name = _T("splitterWindow"));
 
 	void SetSashGravity(double gravity);
 
@@ -36,11 +36,11 @@ protected:
 	DECLARE_EVENT_TABLE()
 	void OnSize(wxSizeEvent& event);
 
-	double m_relative_sash_position;
+	double m_relative_sash_position{0.5};
 
-	int m_soft_min_pane_size;
+	int m_soft_min_pane_size{-1};
 
-	int m_lastSashPosition;
+	int m_lastSashPosition{-1};
 };
 
 #endif

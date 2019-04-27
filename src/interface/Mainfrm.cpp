@@ -1,4 +1,3 @@
-
 #include <filezilla.h>
 #include "Mainfrm.h"
 
@@ -53,8 +52,6 @@
 #include "welcome_dialog.h"
 #include "window_state_manager.h"
 
-#include <wx/tokenzr.h>
-
 #ifdef __WXMSW__
 #include <wx/module.h>
 #endif
@@ -64,7 +61,9 @@
 #include <wx/combobox.h>
 #endif
 
+#include <array>
 #include <functional>
+#include <limits>
 #include <map>
 
 #ifdef __WXGTK__
@@ -1770,7 +1769,7 @@ void CMainFrame::UpdaterStateChanged(UpdaterState s, build const& v)
 		return;
 	}
 
-	if( s == UpdaterState::idle ) {
+	if (s == UpdaterState::idle) {
 		wxMenu* m = 0;
 		wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId(), &m);
 		if (pItem && m) {
@@ -2215,29 +2214,29 @@ void CMainFrame::RememberSplitterPositions()
 		return;
 	}
 
-	wxString posString;
+	std::wstring const posString = fz::sprintf(
+		L"%d %d %d %d %d %d",
+		// top_pos
+		m_pTopSplitter->GetSashPosition(),
 
-	// top_pos
-	posString += wxString::Format(_T("%d "), m_pTopSplitter->GetSashPosition());
+		// bottom_height
+		m_pBottomSplitter->GetSashPosition(),
 
-	// bottom_height
-	posString += wxString::Format(_T("%d "), m_pBottomSplitter->GetSashPosition());
+		// view_pos
+		// Note that we cannot use %f, it is locale-dependent
+		static_cast<int>(controls->pViewSplitter->GetRelativeSashPosition() * 1000000000),
 
-	// view_pos
-	posString += wxString::Format(_T("%d "), (int)(controls->pViewSplitter->GetRelativeSashPosition() * 1000000000));
+		// local_pos
+		controls->pLocalSplitter->GetSashPosition(),
 
-	// local_pos
-	posString += wxString::Format(_T("%d "), controls->pLocalSplitter->GetSashPosition());
+		// remote_pos
+		controls->pRemoteSplitter->GetSashPosition(),
 
-	// remote_pos
-	posString += wxString::Format(_T("%d "), controls->pRemoteSplitter->GetSashPosition());
+		// queuelog splitter
+		static_cast<int>(m_pQueueLogSplitter->GetRelativeSashPosition() * 1000000000)
+	);
 
-	// queuelog splitter
-	// Note that we cannot use %f, it is locale-dependent
-	// m_lastQueueLogSplitterPos is a value between 0 and 1
-	posString += wxString::Format(_T("%d"), (int)(m_pQueueLogSplitter->GetRelativeSashPosition() * 1000000000));
-
-	COptions::Get()->SetOption(OPTION_MAINWINDOW_SPLITTER_POSITION, posString.ToStdWstring());
+	COptions::Get()->SetOption(OPTION_MAINWINDOW_SPLITTER_POSITION, posString);
 }
 
 bool CMainFrame::RestoreSplitterPositions()
@@ -2247,43 +2246,40 @@ bool CMainFrame::RestoreSplitterPositions()
 	}
 
 	// top_pos bottom_height view_pos view_height_width local_pos remote_pos
-	wxString posString = COptions::Get()->GetOption(OPTION_MAINWINDOW_SPLITTER_POSITION);
-	wxStringTokenizer tokens(posString, _T(" "));
-	int count = tokens.CountTokens();
-	if (count < 6)
+	auto tokens = fz::strtok(COptions::Get()->GetOption(OPTION_MAINWINDOW_SPLITTER_POSITION), L" ");
+	if (tokens.size() < 6) {
 		return false;
+	}
 
-	long * aPosValues = new long[count];
-	for (int i = 0; i < count; ++i) {
-		wxString token = tokens.GetNextToken();
-		if (!token.ToLong(aPosValues + i)) {
-			delete [] aPosValues;
+	std::array<long, 6> values;
+	for (int i = 0; i < 6; ++i) {
+		values[i] = fz::to_integral(tokens[i], std::numeric_limits<int>::min());
+		if (values[i] == std::numeric_limits<int>::min()) {
 			return false;
 		}
 	}
 
-	m_pTopSplitter->SetSashPosition(aPosValues[0]);
+	m_pTopSplitter->SetSashPosition(values[0]);
 
-	m_pBottomSplitter->SetSashPosition(aPosValues[1]);
+	m_pBottomSplitter->SetSashPosition(values[1]);
 
 	CContextControl::_context_controls* controls = m_pContextControl ? m_pContextControl->GetCurrentControls() : 0;
 	if (!controls) {
-		delete [] aPosValues;
 		return false;
 	}
 
-	double pos = (double)aPosValues[2] / 1000000000;
-	if (pos >= 0 && pos <= 1)
+	double pos = static_cast<double>(values[2]) / 1000000000;
+	if (pos >= 0 && pos <= 1) {
 		controls->pViewSplitter->SetRelativeSashPosition(pos);
+	}
 
-	controls->pLocalSplitter->SetSashPosition(aPosValues[3]);
-	controls->pRemoteSplitter->SetSashPosition(aPosValues[4]);
+	controls->pLocalSplitter->SetSashPosition(values[3]);
+	controls->pRemoteSplitter->SetSashPosition(values[4]);
 
-	pos = (double)aPosValues[5] / 1000000000;
+	pos = static_cast<double>(values[5]) / 1000000000;
 	if (pos >= 0 && pos <= 1) {
 		m_pQueueLogSplitter->SetRelativeSashPosition(pos);
 	}
-	delete [] aPosValues;
 
 	return true;
 }

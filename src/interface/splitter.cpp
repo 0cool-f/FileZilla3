@@ -7,20 +7,14 @@ END_EVENT_TABLE()
 
 CSplitterWindowEx::CSplitterWindowEx()
 {
-	m_relative_sash_position = 0.5;
-	m_soft_min_pane_size = -1;
-	m_lastSashPosition = -1;
 }
 
-CSplitterWindowEx::CSplitterWindowEx(wxWindow* parent, wxWindowID id, const wxPoint& point /*=wxDefaultPosition*/, const wxSize& size /*=wxDefaultSize*/, long style /*=wxSP_3D*/, const wxString& name /*=_T("splitterWindow")*/)
+CSplitterWindowEx::CSplitterWindowEx(wxWindow* parent, wxWindowID id, wxPoint const& point, wxSize const& size, long style, wxString const& name)
 	: wxSplitterWindow(parent, id, point, size, style, name)
 {
-	m_relative_sash_position = 0.5;
-	m_soft_min_pane_size = -1;
-	m_lastSashPosition = -1;
 }
 
-bool CSplitterWindowEx::Create(wxWindow* parent, wxWindowID id, const wxPoint& point /*=wxDefaultPosition*/, const wxSize& size /*=wxDefaultSize*/, long style /*=wxSP_3D*/, const wxString& name /*=_T("splitterWindow")*/)
+bool CSplitterWindowEx::Create(wxWindow* parent, wxWindowID id, wxPoint const& point, wxSize const& size, long style, wxString const& name)
 {
 	return wxSplitterWindow::Create(parent, id, point, size, style, name);
 }
@@ -44,7 +38,7 @@ void CSplitterWindowEx::OnSize(wxSizeEvent& event)
 	bool iconized;
 
 	auto winTop = dynamic_cast<wxTopLevelWindow*>(parent);
-	if ( winTop ) {
+	if (winTop) {
 		iconized = winTop->IsIconized();
 	}
 	else {
@@ -54,7 +48,7 @@ void CSplitterWindowEx::OnSize(wxSizeEvent& event)
 	}
 
 	if (iconized) {
-		m_lastSize = wxSize(0,0);
+		m_lastSize = wxSize(0, 0);
 
 		event.Skip();
 
@@ -65,39 +59,40 @@ void CSplitterWindowEx::OnSize(wxSizeEvent& event)
 		int w, h;
 		GetClientSize(&w, &h);
 
-		int size = m_splitMode == wxSPLIT_VERTICAL ? w : h;
+		int size = (m_splitMode == wxSPLIT_VERTICAL) ? w : h;
 
 		int newPosition = m_sashPosition;
 
-		int old_size = m_splitMode == wxSPLIT_VERTICAL ? m_lastSize.x : m_lastSize.y;
-		if ( old_size != 0 )
-		{
-			if (m_sashGravity == 0.5)
-				newPosition = (int)(size * m_relative_sash_position);
-			else if (m_sashGravity == 1.0)
-			{
-				int delta = (int) ( (size - old_size) );
-				if ( delta != 0 )
-				{
+		int const old_size = (m_splitMode == wxSPLIT_VERTICAL) ? m_lastSize.x : m_lastSize.y;
+		if (old_size != 0 ) {
+			if (m_sashGravity == 0.5) {
+				newPosition = static_cast<int>(size * m_relative_sash_position);
+			}
+			else if (m_sashGravity == 1.0) {
+				int delta = size - old_size;
+				if (delta != 0) {
 					newPosition = m_sashPosition + delta;
-					if( newPosition < m_minimumPaneSize )
+					if (newPosition < m_minimumPaneSize) {
 						newPosition = m_minimumPaneSize;
+					}
 				}
 			}
-			else
-			{
-				if (newPosition > size - m_minimumPaneSize - GetSashSize())
+			else {
+				if (newPosition > size - m_minimumPaneSize - GetSashSize()) {
 					newPosition = size - m_minimumPaneSize - GetSashSize();
+				}
 			}
 		}
 
-		if ( newPosition >= size - 5 )
+		if (newPosition >= size - 5) {
 			newPosition = wxMax(10, size - 40);
+		}
 
 		newPosition = CalcSoftLimit(newPosition);
 
-		if (newPosition != m_sashPosition)
+		if (newPosition != m_sashPosition) {
 			SetSashPositionAndNotify(newPosition);
+		}
 
 		m_lastSize = wxSize(w,h);
 	}
@@ -105,7 +100,7 @@ void CSplitterWindowEx::OnSize(wxSizeEvent& event)
 	SizeWindows();
 }
 
-void CSplitterWindowEx::SetMinimumPaneSize(int paneSize, int paneSize_soft /*=-1*/)
+void CSplitterWindowEx::SetMinimumPaneSize(int paneSize, int paneSize_soft)
 {
 	wxASSERT(paneSize_soft >= paneSize || paneSize_soft == -1);
 
@@ -121,14 +116,13 @@ int CSplitterWindowEx::OnSashPositionChanging(int newSashPosition)
 
 	newSashPosition = wxSplitterWindow::OnSashPositionChanging(newSashPosition);
 
-	if (newSashPosition != -1)
-	{
+	if (newSashPosition != -1) {
 		int w, h;
 		GetClientSize(&w, &h);
 
 		int size = m_splitMode == wxSPLIT_VERTICAL ? w : h;
 
-		m_relative_sash_position = (double)newSashPosition / size;
+		m_relative_sash_position = static_cast<double>(newSashPosition) / size;
 	}
 
 	return newSashPosition;
@@ -136,20 +130,22 @@ int CSplitterWindowEx::OnSashPositionChanging(int newSashPosition)
 
 int CSplitterWindowEx::CalcSoftLimit(int newSashPosition)
 {
-	if (m_soft_min_pane_size != -1)
-	{
+	if (m_soft_min_pane_size != -1) {
 		int w, h;
 		GetClientSize(&w, &h);
 
 		int size = m_splitMode == wxSPLIT_VERTICAL ? w : h;
 
 		int limit = size / 2;
-		if (limit > m_soft_min_pane_size)
+		if (limit > m_soft_min_pane_size) {
 			limit = m_soft_min_pane_size;
-		if (newSashPosition < limit)
+		}
+		if (newSashPosition < limit) {
 			newSashPosition = limit;
-		else if (newSashPosition > size - limit - GetSashSize())
+		}
+		else if (newSashPosition > size - limit - GetSashSize()) {
 			newSashPosition = wxMax(limit, size - limit - GetSashSize());
+		}
 	}
 
 	return newSashPosition;
@@ -171,8 +167,7 @@ void CSplitterWindowEx::SetRelativeSashPosition(double relative_sash_position)
 
 void CSplitterWindowEx::SetSashPosition(int sash_position)
 {
-	if (!m_windowTwo)
-	{
+	if (!m_windowTwo) {
 		m_lastSashPosition = sash_position;
 		return;
 	}
@@ -180,22 +175,23 @@ void CSplitterWindowEx::SetSashPosition(int sash_position)
 	int w, h;
 	GetClientSize(&w, &h);
 
-	int size = m_splitMode == wxSPLIT_VERTICAL ? w : h;
+	int size = (m_splitMode == wxSPLIT_VERTICAL) ? w : h;
 
-	if (!sash_position)
+	if (!sash_position) {
 		sash_position = size / 2;
-	if (sash_position < 0 && m_sashGravity == 1.0)
+	}
+	if (sash_position < 0 && m_sashGravity == 1.0) {
 		sash_position = size + sash_position - GetSashSize();
+	}
 
 	wxSplitterWindow::SetSashPosition(sash_position);
 
-	m_relative_sash_position = (double)sash_position / size;
+	m_relative_sash_position = static_cast<double>(sash_position) / size;
 }
 
-bool CSplitterWindowEx::Unsplit(wxWindow* toRemove /*=NULL*/)
+bool CSplitterWindowEx::Unsplit(wxWindow* toRemove)
 {
-	if (m_sashGravity == 1)
-	{
+	if (m_sashGravity == 1) {
 		int w, h;
 		GetClientSize(&w, &h);
 
@@ -203,8 +199,9 @@ bool CSplitterWindowEx::Unsplit(wxWindow* toRemove /*=NULL*/)
 
 		m_lastSashPosition = m_sashPosition + GetSashSize() - size;
 	}
-	else
+	else {
 		m_lastSashPosition = m_sashPosition;
+	}
 
 	return wxSplitterWindow::Unsplit(toRemove);
 }
@@ -221,10 +218,12 @@ void CSplitterWindowEx::PrepareSplit(wxWindow* window1, wxWindow* window2, int &
 			sashPosition = (int)(size * m_relative_sash_position);
 		}
 		else if (m_lastSashPosition != -1) {
-			if (m_lastSashPosition < 0)
+			if (m_lastSashPosition < 0) {
 				sashPosition = size + m_lastSashPosition - GetSashSize();
-			else
+			}
+			else {
 				sashPosition = m_lastSashPosition;
+			}
 		}
 	}
 
@@ -251,12 +250,10 @@ bool CSplitterWindowEx::SplitVertically(wxWindow* window1, wxWindow* window2, in
 
 int CSplitterWindowEx::GetSashPosition() const
 {
-	if (m_windowTwo || m_lastSashPosition == -1)
-	{
+	if (m_windowTwo || m_lastSashPosition == -1) {
 		int sashPosition = wxSplitterWindow::GetSashPosition();
 
-		if (m_sashGravity == 1.0)
-		{
+		if (m_sashGravity == 1.0) {
 			int w, h;
 			GetClientSize(&w, &h);
 
