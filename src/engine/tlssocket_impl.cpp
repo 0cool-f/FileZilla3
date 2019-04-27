@@ -109,15 +109,26 @@ struct datum_holder final : gnutls_datum_t
 {
 	datum_holder() {
 		data = nullptr;
+		size = 0;
 	}
 
 	~datum_holder() {
 		gnutls_free(data);
 	}
 
+	void clear()
+	{
+		gnutls_free(data);
+		data = nullptr;
+		size = 0;
+	}
+
 	datum_holder(datum_holder const&) = delete;
 	datum_holder& operator=(datum_holder const&) = delete;
 
+	std::string to_string() const {
+		return data ? std::string(data, data + size) : std::string();
+	}
 };
 
 void clone_cert(gnutls_x509_crt_t in, gnutls_x509_crt_t &out)
@@ -886,22 +897,12 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, CCertificate& ou
 
 	std::wstring subject, issuer;
 
-	size = 0;
-	res = gnutls_x509_crt_get_dn(cert, nullptr, &size);
-	if (size) {
-		char* dn = new char[size + 1];
-		dn[size] = 0;
-		if (!(res = gnutls_x509_crt_get_dn(cert, dn, &size))) {
-			dn[size] = 0;
-			subject = fz::to_wstring_from_utf8(dn);
-		}
-		else {
-			LogError(res, L"gnutls_x509_crt_get_dn");
-		}
-		delete [] dn;
+	datum_holder raw_subject;
+	if (!gnutls_x509_crt_get_dn3(cert, &raw_subject, 0)) {
+		subject = fz::to_wstring_from_utf8(raw_subject.to_string());
 	}
 	else {
-		LogError(res, L"gnutls_x509_crt_get_dn");
+		LogError(res, L"gnutls_x509_crt_get_dn3");
 	}
 	if (subject.empty()) {
 		m_pOwner->LogMessage(MessageType::Error, _("Could not get distinguished name of certificate subject, gnutls_x509_get_dn failed"));
@@ -910,22 +911,12 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, CCertificate& ou
 
 	std::vector<CCertificate::SubjectName> alt_subject_names = GetCertSubjectAltNames(cert);
 
-	size = 0;
-	res = gnutls_x509_crt_get_issuer_dn(cert, nullptr, &size);
-	if (size) {
-		char* dn = new char[++size + 1];
-		dn[size] = 0;
-		if (!(res = gnutls_x509_crt_get_issuer_dn(cert, dn, &size))) {
-			dn[size] = 0;
-			issuer = fz::to_wstring_from_utf8(dn);
-		}
-		else {
-			LogError(res, L"gnutls_x509_crt_get_issuer_dn");
-		}
-		delete [] dn;
+	datum_holder raw_issuer;
+	if (!gnutls_x509_crt_get_issuer_dn3(cert, &raw_issuer, 0)) {
+		issuer = fz::to_wstring_from_utf8(raw_issuer.to_string());
 	}
 	else {
-		LogError(res, L"gnutls_x509_crt_get_issuer_dn");
+		LogError(res, L"gnutls_x509_crt_get_issuer_dn3");
 	}
 	if (issuer.empty() ) {
 		m_pOwner->LogMessage(MessageType::Error, _("Could not get distinguished name of certificate issuer, gnutls_x509_get_issuer_dn failed"));

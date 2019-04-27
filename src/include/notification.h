@@ -375,7 +375,7 @@ public:
 		std::vector<SubjectName> && altSubjectNames);
 
 
-	std::vector<uint8_t> GetRawData() const { return m_rawData; }
+	std::vector<uint8_t> GetRawData() const { return raw_cert_; }
 	fz::datetime GetActivationTime() const { return m_activationTime; }
 	fz::datetime GetExpirationTime() const { return m_expirationTime; }
 
@@ -393,11 +393,13 @@ public:
 
 	std::vector<SubjectName> const& GetAltSubjectNames() const { return m_altSubjectNames; }
 
+	explicit operator bool() const { return !raw_cert_.empty(); }
+
 private:
 	fz::datetime m_activationTime;
 	fz::datetime m_expirationTime;
 
-	std::vector<uint8_t> m_rawData{};
+	std::vector<uint8_t> raw_cert_;
 
 	std::wstring m_serial;
 	std::wstring m_pkalgoname;
