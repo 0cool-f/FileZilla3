@@ -131,7 +131,9 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 
 void CWelcomeDialog::OnTimer(wxTimerEvent&)
 {
-	Run(parent_, false);
+	if (CanShowPopupDialog()) {
+		Run(parent_, false);
+	}
 	Destroy();
 }
 
