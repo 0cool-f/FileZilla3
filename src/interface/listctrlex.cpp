@@ -2,7 +2,6 @@
 #include "listctrlex.h"
 #include "filezillaapp.h"
 #include <wx/renderer.h>
-#include <wx/tokenzr.h>
 #include "Options.h"
 #include "dialogex.h"
 #ifdef __WXMSW__
@@ -456,27 +455,26 @@ void wxListCtrlEx::LoadColumnSettings(int widthsOptionId, int visibilityOptionId
 	}
 
 	if (sortOptionId != -1) {
-		wxString strorder = COptions::Get()->GetOption(sortOptionId);
-		wxStringTokenizer tokens(strorder, _T(","));
+		auto tokens = fz::strtok(COptions::Get()->GetOption(sortOptionId), L",");
 
-		unsigned int count = tokens.CountTokens();
-		if (count == m_columnInfo.size()) {
-			unsigned long *order = new unsigned long[count];
-			bool *order_set = new bool[count];
-			memset(order_set, 0, sizeof(bool) * count);
+		if (tokens.size() >= m_columnInfo.size()) {
+			unsigned int *order = new unsigned int[m_columnInfo.size()];
+			bool *order_set = new bool[m_columnInfo.size()];
+			memset(order_set, 0, sizeof(bool) * m_columnInfo.size());
 
-			unsigned int i = 0;
-			while (tokens.HasMoreTokens()) {
-				if (!tokens.GetNextToken().ToULong(&order[i])) {
+			size_t i{};
+			for (; i < m_columnInfo.size(); ++i) {
+				order[i] = fz::to_integral(tokens[i], std::numeric_limits<unsigned int>::max());
+				if (order[i] == std::numeric_limits<unsigned int>::max()) {
 					break;
 				}
-				if (order[i] >= count || order_set[order[i]]) {
+				if (order[i] >= m_columnInfo.size() || order_set[order[i]]) {
 					break;
 				}
 				order_set[order[i]] = true;
-				++i;
 			}
-			if (i == count) {
+
+			if (i == m_columnInfo.size()) {
 				bool valid = true;
 				for (size_t j = 0; j < m_columnInfo.size(); ++j) {
 					if (!m_columnInfo[j].fixed) {
@@ -546,20 +544,14 @@ bool wxListCtrlEx::ReadColumnWidths(unsigned int optionId)
 		return true;
 	}
 
-	size_t const columnCount = m_columnInfo.size();
 
-	wxString savedWidths = COptions::Get()->GetOption(optionId);
-	wxStringTokenizer tokens(savedWidths, _T(" "));
+	auto tokens = fz::strtok(COptions::Get()->GetOption(optionId), L" ");
 
-	size_t const tokenCount = tokens.CountTokens();
-
-	for (size_t i = 0; i < columnCount; ++i) {
-		unsigned long newWidth{};
-		if (i < tokenCount) {
-			wxString token = tokens.GetNextToken();
-			if (token.ToULong(&newWidth) && newWidth < 10000) {
-				m_columnInfo[i].width = newWidth;
-			}
+	auto const count = std::min(tokens.size(), m_columnInfo.size());
+	for (size_t i = 0; i < count; ++i) {
+		int width = fz::to_integral(tokens[i], -1);
+		if (width >= 0 && width < 10000) {
+			m_columnInfo[i].width = width;
 		}
 	}
 

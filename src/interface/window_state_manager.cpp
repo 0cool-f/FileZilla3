@@ -4,7 +4,6 @@
 #if wxUSE_DISPLAY
 #include <wx/display.h>
 #endif
-#include <wx/tokenzr.h>
 
 CWindowStateManager::CWindowStateManager(wxTopLevelWindow* pWindow)
 {
@@ -58,17 +57,15 @@ bool CWindowStateManager::ReadDefaults(const unsigned int optionId, bool& maximi
 	// - y position
 	// - width
 	// - height
-	const wxString layout = COptions::Get()->GetOption(optionId);
-	wxStringTokenizer tokens(layout, _T(" "));
-	int count = tokens.CountTokens();
-	if (count != 5) {
+	auto tokens = fz::strtok(COptions::Get()->GetOption(optionId), L" ");
+	if (tokens.size() < 5) {
 		return false;
 	}
 
-	long values[5];
-	for (int i = 0; i < count; ++i) {
-		wxString token = tokens.GetNextToken();
-		if (!token.ToLong(values + i)) {
+	int values[5];
+	for (int i = 0; i < 5; ++i) {
+		values[i] = fz::to_integral(tokens[i], std::numeric_limits<int>::min());
+		if (values[i] == std::numeric_limits<int>::min()) {
 			return false;
 		}
 	}
@@ -76,7 +73,7 @@ bool CWindowStateManager::ReadDefaults(const unsigned int optionId, bool& maximi
 		return false;
 	}
 
-	const wxRect screen_size = GetScreenDimensions();
+	wxRect const screen_size = GetScreenDimensions();
 
 	size.x = values[3];
 	size.y = values[4];

@@ -61,7 +61,6 @@
 #include <wx/combobox.h>
 #endif
 
-#include <array>
 #include <functional>
 #include <limits>
 #include <map>
@@ -2251,8 +2250,8 @@ bool CMainFrame::RestoreSplitterPositions()
 		return false;
 	}
 
-	std::array<long, 6> values;
-	for (int i = 0; i < 6; ++i) {
+	int values[6];
+	for (size_t i = 0; i < 6; ++i) {
 		values[i] = fz::to_integral(tokens[i], std::numeric_limits<int>::min());
 		if (values[i] == std::numeric_limits<int>::min()) {
 			return false;
