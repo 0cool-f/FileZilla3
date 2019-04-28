@@ -957,7 +957,6 @@ bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exis
 		ImportSites(importFolder, folder);
 	}
 
-	bool const forget = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
 	auto & loginManager = CLoginManager::Get();
 
 	for (auto importSite = sitesToImport.child("Server"); importSite; importSite = importSite.next_sibling("Server")) {
