@@ -51,8 +51,8 @@ public:
 
 	void Create(wxWindow* parent);
 
-	void CreateTab();
-	void CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath);
+	bool CreateTab();
+	bool CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath);
 	bool CloseTab(int tab);
 
 	_context_controls* GetCurrentControls();

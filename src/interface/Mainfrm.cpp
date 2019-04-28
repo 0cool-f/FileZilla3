@@ -2072,7 +2072,9 @@ bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pS
 		}
 
 		if (!(action & 1)) {
-			m_pContextControl->CreateTab();
+			if (!m_pContextControl->CreateTab()) {
+				return false;
+			}
 			pState = CContextManager::Get()->GetCurrentContext();
 		}
 	}

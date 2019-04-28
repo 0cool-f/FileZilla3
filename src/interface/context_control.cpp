@@ -56,7 +56,7 @@ void CContextControl::Create(wxWindow *parent)
 	wxSplitterWindow::Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER);
 }
 
-void CContextControl::CreateTab()
+bool CContextControl::CreateTab()
 {
 	CLocalPath localPath;
 	Site site;
@@ -68,12 +68,17 @@ void CContextControl::CreateTab()
 		site = controls->pState->GetLastSite();
 		remotePath = controls->pState->GetLastServerPath();
 	}
-	CreateTab(localPath, site, remotePath);
+	return CreateTab(localPath, site, remotePath);
 }
 
-void CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath)
+bool  CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath)
 {
 	wxGetApp().AddStartupProfileRecord("CContextControl::CreateTab");
+
+	if (GetTabCount() >= 200) {
+		wxBell();
+		return false;
+	}
 
 	{
 	#ifdef __WXMSW__
@@ -141,6 +146,8 @@ void CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, C
 	if (m_tabs) {
 		m_tabs->SetSelection(m_tabs->GetPageCount() - 1);
 	}
+
+	return true;
 }
 
 void CContextControl::CreateContextControls(CState& state)
