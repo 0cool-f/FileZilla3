@@ -183,7 +183,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 			}
 		}
 
-		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+		SendReply(entry);
 	}
 	else if (entry.pNotification->GetRequestID() == reqId_hostkey || entry.pNotification->GetRequestID() == reqId_hostkeyChanged) {
 		if (!CheckWindowState()) {
@@ -200,7 +200,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 			CVerifyHostkeyDialog::ShowVerificationDialog(m_pMainFrame, notification);
 		}
 
-		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+		SendReply(entry);
 	}
 	else if (entry.pNotification->GetRequestID() == reqId_certificate) {
 		if (!CheckWindowState()) {
@@ -210,7 +210,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 		auto & notification = static_cast<CCertificateNotification&>(*entry.pNotification.get());
 		verifyCertDlg_->ShowVerificationDialog(notification);
 
-		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+		SendReply(entry);
 	}
 	else if (entry.pNotification->GetRequestID() == reqId_insecure_ftp) {
 		if (!CheckWindowState()) {
@@ -221,13 +221,12 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 
 		ConfirmInsecureConection(*certStore_.get(), notification);
 
-		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+		SendReply(entry);
 	}
 	else {
-		entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+		SendReply(entry);
 	}
 
-	RecheckDefaults();
 	m_requestList.pop_front();
 
 	return true;
@@ -375,8 +374,8 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 						notification.newName = dlg.GetValue().ToStdWstring();
 
 						// If request got processed successfully, notify queue about filename change
-						if (entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification)) && m_pQueueView) {
-							m_pQueueView->RenameFileInTransfer(entry.pEngine, dlg.GetValue(), notification.download);
+						if (SendReply(entry) && m_pQueueView) {
+							m_pQueueView->RenameFileInTransfer(entry.pEngine, dlg.GetValue().ToStdWstring(), notification.download);
 						}
 						return true;
 					}
@@ -393,45 +392,47 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 			break;
 	}
 
-	entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+	SendReply(entry);
 	return true;
 }
 
-void CAsyncRequestQueue::ClearPending(const CFileZillaEngine *pEngine)
+void CAsyncRequestQueue::ClearPending(CFileZillaEngine const* const pEngine)
 {
 	if (m_requestList.empty()) {
 		return;
 	}
 
-	// Remove older requests coming from the same engine, but never the first
-	// entry in the list as that one displays a dialog at this moment.
-	for (auto iter = ++m_requestList.begin(); iter != m_requestList.end(); ++iter) {
+	for (auto iter = m_requestList.begin(); iter != m_requestList.end();) {
 		if (iter->pEngine == pEngine) {
-			m_requestList.erase(iter);
-
-			// At most one pending request per engine possible,
-			// so we can stop here
-			break;
+			if (m_inside_request && iter == m_requestList.begin()) {
+				// Can't remove this entry as it displays a dialog at this moment, holding a reference.
+				iter->pEngine = nullptr;
+				++iter;
+			}
+			else {
+				// Even though there _should_ be at most a single request per engine, in rare circumstances there may be additional requests
+				iter = m_requestList.erase(iter);
+			}
+		}
+		else {
+			++iter;
 		}
 	}
 }
 
 void CAsyncRequestQueue::RecheckDefaults()
 {
-	if (m_requestList.size() <= 1) {
-		return;
+	std::list<t_queueEntry>::iterator it = m_requestList.begin();
+	if (m_inside_request) {
+		++it;
 	}
-
-	std::list<t_queueEntry>::iterator cur, next;
-	cur = ++m_requestList.begin();
-	while (cur != m_requestList.end()) {
-		next = cur;
-		++next;
-
-		if (ProcessDefaults(cur->pEngine, cur->pNotification)) {
-			m_requestList.erase(cur);
+	while (it != m_requestList.end()) {
+		if (ProcessDefaults(it->pEngine, it->pNotification)) {
+			it = m_requestList.erase(it);
 		}
-		cur = next;
+		else {
+			++it;
+		}
 	}
 }
 
@@ -450,14 +451,18 @@ void CAsyncRequestQueue::OnProcessQueue(wxCommandEvent &)
 	bool success = ProcessNextRequest();
 	m_inside_request = false;
 
-	if (success && !m_requestList.empty()) {
-		QueueEvent(new wxCommandEvent(fzEVT_PROCESSASYNCREQUESTQUEUE));
+	if (success) {
+		RecheckDefaults();
+
+		if (!m_requestList.empty()) {
+			QueueEvent(new wxCommandEvent(fzEVT_PROCESSASYNCREQUESTQUEUE));
+		}
 	}
 }
 
 void CAsyncRequestQueue::TriggerProcessing()
 {
-	if (m_inside_request) {
+	if (m_inside_request || m_requestList.empty()) {
 		return;
 	}
 
@@ -473,8 +478,7 @@ bool CAsyncRequestQueue::CheckWindowState()
 	}
 
 #ifndef __WXMAC__
-	if (m_pMainFrame->IsIconized())
-	{
+	if (m_pMainFrame->IsIconized()) {
 #ifndef __WXGTK__
 		m_pMainFrame->Show();
 		m_pMainFrame->Iconize(true);
@@ -498,4 +502,13 @@ bool CAsyncRequestQueue::CheckWindowState()
 void CAsyncRequestQueue::OnTimer(wxTimerEvent&)
 {
 	TriggerProcessing();
+}
+
+bool CAsyncRequestQueue::SendReply(t_queueEntry& entry)
+{
+	if (!entry.pEngine) {
+		return false;
+	}
+
+	return entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
 }

@@ -17,7 +17,7 @@ public:
 	~CAsyncRequestQueue();
 
 	bool AddRequest(CFileZillaEngine *pEngine, std::unique_ptr<CAsyncRequestNotification> && pNotification);
-	void ClearPending(const CFileZillaEngine* pEngine);
+	void ClearPending(CFileZillaEngine const* const pEngine);
 	void RecheckDefaults();
 
 	void SetQueue(CQueueView *pQueue);
@@ -52,6 +52,8 @@ protected:
 	std::list<t_queueEntry> m_requestList;
 
 	bool ProcessFileExistsNotification(t_queueEntry &entry);
+
+	bool SendReply(t_queueEntry & entry);
 
 	DECLARE_EVENT_TABLE()
 	void OnProcessQueue(wxCommandEvent &event);
