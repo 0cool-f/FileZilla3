@@ -1,6 +1,7 @@
 #ifndef FILEZILLA_ENGINE_EXTERNALIPRESOLVER_HEADER
 #define FILEZILLA_ENGINE_EXTERNALIPRESOLVER_HEADER
 
+#include <libfilezilla/buffer.hpp>
 #include <libfilezilla/socket.hpp>
 
 struct external_ip_resolve_event_type;
@@ -41,19 +42,15 @@ protected:
 	void OnSocketEvent(fz::socket_event_source* source, fz::socket_event_flag t, int error);
 
 	void OnConnect(int error);
-	void OnClose();
 	void OnReceive();
 	void OnHeader();
-	void OnData(char* buffer, unsigned int len);
+	void OnData(unsigned char* buffer, size_t len);
 	void OnChunkedData();
 	void OnSend();
 
 	std::string m_sendBuffer;
 
-	char* m_pRecvBuffer{};
-	unsigned int m_recvBufferPos{};
-
-	static const unsigned int m_recvBufferLen = 4096;
+	fz::buffer recvBuffer_;
 
 	// HTTP data
 	void ResetHttpData(bool resetRedirectCount);
