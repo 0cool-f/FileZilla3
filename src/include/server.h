@@ -38,7 +38,7 @@ enum ServerProtocol
 
 	BOX,
 
-	MAX_VALUE = B2
+	MAX_VALUE = BOX
 };
 
 enum ServerType
@@ -93,7 +93,9 @@ enum class ProtocolFeature
 	PostLoginCommands,
 	S3Lifecycle,
 	RecursiveDelete,
-	ServerAssignedHome
+	ServerAssignedHome,
+	TemporaryUrl,
+	S3Sse
 };
 
 class Credentials;
@@ -184,6 +186,7 @@ public:
 	std::wstring GetExtraParameter(std::string const& name) const;
 	std::map<std::string, std::wstring> const& GetExtraParameters() const;
 	void SetExtraParameter(std::string const& name, std::wstring const& value);
+	void ClearExtraParameter(std::string const& name);
 
 protected:
 	ServerProtocol m_protocol{UNKNOWN};
@@ -228,6 +231,7 @@ namespace ParameterSection {
 		user,
 		credentials,
 		extra,
+		custom,
 
 		section_count
 	};

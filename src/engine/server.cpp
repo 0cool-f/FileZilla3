@@ -624,6 +624,15 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 			return true;
 		}
 		break;
+	case ProtocolFeature::TemporaryUrl:
+		if (protocol == S3 || protocol == DROPBOX || protocol == AZURE_BLOB || protocol == AZURE_FILE) {
+			return true;
+		}
+		break;
+	case ProtocolFeature::S3Sse:
+		if (protocol == S3) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -684,6 +693,11 @@ void CServer::SetExtraParameter(std::string const& name, std::wstring const& val
 			extraParameters_[name] = value;
 		}
 	}
+}
+
+void CServer::ClearExtraParameter(const std::string &name)
+{
+	extraParameters_.erase(name);
 }
 
 LogonType GetLogonTypeFromName(std::wstring const& name)
@@ -807,6 +821,7 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 	case GOOGLE_DRIVE:
 	case DROPBOX:
 	case ONEDRIVE:
+	case BOX:
 		return {LogonType::interactive};
 	case HTTPS:
 	case UNKNOWN:
@@ -834,6 +849,17 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 				std::vector<ParameterTraits> ret;
 				ret.emplace_back(ParameterTraits{"identpath", ParameterSection::host, 0, std::wstring(), _("Path of identity service")});
 				ret.emplace_back(ParameterTraits{"identuser", ParameterSection::user, ParameterTraits::optional, std::wstring(), std::wstring()});
+				return ret;
+			}();
+			return ret;
+		}
+	case S3:
+		{
+			static std::vector<ParameterTraits> ret = []() {
+				std::vector<ParameterTraits> ret;
+				ret.emplace_back(ParameterTraits{"ssealgorithm", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"ssekmskey", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"ssecustomerkey", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				return ret;
 			}();
 			return ret;
@@ -866,6 +892,8 @@ std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol)
 		return std::tuple<std::wstring, std::wstring>{L"graph.microsoft.com", L""};
 	case B2:
 		return std::tuple<std::wstring, std::wstring>{L"api.backblazeb2.com", L""};
+	case BOX:
+		return std::tuple<std::wstring, std::wstring>{L"api.box.com", L""};
 	default:
 		break;
 	}
@@ -875,7 +903,7 @@ std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol)
 
 bool ProtocolHasUser(ServerProtocol protocol)
 {
-	return protocol != DROPBOX && protocol != ONEDRIVE;
+	return protocol != DROPBOX && protocol != ONEDRIVE && protocol != BOX;
 }
 
 bool CServer::SameResource(CServer const& other) const
