@@ -35,6 +35,7 @@ static const t_protocolInfo protocolInfos[] = {
 	{ DROPBOX,      L"dropbox",  true, 443, false, "Dropbox",                                                                 L"https" },
 	{ ONEDRIVE,     L"onedrive", true, 443, false, "Microsoft OneDrive",                                                      L"https" },
 	{ B2,           L"b2",       true, 443, false, "Backblaze B2",                                                            L"https" },
+	{ BOX,          L"box",      true, 443, false, "Box",                                                                     L"https" },
 	{ UNKNOWN,      L"",         false, 21, false, "", L"" }
 };
 

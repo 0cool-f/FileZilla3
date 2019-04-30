@@ -36,6 +36,8 @@ enum ServerProtocol
 
 	B2,
 
+	BOX,
+
 	MAX_VALUE = B2
 };
 
