@@ -18,15 +18,11 @@ CExternalIPResolver::CExternalIPResolver(fz::thread_pool & pool, fz::event_handl
 	, thread_pool_(pool)
 	, m_handler(&handler)
 {
-	ResetHttpData(true);
 }
 
 CExternalIPResolver::~CExternalIPResolver()
 {
 	remove_handler();
-
-	delete socket_;
-	socket_ = nullptr;
 }
 
 void CExternalIPResolver::GetExternalIP(std::wstring const& address, fz::address_type protocol, bool force)
@@ -80,7 +76,7 @@ void CExternalIPResolver::GetExternalIP(std::wstring const& address, fz::address
 		return;
 	}
 
-	socket_ = new fz::socket(thread_pool_, this);
+	socket_ = std::make_unique<fz::socket>(thread_pool_, this);
 
 	int res = socket_->connect(fz::to_native(host), m_port, protocol);
 	if (res) {
@@ -155,10 +151,6 @@ void CExternalIPResolver::OnReceive()
 			return;
 		}
 
-		if (m_finished) {
-			// Just ignore all further data
-			return;
-		}
 		recvBuffer_.add(read);
 
 		if (!m_gotHeader) {
@@ -180,7 +172,7 @@ void CExternalIPResolver::OnSend()
 {
 	while (!m_sendBuffer.empty()) {
 		int error;
-		int written = socket_->write(m_sendBuffer.c_str(), m_sendBuffer.size(), error);
+		int written = socket_->write(m_sendBuffer.c_str(), static_cast<int>(m_sendBuffer.size()), error);
 		if (written == -1) {
 			if (error != EAGAIN) {
 				Close(false);
@@ -203,11 +195,8 @@ void CExternalIPResolver::OnSend()
 void CExternalIPResolver::Close(bool successful)
 {
 	m_sendBuffer.clear();
-
 	recvBuffer_.clear();
-
-	delete socket_;
-	socket_ = nullptr;
+	socket_.reset();
 
 	if (m_done) {
 		return;
@@ -294,17 +283,13 @@ void CExternalIPResolver::OnHeader()
 
 				// Redirect if neccessary
 				if (m_responseCode >= 300) {
-					delete socket_;
-					socket_ = nullptr;
-
-					recvBuffer_.clear();
-
 					std::wstring const location = m_location;
 					if (location.empty()) {
 						Close(false);
 					}
 					else {
-						ResetHttpData(false);
+						socket_.reset();
+						ResetHttpData();
 						GetExternalIP(location, m_protocol);
 					}
 					return;
@@ -403,23 +388,17 @@ void CExternalIPResolver::OnData(unsigned char* buffer, size_t len)
 	Close(true);
 }
 
-void CExternalIPResolver::ResetHttpData(bool resetRedirectCount)
+void CExternalIPResolver::ResetHttpData()
 {
 	recvBuffer_.clear();
 	m_sendBuffer.clear();
 	m_gotHeader = false;
 	m_location.clear();
 	m_responseCode = 0;
-	m_responseString.clear();
-	if (resetRedirectCount) {
-		m_redirectCount = 0;
-	}
 
 	m_transferEncoding = unknown;
 
 	m_chunkData = t_chunkData();
-
-	m_finished = false;
 }
 
 void CExternalIPResolver::OnChunkedData()

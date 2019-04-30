@@ -36,7 +36,7 @@ protected:
 
 	std::string m_data;
 
-	fz::socket *socket_{};
+	std::unique_ptr<fz::socket> socket_;
 
 	virtual void operator()(fz::event_base const& ev);
 	void OnSocketEvent(fz::socket_event_source* source, fz::socket_event_flag t, int error);
@@ -53,10 +53,9 @@ protected:
 	fz::buffer recvBuffer_;
 
 	// HTTP data
-	void ResetHttpData(bool resetRedirectCount);
+	void ResetHttpData();
 	bool m_gotHeader{};
 	int m_responseCode{};
-	std::string m_responseString;
 	std::wstring m_location;
 	int m_redirectCount{};
 
@@ -73,8 +72,6 @@ protected:
 		bool terminateChunk{};
 		uint64_t size{};
 	} m_chunkData;
-
-	bool m_finished{};
 };
 
 #endif
