@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.42.0 (2019-05-02)
+
+- Fixed a potential crash if the first-launch welcome dialog is shown at an inopportune moment
+- Fixed display of subject and issuer details in the certificate verification dialogs with some certificates
+- Official binaries are now built againt GnuTLS 3.6.7, minimum required GnuTLS version to build FileZilla is now 3.5.7
+
 3.42.0-rc1 (2019-04-26)
 
 - Switching from using a master password to not saving passwords at all no longer requires entering the master password
