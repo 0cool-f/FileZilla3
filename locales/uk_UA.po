@@ -1,13 +1,14 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Ukrainian translation for FileZilla
+# Copyright (C) 2019 Tim Kosse
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Translators:
+# Igor Chomko <igor.chomko@gmail.com>, 2008-2019.
 msgid ""
 msgstr ""
 "Project-Id-Version: FileZilla\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-04-26 11:42+0200\n"
-"PO-Revision-Date: 2019-03-17 16:10+0200\n"
+"POT-Creation-Date: 2019-05-02 11:00+0200\n"
+"PO-Revision-Date: 2019-04-28 14:42+0300\n"
 "Last-Translator: Igor Chomko <igor.chomko@gmail.com>\n"
 "Language-Team: Igor Chomko <igorchomko@gmail.com>\n"
 "Language: uk_UA\n"
@@ -132,12 +133,12 @@ msgstr "%s (%s/s)"
 msgid "%s (? B/s)"
 msgstr "%s (? Б/с)"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:385
+#: ../../locales/../src/interface/verifycertdialog.cpp:384
 #, c-format
 msgid "%s - Certificate expired!"
 msgstr "%s - Дія сертифікату вичерпана!"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:369
+#: ../../locales/../src/interface/verifycertdialog.cpp:368
 #, c-format
 msgid "%s - Not yet valid!"
 msgstr "%s - Все ще не дійсний!"
@@ -182,12 +183,12 @@ msgstr ""
 "змінної середовища.\n"
 "- Встановіть повний шлях до %s у %s змінної середовища."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:406
+#: ../../locales/../src/interface/verifycertdialog.cpp:405
 #, c-format
 msgid "%s with %d bits"
 msgstr "%s з %d бітами"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:510
+#: ../../locales/../src/interface/verifycertdialog.cpp:509
 #, c-format
 msgid "%s:%d - Hostname does not match certificate"
 msgstr "%s:%d - Ім'я хоста не збігається з сертифікатом"
@@ -256,7 +257,7 @@ msgstr "&Додати до черги"
 msgid "&Adjust server time, offset by:"
 msgstr "&Узгодити час сервера, зсув на:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:766
+#: ../../locales/../src/interface/verifycertdialog.cpp:742
 msgid "&Always allow insecure plain FTP for this server."
 msgstr "&Завжди дозволяти звичайний незахищений протокол FTP на цьому сервері."
 
@@ -335,7 +336,7 @@ msgstr "&Стійкість пакету:"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3911
 #: ../../locales/../src/interface/resources/xrc/inputdialog.xrc:40
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:35
-#: ../../locales/../src/interface/verifycertdialog.cpp:778
+#: ../../locales/../src/interface/verifycertdialog.cpp:754
 msgid "&Cancel"
 msgstr "&Скасувати"
 
@@ -383,7 +384,7 @@ msgstr "&Скопіювати до буферу обміну"
 msgid "&Create directory"
 msgstr "&Створити каталог"
 
-#: ../../locales/../src/interface/context_control.cpp:461
+#: ../../locales/../src/interface/context_control.cpp:468
 msgid "&Create new tab"
 msgstr "&Створити нову вкладку"
 
@@ -500,7 +501,7 @@ msgstr "&Редагувати"
 msgid "&Edit filter rules..."
 msgstr "&Редагувати правила фільтрування..."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2411
+#: ../../locales/../src/interface/Mainfrm.cpp:2408
 #: ../../locales/../src/interface/menu_bar.cpp:89
 #: ../../locales/../src/interface/menu_bar.cpp:128
 #: ../../locales/../src/interface/statusbar.cpp:553
@@ -625,7 +626,7 @@ msgstr "&HTTP/1.1 використовує метод CONNECT"
 msgid "&Help"
 msgstr "&Допомога"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2418
+#: ../../locales/../src/interface/Mainfrm.cpp:2415
 #: ../../locales/../src/interface/menu_bar.cpp:94
 msgid "&Hide identical files"
 msgstr "&Приховати подібні файли"
@@ -764,7 +765,7 @@ msgstr "&Новий"
 msgid "&New Site"
 msgstr "&Новий сайт"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1800
+#: ../../locales/../src/interface/Mainfrm.cpp:1798
 msgid "&New version available!"
 msgstr "&Доступна нова версія!"
 
@@ -795,7 +796,7 @@ msgstr "&Числове значення:"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:486
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3134
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:114
-#: ../../locales/../src/interface/verifycertdialog.cpp:771
+#: ../../locales/../src/interface/verifycertdialog.cpp:747
 msgid "&OK"
 msgstr "&ДОБРЕ"
 
@@ -862,7 +863,7 @@ msgstr "&Відновити з'єднання"
 msgid "&Reconnect information"
 msgstr "&Інформація повторного з'єднання"
 
-#: ../../locales/../src/interface/context_control.cpp:468
+#: ../../locales/../src/interface/context_control.cpp:475
 #: ../../locales/../src/interface/menu_bar.cpp:80
 msgid "&Refresh"
 msgstr "&Оновити"
@@ -1136,7 +1137,7 @@ msgstr "&Користувач:"
 msgid "&Username:"
 msgstr "&Ім'я користувача:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1794
+#: ../../locales/../src/interface/Mainfrm.cpp:1792
 #, c-format
 msgid "&Version %s"
 msgstr "&Версія %s"
@@ -1209,7 +1210,7 @@ msgstr ""
 "Типи входу 'Нормальний' і 'Обліковий запис' відсутні. Ваш вхід було змінено "
 "на 'Запит паролю'."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:645
+#: ../../locales/../src/interface/Mainfrm.cpp:643
 msgid ""
 "'quote' is usually a local command used by commandline clients to send the "
 "arguments following 'quote' to the server. You might want to enter the raw "
@@ -1337,7 +1338,7 @@ msgid ""
 "A bookmark with the entered name already exists. Please enter an unused name."
 msgstr "Закладка з вказаним іменем вже існує. Введіть нове ім'я."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1146
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1137
 msgid "A certificate in the chain was signed using an insecure algorithm"
 msgstr ""
 "Сертифікат у ланцюгу було підписано з використанням незахищеного алгоритму"
@@ -1404,7 +1405,7 @@ msgstr ""
 msgid "A new version of FileZilla is available:"
 msgstr "Доступна нова версія FileZilla:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:721
+#: ../../locales/../src/interface/Mainfrm.cpp:719
 msgid ""
 "A proper server always shows all files, but some broken servers hide files "
 "from the user. Use this option to force the server to show all files."
@@ -1479,8 +1480,8 @@ msgstr "Ключ &доступу:"
 msgid "Access to some local directories could not be restored:"
 msgstr "Неможливо відновити доступ до деяких локальних каталогів:"
 
-#: ../../locales/../src/engine/server.cpp:702
-#: ../../locales/../src/engine/server.cpp:725
+#: ../../locales/../src/engine/server.cpp:717
+#: ../../locales/../src/engine/server.cpp:740
 #: ../../locales/../src/interface/manual_transfer.cpp:148
 #: ../../locales/../src/interface/manual_transfer.cpp:149
 #: ../../locales/../src/interface/manual_transfer.cpp:185
@@ -1619,7 +1620,7 @@ msgstr "Дозволити звернутися до іншого режиму �
 msgid "Already connected"
 msgstr "Існуюче з'єднання"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:427
+#: ../../locales/../src/interface/verifycertdialog.cpp:426
 msgid "Alternative name:"
 msgid_plural "Alternative names:"
 msgstr[0] "Альтернативне ім'я:"
@@ -1668,7 +1669,7 @@ msgstr ""
 "Помилка збереження черги передачі до \"%s\".\n"
 "Деякі елементи черги неможливо зберегти."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1150
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1141
 msgid "An issuer in the certificate chain is not a certificate authority"
 msgstr "Видавець у ланцюжку сертифікатів не є центром сертифікації"
 
@@ -1680,7 +1681,7 @@ msgstr ""
 "Елемент, що перетягується, позначений схожим іменем з елементом, який вже "
 "існує на вказаній позиції."
 
-#: ../../locales/../src/engine/server.cpp:727
+#: ../../locales/../src/engine/server.cpp:742
 #: ../../locales/../src/interface/manual_transfer.cpp:147
 #: ../../locales/../src/interface/manual_transfer.cpp:188
 #: ../../locales/../src/interface/manual_transfer.cpp:203
@@ -1747,8 +1748,8 @@ msgstr "Як вкладка в панелі черги передачі"
 msgid "Ask for action"
 msgstr "Запит на виконання"
 
-#: ../../locales/../src/engine/server.cpp:693
-#: ../../locales/../src/engine/server.cpp:719
+#: ../../locales/../src/engine/server.cpp:708
+#: ../../locales/../src/engine/server.cpp:734
 #: ../../locales/../src/interface/manual_transfer.cpp:179
 msgid "Ask for password"
 msgstr "Запит на пароль"
@@ -1823,7 +1824,7 @@ msgstr "Поведінка"
 msgid "Being edited"
 msgstr "В процесі редагування"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1136
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1127
 msgid "Beware! Certificate has been revoked"
 msgstr "Увага! Сертифікат скасовано"
 
@@ -1872,7 +1873,7 @@ msgstr "Дата створення:"
 msgid "Build information"
 msgstr "Інформація по конструкції"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:595
+#: ../../locales/../src/interface/verifycertdialog.cpp:640
 msgid "Business category:"
 msgstr "Бізнес категорія:"
 
@@ -1978,7 +1979,7 @@ msgstr "Скасовує поточну операцію"
 msgid "Cannot access '%s', no media inserted or drive not ready."
 msgstr "Нема доступу '%s', не встановлені носії або диск не готовий."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:616
+#: ../../locales/../src/interface/Mainfrm.cpp:614
 msgid "Cannot add server to Site Manager"
 msgstr "Неможливо додати сервер до Сайт Менеджера"
 
@@ -1993,7 +1994,7 @@ msgid ""
 msgstr ""
 "Неможливо змінити каталог, виконується операція синхронізованого перегляду."
 
-#: ../../locales/../src/interface/context_control.cpp:391
+#: ../../locales/../src/interface/context_control.cpp:398
 msgid ""
 "Cannot close tab while busy.\n"
 "Cancel current operation and close tab?"
@@ -2040,7 +2041,7 @@ msgstr ""
 msgid "Cannot load key file"
 msgstr "Неможливо завантажити файл ключа"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1096
+#: ../../locales/../src/interface/Mainfrm.cpp:1094
 msgid "Cannot load toolbar from resource file"
 msgstr "Неможливо завантажити панель інструментів з вихідного файлу"
 
@@ -2116,11 +2117,11 @@ msgstr "Черга сертифікату:"
 msgid "Certificate issuer"
 msgstr "Видавець сертифікату"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1297
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1288
 msgid "Certificate of connection does not match expected certificate."
 msgstr "Сертифікат підключення не відповідає очікуваному сертифікату."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1142
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1133
 msgid "Certificate signature verification failed"
 msgstr "Невдала перевірка підпису сертифікату"
 
@@ -2225,7 +2226,7 @@ msgstr "Частину даних завершено неправильно"
 msgid "Cipher:"
 msgstr "Шифр:"
 
-#: ../../locales/../src/interface/context_control.cpp:464
+#: ../../locales/../src/interface/context_control.cpp:471
 #: ../../locales/../src/interface/menu_bar.cpp:55
 msgid "Cl&ose tab"
 msgstr "За&крити вкладку"
@@ -2275,12 +2276,12 @@ msgstr "Клієнт для серверного шифру:"
 msgid "Close"
 msgstr "Закрити"
 
-#: ../../locales/../src/interface/context_control.cpp:465
+#: ../../locales/../src/interface/context_control.cpp:472
 msgid "Close &all other tabs"
 msgstr "Закрити &усі інші вкладки"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1252
-#: ../../locales/../src/interface/Mainfrm.cpp:1274
+#: ../../locales/../src/interface/Mainfrm.cpp:1250
+#: ../../locales/../src/interface/Mainfrm.cpp:1272
 #: ../../locales/../src/interface/menu_bar.cpp:64
 msgid "Close FileZilla"
 msgstr "Закрити FileZilla"
@@ -2289,7 +2290,7 @@ msgstr "Закрити FileZilla"
 msgid "Close all running instances of FileZilla"
 msgstr "Закрити всі діючі екземпляри FileZilla"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2364
+#: ../../locales/../src/interface/Mainfrm.cpp:2361
 msgid "Close quick search and continue comparing?"
 msgstr "Закрити швидкий пошук і продовжити порівняння?"
 
@@ -2301,7 +2302,7 @@ msgstr "Закриває поточну вкладку"
 msgid "Co&mments:"
 msgstr "Ко&ментарі:"
 
-#: ../../locales/../src/interface/listctrlex.cpp:770
+#: ../../locales/../src/interface/listctrlex.cpp:762
 msgid "Column properties"
 msgstr "Властивості стовпців"
 
@@ -2339,7 +2340,7 @@ msgstr "Команда:"
 msgid "Comment"
 msgstr "Коментар"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:593
+#: ../../locales/../src/interface/verifycertdialog.cpp:638
 msgid "Common name:"
 msgstr "Спільне ім'я:"
 
@@ -2348,12 +2349,12 @@ msgstr "Спільне ім'я:"
 msgid "Communication tainted by router or firewall"
 msgstr "Зв'язок блокується маршрутизатором або файєрволом"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2415
+#: ../../locales/../src/interface/Mainfrm.cpp:2412
 #: ../../locales/../src/interface/menu_bar.cpp:92
 msgid "Compare &modification time"
 msgstr "Порівняти &час модифікації"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2414
+#: ../../locales/../src/interface/Mainfrm.cpp:2411
 #: ../../locales/../src/interface/menu_bar.cpp:91
 msgid "Compare file&size"
 msgstr "Порівняти розмір &файлу"
@@ -2624,7 +2625,7 @@ msgstr "Неможливо прийняти з'єднання: %s"
 msgid "Could not access path %s"
 msgstr "Неможливо отримати доступ до шляху %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1252
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1243
 msgid "Could not add certificate to temporary trust list"
 msgstr "Неможливо додати сертифікат до тимчасового списку довіри"
 
@@ -2664,7 +2665,7 @@ msgstr "Неможливо сконвертувати приватний клю�
 msgid "Could not copy URLs"
 msgstr "Неможливо скопіювати адреси"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1244
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1235
 msgid "Could not copy certificate"
 msgstr "Неможливо скопіювати сертифікат"
 
@@ -2731,7 +2732,7 @@ msgstr "Неможливо згенерувати настроювану пос�
 msgid "Could not generate key"
 msgstr "Неможливо згенерувати ключ"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:931
+#: ../../locales/../src/engine/tlssocket_impl.cpp:922
 msgid ""
 "Could not get distinguished name of certificate issuer, "
 "gnutls_x509_get_issuer_dn failed"
@@ -2739,7 +2740,7 @@ msgstr ""
 "Неможливо отримати виразного імені сертифікату видавця, невдале "
 "gnutls_x509_get_issuer_dn"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:907
+#: ../../locales/../src/engine/tlssocket_impl.cpp:908
 msgid ""
 "Could not get distinguished name of certificate subject, gnutls_x509_get_dn "
 "failed"
@@ -2915,7 +2916,7 @@ msgstr "Неможливо надіслати команду до fzputtygen."
 msgid "Could not send command to fzstorj."
 msgstr "Неможливо надіслати команду до fzstorj."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1119
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1110
 msgid "Could not sort peer certificates"
 msgstr "Неможливо відсортувати сертифікати кінцевого користувача"
 
@@ -2990,7 +2991,7 @@ msgstr "Неможливо записати у файл журналу: %s"
 msgid "Could not write to socket: %s"
 msgstr "Неможливо записати в сокет: %s"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:598
+#: ../../locales/../src/interface/verifycertdialog.cpp:643
 msgid "Country:"
 msgstr "Країна:"
 
@@ -3156,7 +3157,7 @@ msgstr "Дія по&двійного клацання на каталогах:"
 msgid "D&uplicate"
 msgstr "Д&ублювати"
 
-#: ../../locales/../src/engine/server.cpp:61
+#: ../../locales/../src/engine/server.cpp:62
 msgid "DOS-like with virtual paths"
 msgstr "DOS- подібний з віртуальними шляхами"
 
@@ -3201,7 +3202,7 @@ msgstr "Налаштування відлагодження"
 msgid "Default &local directory:"
 msgstr "Типовий &локальний каталог:"
 
-#: ../../locales/../src/engine/server.cpp:53
+#: ../../locales/../src/engine/server.cpp:54
 msgid "Default (Autodetect)"
 msgstr "Типово (Атовизначення)"
 
@@ -3339,8 +3340,8 @@ msgstr "Дозволи доступу до каталогу"
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1628
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:534
 #: ../../locales/../src/interface/filelistctrl.cpp:477
-#: ../../locales/../src/interface/Mainfrm.cpp:2362
-#: ../../locales/../src/interface/Mainfrm.cpp:2382
+#: ../../locales/../src/interface/Mainfrm.cpp:2359
+#: ../../locales/../src/interface/Mainfrm.cpp:2379
 #: ../../locales/../src/interface/toolbar.cpp:51
 #: ../../locales/../src/interface/view.cpp:109
 msgid "Directory comparison"
@@ -3389,7 +3390,7 @@ msgid ""
 msgstr ""
 "Вимкнути синхронізований перегляд і продовжити зміни у віддаленому каталозі?"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:723
+#: ../../locales/../src/interface/Mainfrm.cpp:721
 msgid ""
 "Disable this option again if you will not be able to see the correct "
 "directory contents anymore."
@@ -3437,8 +3438,8 @@ msgstr "Не &використовувати типовий редактор"
 msgid "Do the same with &all selected files already being edited"
 msgstr "Повторіть дію з &усіма обраними файлами, що уже редагуються"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1255
-#: ../../locales/../src/interface/Mainfrm.cpp:1278
+#: ../../locales/../src/interface/Mainfrm.cpp:1253
+#: ../../locales/../src/interface/Mainfrm.cpp:1276
 msgid "Do you really want to close FileZilla?"
 msgstr "Ви дійсно бажаєте закрити FileZilla?"
 
@@ -3460,7 +3461,7 @@ msgstr "Ви дійсно бажаєте видалити вибраний за�
 msgid "Do you really want to delete the transfer queue?"
 msgstr "Ви дійсно бажаєте видалити чергу передач?"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:646
+#: ../../locales/../src/interface/Mainfrm.cpp:644
 #, c-format
 msgid "Do you really want to send '%s' to the server?"
 msgstr "Ви дійсно бажаєте надіслати '%s' до сервера?"
@@ -3519,7 +3520,7 @@ msgstr "Завантажити обраний каталог"
 msgid "Download selected files and directories"
 msgstr "Завантажити обрані файли і каталоги"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1068
+#: ../../locales/../src/interface/Mainfrm.cpp:1066
 #, c-format
 msgid ""
 "Download speed: %s/s\n"
@@ -3594,7 +3595,7 @@ msgstr "Е&кспорт..."
 msgid "E-&mail account:"
 msgstr "Обліковий запис ел.пошти:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:604
+#: ../../locales/../src/interface/verifycertdialog.cpp:648
 msgid "E-Mail:"
 msgstr "Ел. пошта:"
 
@@ -3712,7 +3713,7 @@ msgstr "Введіть 0 для необмеженої швидкості."
 msgid "Enter command"
 msgstr "Ввести команду"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:628
+#: ../../locales/../src/interface/Mainfrm.cpp:626
 msgid "Enter custom command"
 msgstr "Ввести настроювану команду"
 
@@ -4029,7 +4030,7 @@ msgstr ""
 "Помилка отримання адреси вузла кешування даних з'єднання, з'єднання "
 "завершено."
 
-#: ../../locales/../src/interface/context_control.cpp:109
+#: ../../locales/../src/interface/context_control.cpp:114
 msgid "Failed to initialize FTP engine"
 msgstr "Помилка ініціалізації двигуна FTP"
 
@@ -4135,8 +4136,8 @@ msgstr "Помилка встановлення мови на %s, викорис
 msgid "Failed to validate settings"
 msgstr "Помилка перевірки налаштувань"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1220
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1266
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1211
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1257
 msgid "Failed to verify peer certificate"
 msgstr "Помилка перевірки сертифікату вузла кешування"
 
@@ -4242,7 +4243,7 @@ msgstr "Файл передано успішно"
 msgid "File transfer successful, transferred %s in %s"
 msgstr "Файл передано успішно, передано %s до %s"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1254
+#: ../../locales/../src/interface/Mainfrm.cpp:1252
 msgid "File transfers still in progress."
 msgstr "Передачі файлів усе ще виконуються."
 
@@ -4271,7 +4272,7 @@ msgstr ""
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla уже підключено до сервера."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1570
+#: ../../locales/../src/interface/Mainfrm.cpp:1568
 msgid "FileZilla needs to be restarted for the language change to take effect."
 msgstr ""
 "FileZilla потребує перезавантаження для того, щоб зміни у виборі мови набули "
@@ -4304,7 +4305,7 @@ msgstr "Для каталогу %s та імені файлу %s неможли�
 msgid "Filename invalid"
 msgstr "Ім'я файлу не дійсне"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:359
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:358
 msgid "Filename unchanged"
 msgstr "Ім'я файлу не змінено"
 
@@ -4460,7 +4461,7 @@ msgstr "Примусове &UTF-8"
 msgid "Force showing &hidden files"
 msgstr "Примусити показ &прихованих файлів"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:718
+#: ../../locales/../src/interface/Mainfrm.cpp:716
 msgid "Force showing hidden files"
 msgstr "Примусити показ прихованих файлів"
 
@@ -4523,22 +4524,22 @@ msgstr "Ім'я встановленого фільтру вже існує, п�
 msgid "Global bookmarks"
 msgstr "Глобальні закладки"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:319
+#: ../../locales/../src/engine/tlssocket_impl.cpp:330
 #, c-format
 msgid "GnuTLS error %d"
 msgstr "Помилка GnuTLS %d"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:322
+#: ../../locales/../src/engine/tlssocket_impl.cpp:333
 #, c-format
 msgid "GnuTLS error %d in %s"
 msgstr "Помилка GnuTLS %d в %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:314
+#: ../../locales/../src/engine/tlssocket_impl.cpp:325
 #, c-format
 msgid "GnuTLS error %d in %s: %s"
 msgstr "Помилка GnuTLS %d в %s: %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:311
+#: ../../locales/../src/engine/tlssocket_impl.cpp:322
 #, c-format
 msgid "GnuTLS error %d: %s"
 msgstr "Помилка GnuTLS %d: %s"
@@ -4622,7 +4623,7 @@ msgstr "Хост недосяжний"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:420
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1040
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1161
-#: ../../locales/../src/interface/verifycertdialog.cpp:761
+#: ../../locales/../src/interface/verifycertdialog.cpp:737
 msgid "Host:"
 msgstr "Хост:"
 
@@ -4786,11 +4787,11 @@ msgstr ""
 "Якщо ви натисните кнопку тест, FileZilla з'єднається з probe.filezilla-"
 "project.org і виконає кілька простих тестів."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1277
+#: ../../locales/../src/interface/Mainfrm.cpp:1275
 msgid "If you close FileZilla, your changes will be lost."
 msgstr "Якщо ви закриєте FileZilla,ваші зміни будуть втрачені."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:756
+#: ../../locales/../src/interface/verifycertdialog.cpp:732
 msgid ""
 "If you continue, your password and files will be sent in clear over the "
 "internet."
@@ -4928,11 +4929,11 @@ msgstr ""
 msgid "Initializing TLS..."
 msgstr "Ініціалазація TLS..."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:738
+#: ../../locales/../src/interface/verifycertdialog.cpp:714
 msgid "Insecure FTP connection"
 msgstr "Незахищене з'єднання FTP"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:454
+#: ../../locales/../src/interface/verifycertdialog.cpp:453
 msgid "Insecure algorithm!"
 msgstr "Вразливий алгоритм!"
 
@@ -4940,8 +4941,8 @@ msgstr "Вразливий алгоритм!"
 msgid "Insecure server, it does not support FTP over TLS."
 msgstr "Незахищений сервер, він не підтримує FTP через TLS."
 
-#: ../../locales/../src/engine/server.cpp:699
-#: ../../locales/../src/engine/server.cpp:723
+#: ../../locales/../src/engine/server.cpp:714
+#: ../../locales/../src/engine/server.cpp:738
 #: ../../locales/../src/interface/manual_transfer.cpp:182
 msgid "Interactive"
 msgstr "Інтерактивний"
@@ -4981,9 +4982,8 @@ msgstr ""
 "виберіть опцію UTF-8, щоб примусити UTF-8."
 
 #: ../../locales/../src/engine/socket_errors.cpp:94
-#, fuzzy
 msgid "Invalid characters in hostname"
-msgstr "Фільтрувати недійсні символи в іменах файлів"
+msgstr "Недійсні символи в імені хоста"
 
 #: ../../locales/../src/engine/http/request.cpp:699
 msgid "Invalid chunk size"
@@ -4996,8 +4996,8 @@ msgstr "Недійсний розмір чанку"
 msgid "Invalid data received"
 msgstr "Отримано недійсні дані"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:380
-#: ../../locales/../src/interface/verifycertdialog.cpp:396
+#: ../../locales/../src/interface/verifycertdialog.cpp:379
+#: ../../locales/../src/interface/verifycertdialog.cpp:395
 msgid "Invalid date"
 msgstr "Недійсні дані"
 
@@ -5107,15 +5107,15 @@ msgstr "Недійсне значення підказки"
 msgid "Invert Filter"
 msgstr "Обернути фільтр"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:606
+#: ../../locales/../src/interface/verifycertdialog.cpp:652
 msgid "Jurisdiction country:"
 msgstr "Країна юрисдикції:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:608
+#: ../../locales/../src/interface/verifycertdialog.cpp:654
 msgid "Jurisdiction locality:"
 msgstr "Розташування юрисдикції:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:607
+#: ../../locales/../src/interface/verifycertdialog.cpp:653
 msgid "Jurisdiction state or province:"
 msgstr "Штат або провінція юрисдикції:"
 
@@ -5123,7 +5123,7 @@ msgstr "Штат або провінція юрисдикції:"
 msgid "Keep directories on top"
 msgstr "Каталоги тримати зверху"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:722
+#: ../../locales/../src/interface/Mainfrm.cpp:720
 msgid ""
 "Keep in mind that not all servers support this feature and may return "
 "incorrect listings if this option is enabled. Although FileZilla performs "
@@ -5142,8 +5142,8 @@ msgstr "Обмін ключами"
 msgid "Key exchange:"
 msgstr "Обмін ключами:"
 
-#: ../../locales/../src/engine/server.cpp:696
-#: ../../locales/../src/engine/server.cpp:721
+#: ../../locales/../src/engine/server.cpp:711
+#: ../../locales/../src/engine/server.cpp:736
 msgid "Key file"
 msgstr "Файл ключа"
 
@@ -5161,7 +5161,7 @@ msgstr "Най&нижчий"
 msgid "Language"
 msgstr "Мова"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1570
+#: ../../locales/../src/interface/Mainfrm.cpp:1568
 msgid "Language changed"
 msgstr "Зміна мови"
 
@@ -5284,7 +5284,7 @@ msgstr "Локальний сайт:"
 msgid "Local size of '%s' does not match expected size: %d != %d"
 msgstr "Локальний розмір '%s' не співпадає з очікуваним розміром: %d != %d"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:600
+#: ../../locales/../src/interface/verifycertdialog.cpp:645
 msgid "Locality:"
 msgstr "Розташування:"
 
@@ -5441,8 +5441,8 @@ msgstr "Максимум одночасних &передач:"
 msgid "Memory allocation failure"
 msgstr "Помилка виділення пам'яті"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:434
-#: ../../locales/../src/interface/Mainfrm.cpp:1895
+#: ../../locales/../src/interface/Mainfrm.cpp:432
+#: ../../locales/../src/interface/Mainfrm.cpp:1893
 msgid "Message log"
 msgstr "Журнал повідомлень"
 
@@ -5505,6 +5505,7 @@ msgstr "Ім'я закладки вже існує."
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:276
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:412
+#: ../../locales/../src/interface/verifycertdialog.cpp:651
 msgid "Name:"
 msgstr "Ім'я:"
 
@@ -5689,7 +5690,7 @@ msgstr "Не задано імені користувача."
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1683
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1702
 #: ../../locales/../src/interface/sitemanager.cpp:18
-#: ../../locales/../src/interface/verifycertdialog.cpp:403
+#: ../../locales/../src/interface/verifycertdialog.cpp:402
 msgid "None"
 msgstr "Жодного"
 
@@ -5702,8 +5703,8 @@ msgid "Nonrecoverable failure in name resolution"
 msgstr "Невиправна помилка в визначенні імен"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:963
-#: ../../locales/../src/engine/server.cpp:690
-#: ../../locales/../src/engine/server.cpp:717
+#: ../../locales/../src/engine/server.cpp:705
+#: ../../locales/../src/engine/server.cpp:732
 #: ../../locales/../src/interface/manual_transfer.cpp:148
 #: ../../locales/../src/interface/manual_transfer.cpp:176
 #: ../../locales/../src/interface/manual_transfer.cpp:535
@@ -5726,7 +5727,7 @@ msgstr "Не з'єднано"
 msgid "Not connected to any server"
 msgstr "Нема під'єднання до жодного серверу"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:616
+#: ../../locales/../src/interface/Mainfrm.cpp:614
 msgid "Not connected to any server."
 msgstr "Нема під'єднання до жодного серверу."
 
@@ -5738,7 +5739,7 @@ msgstr "Не з'єднано."
 msgid "Not initialized, need to call WSAStartup"
 msgstr "Не ініціалізовано, потрібно викликати WSAStartup"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:720
+#: ../../locales/../src/interface/Mainfrm.cpp:718
 msgid "Note that this feature is only supported using the FTP protocol."
 msgstr ""
 "Зауважте, що даний елемент підтримується лише при використанні протоколу FTP."
@@ -5929,7 +5930,7 @@ msgstr "Параметри"
 msgid "Orange"
 msgstr "Оранжевий"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:594
+#: ../../locales/../src/interface/verifycertdialog.cpp:639
 msgid "Organization:"
 msgstr "Організація:"
 
@@ -5941,7 +5942,7 @@ msgstr "Інші налаштування SFTP"
 msgid "Other system error"
 msgstr "Помилка іншої системи"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:616
+#: ../../locales/../src/interface/verifycertdialog.cpp:667
 msgid "Other:"
 msgstr "Інше:"
 
@@ -6029,7 +6030,7 @@ msgstr "Команда ПОРТА заблокована маршрутизат�
 msgid "Pa&ssive (recommended)"
 msgstr "Па&сивний (рекомендовано)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2550
+#: ../../locales/../src/interface/Mainfrm.cpp:2547
 msgid "Parameter not a valid URL"
 msgstr "Значення параметру - це недійсна URL адреса"
 
@@ -6086,11 +6087,11 @@ msgstr "Шлях"
 msgid "Path cannot be constructed for directory %s and subdir %s"
 msgstr "Для каталогу %s та підкаталогу %s шлях створити неможливо"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2508
+#: ../../locales/../src/interface/Mainfrm.cpp:2505
 msgid "Path not found:"
 msgstr "Шляху не знайдено:"
 
-#: ../../locales/../src/engine/server.cpp:834
+#: ../../locales/../src/engine/server.cpp:850
 msgid "Path of identity service"
 msgstr "Шлях ідентифікаційної служби"
 
@@ -6264,7 +6265,7 @@ msgid "Please enter an upload speed limit greater or equal to 0 %s/s."
 msgstr ""
 "Введіть значення обмеження швидкості відвантаження більшим або рівним 0 %s/s."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:628
+#: ../../locales/../src/interface/Mainfrm.cpp:626
 msgid ""
 "Please enter raw FTP command.\n"
 "Using raw ftp commands will clear the directory cache."
@@ -6379,7 +6380,7 @@ msgstr ""
 "що використовується троянами або іншими шкідливими програмами. Це може "
 "викликати хибну тривогу, яку ви можете безпечно скасувати."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:761
+#: ../../locales/../src/interface/Mainfrm.cpp:759
 msgid ""
 "Please note that preserving timestamps on uploads on FTP, FTPS and FTPES "
 "servers only works if they support the MFMT command."
@@ -6464,12 +6465,11 @@ msgstr ""
 "'режимі DMZ' або 'ігровому режимі'.Такі речі, як протокол інспекцій чи "
 "протокол специфічних 'полагоджень' повинні бути відключеними"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:763
+#: ../../locales/../src/interface/verifycertdialog.cpp:739
 msgid "Port:"
 msgstr "Порт:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:601
-#: ../../locales/../src/interface/verifycertdialog.cpp:602
+#: ../../locales/../src/interface/verifycertdialog.cpp:646
 msgid "Postal code:"
 msgstr "Поштовий індекс:"
 
@@ -6486,7 +6486,7 @@ msgstr "Попереднє виділення"
 msgid "Predefined Sites"
 msgstr "Попередньо вказані Сайти"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:760
+#: ../../locales/../src/interface/Mainfrm.cpp:758
 msgid "Preserving file timestamps"
 msgstr "Збереження файлу часових позначок"
 
@@ -6681,7 +6681,7 @@ msgstr "Від&далене дерево каталогів"
 msgid "R&eset and requeue selected files"
 msgstr "С&кинути і поновити чергу обраних файлів"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:643
+#: ../../locales/../src/interface/Mainfrm.cpp:641
 msgid "Raw FTP command"
 msgstr "Проста команда FTP"
 
@@ -6718,7 +6718,7 @@ msgstr "Лише читати"
 msgid "Reading from local file failed"
 msgstr "Помилка читання з локального файлу"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1136
+#: ../../locales/../src/interface/Mainfrm.cpp:1134
 msgid "Really cancel current operation?"
 msgstr "Дійсно скасувати дану операцію?"
 
@@ -6767,7 +6767,7 @@ msgstr "Перезавантажити зараз"
 msgid "Rec&urse into subdirectories"
 msgstr "Про&ектувати в підкаталоги"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:333
+#: ../../locales/../src/engine/tlssocket_impl.cpp:344
 #, c-format
 msgid "Received TLS alert from the server: %s (%d)"
 msgstr "Отримано оповіщення TLS з сервера: %s (%d)"
@@ -6781,7 +6781,7 @@ msgstr "Отримано перелік файлів каталогу і схо�
 msgid "Received a line exceeding 10000 characters, aborting."
 msgstr "Отримано рядок, що перевищує 10000 символів, аварійне завершення."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1164
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1155
 #, c-format
 msgid ""
 "Received certificate chain could not be verified. Verification status is %d."
@@ -6798,7 +6798,7 @@ msgstr "Отримані дані заблоковано"
 msgid "Received invalid character in version information"
 msgstr "Отримано неприпустимий символ в інформації версії"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:336
+#: ../../locales/../src/engine/tlssocket_impl.cpp:347
 #, c-format
 msgid "Received unknown TLS alert %d from the server"
 msgstr "Від сервера отримано невідоме повідомлення TLS %d"
@@ -6861,7 +6861,7 @@ msgstr "Пам'ятати паролі?"
 msgid "Remote"
 msgstr "Віддалений"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:833
+#: ../../locales/../src/engine/tlssocket_impl.cpp:844
 msgid "Remote certificate not trusted."
 msgstr "Не довіряти віддаленому сертифікату."
 
@@ -6940,7 +6940,7 @@ msgstr "Видалити &обране"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1644
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1193
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1214
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:349
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:348
 msgid "Rename file"
 msgstr "Перейменувати файл"
 
@@ -7389,7 +7389,7 @@ msgid "Sending keep-alive command"
 msgstr "Надсилання команди keep-alive"
 
 #: ../../locales/../src/interface/resources/xrc/certificate.xrc:65
-#: ../../locales/../src/interface/verifycertdialog.cpp:605
+#: ../../locales/../src/interface/verifycertdialog.cpp:649
 msgid "Serial number:"
 msgstr "Серійний номер:"
 
@@ -7397,7 +7397,7 @@ msgstr "Серійний номер:"
 msgid "Server &Type:"
 msgstr "&Тип сервера:"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:733
+#: ../../locales/../src/engine/tlssocket_impl.cpp:744
 msgid "Server did not properly shut down TLS connection"
 msgstr "Сервер неправильно завершив з'єднання TLS"
 
@@ -7511,7 +7511,7 @@ msgstr "Сервер надіслав занадто багато даних."
 msgid "Server sent unexpected reply."
 msgstr "Сервер надіслав неочікувану відповідь."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1110
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1101
 msgid ""
 "Server sent unsorted certificate chain in violation of the TLS specifications"
 msgstr ""
@@ -7573,7 +7573,7 @@ msgstr "Показати список &простих каталогів"
 msgid "Show &welcome dialog..."
 msgstr "Показати діалог &привітання..."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2385
+#: ../../locales/../src/interface/Mainfrm.cpp:2382
 msgid "Show both directory trees and continue comparing?"
 msgstr "Показати обидва дерева каталогів і продовжити порівняння?"
 
@@ -7742,7 +7742,7 @@ msgstr "Сокет не з'єднано"
 msgid "Socket type not supported for address family"
 msgstr "Тип сокету не підтримується родиною адрес"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1276
+#: ../../locales/../src/interface/Mainfrm.cpp:1274
 msgid "Some files are still being edited or need to be uploaded."
 msgstr "Деякі файли усе ще редагуються або потребують оновлення."
 
@@ -7848,7 +7848,7 @@ msgstr "Розпочинаємо відвантаження %s"
 msgid "Starts the local site in the given path"
 msgstr "Запускає локальний сайт за вказаним шляхом"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:599
+#: ../../locales/../src/interface/verifycertdialog.cpp:644
 msgid "State or province:"
 msgstr "Штат, або провінція:"
 
@@ -7884,7 +7884,7 @@ msgstr "Storj - Децентралізоване Хмарне Сховище"
 msgid "Storj support"
 msgstr "Підтримка Storj"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:603
+#: ../../locales/../src/interface/verifycertdialog.cpp:647
 msgid "Street:"
 msgstr "Вулиця:"
 
@@ -7947,8 +7947,8 @@ msgstr "Помилка синтаксису"
 #: ../../locales/../src/interface/cmdline.cpp:93
 #: ../../locales/../src/interface/cmdline.cpp:100
 #: ../../locales/../src/interface/cmdline.cpp:105
-#: ../../locales/../src/interface/Mainfrm.cpp:2510
-#: ../../locales/../src/interface/Mainfrm.cpp:2552
+#: ../../locales/../src/interface/Mainfrm.cpp:2507
+#: ../../locales/../src/interface/Mainfrm.cpp:2549
 msgid "Syntax error in command line"
 msgstr "Помилка синтаксису у командній лінійці"
 
@@ -8003,6 +8003,10 @@ msgstr "Ім'я кінцевого файлу вже існує!"
 #: ../../locales/../src/interface/RemoteListView.cpp:1742
 msgid "Target filename already exists, really continue?"
 msgstr "Ім'я кінцевого файлу вже існує, продовжувати далі?"
+
+#: ../../locales/../src/interface/verifycertdialog.cpp:650
+msgid "Telephone number:"
+msgstr "Номер телефону:"
 
 #: ../../locales/../src/engine/socket_errors.cpp:70
 msgid "Temporary failure in name resolution"
@@ -8068,7 +8072,7 @@ msgstr "Додати закладку неможливо."
 msgid "The bookmarks could not be cleared."
 msgstr "Очистити закладки неможливо."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1159
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1150
 msgid ""
 "The certificate requires the server to include an OCSP status in its "
 "response, but the OCSP status is missing."
@@ -8129,8 +8133,8 @@ msgstr "Введені паролі не співпадають."
 msgid "The extension '%s' does already exist in the list"
 msgstr "Розширення '%s' таки існує в цьому списку"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:338
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:346
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:337
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:345
 #, c-format
 msgid ""
 "The file %s already exists.\n"
@@ -8218,11 +8222,11 @@ msgstr ""
 msgid "The file selected as default editor does not exist."
 msgstr "Обраного файлу, як редактора по замовчувнню не існує."
 
-#: ../../locales/../src/interface/listctrlex.cpp:770
+#: ../../locales/../src/interface/listctrlex.cpp:762
 msgid "The filename column can neither be hidden nor moved."
 msgstr "Стовпець імен файлів не можна ані приховати, ані перемістити."
 
-#: ../../locales/../src/interface/listctrlex.cpp:820
+#: ../../locales/../src/interface/listctrlex.cpp:812
 msgid "The filename column cannot be hidden."
 msgstr "Стовпець імен файлів неможливо приховати."
 
@@ -8389,7 +8393,7 @@ msgstr ""
 "Ключ хоста сервера невідомий. У вас немає гарантії того, що даний сервер "
 "являє собою той комп'ютер, який ви мали на увазі."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1154
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1145
 msgid "The server's hostname does not match the certificate's hostname"
 msgstr "Ім'я хоста сервера не збігається з іменем хоста сертифіката"
 
@@ -8451,7 +8455,7 @@ msgstr "Встановлений фільтр неможливо переміс�
 msgid "This filter set cannot be renamed."
 msgstr "Встановлений фільтр не може бути переіменованим."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:751
+#: ../../locales/../src/interface/verifycertdialog.cpp:727
 msgid ""
 "This may be the result of a downgrade attack, only continue after you have "
 "spoken to the server administrator or server hosting provider."
@@ -8475,7 +8479,7 @@ msgstr ""
 "Це спрацьовує лише у випадку, якщо ви не в позиції позаду маршрутизатора, а "
 "також, якщо ваша система лише повертає внутрішню адресу."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:754
+#: ../../locales/../src/interface/verifycertdialog.cpp:730
 msgid "This server does not support FTP over TLS."
 msgstr "Цей сервер не підтримує FTP через TLS."
 
@@ -8504,20 +8508,20 @@ msgstr "Час &очікування в секундах:"
 msgid "Timeout"
 msgstr "Час вичерпано"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:597
+#: ../../locales/../src/interface/verifycertdialog.cpp:642
 msgid "Title:"
 msgstr "Назва:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2363
+#: ../../locales/../src/interface/Mainfrm.cpp:2360
 msgid "To compare directories quick search must be closed."
 msgstr "Для того, щоб порівняти каталоги необхідно закрити швидкий пошук."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2383
+#: ../../locales/../src/interface/Mainfrm.cpp:2380
 msgid "To compare directories, both file lists have to be aligned."
 msgstr ""
 "Для того, щоб порівняти каталоги, обидва списки файлів необхідно вирівняти."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2384
+#: ../../locales/../src/interface/Mainfrm.cpp:2381
 msgid "To do this, the directory trees need to be both shown or both hidden."
 msgstr ""
 "Для того, щоб це зробити, необхідно, щоб обидва дерева каталогів були або "
@@ -8712,7 +8716,7 @@ msgstr "КОРИСТУВАЧ@&ХОСТ"
 msgid "Unassigned error code %d"
 msgstr "Неініціалізоаний код помилки %d"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:596
+#: ../../locales/../src/interface/verifycertdialog.cpp:641
 msgid "Unit:"
 msgstr "Модуль:"
 
@@ -8792,7 +8796,7 @@ msgstr ""
 "Якщо ця проблема не буде усунута, активний режим FTP не працюватиме і "
 "необхідно використати пасивний режим."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1177
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1168
 msgid "Unsupported certificate type"
 msgstr "Непідтримуваний тип сертифікату"
 
@@ -8971,7 +8975,7 @@ msgstr "Дійсний до:"
 msgid "Verbose log messages from wxWidgets"
 msgstr "Багатошарові журнали повідомлень від wxWidgets"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1310
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1301
 msgid "Verifying certificate..."
 msgstr "Перевірка сертифікату..."
 
@@ -9011,7 +9015,7 @@ msgstr "Очікування на скасування передачі"
 msgid "Waiting to retry..."
 msgstr "Очікування на повторну спробу..."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:750
+#: ../../locales/../src/interface/verifycertdialog.cpp:726
 msgid ""
 "Warning! You have previously connected to this server using FTP over TLS, "
 "yet the server has now rejected FTP over TLS."
@@ -9176,7 +9180,7 @@ msgstr ""
 msgid "You cannot upload files into the root directory."
 msgstr "Неможливо відвантажити файли до кореневого каталогу."
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:359
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:358
 msgid "You did not enter a new name for the file. Overwrite the file instead?"
 msgstr ""
 "Ви не ввели нове ім'я для цього файлу. Бажаєте переписати цей файл натомість?"
@@ -9426,11 +9430,11 @@ msgstr ""
 "Переконайтесь, що даний виконуваний файл знаходиться у тому ж каталозі, що і "
 "головний виконуваний файл FileZilla."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1073
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1064
 msgid "gnutls_certificate_get_peers returned no certificates"
 msgstr "функція gnutls_certificate_get_peers не повернула сертифікатів"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1085
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1076
 msgid "gnutls_pem_base64_encode2 failed"
 msgstr "невдале gnutls_pem_base64_encode2"
 
@@ -9474,7 +9478,7 @@ msgstr "менше, ніж"
 msgid "matches regex"
 msgstr "співпадає з regex"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:341
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:340
 msgid "new name"
 msgstr "нове ім'я"
 
@@ -9491,10 +9495,10 @@ msgid "owner writeable"
 msgstr "записується власником"
 
 #: ../../locales/../src/engine/proxy.cpp:52
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1368
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1384
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1400
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1416
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1359
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1375
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1391
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1407
 #: ../../locales/../src/interface/sftp_crypt_info_dlg.cpp:43
 msgid "unknown"
 msgstr "невідомо"

@@ -6,11 +6,11 @@
 # Michał Trzebiatowski <michtrz@gmail.com>, 2010-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: FileZilla\n"
+"Project-Id-Version: FileZilla 3.x\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-04-26 11:42+0200\n"
-"PO-Revision-Date: 2019-03-24 23:07+0100\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2019-05-02 11:00+0200\n"
+"PO-Revision-Date: 2019-04-29 22:47+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/zeron/filezilla/language/"
 "de/)\n"
 "Language: de\n"
@@ -18,7 +18,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.7\n"
 
 #. @translator: This is a date/time formatting specifier. See https://wiki.filezilla-project.org/Date_and_Time_formatting
 #: ../../locales/../src/interface/statuslinectrl.cpp:59
@@ -124,12 +123,12 @@ msgstr "%s (%s/s)"
 msgid "%s (? B/s)"
 msgstr "%s (? B/s)"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:385
+#: ../../locales/../src/interface/verifycertdialog.cpp:384
 #, c-format
 msgid "%s - Certificate expired!"
 msgstr "%s - Zertifikat abgelaufen!"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:369
+#: ../../locales/../src/interface/verifycertdialog.cpp:368
 #, c-format
 msgid "%s - Not yet valid!"
 msgstr "%s - Noch nicht gültig!"
@@ -173,12 +172,12 @@ msgstr ""
 "PATH-Umgebungsvariable enthalten ist.\n"
 "- Geben Sie den vollständigen Pfad zu %s in der %s-Umgebungsvariable an."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:406
+#: ../../locales/../src/interface/verifycertdialog.cpp:405
 #, c-format
 msgid "%s with %d bits"
 msgstr "%s mit %d Bits"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:510
+#: ../../locales/../src/interface/verifycertdialog.cpp:509
 #, c-format
 msgid "%s:%d - Hostname does not match certificate"
 msgstr "%s:%d - Hostname passt nicht zum Zertifikat"
@@ -247,7 +246,7 @@ msgstr "Zur W&arteschlange hinzufügen"
 msgid "&Adjust server time, offset by:"
 msgstr "&Serverzeit anpassen, versetzt um:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:766
+#: ../../locales/../src/interface/verifycertdialog.cpp:742
 msgid "&Always allow insecure plain FTP for this server."
 msgstr "&Immer nur unverschlüsseltes FTP für diesen Server erlauben"
 
@@ -325,7 +324,7 @@ msgstr "Burst-&Toleranz:"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3911
 #: ../../locales/../src/interface/resources/xrc/inputdialog.xrc:40
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:35
-#: ../../locales/../src/interface/verifycertdialog.cpp:778
+#: ../../locales/../src/interface/verifycertdialog.cpp:754
 msgid "&Cancel"
 msgstr "Abbre&chen"
 
@@ -373,7 +372,7 @@ msgstr "In die Zwis&chenablage kopieren"
 msgid "&Create directory"
 msgstr "&Verzeichnis erstellen"
 
-#: ../../locales/../src/interface/context_control.cpp:461
+#: ../../locales/../src/interface/context_control.cpp:468
 msgid "&Create new tab"
 msgstr "&Neuen Tab erzeugen"
 
@@ -490,7 +489,7 @@ msgstr "&Bearbeiten"
 msgid "&Edit filter rules..."
 msgstr "Filterregeln &bearbeiten..."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2411
+#: ../../locales/../src/interface/Mainfrm.cpp:2408
 #: ../../locales/../src/interface/menu_bar.cpp:89
 #: ../../locales/../src/interface/menu_bar.cpp:128
 #: ../../locales/../src/interface/statusbar.cpp:553
@@ -616,7 +615,7 @@ msgstr "&HTTP/1.1 unter Verwendung der 'CONNECT'-Methode"
 msgid "&Help"
 msgstr "&Hilfe"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2418
+#: ../../locales/../src/interface/Mainfrm.cpp:2415
 #: ../../locales/../src/interface/menu_bar.cpp:94
 msgid "&Hide identical files"
 msgstr "Identische &Dateien verstecken"
@@ -756,7 +755,7 @@ msgstr "&Neu"
 msgid "&New Site"
 msgstr "&Neuer Server"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1800
+#: ../../locales/../src/interface/Mainfrm.cpp:1798
 msgid "&New version available!"
 msgstr "&Neue Version verfügbar!"
 
@@ -787,7 +786,7 @@ msgstr "&Numerischer Wert:"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:486
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:3134
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:114
-#: ../../locales/../src/interface/verifycertdialog.cpp:771
+#: ../../locales/../src/interface/verifycertdialog.cpp:747
 msgid "&OK"
 msgstr "&OK"
 
@@ -854,7 +853,7 @@ msgstr "&Wiederverbinden"
 msgid "&Reconnect information"
 msgstr "&Wiederverbindungsinformationen"
 
-#: ../../locales/../src/interface/context_control.cpp:468
+#: ../../locales/../src/interface/context_control.cpp:475
 #: ../../locales/../src/interface/menu_bar.cpp:80
 msgid "&Refresh"
 msgstr "&Aktualisieren"
@@ -1129,7 +1128,7 @@ msgstr "&Benutzer:"
 msgid "&Username:"
 msgstr "Ben&utzername:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1794
+#: ../../locales/../src/interface/Mainfrm.cpp:1792
 #, c-format
 msgid "&Version %s"
 msgstr "&Version %s"
@@ -1201,7 +1200,7 @@ msgstr ""
 "Anmeldung via 'Normal' oder 'Konto' ist nicht verfügbar. Ihr Eintrag wurde "
 "auf 'Nach Passwort fragen' geändert."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:645
+#: ../../locales/../src/interface/Mainfrm.cpp:643
 msgid ""
 "'quote' is usually a local command used by commandline clients to send the "
 "arguments following 'quote' to the server. You might want to enter the raw "
@@ -1330,7 +1329,7 @@ msgstr ""
 "Ein Lesezeichen mit dem angegebenen Namen existiert bereits. Bitte geben Sie "
 "einen noch nicht verwendeten Namen an."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1146
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1137
 msgid "A certificate in the chain was signed using an insecure algorithm"
 msgstr ""
 "Ein Zertifikat der Kette wurde mit einem unsicheren Algorithmus signiert"
@@ -1401,7 +1400,7 @@ msgstr ""
 msgid "A new version of FileZilla is available:"
 msgstr "Eine neue FileZilla-Version ist verfügbar:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:721
+#: ../../locales/../src/interface/Mainfrm.cpp:719
 msgid ""
 "A proper server always shows all files, but some broken servers hide files "
 "from the user. Use this option to force the server to show all files."
@@ -1481,8 +1480,8 @@ msgstr ""
 "Zugriff auf einige lokale Verzeichnisse konnte nicht wiederhergestellt "
 "werden:"
 
-#: ../../locales/../src/engine/server.cpp:702
-#: ../../locales/../src/engine/server.cpp:725
+#: ../../locales/../src/engine/server.cpp:717
+#: ../../locales/../src/engine/server.cpp:740
 #: ../../locales/../src/interface/manual_transfer.cpp:148
 #: ../../locales/../src/interface/manual_transfer.cpp:149
 #: ../../locales/../src/interface/manual_transfer.cpp:185
@@ -1626,7 +1625,7 @@ msgstr "Zurückgreifen auf anderen Übertragungsmodus bei Fehlschlag erlauben"
 msgid "Already connected"
 msgstr "Bereits verbunden"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:427
+#: ../../locales/../src/interface/verifycertdialog.cpp:426
 msgid "Alternative name:"
 msgid_plural "Alternative names:"
 msgstr[0] "Alternativer Name:"
@@ -1677,7 +1676,7 @@ msgstr ""
 "aufgetreten.\n"
 "Möglicherweise wurden einige Warteschlangeneinträge nicht gespeichert."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1150
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1141
 msgid "An issuer in the certificate chain is not a certificate authority"
 msgstr ""
 "Einer der Aussteller in der Zertifikatskette ist keine Zertifizierungsstelle"
@@ -1688,7 +1687,7 @@ msgid ""
 "location."
 msgstr "Am Zielort ist bereits ein Eintrag mit diesem Namen vorhanden."
 
-#: ../../locales/../src/engine/server.cpp:727
+#: ../../locales/../src/engine/server.cpp:742
 #: ../../locales/../src/interface/manual_transfer.cpp:147
 #: ../../locales/../src/interface/manual_transfer.cpp:188
 #: ../../locales/../src/interface/manual_transfer.cpp:203
@@ -1758,8 +1757,8 @@ msgstr "Als Tab in der Übertragungs-Warteschlangenansicht"
 msgid "Ask for action"
 msgstr "Aktion erfragen"
 
-#: ../../locales/../src/engine/server.cpp:693
-#: ../../locales/../src/engine/server.cpp:719
+#: ../../locales/../src/engine/server.cpp:708
+#: ../../locales/../src/engine/server.cpp:734
 #: ../../locales/../src/interface/manual_transfer.cpp:179
 msgid "Ask for password"
 msgstr "Nach Passwort fragen"
@@ -1834,7 +1833,7 @@ msgstr "Verhalten"
 msgid "Being edited"
 msgstr "Wird bearbeitet"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1136
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1127
 msgid "Beware! Certificate has been revoked"
 msgstr "Vorsicht! Zertifikat wurde widerrufen"
 
@@ -1883,7 +1882,7 @@ msgstr "Erstellungsdatum:"
 msgid "Build information"
 msgstr "Versionsinformationen"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:595
+#: ../../locales/../src/interface/verifycertdialog.cpp:640
 msgid "Business category:"
 msgstr "Geschäftskategorie:"
 
@@ -1990,7 +1989,7 @@ msgstr ""
 "Kein Zugriff auf '%s' möglich, kein Datenträger im Laufwerk oder Laufwerk "
 "nicht bereit."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:616
+#: ../../locales/../src/interface/Mainfrm.cpp:614
 msgid "Cannot add server to Site Manager"
 msgstr "Kann Server nicht zum Servermanager hinzufügen"
 
@@ -2006,7 +2005,7 @@ msgstr ""
 "Kann Verzeichnis nicht wechseln; es wird bereits eine Operation des "
 "synchronisierten Verzeichniswechsels ausgeführt."
 
-#: ../../locales/../src/interface/context_control.cpp:391
+#: ../../locales/../src/interface/context_control.cpp:398
 msgid ""
 "Cannot close tab while busy.\n"
 "Cancel current operation and close tab?"
@@ -2054,7 +2053,7 @@ msgstr ""
 msgid "Cannot load key file"
 msgstr "Kann Schlüsseldatei nicht laden"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1096
+#: ../../locales/../src/interface/Mainfrm.cpp:1094
 msgid "Cannot load toolbar from resource file"
 msgstr "Werkzeugleiste kann nicht aus Ressourcendatei geladen werden"
 
@@ -2130,12 +2129,12 @@ msgstr "Zertifikat in Kette:"
 msgid "Certificate issuer"
 msgstr "Herausgeber des Zertifikats"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1297
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1288
 msgid "Certificate of connection does not match expected certificate."
 msgstr ""
 "Das Verbindungszertifikat stimmt nicht mit dem erwarteten Zertifikat überein."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1142
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1133
 msgid "Certificate signature verification failed"
 msgstr "Zertifikat-Signaturverifikation fehlgeschlagen"
 
@@ -2241,7 +2240,7 @@ msgstr "HTTP-Datenblock nicht ordnungsgemäß terminiert"
 msgid "Cipher:"
 msgstr "Chiffre:"
 
-#: ../../locales/../src/interface/context_control.cpp:464
+#: ../../locales/../src/interface/context_control.cpp:471
 #: ../../locales/../src/interface/menu_bar.cpp:55
 msgid "Cl&ose tab"
 msgstr "Tab s&chließen"
@@ -2291,12 +2290,12 @@ msgstr "Client-zu-Server-Chiffre:"
 msgid "Close"
 msgstr "Schließen"
 
-#: ../../locales/../src/interface/context_control.cpp:465
+#: ../../locales/../src/interface/context_control.cpp:472
 msgid "Close &all other tabs"
 msgstr "Andere Tabs &schließen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1252
-#: ../../locales/../src/interface/Mainfrm.cpp:1274
+#: ../../locales/../src/interface/Mainfrm.cpp:1250
+#: ../../locales/../src/interface/Mainfrm.cpp:1272
 #: ../../locales/../src/interface/menu_bar.cpp:64
 msgid "Close FileZilla"
 msgstr "FileZilla beenden"
@@ -2305,7 +2304,7 @@ msgstr "FileZilla beenden"
 msgid "Close all running instances of FileZilla"
 msgstr "Alle offenen Instanzen von FileZilla schließen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2364
+#: ../../locales/../src/interface/Mainfrm.cpp:2361
 msgid "Close quick search and continue comparing?"
 msgstr "Schnellsuche schließen und Vergleich fortsetzen?"
 
@@ -2317,7 +2316,7 @@ msgstr "Schließt den aktuellen Tab"
 msgid "Co&mments:"
 msgstr "Ko&mmentare:"
 
-#: ../../locales/../src/interface/listctrlex.cpp:770
+#: ../../locales/../src/interface/listctrlex.cpp:762
 msgid "Column properties"
 msgstr "Spalteneigenschaften"
 
@@ -2357,7 +2356,7 @@ msgstr "Befehl:"
 msgid "Comment"
 msgstr "Kommentar"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:593
+#: ../../locales/../src/interface/verifycertdialog.cpp:638
 msgid "Common name:"
 msgstr "Allgemeiner Name:"
 
@@ -2366,12 +2365,12 @@ msgstr "Allgemeiner Name:"
 msgid "Communication tainted by router or firewall"
 msgstr "Kommunikation vom Router oder der Firewall beeinträchtigt"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2415
+#: ../../locales/../src/interface/Mainfrm.cpp:2412
 #: ../../locales/../src/interface/menu_bar.cpp:92
 msgid "Compare &modification time"
 msgstr "Vergleiche Ä&nderungszeitpunkt"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2414
+#: ../../locales/../src/interface/Mainfrm.cpp:2411
 #: ../../locales/../src/interface/menu_bar.cpp:91
 msgid "Compare file&size"
 msgstr "Vergleiche Datei&größe"
@@ -2641,7 +2640,7 @@ msgstr "Konnte Verbindung nicht akzeptieren: %s"
 msgid "Could not access path %s"
 msgstr "Konnte nicht auf Pfad %s zugreifen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1252
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1243
 msgid "Could not add certificate to temporary trust list"
 msgstr "Konnte Zertifikat nicht zu temporärer Vertrauensliste hinzufügen"
 
@@ -2681,7 +2680,7 @@ msgstr "Konnte privaten Schlüssel nicht konvertieren"
 msgid "Could not copy URLs"
 msgstr "Konnte URLs nicht kopieren"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1244
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1235
 msgid "Could not copy certificate"
 msgstr "Konnte Zertifikat nicht kopieren"
 
@@ -2749,7 +2748,7 @@ msgstr "Es konnte keine benutzerdefinierte Anmeldesequenz erstellt werden."
 msgid "Could not generate key"
 msgstr "Konnte Schlüssel nicht erzeugen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:931
+#: ../../locales/../src/engine/tlssocket_impl.cpp:922
 msgid ""
 "Could not get distinguished name of certificate issuer, "
 "gnutls_x509_get_issuer_dn failed"
@@ -2757,7 +2756,7 @@ msgstr ""
 "Konnte 'Distinguished Name' des Zertifikatsausstellers nicht ermitteln; "
 "gnutls_x509_get_issuer_dn fehlgeschlagen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:907
+#: ../../locales/../src/engine/tlssocket_impl.cpp:908
 msgid ""
 "Could not get distinguished name of certificate subject, gnutls_x509_get_dn "
 "failed"
@@ -2934,7 +2933,7 @@ msgstr "Konnte Befehl nicht an fzputtygen senden."
 msgid "Could not send command to fzstorj."
 msgstr "Konnte Befehl nicht an fzstorj senden."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1119
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1110
 msgid "Could not sort peer certificates"
 msgstr "Konnte Peer-Zertifikate nicht sortieren"
 
@@ -3016,7 +3015,7 @@ msgstr "Konnte nicht in Logdatei schreiben: %s"
 msgid "Could not write to socket: %s"
 msgstr "Konnte nicht in Socket schreiben: %s"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:598
+#: ../../locales/../src/interface/verifycertdialog.cpp:643
 msgid "Country:"
 msgstr "Staat:"
 
@@ -3183,7 +3182,7 @@ msgstr "D&oppelklick-Aktion für Verzeichnisse:"
 msgid "D&uplicate"
 msgstr "&Kopieren"
 
-#: ../../locales/../src/engine/server.cpp:61
+#: ../../locales/../src/engine/server.cpp:62
 msgid "DOS-like with virtual paths"
 msgstr "DOS-ähnlich mit virtuellen Pfaden"
 
@@ -3228,7 +3227,7 @@ msgstr "Debug-Einstellungen"
 msgid "Default &local directory:"
 msgstr "Lokales Standard-Verzeic&hnis:"
 
-#: ../../locales/../src/engine/server.cpp:53
+#: ../../locales/../src/engine/server.cpp:54
 msgid "Default (Autodetect)"
 msgstr "Standard (Automatische Erkennung)"
 
@@ -3364,8 +3363,8 @@ msgstr "Verzeichniszugriffsberechtigungen"
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1628
 #: ../../locales/../src/interface/resources/xrc/sitemanager.xrc:534
 #: ../../locales/../src/interface/filelistctrl.cpp:477
-#: ../../locales/../src/interface/Mainfrm.cpp:2362
-#: ../../locales/../src/interface/Mainfrm.cpp:2382
+#: ../../locales/../src/interface/Mainfrm.cpp:2359
+#: ../../locales/../src/interface/Mainfrm.cpp:2379
 #: ../../locales/../src/interface/toolbar.cpp:51
 #: ../../locales/../src/interface/view.cpp:109
 msgid "Directory comparison"
@@ -3417,7 +3416,7 @@ msgstr ""
 "Synchronisierten Verzeichniswechsel deaktivieren und das Serververzeichnis "
 "wechseln?"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:723
+#: ../../locales/../src/interface/Mainfrm.cpp:721
 msgid ""
 "Disable this option again if you will not be able to see the correct "
 "directory contents anymore."
@@ -3466,8 +3465,8 @@ msgstr "&Keinen Standardeditor verwenden"
 msgid "Do the same with &all selected files already being edited"
 msgstr "Für alle ausgewählten &momentan bearbeiteten Dateien anwenden"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1255
-#: ../../locales/../src/interface/Mainfrm.cpp:1278
+#: ../../locales/../src/interface/Mainfrm.cpp:1253
+#: ../../locales/../src/interface/Mainfrm.cpp:1276
 msgid "Do you really want to close FileZilla?"
 msgstr "Wollen Sie FileZilla wirklich beenden?"
 
@@ -3490,7 +3489,7 @@ msgstr "Wollen Sie wirklich den gewählten Eintrag löschen?"
 msgid "Do you really want to delete the transfer queue?"
 msgstr "Wollen Sie wirklich die Übertragungs-Warteschlange löschen?"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:646
+#: ../../locales/../src/interface/Mainfrm.cpp:644
 #, c-format
 msgid "Do you really want to send '%s' to the server?"
 msgstr "Wollen Sie wirklich '%s' zum Server senden?"
@@ -3549,7 +3548,7 @@ msgstr "Ausgewähltes Verzeichnis herunterladen"
 msgid "Download selected files and directories"
 msgstr "Ausgewählte Dateien und Verzeichnisse herunterladen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1068
+#: ../../locales/../src/interface/Mainfrm.cpp:1066
 #, c-format
 msgid ""
 "Download speed: %s/s\n"
@@ -3623,7 +3622,7 @@ msgstr "&Export..."
 msgid "E-&mail account:"
 msgstr "E&mail-Konto:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:604
+#: ../../locales/../src/interface/verifycertdialog.cpp:648
 msgid "E-Mail:"
 msgstr "E-Mail:"
 
@@ -3740,7 +3739,7 @@ msgstr "Geben Sie 0 für unbegrenzte Geschwindigkeit ein."
 msgid "Enter command"
 msgstr "Befehl eingeben"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:628
+#: ../../locales/../src/interface/Mainfrm.cpp:626
 msgid "Enter custom command"
 msgstr "Benutzerdefinierten Befehl eingeben"
 
@@ -4059,7 +4058,7 @@ msgstr ""
 "Server-IP-Adresse für die Datenverbindung konnte nicht ermittelt werden, "
 "Verbindung getrennt."
 
-#: ../../locales/../src/interface/context_control.cpp:109
+#: ../../locales/../src/interface/context_control.cpp:114
 msgid "Failed to initialize FTP engine"
 msgstr "FTP-Engine konnte nicht initialisiert werden."
 
@@ -4175,8 +4174,8 @@ msgstr ""
 msgid "Failed to validate settings"
 msgstr "Überprüfung der Einstellungen fehlgeschlagen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1220
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1266
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1211
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1257
 msgid "Failed to verify peer certificate"
 msgstr "Verifizierung des Zertifikats der Gegenstelle fehlgeschlagen"
 
@@ -4283,7 +4282,7 @@ msgstr "Dateiübertragung erfolgreich"
 msgid "File transfer successful, transferred %s in %s"
 msgstr "Dateiübertragung erfolgreich, %s in %s übertragen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1254
+#: ../../locales/../src/interface/Mainfrm.cpp:1252
 msgid "File transfers still in progress."
 msgstr "Dateiübertragungen dauern noch an."
 
@@ -4312,7 +4311,7 @@ msgstr ""
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla ist schon mit einem Server verbunden."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1570
+#: ../../locales/../src/interface/Mainfrm.cpp:1568
 msgid "FileZilla needs to be restarted for the language change to take effect."
 msgstr ""
 "FileZilla muss neu gestartet werden, damit das Ändern der Sprache wirksam "
@@ -4346,7 +4345,7 @@ msgstr ""
 msgid "Filename invalid"
 msgstr "Dateiname ungültig"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:359
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:358
 msgid "Filename unchanged"
 msgstr "Dateiname nicht geändert"
 
@@ -4504,7 +4503,7 @@ msgstr "&UTF-8 erzwingen"
 msgid "Force showing &hidden files"
 msgstr "A&uflistung versteckter Dateien erzwingen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:718
+#: ../../locales/../src/interface/Mainfrm.cpp:716
 msgid "Force showing hidden files"
 msgstr "Auflistung versteckter Dateien erzwingen"
 
@@ -4568,22 +4567,22 @@ msgstr ""
 msgid "Global bookmarks"
 msgstr "Globale Lesezeichen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:319
+#: ../../locales/../src/engine/tlssocket_impl.cpp:330
 #, c-format
 msgid "GnuTLS error %d"
 msgstr "GnuTLS-Fehler %d"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:322
+#: ../../locales/../src/engine/tlssocket_impl.cpp:333
 #, c-format
 msgid "GnuTLS error %d in %s"
 msgstr "GnuTLS-Fehler %d in %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:314
+#: ../../locales/../src/engine/tlssocket_impl.cpp:325
 #, c-format
 msgid "GnuTLS error %d in %s: %s"
 msgstr "GnuTLS-Fehler %d in %s: %s"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:311
+#: ../../locales/../src/engine/tlssocket_impl.cpp:322
 #, c-format
 msgid "GnuTLS error %d: %s"
 msgstr "GnuTLS-Fehler %d: %s"
@@ -4670,7 +4669,7 @@ msgstr "Host nicht erreichbar"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:420
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1040
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1161
-#: ../../locales/../src/interface/verifycertdialog.cpp:761
+#: ../../locales/../src/interface/verifycertdialog.cpp:737
 msgid "Host:"
 msgstr "Server:"
 
@@ -4836,11 +4835,11 @@ msgstr ""
 "Wenn Sie auf \"Test\" klicken, wird sich FileZilla mit probe.filezilla-"
 "project.org verbinden und einige einfache Tests ausführen."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1277
+#: ../../locales/../src/interface/Mainfrm.cpp:1275
 msgid "If you close FileZilla, your changes will be lost."
 msgstr "Wenn Sie FileZilla schließen, werden Ihre Änderungen verloren gehen."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:756
+#: ../../locales/../src/interface/verifycertdialog.cpp:732
 msgid ""
 "If you continue, your password and files will be sent in clear over the "
 "internet."
@@ -4979,11 +4978,11 @@ msgstr ""
 msgid "Initializing TLS..."
 msgstr "Initialisiere TLS..."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:738
+#: ../../locales/../src/interface/verifycertdialog.cpp:714
 msgid "Insecure FTP connection"
 msgstr "Unsichere FTP-Verbindung"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:454
+#: ../../locales/../src/interface/verifycertdialog.cpp:453
 msgid "Insecure algorithm!"
 msgstr "Unsicherer Algorithmus!"
 
@@ -4991,8 +4990,8 @@ msgstr "Unsicherer Algorithmus!"
 msgid "Insecure server, it does not support FTP over TLS."
 msgstr "Unsicherer Server; er unterstützt kein FTP über TLS."
 
-#: ../../locales/../src/engine/server.cpp:699
-#: ../../locales/../src/engine/server.cpp:723
+#: ../../locales/../src/engine/server.cpp:714
+#: ../../locales/../src/engine/server.cpp:738
 #: ../../locales/../src/interface/manual_transfer.cpp:182
 msgid "Interactive"
 msgstr "Interaktiv"
@@ -5032,9 +5031,8 @@ msgstr ""
 "im Servermanager, um UTF-8 zu erzwingen."
 
 #: ../../locales/../src/engine/socket_errors.cpp:94
-#, fuzzy
 msgid "Invalid characters in hostname"
-msgstr "Ungültige Zeichen in Dateinamen filtern"
+msgstr "Ungültige Zeichen im Hostnamen"
 
 #: ../../locales/../src/engine/http/request.cpp:699
 msgid "Invalid chunk size"
@@ -5047,8 +5045,8 @@ msgstr "Ungültige Datenpaketgröße."
 msgid "Invalid data received"
 msgstr "Ungültige Daten empfangen"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:380
-#: ../../locales/../src/interface/verifycertdialog.cpp:396
+#: ../../locales/../src/interface/verifycertdialog.cpp:379
+#: ../../locales/../src/interface/verifycertdialog.cpp:395
 msgid "Invalid date"
 msgstr "Ungültiges Datum"
 
@@ -5159,15 +5157,15 @@ msgstr "Ungültiger Wert für 'hints'"
 msgid "Invert Filter"
 msgstr "Filter invertieren"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:606
+#: ../../locales/../src/interface/verifycertdialog.cpp:652
 msgid "Jurisdiction country:"
 msgstr "Staat des Gerichtsstands:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:608
+#: ../../locales/../src/interface/verifycertdialog.cpp:654
 msgid "Jurisdiction locality:"
 msgstr "Ort des Gerichtsstands:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:607
+#: ../../locales/../src/interface/verifycertdialog.cpp:653
 msgid "Jurisdiction state or province:"
 msgstr "Land oder Provinz des Gerichtsstands:"
 
@@ -5175,7 +5173,7 @@ msgstr "Land oder Provinz des Gerichtsstands:"
 msgid "Keep directories on top"
 msgstr "Verzeichnisse immer oben"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:722
+#: ../../locales/../src/interface/Mainfrm.cpp:720
 msgid ""
 "Keep in mind that not all servers support this feature and may return "
 "incorrect listings if this option is enabled. Although FileZilla performs "
@@ -5194,8 +5192,8 @@ msgstr "Schlüsselaustausch"
 msgid "Key exchange:"
 msgstr "Schlüsselaustausch:"
 
-#: ../../locales/../src/engine/server.cpp:696
-#: ../../locales/../src/engine/server.cpp:721
+#: ../../locales/../src/engine/server.cpp:711
+#: ../../locales/../src/engine/server.cpp:736
 msgid "Key file"
 msgstr "Schlüsseldatei"
 
@@ -5213,7 +5211,7 @@ msgstr "Niedri&gste"
 msgid "Language"
 msgstr "Sprache"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1570
+#: ../../locales/../src/interface/Mainfrm.cpp:1568
 msgid "Language changed"
 msgstr "Sprache gewechselt"
 
@@ -5337,7 +5335,7 @@ msgid "Local size of '%s' does not match expected size: %d != %d"
 msgstr ""
 "Lokale Größe von '%s' stimmt nicht mit erwarteter Größe überein: %d != %d"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:600
+#: ../../locales/../src/interface/verifycertdialog.cpp:645
 msgid "Locality:"
 msgstr "Ort:"
 
@@ -5495,8 +5493,8 @@ msgstr "Maximale Anzahl gleichzeitiger Über&tragungen:"
 msgid "Memory allocation failure"
 msgstr "Speicherzuweisungsfehlschlag"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:434
-#: ../../locales/../src/interface/Mainfrm.cpp:1895
+#: ../../locales/../src/interface/Mainfrm.cpp:432
+#: ../../locales/../src/interface/Mainfrm.cpp:1893
 msgid "Message log"
 msgstr "Nachrichtenprotokoll"
 
@@ -5559,6 +5557,7 @@ msgstr "Lesezeichenname existiert bereits."
 
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:276
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:412
+#: ../../locales/../src/interface/verifycertdialog.cpp:651
 msgid "Name:"
 msgstr "Name:"
 
@@ -5745,7 +5744,7 @@ msgstr "Kein Benutzername angegeben."
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1683
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1702
 #: ../../locales/../src/interface/sitemanager.cpp:18
-#: ../../locales/../src/interface/verifycertdialog.cpp:403
+#: ../../locales/../src/interface/verifycertdialog.cpp:402
 msgid "None"
 msgstr "Keine"
 
@@ -5758,8 +5757,8 @@ msgid "Nonrecoverable failure in name resolution"
 msgstr "Nicht behebbarer Fehlschlag bei Namensauflösung"
 
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:963
-#: ../../locales/../src/engine/server.cpp:690
-#: ../../locales/../src/engine/server.cpp:717
+#: ../../locales/../src/engine/server.cpp:705
+#: ../../locales/../src/engine/server.cpp:732
 #: ../../locales/../src/interface/manual_transfer.cpp:148
 #: ../../locales/../src/interface/manual_transfer.cpp:176
 #: ../../locales/../src/interface/manual_transfer.cpp:535
@@ -5784,7 +5783,7 @@ msgstr "Nicht verbunden"
 msgid "Not connected to any server"
 msgstr "Derzeit mit keinem Server verbunden"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:616
+#: ../../locales/../src/interface/Mainfrm.cpp:614
 msgid "Not connected to any server."
 msgstr "Derzeit mit keinem Server verbunden."
 
@@ -5796,7 +5795,7 @@ msgstr "Nicht verbunden."
 msgid "Not initialized, need to call WSAStartup"
 msgstr "Nicht initialisiert; WSAStartup muss aufgerufen werden"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:720
+#: ../../locales/../src/interface/Mainfrm.cpp:718
 msgid "Note that this feature is only supported using the FTP protocol."
 msgstr ""
 "Beachten Sie, dass dieses Feature nur bei Verwendung des FTP-Protokolls "
@@ -5989,7 +5988,7 @@ msgstr "Optionen"
 msgid "Orange"
 msgstr "Orange"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:594
+#: ../../locales/../src/interface/verifycertdialog.cpp:639
 msgid "Organization:"
 msgstr "Organisation:"
 
@@ -6001,7 +6000,7 @@ msgstr "Sonstige SFTP-Optionen"
 msgid "Other system error"
 msgstr "Anderer Systemfehler"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:616
+#: ../../locales/../src/interface/verifycertdialog.cpp:667
 msgid "Other:"
 msgstr "Andere:"
 
@@ -6090,7 +6089,7 @@ msgstr "PORT-Befehl wurde vom Router oder der Firewall beeinträchtigt."
 msgid "Pa&ssive (recommended)"
 msgstr "&Passiv (empfohlen)"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2550
+#: ../../locales/../src/interface/Mainfrm.cpp:2547
 msgid "Parameter not a valid URL"
 msgstr "Parameter keine gültige URL"
 
@@ -6148,11 +6147,11 @@ msgid "Path cannot be constructed for directory %s and subdir %s"
 msgstr ""
 "Pfad kann für Verzeichnis %s und Unterverzeichnis %s nicht erstellt werden"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2508
+#: ../../locales/../src/interface/Mainfrm.cpp:2505
 msgid "Path not found:"
 msgstr "Pfad nicht gefunden:"
 
-#: ../../locales/../src/engine/server.cpp:834
+#: ../../locales/../src/engine/server.cpp:850
 msgid "Path of identity service"
 msgstr "Pfad des Identitätsdienstes"
 
@@ -6336,7 +6335,7 @@ msgstr ""
 "Bitte tragen Sie für die Begrenzung der Uploadgeschwindigkeit einen Wert "
 "größer oder gleich 0 %s/s ein."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:628
+#: ../../locales/../src/interface/Mainfrm.cpp:626
 msgid ""
 "Please enter raw FTP command.\n"
 "Using raw ftp commands will clear the directory cache."
@@ -6453,7 +6452,7 @@ msgstr ""
 "Software benutzt wird. Sollte dies einen Fehlalarm auslösen, können Sie "
 "diesen ohne weiteres ignorieren."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:761
+#: ../../locales/../src/interface/Mainfrm.cpp:759
 msgid ""
 "Please note that preserving timestamps on uploads on FTP, FTPS and FTPES "
 "servers only works if they support the MFMT command."
@@ -6543,12 +6542,11 @@ msgstr ""
 "sogenannten 'DMZ mode' oder 'Game mode'. Dinge wie Protokollprüfungen oder "
 "protokollspezifische 'Korrekturen' müssen deaktiviert sein."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:763
+#: ../../locales/../src/interface/verifycertdialog.cpp:739
 msgid "Port:"
 msgstr "Port:"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:601
-#: ../../locales/../src/interface/verifycertdialog.cpp:602
+#: ../../locales/../src/interface/verifycertdialog.cpp:646
 msgid "Postal code:"
 msgstr "Postleitzahl:"
 
@@ -6565,7 +6563,7 @@ msgstr "Speicherplatzvorbelegung"
 msgid "Predefined Sites"
 msgstr "Vordefinierte Server"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:760
+#: ../../locales/../src/interface/Mainfrm.cpp:758
 msgid "Preserving file timestamps"
 msgstr "Änderungszeitpunkt der Dateien beibehalten"
 
@@ -6767,7 +6765,7 @@ msgid "R&eset and requeue selected files"
 msgstr ""
 "A&usgewählte Dateien zurücksetzen und wieder zur Warteschlange hinzufügen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:643
+#: ../../locales/../src/interface/Mainfrm.cpp:641
 msgid "Raw FTP command"
 msgstr "Raw-FTP-Befehl"
 
@@ -6804,7 +6802,7 @@ msgstr "Schreibgeschützt"
 msgid "Reading from local file failed"
 msgstr "Lesen aus lokaler Datei fehlgeschlagen"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1136
+#: ../../locales/../src/interface/Mainfrm.cpp:1134
 msgid "Really cancel current operation?"
 msgstr "Aktuelle Operation wirklich abbrechen?"
 
@@ -6855,7 +6853,7 @@ msgstr "Jetzt neu starten"
 msgid "Rec&urse into subdirectories"
 msgstr "&Unterverzeichnisse einbeziehen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:333
+#: ../../locales/../src/engine/tlssocket_impl.cpp:344
 #, c-format
 msgid "Received TLS alert from the server: %s (%d)"
 msgstr "TLS-Warnung vom Server erhalten: %s (%d)"
@@ -6869,7 +6867,7 @@ msgstr "Verzeichnisinhalt empfangen, der EBCDIC-codiert zu sein scheint."
 msgid "Received a line exceeding 10000 characters, aborting."
 msgstr "Zeile mit einer Länge größer als 10000 Zeichen empfangen; breche ab."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1164
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1155
 #, c-format
 msgid ""
 "Received certificate chain could not be verified. Verification status is %d."
@@ -6887,7 +6885,7 @@ msgstr "Empfangene Daten fehlerhaft"
 msgid "Received invalid character in version information"
 msgstr "Ungültiges Zeichen in Versionsinformationen empfangen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:336
+#: ../../locales/../src/engine/tlssocket_impl.cpp:347
 #, c-format
 msgid "Received unknown TLS alert %d from the server"
 msgstr "Unbekannte TLS-Warnung %d vom Server erhalten"
@@ -6951,7 +6949,7 @@ msgstr "Passwörter speichern?"
 msgid "Remote"
 msgstr "Server"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:833
+#: ../../locales/../src/engine/tlssocket_impl.cpp:844
 msgid "Remote certificate not trusted."
 msgstr "Zertifikat des Servers nicht vertrauenswürdig."
 
@@ -7031,7 +7029,7 @@ msgstr "Auswahl &entfernen"
 #: ../../locales/../src/interface/resources/xrc/dialogs.xrc:1644
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1193
 #: ../../locales/../src/interface/resources/xrc/settings.xrc:1214
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:349
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:348
 msgid "Rename file"
 msgstr "Datei umbenennen"
 
@@ -7483,7 +7481,7 @@ msgid "Sending keep-alive command"
 msgstr "Sende Verbindungserhaltungs-Befehl"
 
 #: ../../locales/../src/interface/resources/xrc/certificate.xrc:65
-#: ../../locales/../src/interface/verifycertdialog.cpp:605
+#: ../../locales/../src/interface/verifycertdialog.cpp:649
 msgid "Serial number:"
 msgstr "Seriennummer:"
 
@@ -7491,7 +7489,7 @@ msgstr "Seriennummer:"
 msgid "Server &Type:"
 msgstr "Server&typ:"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:733
+#: ../../locales/../src/engine/tlssocket_impl.cpp:744
 msgid "Server did not properly shut down TLS connection"
 msgstr "Server hat die TLS-Verbindung nicht ordnungsgemäß geschlossen"
 
@@ -7614,7 +7612,7 @@ msgstr "Server sendete zu viele Daten."
 msgid "Server sent unexpected reply."
 msgstr "Server sendete unerwartete Antwort."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1110
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1101
 msgid ""
 "Server sent unsorted certificate chain in violation of the TLS specifications"
 msgstr ""
@@ -7676,7 +7674,7 @@ msgstr "&Unverarbeiteten Verzeichnisinhalt anzeigen"
 msgid "Show &welcome dialog..."
 msgstr "&Begrüßungsdialog anzeigen..."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2385
+#: ../../locales/../src/interface/Mainfrm.cpp:2382
 msgid "Show both directory trees and continue comparing?"
 msgstr "Beide Verzeichnisbäume anzeigen und Vergleich fortsetzen?"
 
@@ -7846,7 +7844,7 @@ msgstr "Socket nicht verbunden"
 msgid "Socket type not supported for address family"
 msgstr "Sockettyp für Adressfamilie nicht unterstützt"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:1276
+#: ../../locales/../src/interface/Mainfrm.cpp:1274
 msgid "Some files are still being edited or need to be uploaded."
 msgstr ""
 "Einige Dateien werden immer noch bearbeitet oder müssen hochgeladen werden."
@@ -7958,7 +7956,7 @@ msgstr "Starte Upload von %s"
 msgid "Starts the local site in the given path"
 msgstr "Legt den Startpfad für die lokale Ansicht fest"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:599
+#: ../../locales/../src/interface/verifycertdialog.cpp:644
 msgid "State or province:"
 msgstr "Land oder Provinz:"
 
@@ -7994,7 +7992,7 @@ msgstr "Storj - Dezentralisierter Cloudspeicher"
 msgid "Storj support"
 msgstr "Storj-Unterstützung"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:603
+#: ../../locales/../src/interface/verifycertdialog.cpp:647
 msgid "Street:"
 msgstr "Straße:"
 
@@ -8057,8 +8055,8 @@ msgstr "Syntaxfehler"
 #: ../../locales/../src/interface/cmdline.cpp:93
 #: ../../locales/../src/interface/cmdline.cpp:100
 #: ../../locales/../src/interface/cmdline.cpp:105
-#: ../../locales/../src/interface/Mainfrm.cpp:2510
-#: ../../locales/../src/interface/Mainfrm.cpp:2552
+#: ../../locales/../src/interface/Mainfrm.cpp:2507
+#: ../../locales/../src/interface/Mainfrm.cpp:2549
 msgid "Syntax error in command line"
 msgstr "Syntaxfehler in der Befehlszeile"
 
@@ -8113,6 +8111,10 @@ msgstr "Zieldateiname existiert bereits!"
 #: ../../locales/../src/interface/RemoteListView.cpp:1742
 msgid "Target filename already exists, really continue?"
 msgstr "Zieldateiname existiert bereits - trotzdem fortfahren?"
+
+#: ../../locales/../src/interface/verifycertdialog.cpp:650
+msgid "Telephone number:"
+msgstr "Telefonnummer:"
 
 #: ../../locales/../src/engine/socket_errors.cpp:70
 msgid "Temporary failure in name resolution"
@@ -8181,7 +8183,7 @@ msgstr "Das Lesezeichen konnte nicht hinzugefügt werden."
 msgid "The bookmarks could not be cleared."
 msgstr "Die Lesezeichen konnten nicht gelöscht werden."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1159
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1150
 msgid ""
 "The certificate requires the server to include an OCSP status in its "
 "response, but the OCSP status is missing."
@@ -8246,8 +8248,8 @@ msgstr "Die eingegebenen Passwörter unterscheiden sich."
 msgid "The extension '%s' does already exist in the list"
 msgstr "Die Dateiendung '%s' ist bereits in der Liste vorhanden"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:338
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:346
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:337
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:345
 #, c-format
 msgid ""
 "The file %s already exists.\n"
@@ -8338,11 +8340,11 @@ msgstr ""
 msgid "The file selected as default editor does not exist."
 msgstr "Die als Standardeditor gewählte Datei existiert nicht."
 
-#: ../../locales/../src/interface/listctrlex.cpp:770
+#: ../../locales/../src/interface/listctrlex.cpp:762
 msgid "The filename column can neither be hidden nor moved."
 msgstr "Die Spalte 'Dateiname' kann weder versteckt noch verschoben werden."
 
-#: ../../locales/../src/interface/listctrlex.cpp:820
+#: ../../locales/../src/interface/listctrlex.cpp:812
 msgid "The filename column cannot be hidden."
 msgstr "Die Spalte 'Dateiname' kann nicht versteckt werden."
 
@@ -8517,7 +8519,7 @@ msgstr ""
 "Der Server-Schlüssel ist unbekannt. Daher kann nicht garantiert werden, dass "
 "der Server wirklich derjenige ist, mit dem Sie sich verbinden wollen."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1154
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1145
 msgid "The server's hostname does not match the certificate's hostname"
 msgstr ""
 "Der Hostname des Servers stimmt nicht mit dem Hostnamen des Zertifikats "
@@ -8586,7 +8588,7 @@ msgstr "Dieser Filtersatz kann nicht entfernt werden."
 msgid "This filter set cannot be renamed."
 msgstr "Dieser Filtersatz kann nicht umbenannt werden."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:751
+#: ../../locales/../src/interface/verifycertdialog.cpp:727
 msgid ""
 "This may be the result of a downgrade attack, only continue after you have "
 "spoken to the server administrator or server hosting provider."
@@ -8611,7 +8613,7 @@ msgstr ""
 "Dies funktioniert nur, wenn Sie nicht hinter einem Router sind, ansonsten "
 "würde Ihr System nur die interne Adresse zurückliefern."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:754
+#: ../../locales/../src/interface/verifycertdialog.cpp:730
 msgid "This server does not support FTP over TLS."
 msgstr "Dieser Server unterstützt kein FTP über TLS."
 
@@ -8640,23 +8642,23 @@ msgstr "&Zeitüberschreitung nach"
 msgid "Timeout"
 msgstr "Zeitüberschreitung"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:597
+#: ../../locales/../src/interface/verifycertdialog.cpp:642
 msgid "Title:"
 msgstr "Titel:"
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2363
+#: ../../locales/../src/interface/Mainfrm.cpp:2360
 msgid "To compare directories quick search must be closed."
 msgstr ""
 "Um Verzeichnisse vergleichen zu können, ist es notwendig, die Schnellsuche "
 "zu schließen."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2383
+#: ../../locales/../src/interface/Mainfrm.cpp:2380
 msgid "To compare directories, both file lists have to be aligned."
 msgstr ""
 "Um Verzeichnisse vergleichen zu können, ist es notwendig, dass die "
 "Dateilisten entsprechend angeordnet sind."
 
-#: ../../locales/../src/interface/Mainfrm.cpp:2384
+#: ../../locales/../src/interface/Mainfrm.cpp:2381
 msgid "To do this, the directory trees need to be both shown or both hidden."
 msgstr ""
 "Zu diesem Zweck müssen beide Verzeichnisbäume angezeigt oder versteckt sein."
@@ -8850,7 +8852,7 @@ msgstr "&BENUTZER@SERVER"
 msgid "Unassigned error code %d"
 msgstr "Nicht zugewiesener Fehlercode %d"
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:596
+#: ../../locales/../src/interface/verifycertdialog.cpp:641
 msgid "Unit:"
 msgstr "Element:"
 
@@ -8932,7 +8934,7 @@ msgstr ""
 "Solange dieses Problem nicht gelöst ist, funktioniert der Aktive Modus "
 "nicht. Stattdessen muss der Passive Modus verwendet werden."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1177
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1168
 msgid "Unsupported certificate type"
 msgstr "Nicht unterstützter Zertifikatstyp"
 
@@ -9111,7 +9113,7 @@ msgstr "Gültig bis:"
 msgid "Verbose log messages from wxWidgets"
 msgstr "Ausführliche wxWidgets-Logmeldungen"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1310
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1301
 msgid "Verifying certificate..."
 msgstr "Überprüfe Zertifikat..."
 
@@ -9152,7 +9154,7 @@ msgstr "Warte auf Abbruch der Übertragung"
 msgid "Waiting to retry..."
 msgstr "Nächsten Versuch abwarten..."
 
-#: ../../locales/../src/interface/verifycertdialog.cpp:750
+#: ../../locales/../src/interface/verifycertdialog.cpp:726
 msgid ""
 "Warning! You have previously connected to this server using FTP over TLS, "
 "yet the server has now rejected FTP over TLS."
@@ -9319,7 +9321,7 @@ msgstr ""
 msgid "You cannot upload files into the root directory."
 msgstr "Sie können in das Wurzelverzeichnis keine Dateien hochladen."
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:359
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:358
 msgid "You did not enter a new name for the file. Overwrite the file instead?"
 msgstr ""
 "Sie haben keinen neuen Namen für die Datei angegeben. Die Datei stattdessen "
@@ -9577,11 +9579,11 @@ msgstr ""
 "Bitte stellen Sie sicher, dass sich diese ausführbare Datei im gleichen "
 "Verzeichnis wie das FileZilla-Hauptprogramm befindet."
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1073
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1064
 msgid "gnutls_certificate_get_peers returned no certificates"
 msgstr "gnutls_certificate_get_peers gab keine Zertifikate zurück"
 
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1085
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1076
 msgid "gnutls_pem_base64_encode2 failed"
 msgstr "gnutls_pem_base64_encode2 fehlgeschlagen"
 
@@ -9625,7 +9627,7 @@ msgstr "kleiner als"
 msgid "matches regex"
 msgstr "entspricht regulärem Ausdruck"
 
-#: ../../locales/../src/interface/asyncrequestqueue.cpp:341
+#: ../../locales/../src/interface/asyncrequestqueue.cpp:340
 msgid "new name"
 msgstr "Neuer Name"
 
@@ -9642,10 +9644,10 @@ msgid "owner writeable"
 msgstr "'Besitzer: beschreibbar'"
 
 #: ../../locales/../src/engine/proxy.cpp:52
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1368
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1384
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1400
-#: ../../locales/../src/engine/tlssocket_impl.cpp:1416
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1359
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1375
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1391
+#: ../../locales/../src/engine/tlssocket_impl.cpp:1407
 #: ../../locales/../src/interface/sftp_crypt_info_dlg.cpp:43
 msgid "unknown"
 msgstr "unbekannt"
