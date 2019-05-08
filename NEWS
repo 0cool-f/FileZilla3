@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     OS X: Apple Mac OS X
 
+3.42.1 (2019-06-08)
+
+- OS X: Fix a compatibility issue with macOS 10.13
+
 3.42.0 (2019-05-02)
 
 - Fixed a potential crash if the first-launch welcome dialog is shown at an inopportune moment
