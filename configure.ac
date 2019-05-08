@@ -633,7 +633,6 @@ if test "$buildmain" = "yes"; then
 
   # Must be done after setting linker flags
   CHECK_CLOCK_GETTIME
-  AC_CHECK_DECLS([pthread_condattr_setclock], [], [], [[#include <pthread.h>]])
 
   # SQLite3
   # -------
