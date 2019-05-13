@@ -3007,21 +3007,23 @@ void CQueueView::OnSize(wxSizeEvent& event)
 void CQueueView::RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString& newName, bool local)
 {
 	t_EngineData* const pEngineData = GetEngineData(pEngine);
-	if (!pEngineData || !pEngineData->pItem)
+	if (!pEngineData || !pEngineData->pItem) {
 		return;
+	}
 
-	if (pEngineData->pItem->GetType() != QueueItemType::File)
+	if (pEngineData->pItem->GetType() != QueueItemType::File) {
 		return;
+	}
 
 	CFileItem* pFile = (CFileItem*)pEngineData->pItem;
-	if (local)
-	{
+	if (local) {
 		wxFileName fn(pFile->GetLocalPath().GetPath(), pFile->GetLocalFile());
 		fn.SetFullName(newName);
-		pFile->SetTargetFile(fn.GetFullName());
+		pFile->SetTargetFile(fn.GetFullName().ToStdWstring());
 	}
-	else
-		pFile->SetTargetFile(newName);
+	else {
+		pFile->SetTargetFile(newName.ToStdWstring());
+	}
 
 	RefreshItem(pFile);
 }

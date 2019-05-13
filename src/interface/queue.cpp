@@ -327,10 +327,10 @@ bool CFileItem::TryRemoveAll()
 	return false;
 }
 
-void CFileItem::SetTargetFile(wxString const& file)
+void CFileItem::SetTargetFile(std::wstring const& file)
 {
 	if (!file.empty() && file != m_sourceFile) {
-		m_targetFile = fz::sparse_optional<std::wstring>(fz::to_wstring(file));
+		m_targetFile = fz::sparse_optional<std::wstring>(file);
 	}
 	else {
 		m_targetFile.clear();

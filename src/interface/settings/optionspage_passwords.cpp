@@ -63,7 +63,7 @@ bool COptionsPagePasswords::SavePage()
 		return true;
 	}
 
-	wxString const newPw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
+	std::wstring const newPw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue).ToStdWstring();
 
 	bool const save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
 	bool const useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
@@ -81,7 +81,7 @@ bool COptionsPagePasswords::SavePage()
 		// Keeping existing master password
 		return true;
 	}
-	
+
 	// Something is being changed
 
 	CLoginManager loginManager;

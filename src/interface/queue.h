@@ -201,7 +201,7 @@ public:
 	// Returns true if item can be removed itself
 	virtual bool TryRemoveAll() override final;
 
-	void SetTargetFile(wxString const& file);
+	void SetTargetFile(std::wstring const& file);
 
 	enum class Status : unsigned char {
 		none,

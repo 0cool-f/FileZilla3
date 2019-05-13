@@ -35,8 +35,8 @@ void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 {
 	bool useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
 	if (useMaster) {
-		wxString pw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
-		wxString repeat = xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxTextCtrl::GetValue);
+		std::wstring pw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue).ToStdWstring();
+		std::wstring repeat = xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxTextCtrl::GetValue).ToStdWstring();
 		if (pw != repeat) {
 			wxMessageBoxEx(_("The entered passwords are not the same."), _("Invalid input"));
 			return;

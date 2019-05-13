@@ -104,7 +104,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 			return false;
 		}
 
-		auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue));
+		auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue).ToStdWstring());
 		auto key = fz::private_key::from_password(pass, site.credentials.encrypted_.salt_);
 
 		if (key.pubkey() != site.credentials.encrypted_) {
@@ -304,7 +304,7 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 
 		bool const forgot = xrc_call(pwdDlg, "ID_FORGOT", &wxCheckBox::GetValue);
 		if (!forgot) {
-			auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue));
+			auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue).ToStdWstring());
 			auto key = fz::private_key::from_password(pass, pub.salt_);
 
 			if (key.pubkey() != pub) {
