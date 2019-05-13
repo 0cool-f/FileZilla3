@@ -433,7 +433,7 @@ bool CThemeProvider::GetThemeData(std::wstring const& theme, std::wstring & name
 	return true;
 }
 
-wxIconBundle CThemeProvider::GetIconBundle(const wxArtID& id, const wxArtClient&)
+wxIconBundle CThemeProvider::GetIconBundle(const wxArtID& id, const wxArtClient& client)
 {
 	wxIconBundle iconBundle;
 
@@ -441,19 +441,14 @@ wxIconBundle CThemeProvider::GetIconBundle(const wxArtID& id, const wxArtClient&
 		return iconBundle;
 	}
 
-	wxString name = fz::str_tolower_ascii(id.Mid(4));
-
-	const wxChar* dirs[] = { _T("16x16/"), _T("32x32/"), _T("48x48/") };
-
-	CLocalPath const resourcePath = wxGetApp().GetResourceDir();
-
-	for (auto const& dir : dirs) {
-		wxString file = resourcePath.GetPath() + dir + name + _T(".png");
-		if (!wxFileName::FileExists(file)) {
-			continue;
+	wxSize const sizes[] = { {16,16}, {32,32}, {48,48}, {256,256} };
+	for (auto const& size : sizes) {
+		auto bmp = CThemeProvider::Get()->CreateBitmap(id, client, size);
+		if (bmp.IsOk()) {
+			wxIcon icon;
+			icon.CopyFromBitmap(bmp);
+			iconBundle.AddIcon(icon);
 		}
-
-		iconBundle.AddIcon(wxIcon(file, wxBITMAP_TYPE_PNG));
 	}
 
 	return iconBundle;
