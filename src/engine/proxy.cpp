@@ -271,7 +271,7 @@ void CProxySocket::OnReceive()
 				buf = receiveBuffer_.get();
 				size_t i = 0;
 				for (i = 0; i + 4 <= receiveBuffer_.size(); ++i) {
-					if (buf[i] == '\r' && buf[i + 1] == '\n' && buf[i + 2] == 'r' && buf[i + 3] == '\n') {
+					if (buf[i] == '\r' && buf[i + 1] == '\n' && buf[i + 2] == '\r' && buf[i + 3] == '\n') {
 						break;
 					}
 				}
