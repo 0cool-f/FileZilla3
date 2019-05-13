@@ -71,7 +71,9 @@ void CStatusLineCtrl::InitFieldOffsets()
 CStatusLineCtrl::~CStatusLineCtrl()
 {
 	if (!status_.empty() && status_.totalSize >= 0) {
-		m_pEngineData->pItem->SetSize(status_.totalSize);
+		if (m_pEngineData && m_pEngineData->pItem) {
+			m_pEngineData->pItem->SetSize(status_.totalSize);
+		}
 	}
 
 	if (m_transferStatusTimer.IsRunning()) {
@@ -247,11 +249,14 @@ void CStatusLineCtrl::OnPaint(wxPaintEvent&)
 void CStatusLineCtrl::ClearTransferStatus()
 {
 	if (!status_.empty() && status_.totalSize >= 0) {
-		m_pParent->UpdateItemSize(m_pEngineData->pItem, status_.totalSize);
+		if (m_pEngineData && m_pEngineData->pItem) {
+			m_pParent->UpdateItemSize(m_pEngineData->pItem, status_.totalSize);
+		}
 	}
 	status_.clear();
 
-	switch (m_pEngineData->state)
+	auto const state = m_pEngineData ? m_pEngineData->state : t_EngineData::none;
+	switch (state)
 	{
 	case t_EngineData::disconnect:
 		m_statusText = _("Disconnecting from previous server");
@@ -457,6 +462,5 @@ bool CStatusLineCtrl::Show(bool show)
 
 void CStatusLineCtrl::SetEngineData(const t_EngineData* const pEngineData)
 {
-	wxASSERT(pEngineData);
 	m_pEngineData = pEngineData;
 }
