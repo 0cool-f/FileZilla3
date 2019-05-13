@@ -61,8 +61,8 @@ else
   AC_MSG_ERROR([Compiler does not seem to target MinGW.])
 fi
 
-# Check for C++14 support
-CXX_COMPILE_STDCXX_14([],[mandatory])
+# Check for C++17 support
+AX_CXX_COMPILE_STDCXX_17([noext],[mandatory])
 CHECK_LIBCXX
 AC_CACHE_SAVE
 
