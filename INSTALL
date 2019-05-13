@@ -15,7 +15,7 @@ FileZilla depends on the following libraries:
 - sqlite3 3.7 or greater
 
 To compile FileZilla 3, the following tools need to be installed:
-- A C++14 compiler, e.g. a recent GCC or Clang
+- A C++17 compiler, e.g. a recent GCC or Clang
 - GNU make
 - GNU gettext
 

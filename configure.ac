@@ -56,8 +56,8 @@ if ! test "$localesonly" = "yes"; then
     AX_APPEND_FLAG([-Wl,-no_weak_imports], LFDLAGS)
   ])
 
-  # Check for C++14 support
-  CXX_COMPILE_STDCXX_14([noext],[mandatory])
+  # Check for C++17 support
+  AX_CXX_COMPILE_STDCXX_17([noext],[mandatory])
   CHECK_LIBCXX
 
   # libstdc++ as shipped with GCC 4.7 lacks std::map::emplace
