@@ -397,6 +397,8 @@ CLocalPath CFileZillaApp::GetDataDir(std::vector<std::wstring> const& fileToFind
 	};
 
 #ifdef __WXMAC__
+	(void)prefixSub;
+
 	if (searchSelfDir && testPath(wxStandardPaths::Get().GetDataDir().ToStdWstring())) {
 		return ret;
 	}
@@ -620,6 +622,8 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 
 	std::wstring program = tool;
 #ifdef __WXMAC__
+	(void)buildRelPath;
+
 	// On Mac we only look inside the bundle
 	std::wstring path = GetOwnExecutableDir();
 	if (!path.empty()) {

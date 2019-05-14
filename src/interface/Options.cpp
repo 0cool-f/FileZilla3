@@ -305,7 +305,7 @@ std::unique_ptr<pugi::xml_document> COptions::GetOptionXml(unsigned int nID)
 	auto value = std::make_unique<pugi::xml_document>();
 	value->append_copy(m_optionsCache[nID].xmlValue->first_child());
 
-	return std::move(value);
+	return value;
 }
 
 bool COptions::SetOption(unsigned int nID, int value)
