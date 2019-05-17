@@ -240,7 +240,7 @@ std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int 
 		algo = algo.substr(0, algo.size() - 5);
 	}
 
-	std::vector<uint8_t> (*h)(std::string const&) = 0;
+	std::vector<uint8_t> (*h)(std::string_view const&) = 0;
 	if (algo == "MD5") {
 		h = &fz::md5;
 	}
