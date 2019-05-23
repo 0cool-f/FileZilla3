@@ -16,8 +16,6 @@
 
 static_assert(GNUTLS_VERSION_NUMBER != 0x030604, "Using TLS 1.3 with this version of GnuTLS does not work, update your version of GnuTLS");
 
-#include <string_view>
-
 #if FZ_USE_GNUTLS_SYSTEM_CIPHERS
 char const ciphers[] = "@SYSTEM";
 #else
@@ -1288,9 +1286,6 @@ int CTlsSocketImpl::VerifyCertificate()
 	}
 
 	if (!required_certificate_.empty()) {
-		auto v = std::string_view((char const*)cert_der.data, cert_der.size);
-		auto first = fz::hex_encode<std::string>(required_certificate_);
-		auto second = fz::hex_encode<std::string>(v);
 		if (required_certificate_.size() != cert_der.size ||
 			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
 		{
