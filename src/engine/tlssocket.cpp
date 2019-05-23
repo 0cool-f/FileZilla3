@@ -17,9 +17,9 @@ CTlsSocket::~CTlsSocket()
 	remove_handler();
 }
 
-bool CTlsSocket::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate)
+bool CTlsSocket::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, fz::native_string const& session_hostname)
 {
-	return impl_->client_handshake(session_to_resume, required_certificate);
+	return impl_->client_handshake(session_to_resume, required_certificate, session_hostname);
 }
 
 int CTlsSocket::read(void *buffer, unsigned int size, int& error)

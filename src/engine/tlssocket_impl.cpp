@@ -16,7 +16,7 @@
 
 static_assert(GNUTLS_VERSION_NUMBER != 0x030604, "Using TLS 1.3 with this version of GnuTLS does not work, update your version of GnuTLS");
 
-
+#include <string_view>
 
 #if FZ_USE_GNUTLS_SYSTEM_CIPHERS
 char const ciphers[] = "@SYSTEM";
@@ -549,7 +549,7 @@ bool CTlsSocketImpl::ResumedSession() const
 	return gnutls_session_is_resumed(m_session) != 0;
 }
 
-bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate)
+bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, fz::native_string const& session_hostname)
 {
 	m_pOwner->LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::client_handshake()");
 
@@ -584,11 +584,17 @@ bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_res
 		gnutls_handshake_set_hook_function(m_session, GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_BOTH, &handshake_hook_func);
 	}
 
+	if (!session_hostname.empty()) {
+		set_hostname(session_hostname);
+	}
+
 	if (tlsSocket_.next_layer_.get_state() != fz::socket_state::connected) {
 		return true;
 	}
 
-	set_hostname(tlsSocket_.next_layer_.peer_host());
+	if (hostname_.empty()) {
+		set_hostname(tlsSocket_.next_layer_.peer_host());
+	}
 	return ContinueHandshake() == EAGAIN;
 }
 
@@ -1282,6 +1288,9 @@ int CTlsSocketImpl::VerifyCertificate()
 	}
 
 	if (!required_certificate_.empty()) {
+		auto v = std::string_view((char const*)cert_der.data, cert_der.size);
+		auto first = fz::hex_encode<std::string>(required_certificate_);
+		auto second = fz::hex_encode<std::string>(v);
 		if (required_certificate_.size() != cert_der.size ||
 			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
 		{
@@ -1497,7 +1506,9 @@ void CTlsSocketImpl::set_hostname(fz::native_string const& host)
 
 int CTlsSocketImpl::connect(fz::native_string const& host, unsigned int port, fz::address_type family)
 {
-	set_hostname(host);
+	if (hostname_.empty()) {
+		set_hostname(host);
+	}
 
 	return tlsSocket_.next_layer_.connect(host, port, family);
 }

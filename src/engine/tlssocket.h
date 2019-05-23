@@ -22,7 +22,7 @@ public:
 	 * If a required certificate is passed, either in DER or PEM, the session's certificate
 	 * must match the passed certificate or the handshake will fail.
 	 */
-	bool client_handshake(std::vector<uint8_t> const& session_to_resume = std::vector<uint8_t>(), std::vector<uint8_t> const& required_certificate = std::vector<uint8_t>());
+	bool client_handshake(std::vector<uint8_t> const& session_to_resume = std::vector<uint8_t>(), std::vector<uint8_t> const& required_certificate = std::vector<uint8_t>(), fz::native_string const& session_hostname = fz::native_string());
 
 	/// Gets session parameters for resumption
 	std::vector<uint8_t> get_session_parameters() const;

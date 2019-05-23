@@ -19,7 +19,7 @@ public:
 	CTlsSocketImpl(CTlsSocket& tlsSocket, CControlSocket* pOwner);
 	~CTlsSocketImpl();
 
-	bool client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate);
+	bool client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, fz::native_string const& session_hostname);
 
 	int connect(fz::native_string const& host, unsigned int port, fz::address_type family);
 
