@@ -427,7 +427,9 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 				return false;
 			}
 			std::wstring const& pass = pInteractiveLoginNotification->credentials.GetPass();
-			data.credentials_.SetPass(pass);
+			if (pInteractiveLoginNotification->GetType() != CInteractiveLoginNotification::keyfile) {
+				data.credentials_.SetPass(pass);
+			}
 			std::wstring show = L"Pass: ";
 			show.append(pass.size(), '*');
 			SendCommand(pass, show);
