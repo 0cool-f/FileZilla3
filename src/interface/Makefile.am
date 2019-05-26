@@ -9,6 +9,16 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 bin_PROGRAMS = filezilla
 
+filezilla_DEPENDENCIES =
+
+if MACAPPBUNDLE
+noinst_LIBRARIES = libfzmac.a
+libfzmac_a_CPPFLAGS = -I$(srcdir)/../include
+libfzmac_a_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libfzmac_a_SOURCES = file_utils_osx.mm power_management_osx.mm
+filezilla_DEPENDENCIES += libfzmac.a
+endif
+
 # the application source, library search path, and link libraries
 filezilla_SOURCES = aboutdialog.cpp \
 		asksavepassworddialog.cpp \
@@ -268,7 +278,7 @@ if USE_RESOURCEFILE
 RESOURCEFILE = resources/filezilla.o
 endif
 
-filezilla_DEPENDENCIES = ../engine/libengine.a
+filezilla_DEPENDENCIES += ../engine/libengine.a
 
 filezilla_CPPFLAGS = -I$(srcdir)/../include
 filezilla_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
@@ -314,16 +324,12 @@ dist_noinst_DATA = interface.vcxproj
 
 if MACAPPBUNDLE
 noinst_DATA = $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla$(EXEEXT)
+filezilla_LDFLAGS += libfzmac.a
 
 if USE_MAC_SANDBOX
 filezilla_SOURCES += osx_sandbox_userdirs.cpp
 noinst_HEADERS += osx_sandbox_userdirs.h
 endif
-
-filezilla_SOURCES += file_utils_osx.mm power_management_osx.mm
-filezilla_LIBTOOLFLAGS = --tag=CXX
-filezilla_OBJCXXFLAGS = -std=gnu++14
-
 endif
 
 $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla$(EXEEXT): filezilla
@@ -338,7 +344,7 @@ $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla$(EXEEXT): filezilla
 	cp -f $(top_srcdir)/docs/*.man $(top_builddir)/FileZilla.app/Contents/docs
 
 CLEANFILES = filezilla.h.gch
-MAINTAINERCLEANFILES = ./$(DEPDIR)/filezilla.Po
+DISTCLEANFILES = ./$(DEPDIR)/filezilla.Po
 if ENABLE_PRECOMP
 
 BUILT_SOURCES = filezilla.h.gch
@@ -346,8 +352,8 @@ BUILT_SOURCES = filezilla.h.gch
 -include ./$(DEPDIR)/filezilla.Po
 
 filezilla.h.gch: filezilla.h
-	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(filezilla_CPPFLAGS) $(CPPFLAGS) $(filezilla_CXXFLAGS) $(CXXFLAGS) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o "$@" $<; \
-	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(filezilla_CPPFLAGS) $(CPPFLAGS) $(filezilla_CXXFLAGS) $(CXXFLAGS) -MT $@ -MD -MP -MF "$(DEPDIR)/filezilla.Tpo" -c -o "$@" $<; \
+	then mv -f "$(DEPDIR)/filezilla.Tpo" "$(DEPDIR)/filezilla.Po"; else rm -f "$(DEPDIR)/filezilla.Tpo"; exit 1; fi
 
 endif
 
