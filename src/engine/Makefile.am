@@ -145,7 +145,7 @@ endif
 dist_noinst_DATA = engine.vcxproj
 
 CLEANFILES = filezilla.h.gch
-MAINTAINERCLEANFILES = ./$(DEPDIR)/filezilla.Po
+DISTCLEANFILES = ./$(DEPDIR)/filezilla.Po
 
 if ENABLE_PRECOMP
 

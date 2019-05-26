@@ -34,4 +34,6 @@ dylibs.copied: $(top_builddir)/FileZilla.app/Contents/MacOS/*
 	"$(top_srcdir)/data/dylibcopy.sh" "$(top_builddir)/FileZilla.app"
 	@touch dylibs.copied
 
+CLEANFILES = dylibs.copied
+
 endif
