@@ -6,10 +6,14 @@
 class CControlSocket;
 class CTlsSocketImpl;
 
+namespace fz {
+class tls_system_trust_store;
+}
+
 class CTlsSocket final : protected fz::event_handler, public SocketLayer
 {
 public:
-	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface& layer, CControlSocket* pOwner);
+	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface& layer, fz::tls_system_trust_store * systemTrustStore, CControlSocket* pOwner);
 	virtual ~CTlsSocket();
 
 	/**

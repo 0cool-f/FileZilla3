@@ -8,11 +8,11 @@ class COptionsBase;
 class CPathCache;
 class CRateLimiter;
 class OpLockManager;
-class TlsSystemTrustStore;
 
 namespace fz {
 class event_loop;
 class thread_pool;
+class tls_system_trust_store;
 }
 
 
@@ -40,7 +40,7 @@ public:
 	CPathCache& GetPathCache();
 	CustomEncodingConverterBase const& GetCustomEncodingConverter() { return customEncodingConverter_; }
 	OpLockManager& GetOpLockManager();
-	TlsSystemTrustStore& GetTlsSystemTrustStore();
+	fz::tls_system_trust_store& GetTlsSystemTrustStore();
 
 protected:
 	COptionsBase& options_;

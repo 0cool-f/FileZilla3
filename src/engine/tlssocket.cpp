@@ -4,11 +4,11 @@
 #include "tlssocket.h"
 #include "tlssocket_impl.h"
 
-CTlsSocket::CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner)
+CTlsSocket::CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, fz::tls_system_trust_store* systemTrustStore, CControlSocket* pOwner)
 	: event_handler(pOwner->event_loop_)
 	, SocketLayer(pEvtHandler, next_layer, false)
 {
-	impl_ = std::make_unique<CTlsSocketImpl>(*this, pOwner);
+	impl_ = std::make_unique<CTlsSocketImpl>(*this, systemTrustStore, pOwner);
 	next_layer.set_event_handler(this);
 }
 

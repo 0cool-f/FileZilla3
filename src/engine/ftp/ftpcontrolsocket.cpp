@@ -176,7 +176,7 @@ void CFtpControlSocket::OnConnect()
 		if (!tls_layer_) {
 			LogMessage(MessageType::Status, _("Connection established, initializing TLS..."));
 
-			tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, this);
+			tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, nullptr, this);
 			active_layer_ = tls_layer_.get();
 
 			if (!tls_layer_->client_handshake()) {

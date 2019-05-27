@@ -69,7 +69,7 @@ public:
 	CPathCache path_cache_;
 	CLoggingOptionsChanged optionChangeHandler_;
 	OpLockManager opLockManager_;
-	TlsSystemTrustStore tlsSystemTrustStore_;
+	fz::tls_system_trust_store tlsSystemTrustStore_;
 };
 
 CFileZillaEngineContext::CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter)
@@ -113,7 +113,7 @@ OpLockManager& CFileZillaEngineContext::GetOpLockManager()
 	return impl_->opLockManager_;
 }
 
-TlsSystemTrustStore& CFileZillaEngineContext::GetTlsSystemTrustStore()
+fz::tls_system_trust_store& CFileZillaEngineContext::GetTlsSystemTrustStore()
 {
 	return impl_->tlsSystemTrustStore_;
 }

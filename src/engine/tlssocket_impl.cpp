@@ -29,15 +29,15 @@ char const ciphers[] = "@SYSTEM";
 #define TLSDEBUG 0
 #if TLSDEBUG
 // This is quite ugly
-CControlSocket* pLoggingControlSocket;
+CLogging* pLogging;
 void log_func(int level, char const* msg)
 {
-	if (!msg || !pLoggingControlSocket) {
+	if (!msg || !pLogging) {
 		return;
 	}
 	std::wstring s = fz::to_wstring(msg);
 	fz::trim(s);
-	pLoggingControlSocket->LogMessage(MessageType::Debug_Debug, L"tls: %d %s", level, s);
+	pLogging->LogMessage(MessageType::Debug_Debug, L"tls: %d %s", level, s);
 }
 #endif
 
@@ -147,9 +147,10 @@ void clone_cert(gnutls_x509_crt_t in, gnutls_x509_crt_t &out)
 }
 }
 
-CTlsSocketImpl::CTlsSocketImpl(CTlsSocket& tlsSocket, CControlSocket* pOwner)
+CTlsSocketImpl::CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store* systemTrustStore, CControlSocket* pOwner)
 	: tlsSocket_(tlsSocket)
 	, m_pOwner(pOwner)
+	, systemTrustStore_(systemTrustStore)
 {
 }
 
@@ -171,8 +172,8 @@ bool CTlsSocketImpl::Init()
 		}
 
 #if TLSDEBUG
-		if (!pLoggingControlSocket) {
-			pLoggingControlSocket = m_pOwner;
+		if (!pLogging) {
+			pLogging = m_pOwner;
 			gnutls_global_set_log_function(log_func);
 			gnutls_global_set_log_level(99);
 		}
@@ -272,8 +273,8 @@ void CTlsSocketImpl::Uninit()
 	state_ = fz::socket_state::failed;
 
 #if TLSDEBUG
-	if (pLoggingControlSocket == m_pOwner) {
-		pLoggingControlSocket = nullptr;
+	if (pLogging == m_pOwner) {
+		pLogging = nullptr;
 	}
 #endif
 }
@@ -1180,6 +1181,30 @@ int CTlsSocketImpl::VerifyCertificate()
 		return EINVAL;
 	}
 
+	datum_holder cert_der{};
+	int res = gnutls_x509_crt_export2(certs.certs[0], GNUTLS_X509_FMT_DER, &cert_der);
+	if (res != GNUTLS_E_SUCCESS) {
+		Failure(res, true, L"gnutls_x509_crt_export2");
+		return ECONNABORTED;
+	}
+
+	if (!required_certificate_.empty()) {
+		if (required_certificate_.size() != cert_der.size ||
+			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
+		{
+			m_pOwner->LogMessage(MessageType::Error, _("Certificate of connection does not match expected certificate."));
+			Failure(0, true);
+			return EINVAL;
+		}
+
+		TrustCurrentCert(true);
+
+		if (state_ != fz::socket_state::connected && state_ != fz::socket_state::shutting_down && state_ != fz::socket_state::shut_down) {
+			return ECONNABORTED;
+		}
+		return 0;
+	}
+
 	bool const uses_hostname = !hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown;
 
 	bool systemTrust = false;
@@ -1199,9 +1224,9 @@ int CTlsSocketImpl::VerifyCertificate()
 
 
 	// First, check system trust
-	if (uses_hostname) {
+	if (uses_hostname && systemTrustStore_) {
 
-		auto lease = m_pOwner->GetEngine().GetContext().GetTlsSystemTrustStore().impl_->lease();
+		auto lease = systemTrustStore_->impl_->lease();
 		auto cred = std::get<0>(lease);
 		if (cred) {
 			gnutls_credentials_set(m_session, GNUTLS_CRD_CERTIFICATE, cred);
@@ -1277,29 +1302,6 @@ int CTlsSocketImpl::VerifyCertificate()
 				m_pOwner->LogMessage(MessageType::Debug_Warning, L"Hostname does not match certificate SANs");
 			}
 		}
-	}
-
-	datum_holder cert_der{};
-	if (gnutls_x509_crt_export2(certs.certs[0], GNUTLS_X509_FMT_DER, &cert_der) != GNUTLS_E_SUCCESS) {
-		Failure(0, true);
-		return ECONNABORTED;
-	}
-
-	if (!required_certificate_.empty()) {
-		if (required_certificate_.size() != cert_der.size ||
-			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
-		{
-			m_pOwner->LogMessage(MessageType::Error, _("Certificate of connection does not match expected certificate."));
-			Failure(0, true);
-			return EINVAL;
-		}
-
-		TrustCurrentCert(true);
-
-		if (state_ != fz::socket_state::connected && state_ != fz::socket_state::shutting_down && state_ != fz::socket_state::shut_down) {
-			return ECONNABORTED;
-		}
-		return 0;
 	}
 
 	m_pOwner->LogMessage(MessageType::Status, _("Verifying certificate..."));

@@ -13,9 +13,9 @@ struct xml_string_writer : pugi::xml_writer
 {
 	std::string result_;
 
-	virtual void write(const void* data, size_t size) override
+	virtual void write(void const* data, size_t size) override
 	{
-		result_.append(static_cast<const char*>(data), size);
+		result_.append(static_cast<char const*>(data), size);
 	}
 };
 

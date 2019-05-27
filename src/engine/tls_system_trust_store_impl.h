@@ -9,26 +9,28 @@ typedef std::make_signed_t<size_t> ssize_t;
 
 #include <gnutls/gnutls.h>
 
-
 #include <libfilezilla/thread_pool.hpp>
 
 #include <tuple>
 
-class TlsSystemTrustStoreImpl
+namespace fz {
+
+class tls_system_trust_store_impl final
 {
 public:
-	TlsSystemTrustStoreImpl(fz::thread_pool & pool);
-	~TlsSystemTrustStoreImpl();
+	tls_system_trust_store_impl(thread_pool& pool);
+	~tls_system_trust_store_impl();
 
-	std::tuple<gnutls_certificate_credentials_t, fz::scoped_lock> lease();
+	std::tuple<gnutls_certificate_credentials_t, scoped_lock> lease();
 
 private:
-	fz::mutex mtx_{false};
-	fz::condition cond_;
+	mutex mtx_{false};
+	condition cond_;
 
 	gnutls_certificate_credentials_t credentials_{};
 
-	fz::async_task task_;
+	async_task task_;
 };
 
+}
 #endif

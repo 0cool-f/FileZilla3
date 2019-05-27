@@ -3,7 +3,9 @@
 #include "tls_system_trust_store.h"
 #include "tls_system_trust_store_impl.h"
 
-TlsSystemTrustStoreImpl::TlsSystemTrustStoreImpl(fz::thread_pool & pool)
+namespace fz {
+
+tls_system_trust_store_impl::tls_system_trust_store_impl(thread_pool& pool)
 {
 	task_ = pool.spawn([this]() {
 		gnutls_certificate_credentials_t cred{};
@@ -15,22 +17,22 @@ TlsSystemTrustStoreImpl::TlsSystemTrustStoreImpl(fz::thread_pool & pool)
 			}
 		}
 
-		fz::scoped_lock l(mtx_);
+		scoped_lock l(mtx_);
 		credentials_ = cred;
 		cond_.signal(l);
 	});
 }
 
-TlsSystemTrustStoreImpl::~TlsSystemTrustStoreImpl()
+tls_system_trust_store_impl::~tls_system_trust_store_impl()
 {
 	task_.join();
 
 	gnutls_certificate_free_credentials(credentials_);
 }
 
-std::tuple<gnutls_certificate_credentials_t, fz::scoped_lock> TlsSystemTrustStoreImpl::lease()
+std::tuple<gnutls_certificate_credentials_t, scoped_lock> tls_system_trust_store_impl::lease()
 {
-	fz::scoped_lock l(mtx_);
+	scoped_lock l(mtx_);
 	if (task_) {
 		cond_.wait(l);
 		task_.join();
@@ -40,11 +42,13 @@ std::tuple<gnutls_certificate_credentials_t, fz::scoped_lock> TlsSystemTrustStor
 }
 
 
-TlsSystemTrustStore::TlsSystemTrustStore(fz::thread_pool & pool)
-	: impl_(std::make_unique<TlsSystemTrustStoreImpl>(pool))
+tls_system_trust_store::tls_system_trust_store(thread_pool& pool)
+	: impl_(std::make_unique<tls_system_trust_store_impl>(pool))
 {
 }
 
-TlsSystemTrustStore::~TlsSystemTrustStore()
+tls_system_trust_store::~tls_system_trust_store()
 {
+}
+
 }

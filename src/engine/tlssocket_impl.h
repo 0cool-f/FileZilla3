@@ -11,12 +11,16 @@ typedef std::make_signed_t<size_t> ssize_t;
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/socket.hpp>
 
+namespace fz {
+class tls_system_trust_store;
+}
+
 class CControlSocket;
 class CTlsSocket;
 class CTlsSocketImpl final
 {
 public:
-	CTlsSocketImpl(CTlsSocket& tlsSocket, CControlSocket* pOwner);
+	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store * systemTrustStore, CControlSocket* pOwner);
 	~CTlsSocketImpl();
 
 	bool client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, fz::native_string const& session_hostname);
@@ -130,6 +134,8 @@ private:
 	friend class CTlsSocketCallbacks;
 
 	fz::native_string hostname_;
+
+	fz::tls_system_trust_store* systemTrustStore_{};
 };
 
 #endif
