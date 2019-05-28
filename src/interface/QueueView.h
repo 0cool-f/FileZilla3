@@ -38,12 +38,28 @@ class CStatusLineCtrl;
 class CFileItem;
 struct t_EngineData final
 {
-	t_EngineData() = default;
-	~t_EngineData();
+	t_EngineData()
+		: pEngine()
+		, active()
+		, transient()
+		, state(t_EngineData::none)
+		, pItem()
+		, pStatusLineCtrl()
+		, m_idleDisconnectTimer()
+	{
+	}
 
-	CFileZillaEngine* pEngine{};
-	bool active{};
-	bool transient{};
+	~t_EngineData()
+	{
+		wxASSERT(!active);
+		if (!transient)
+			delete pEngine;
+		delete m_idleDisconnectTimer;
+	}
+
+	CFileZillaEngine* pEngine;
+	bool active;
+	bool transient;
 
 	enum EngineDataState
 	{
@@ -56,13 +72,12 @@ struct t_EngineData final
 		mkdir,
 		askpassword,
 		waitprimary
-	};
-	EngineDataState state{none};
+	} state;
 
-	CFileItem* pItem{};
+	CFileItem* pItem;
 	Site lastSite;
-	CStatusLineCtrl* pStatusLineCtrl{};
-	wxTimer* m_idleDisconnectTimer{};
+	CStatusLineCtrl* pStatusLineCtrl;
+	wxTimer* m_idleDisconnectTimer;
 };
 
 class CMainFrame;
@@ -133,7 +148,7 @@ public:
 
 	void ProcessNotification(CFileZillaEngine* pEngine, std::unique_ptr<CNotification>&& pNotification);
 
-	void RenameFileInTransfer(CFileZillaEngine *pEngine, std::wstring const& newName, bool local);
+	void RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString& newName, bool local);
 
 	static std::wstring ReplaceInvalidCharacters(std::wstring const& filename);
 
@@ -146,8 +161,6 @@ public:
 	wxFileOffset GetCurrentUploadSpeed();
 
 	std::shared_ptr<CActionAfterBlocker> GetActionAfterBlocker();
-
-	void DeleteEngines();
 
 protected:
 
@@ -177,6 +190,7 @@ protected:
 	};
 
 	void ResetEngine(t_EngineData& data, const ResetReason reason);
+	void DeleteEngines();
 
 	virtual bool RemoveItem(CQueueItem* item, bool destroy, bool updateItemCount = true, bool updateSelections = true, bool forward = true) override;
 
