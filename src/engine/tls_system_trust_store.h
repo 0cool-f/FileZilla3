@@ -27,7 +27,7 @@ public:
 	~tls_system_trust_store();
 
 private:
-	friend class CTlsSocketImpl;
+	friend class ::CTlsSocketImpl;
 	std::unique_ptr<tls_system_trust_store_impl> impl_;
 };
 }

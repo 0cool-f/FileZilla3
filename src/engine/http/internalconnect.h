@@ -38,7 +38,6 @@ public:
 			return;
 		}
 
-		CCertificateNotification* pNotification = new CCertificateNotification(std::move(info));
 		controlSocket_.SendAsyncRequest(new CCertificateNotification(std::move(info)));
 	}
 

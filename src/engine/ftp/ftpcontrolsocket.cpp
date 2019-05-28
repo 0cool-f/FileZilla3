@@ -858,6 +858,5 @@ void CFtpControlSocket::OnVerifyCert(CTlsSocket* source, fz::tls_session_info & 
 		return;
 	}
 
-	CCertificateNotification* pNotification = new CCertificateNotification(std::move(info));
 	SendAsyncRequest(new CCertificateNotification(std::move(info)));
 }
