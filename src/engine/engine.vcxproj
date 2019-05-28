@@ -22,12 +22,12 @@
     <ProjectGuid>{AAD2642D-D07A-4415-BB32-D678D89D546F}</ProjectGuid>
     <RootNamespace>engine</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -200,11 +200,13 @@
     <ClCompile Include="storj\storjcontrolsocket.cpp" />
     <ClCompile Include="tlssocket.cpp" />
     <ClCompile Include="tlssocket_impl.cpp" />
+    <ClCompile Include="tls_info.cpp" />
     <ClCompile Include="tls_system_trust_store.cpp" />
     <ClCompile Include="xmlutils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\engine_context.h" />
+    <ClInclude Include="..\include\tls_info.h" />
     <ClInclude Include="backend.h" />
     <ClInclude Include="..\include\commands.h" />
     <ClInclude Include="ControlSocket.h" />

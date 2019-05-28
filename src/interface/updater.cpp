@@ -398,19 +398,19 @@ void CUpdater::ProcessNotification(std::unique_ptr<CNotification> && notificatio
 			else if (pData->GetRequestID() == reqId_certificate) {
 				auto & certNotification = static_cast<CCertificateNotification &>(*pData.get());
 				if (m_use_internal_rootcert) {
-					auto certs = certNotification.GetCertificates();
+					auto certs = certNotification.info_.GetCertificates();
 					if (certs.size() > 1) {
 						auto const& ca = certs.back();
 						std::vector<uint8_t> ca_data = ca.GetRawData();
 
 						std::string updater_root = fz::base64_decode(s_update_cert);
 						if (ca_data.size() == updater_root.size() && !memcmp(&ca_data[0], updater_root.c_str(), ca_data.size())) {
-							certNotification.m_trusted = true;
+							certNotification.trusted_ = true;
 						}
 					}
 				}
 				else {
-					certNotification.m_trusted = true;
+					certNotification.trusted_ = true;
 				}
 			}
 			engine_->SetAsyncRequestReply(std::move(pData));

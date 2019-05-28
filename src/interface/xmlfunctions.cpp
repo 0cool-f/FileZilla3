@@ -260,7 +260,7 @@ bool CXmlFile::SaveXmlFile()
 		{
 		}
 
-		virtual void write(const void* data, size_t size) override {
+		virtual void write(void const* data, size_t size) override {
 			if (file_.opened()) {
 				if (file_.write(data, static_cast<int64_t>(size)) != static_cast<int64_t>(size)) {
 					file_.close();
@@ -552,7 +552,7 @@ struct xml_memory_writer : pugi::xml_writer
 	char* buffer{};
 	size_t remaining{};
 
-	virtual void write(const void* data, size_t size)
+	virtual void write(void const* data, size_t size)
 	{
 		if (buffer && size <= remaining) {
 			memcpy(buffer, data, size);

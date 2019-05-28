@@ -176,10 +176,10 @@ void CFtpControlSocket::OnConnect()
 		if (!tls_layer_) {
 			LogMessage(MessageType::Status, _("Connection established, initializing TLS..."));
 
-			tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, nullptr, this);
+			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), *this);
 			active_layer_ = tls_layer_.get();
 
-			if (!tls_layer_->client_handshake()) {
+			if (!tls_layer_->client_handshake(this)) {
 				DoClose();
 			}
 
@@ -524,9 +524,9 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 			}
 
 			CCertificateNotification* pCertificateNotification = static_cast<CCertificateNotification *>(pNotification);
-			tls_layer_->TrustCurrentCert(pCertificateNotification->m_trusted);
+			tls_layer_->set_verification_result(pCertificateNotification->trusted_);
 
-			if (!pCertificateNotification->m_trusted) {
+			if (!pCertificateNotification->trusted_) {
 				DoClose(FZ_REPLY_CRITICALERROR);
 				return false;
 			}
@@ -839,6 +839,10 @@ void CFtpControlSocket::operator()(fz::event_base const& ev)
 		return;
 	}
 
+	if (fz::dispatch<fz::certificate_verification_event>(ev, this, &CFtpControlSocket::OnVerifyCert)) {
+		return;
+	}
+
 	CRealControlSocket::operator()(ev);
 }
 
@@ -846,4 +850,14 @@ void CFtpControlSocket::ResetSocket()
 {
 	tls_layer_.reset();
 	CRealControlSocket::ResetSocket();
+}
+
+void CFtpControlSocket::OnVerifyCert(CTlsSocket* source, fz::tls_session_info & info)
+{
+	if (!tls_layer_ || source != tls_layer_.get()) {
+		return;
+	}
+
+	CCertificateNotification* pNotification = new CCertificateNotification(std::move(info));
+	SendAsyncRequest(new CCertificateNotification(std::move(info)));
 }

@@ -3,17 +3,22 @@
 
 #include "backend.h"
 
-class CControlSocket;
+class CLogging;
+class CTlsSocket;
 class CTlsSocketImpl;
 
 namespace fz {
 class tls_system_trust_store;
+class tls_session_info;
+
+struct certificate_verification_event_type;
+typedef simple_event<certificate_verification_event_type, CTlsSocket *, fz::tls_session_info> certificate_verification_event;
 }
 
 class CTlsSocket final : protected fz::event_handler, public SocketLayer
 {
 public:
-	CTlsSocket(fz::event_handler* pEvtHandler, fz::socket_interface& layer, fz::tls_system_trust_store * systemTrustStore, CControlSocket* pOwner);
+	CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface& layer, fz::tls_system_trust_store * systemTrustStore, CLogging & logger);
 	virtual ~CTlsSocket();
 
 	/**
@@ -23,10 +28,26 @@ public:
 	 *
 	 * If the handshake is started, wait for a connection event for the result.
 	 *
-	 * If a required certificate is passed, either in DER or PEM, the session's certificate
-	 * must match the passed certificate or the handshake will fail.
+	 * The certificate negotiated that eventually gets negotiated for the session]
+	 * must match the passed required_certificate, either in DER or PEM, 
+	 * or the handshake will fail.
 	 */
-	bool client_handshake(std::vector<uint8_t> const& session_to_resume = std::vector<uint8_t>(), std::vector<uint8_t> const& required_certificate = std::vector<uint8_t>(), fz::native_string const& session_hostname = fz::native_string());
+	bool client_handshake(std::vector<uint8_t> const& required_certificate, std::vector<uint8_t> const& session_to_resume = std::vector<uint8_t>(), fz::native_string const& session_hostname = fz::native_string());
+
+	/**
+	 * \brief Starts shaking hand for a new TLS session as client.
+	 *
+	 * Returns true if the handshake has started, false on error.
+	 *
+	 * If the handshake is started, wait for a connection event for the result.
+	 *
+	 * If a verification handler is passed, it will receive a 
+	 * certificate_verification_event event upon which it must call
+	 * set_verification_result.
+	 * If no verification handler is passed, verification is done soley using the system
+	 * trust store.
+	 */
+	bool client_handshake(fz::event_handler *const verification_handler, std::vector<uint8_t> const& session_to_resume = std::vector<uint8_t>(), fz::native_string const& session_hostname = fz::native_string());
 
 	/// Gets session parameters for resumption
 	std::vector<uint8_t> get_session_parameters() const;
@@ -41,14 +62,14 @@ public:
 
 	virtual int shutdown() override;
 
-	void TrustCurrentCert(bool trusted);
+	void set_verification_result(bool trusted);
 
 	virtual fz::socket_state get_state() const override;
 
-	std::wstring GetProtocolName();
-	std::wstring GetKeyExchange();
-	std::wstring GetCipherName();
-	std::wstring GetMacName();
+	std::string GetProtocolName();
+	std::string GetKeyExchange();
+	std::string GetCipherName();
+	std::string GetMacName();
 	int GetAlgorithmWarnings();
 
 	bool ResumedSession() const;
@@ -58,6 +79,7 @@ public:
 	bool SetClientCertificate(fz::native_string const& keyfile, fz::native_string const& certs, fz::native_string const& password);
 
 	static std::wstring GetGnutlsVersion();
+
 private:
 	virtual void operator()(fz::event_base const& ev) override;
 

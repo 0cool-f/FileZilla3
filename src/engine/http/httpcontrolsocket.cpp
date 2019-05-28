@@ -143,7 +143,7 @@ bool CHttpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 			}
 
 			CCertificateNotification* pCertificateNotification = static_cast<CCertificateNotification *>(pNotification);
-			tls_layer_->TrustCurrentCert(pCertificateNotification->m_trusted);
+			tls_layer_->set_verification_result(pCertificateNotification->trusted_);
 		}
 		break;
 	default:
@@ -201,10 +201,10 @@ void CHttpControlSocket::OnConnect()
 		if (!tls_layer_) {
 			LogMessage(MessageType::Status, _("Connection established, initializing TLS..."));
 
-			tls_layer_ = std::make_unique<CTlsSocket>(this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), this);
+			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), *this);
 			active_layer_ = tls_layer_.get();
 
-			if (!tls_layer_->client_handshake()) {
+			if (!tls_layer_->client_handshake(&data)) {
 				DoClose();
 			}
 		}

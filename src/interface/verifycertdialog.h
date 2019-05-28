@@ -10,32 +10,32 @@ class CertStore final
 public:
 	CertStore();
 
-	bool IsTrusted(CCertificateNotification const& notification);
-	void SetTrusted(CCertificateNotification const& notification, bool permanent, bool trustAllHostnames);
+	bool IsTrusted(fz::tls_session_info const& info);
+	void SetTrusted(fz::tls_session_info const& info, bool permanent, bool trustAllHostnames);
 
-	void SetInsecure(std::wstring const& host, unsigned int port, bool permanent);
+	void SetInsecure(std::string const& host, unsigned int port, bool permanent);
 
-	bool IsInsecure(std::wstring const& host, unsigned int port, bool permanentOnly = false);
+	bool IsInsecure(std::string const& host, unsigned int port, bool permanentOnly = false);
 
-	bool HasCertificate(std::wstring const& host, unsigned int port);
+	bool HasCertificate(std::string const& host, unsigned int port);
 
 private:
 	struct t_certData {
-		std::wstring host;
+		std::string host;
 		bool trustSans{};
 		unsigned int port{};
 		std::vector<uint8_t> data;
 	};
 
-	bool IsTrusted(std::wstring const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans);
-	bool DoIsTrusted(std::wstring const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<t_certData> const& trustedCerts, bool allowSans);
+	bool IsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans);
+	bool DoIsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<t_certData> const& trustedCerts, bool allowSans);
 
 	void LoadTrustedCerts();
 
 	std::list<t_certData> trustedCerts_;
 	std::list<t_certData> sessionTrustedCerts_;
-	std::set<std::tuple<std::wstring, unsigned int>> insecureHosts_;
-	std::set<std::tuple<std::wstring, unsigned int>> sessionInsecureHosts_;
+	std::set<std::tuple<std::string, unsigned int>> insecureHosts_;
+	std::set<std::tuple<std::string, unsigned int>> sessionInsecureHosts_;
 
 	CXmlFile m_xmlFile;
 };
@@ -50,14 +50,14 @@ public:
 
 private:
 
-	bool DisplayAlgorithm(int controlId, wxString name, bool insecure);
+	bool DisplayAlgorithm(int controlId, std::string const& name, bool insecure);
 
-	bool DisplayCert(wxDialogEx* pDlg, const CCertificate& cert);
+	bool DisplayCert(wxDialogEx* pDlg, fz::x509_certificate const& cert);
 
 	void ParseDN(wxWindow* parent, std::wstring const& dn, wxSizer* pSizer);
 	void ParseDN_by_prefix(wxWindow* parent, std::vector<std::pair<std::wstring, std::wstring>>& tokens, std::wstring const& prefix, wxString const& name, wxSizer* pSizer);
 
-	std::vector<CCertificate> m_certificates;
+	std::vector<fz::x509_certificate> m_certificates;
 	wxDialogEx* m_pDlg{};
 	wxSizer* m_pSubjectSizer{};
 	wxSizer* m_pIssuerSizer{};

@@ -15,15 +15,15 @@ namespace fz {
 class tls_system_trust_store;
 }
 
-class CControlSocket;
+class CLogging;
 class CTlsSocket;
 class CTlsSocketImpl final
 {
 public:
-	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store * systemTrustStore, CControlSocket* pOwner);
+	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store * systemTrustStore, CLogging & logger);
 	~CTlsSocketImpl();
 
-	bool client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, fz::native_string const& session_hostname);
+	bool client_handshake(std::vector<uint8_t> const& session_to_resume, fz::native_string const& session_hostname, std::vector<uint8_t> const& required_certificate, fz::event_handler * verification_handler);
 
 	int connect(fz::native_string const& host, unsigned int port, fz::address_type family);
 
@@ -32,7 +32,7 @@ public:
 
 	int shutdown();
 
-	void TrustCurrentCert(bool trusted);
+	void set_verification_result(bool trusted);
 
 	fz::socket_state get_state() const {
 		return state_;
@@ -41,10 +41,10 @@ public:
 	std::vector<uint8_t> get_session_parameters() const;
 	std::vector<uint8_t> get_raw_certificate() const;
 
-	std::wstring GetProtocolName();
-	std::wstring GetKeyExchange();
-	std::wstring GetCipherName();
-	std::wstring GetMacName();
+	std::string GetProtocolName();
+	std::string GetKeyExchange();
+	std::string GetCipherName();
+	std::string GetMacName();
 	int GetAlgorithmWarnings();
 
 	bool ResumedSession() const;
@@ -67,7 +67,7 @@ private:
 	int ContinueShutdown();
 
 	int VerifyCertificate();
-	bool CertificateIsBlacklisted(std::vector<CCertificate> const& certificates);
+	bool CertificateIsBlacklisted(std::vector<fz::x509_certificate> const& certificates);
 
 	void LogError(int code, std::wstring const& function, MessageType logLegel = MessageType::Error);
 	void PrintAlert(MessageType logLevel);
@@ -91,8 +91,8 @@ private:
 
 	bool GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsigned int & certs_size);
 
-	bool ExtractCert(gnutls_x509_crt_t const& cert, CCertificate& out);
-	std::vector<CCertificate::SubjectName> GetCertSubjectAltNames(gnutls_x509_crt_t cert);
+	bool ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certificate& out);
+	std::vector<fz::x509_certificate::SubjectName> GetCertSubjectAltNames(gnutls_x509_crt_t cert);
 
 	void PrintVerificationError(int status);
 
@@ -102,7 +102,7 @@ private:
 
 	fz::socket_state state_{};
 
-	CControlSocket* m_pOwner{};
+	CLogging& logger_;
 
 	bool m_initialized{};
 	gnutls_session_t m_session{};
@@ -136,6 +136,8 @@ private:
 	fz::native_string hostname_;
 
 	fz::tls_system_trust_store* systemTrustStore_{};
+
+	fz::event_handler * verification_handler_{};
 };
 
 #endif

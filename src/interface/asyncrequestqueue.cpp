@@ -93,11 +93,11 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 		{
 			auto & certNotification = static_cast<CCertificateNotification&>(*pNotification.get());
 
-			if (!certStore_->IsTrusted(certNotification)) {
+			if (!certStore_->IsTrusted(certNotification.info_)) {
 				break;
 			}
 
-			certNotification.m_trusted = true;
+			certNotification.trusted_ = true;
 			pEngine->SetAsyncRequestReply(std::move(pNotification));
 
 			return true;
@@ -106,7 +106,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 	case reqId_insecure_ftp:
 		{
 			auto & insecureNotification = static_cast<CInsecureFTPNotification&>(*pNotification.get());
-			if (!certStore_->IsInsecure(insecureNotification.server_.GetHost(), insecureNotification.server_.GetPort())) {
+			if (!certStore_->IsInsecure(fz::to_utf8(insecureNotification.server_.GetHost()), insecureNotification.server_.GetPort())) {
 				break;
 			}
 
@@ -398,10 +398,6 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 
 void CAsyncRequestQueue::ClearPending(CFileZillaEngine const* const pEngine)
 {
-	if (m_requestList.empty()) {
-		return;
-	}
-
 	for (auto iter = m_requestList.begin(); iter != m_requestList.end();) {
 		if (iter->pEngine == pEngine) {
 			if (m_inside_request && iter == m_requestList.begin()) {

@@ -19,5 +19,6 @@ noinst_HEADERS = \
 	setup.h \
 	sizeformatting_base.h \
 	socket_errors.h \
+	tls_info.h \
 	xmlutils.h \
 	xml_string_writer.h

@@ -17,21 +17,21 @@ CertStore::CertStore()
 {
 }
 
-bool CertStore::IsTrusted(CCertificateNotification const& notification)
+bool CertStore::IsTrusted(fz::tls_session_info const& info)
 {
-	if (notification.GetAlgorithmWarnings() != 0) {
+	if (info.GetAlgorithmWarnings() != 0) {
 		// These certs are never trusted.
 		return false;
 	}
 
 	LoadTrustedCerts();
 
-	CCertificate cert = notification.GetCertificates()[0];
+	fz::x509_certificate cert = info.GetCertificates()[0];
 
-	return IsTrusted(notification.GetHost(), notification.GetPort(), cert.GetRawData(), false, !notification.MismatchedHostname());
+	return IsTrusted(info.GetHost(), info.GetPort(), cert.GetRawData(), false, !info.MismatchedHostname());
 }
 
-bool CertStore::IsInsecure(std::wstring const& host, unsigned int port, bool permanentOnly)
+bool CertStore::IsInsecure(std::string const& host, unsigned int port, bool permanentOnly)
 {
 	auto const t = std::make_tuple(host, port);
 	if (!permanentOnly && sessionInsecureHosts_.find(t) != sessionInsecureHosts_.cend()) {
@@ -47,7 +47,7 @@ bool CertStore::IsInsecure(std::wstring const& host, unsigned int port, bool per
 	return false;
 }
 
-bool CertStore::HasCertificate(std::wstring const& host, unsigned int port)
+bool CertStore::HasCertificate(std::string const& host, unsigned int port)
 {
 	for (auto const& cert : sessionTrustedCerts_) {
 		if (cert.host == host && cert.port == port) {
@@ -66,7 +66,7 @@ bool CertStore::HasCertificate(std::wstring const& host, unsigned int port)
 	return false;
 }
 
-bool CertStore::DoIsTrusted(std::wstring const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<CertStore::t_certData> const& trustedCerts, bool allowSans)
+bool CertStore::DoIsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<CertStore::t_certData> const& trustedCerts, bool allowSans)
 {
 	if (!data.size()) {
 		return false;
@@ -95,7 +95,7 @@ bool CertStore::DoIsTrusted(std::wstring const& host, unsigned int port, std::ve
 	return false;
 }
 
-bool CertStore::IsTrusted(std::wstring const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans)
+bool CertStore::IsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans)
 {
 	bool trusted = DoIsTrusted(host, port, data, trustedCerts_, allowSans);
 	if (!trusted && !permanentOnly) {
@@ -135,7 +135,7 @@ void CertStore::LoadTrustedCerts()
 				return false;
 			}
 
-			data.host = GetTextElement(cert, "Host");
+			data.host = cert.child_value("Host");
 			data.port = GetTextElementInt(cert, "Port");
 			if (data.host.empty() || data.port < 1 || data.port > 65535) {
 				return false;
@@ -180,7 +180,7 @@ void CertStore::LoadTrustedCerts()
 
 		auto const processEntry = [&](pugi::xml_node const& node)
 		{
-			std::wstring host = GetTextElement(node);
+			std::string host = node.value();
 			unsigned int port = node.attribute("Port").as_uint();
 			if (host.empty() || port < 1 || port > 65535) {
 				return false;
@@ -215,7 +215,7 @@ void CertStore::LoadTrustedCerts()
 	}
 }
 
-void CertStore::SetInsecure(std::wstring const& host, unsigned int port, bool permanent)
+void CertStore::SetInsecure(std::string const& host, unsigned int port, bool permanent)
 {
 	// A host can't be both trusted and insecure
 	sessionTrustedCerts_.erase(
@@ -243,7 +243,7 @@ void CertStore::SetInsecure(std::wstring const& host, unsigned int port, bool pe
 			// Purge certificates for this host
 			auto const processEntry = [&host, &port](pugi::xml_node const& cert)
 			{
-				return host != GetTextElement(cert, "Host") || port != GetTextElementInt(cert, "Port");
+				return host != cert.child_value("Host") || port != GetTextElementInt(cert, "Port");
 			};
 
 			auto cert = certs.child("Certificate");
@@ -278,13 +278,13 @@ void CertStore::SetInsecure(std::wstring const& host, unsigned int port, bool pe
 	insecureHosts_.emplace(std::make_tuple(host, port));
 }
 
-void CertStore::SetTrusted(CCertificateNotification const& notification, bool permanent, bool trustAllHostnames)
+void CertStore::SetTrusted(fz::tls_session_info const& info, bool permanent, bool trustAllHostnames)
 {
-	const CCertificate certificate = notification.GetCertificates()[0];
+	const fz::x509_certificate certificate = info.GetCertificates()[0];
 
 	t_certData cert;
-	cert.host = notification.GetHost();
-	cert.port = notification.GetPort();
+	cert.host = info.GetHost();
+	cert.port = info.GetPort();
 	cert.data = certificate.GetRawData();
 
 	if (trustAllHostnames) {
@@ -360,7 +360,7 @@ CVerifyCertDialog::CVerifyCertDialog(CertStore & certStore)
 }
 
 
-bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
+bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, fz::x509_certificate const& cert)
 {
 	bool warning = false;
 	if (!cert.GetActivationTime().empty()) {
@@ -396,31 +396,31 @@ bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
 	}
 
 	if (!cert.GetSerial().empty()) {
-		pDlg->SetChildLabel(XRCID("ID_SERIAL"), cert.GetSerial());
+		pDlg->SetChildLabel(XRCID("ID_SERIAL"), fz::to_wstring_from_utf8(cert.GetSerial()));
 	}
 	else {
 		pDlg->SetChildLabel(XRCID("ID_SERIAL"), _("None"));
 	}
 
-	pDlg->SetChildLabel(XRCID("ID_PKALGO"), wxString::Format(_("%s with %d bits"), cert.GetPkAlgoName(), cert.GetPkAlgoBits()));
-	pDlg->SetChildLabel(XRCID("ID_SIGNALGO"), cert.GetSignatureAlgorithm());
+	pDlg->SetChildLabel(XRCID("ID_PKALGO"), wxString::Format(_("%s with %d bits"), fz::to_wstring_from_utf8(cert.GetPkAlgoName()), cert.GetPkAlgoBits()));
+	pDlg->SetChildLabel(XRCID("ID_SIGNALGO"), fz::to_wstring_from_utf8(cert.GetSignatureAlgorithm()));
 
-	wxString const& sha256 = cert.GetFingerPrintSHA256();
+	wxString const sha256 = fz::to_wstring_from_utf8(cert.GetFingerPrintSHA256());
 	pDlg->SetChildLabel(XRCID("ID_FINGERPRINT_SHA256"), sha256.Left(sha256.size() / 2 + 1) + L"\n" + sha256.Mid(sha256.size() / 2 + 1));
-	pDlg->SetChildLabel(XRCID("ID_FINGERPRINT_SHA1"), cert.GetFingerPrintSHA1());
+	pDlg->SetChildLabel(XRCID("ID_FINGERPRINT_SHA1"), fz::to_wstring_from_utf8(cert.GetFingerPrintSHA1()));
 
-	ParseDN(XRCCTRL(*pDlg, "ID_ISSUER_BOX", wxStaticBox), cert.GetIssuer(), m_pIssuerSizer);
+	ParseDN(XRCCTRL(*pDlg, "ID_ISSUER_BOX", wxStaticBox), fz::to_wstring_from_utf8(cert.GetIssuer()), m_pIssuerSizer);
 
 	auto subjectPanel = XRCCTRL(*pDlg, "ID_SUBJECT_PANEL", wxScrolledWindow);
 	subjectPanel->Freeze();
 
-	ParseDN(subjectPanel, cert.GetSubject(), m_pSubjectSizer);
+	ParseDN(subjectPanel, fz::to_wstring_from_utf8(cert.GetSubject()), m_pSubjectSizer);
 
 	auto const& altNames = cert.GetAltSubjectNames();
 	if (!altNames.empty()) {
 		wxString str;
 		for (auto const& altName : altNames) {
-			str += LabelEscape(altName.name) + L"\n";
+			str += LabelEscape(fz::to_wstring_from_utf8(altName.name)) + L"\n";
 		}
 		str.RemoveLast();
 		m_pSubjectSizer->Add(new wxStaticText(subjectPanel, wxID_ANY, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
@@ -446,11 +446,12 @@ bool CVerifyCertDialog::DisplayCert(wxDialogEx* pDlg, const CCertificate& cert)
 
 #include <wx/scrolwin.h>
 
-bool CVerifyCertDialog::DisplayAlgorithm(int controlId, wxString name, bool insecure)
+bool CVerifyCertDialog::DisplayAlgorithm(int controlId, std::string const& name, bool insecure)
 {
+	wxString wname = fz::to_wstring_from_utf8(name);
 	if (insecure) {
-		name += L" - ";
-		name += _("Insecure algorithm!");
+		wname += L" - ";
+		wname += _("Insecure algorithm!");
 
 		auto wnd = m_pDlg->FindWindow(controlId);
 		if (wnd) {
@@ -458,13 +459,15 @@ bool CVerifyCertDialog::DisplayAlgorithm(int controlId, wxString name, bool inse
 		}
 	}
 
-	m_pDlg->SetChildLabel(controlId, name);
+	m_pDlg->SetChildLabel(controlId, wname);
 
 	return insecure;
 }
 
 void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notification, bool displayOnly)
 {
+	fz::tls_session_info& info = notification.info_;
+
 	m_pDlg = new wxDialogEx;
 	if (!m_pDlg->Load(0, L"ID_VERIFYCERT")) {
 		wxBell();
@@ -489,7 +492,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 		}
 	}
 
-	m_certificates = notification.GetCertificates();
+	m_certificates = info.GetCertificates();
 	if (m_certificates.size() == 1) {
 		XRCCTRL(*m_pDlg, "ID_CHAIN_DESC", wxStaticText)->Hide();
 		XRCCTRL(*m_pDlg, "ID_CHAIN", wxChoice)->Hide();
@@ -504,12 +507,12 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 		pChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(CVerifyCertDialog::OnCertificateChoice), 0, this);
 	}
 
-	if (notification.MismatchedHostname()) {
+	if (info.MismatchedHostname()) {
 		xrc_call(*m_pDlg, "ID_HOST", &wxWindow::SetForegroundColour, wxColour(255, 0, 0));
-		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(_("%s:%d - Hostname does not match certificate"), LabelEscape(notification.GetHost()), notification.GetPort()));
+		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(_("%s:%d - Hostname does not match certificate"), LabelEscape(fz::to_wstring_from_utf8(info.GetHost())), info.GetPort()));
 	}
 	else {
-		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(L"%s:%d", LabelEscape(notification.GetHost()), notification.GetPort()));
+		m_pDlg->SetChildLabel(XRCID("ID_HOST"), wxString::Format(L"%s:%d", LabelEscape(fz::to_wstring_from_utf8(info.GetHost())), info.GetPort()));
 	}
 
 	line_height_ = XRCCTRL(*m_pDlg, "ID_SUBJECT_DUMMY", wxStaticText)->GetSize().y;
@@ -531,12 +534,12 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 
 	bool warning = DisplayCert(m_pDlg, m_certificates[0]);
 
-	DisplayAlgorithm(XRCID("ID_PROTOCOL"), notification.GetProtocol(), (notification.GetAlgorithmWarnings() & CCertificateNotification::tlsver) != 0);
-	DisplayAlgorithm(XRCID("ID_KEYEXCHANGE"), notification.GetKeyExchange(), (notification.GetAlgorithmWarnings() & CCertificateNotification::kex) != 0);
-	DisplayAlgorithm(XRCID("ID_CIPHER"), notification.GetSessionCipher(), (notification.GetAlgorithmWarnings() & CCertificateNotification::cipher) != 0);
-	DisplayAlgorithm(XRCID("ID_MAC"), notification.GetSessionMac(), (notification.GetAlgorithmWarnings() & CCertificateNotification::mac) != 0);
+	DisplayAlgorithm(XRCID("ID_PROTOCOL"), info.GetProtocol(), (info.GetAlgorithmWarnings() & fz::tls_session_info::tlsver) != 0);
+	DisplayAlgorithm(XRCID("ID_KEYEXCHANGE"), info.GetKeyExchange(), (info.GetAlgorithmWarnings() & fz::tls_session_info::kex) != 0);
+	DisplayAlgorithm(XRCID("ID_CIPHER"), info.GetSessionCipher(), (info.GetAlgorithmWarnings() & fz::tls_session_info::cipher) != 0);
+	DisplayAlgorithm(XRCID("ID_MAC"), info.GetSessionMac(), (info.GetAlgorithmWarnings() & fz::tls_session_info::mac) != 0);
 
-	if (notification.GetAlgorithmWarnings() != 0) {
+	if (info.GetAlgorithmWarnings() != 0) {
 		warning = true;
 	}
 
@@ -545,11 +548,11 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 		XRCCTRL(*m_pDlg, "ID_ALWAYS", wxCheckBox)->Enable(false);
 	}
 
-	bool const dnsname = fz::get_address_type(notification.GetHost()) == fz::address_type::unknown;
-	bool const sanTrustAllowed = !warning && dnsname && !notification.MismatchedHostname();
+	bool const dnsname = fz::get_address_type(info.GetHost()) == fz::address_type::unknown;
+	bool const sanTrustAllowed = !warning && dnsname && !info.MismatchedHostname();
 	XRCCTRL(*m_pDlg, "ID_TRUST_SANS", wxCheckBox)->Enable(sanTrustAllowed);
 
-	if (sanTrustAllowed && notification.SystemTrust()) {
+	if (sanTrustAllowed && info.SystemTrust()) {
 		xrc_call(*m_pDlg, "ID_ALWAYS", &wxCheckBox::SetValue, true);
 		xrc_call(*m_pDlg, "ID_TRUST_SANS", &wxCheckBox::SetValue, true);
 	}
@@ -561,16 +564,16 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 
 	if (!displayOnly) {
 		if (res == wxID_OK) {
-			notification.m_trusted = true;
+			notification.trusted_ = true;
 
-			if (!notification.GetAlgorithmWarnings()) {
+			if (!info.GetAlgorithmWarnings()) {
 				bool trustSANs = sanTrustAllowed && xrc_call(*m_pDlg, "ID_TRUST_SANS", &wxCheckBox::GetValue);
 				bool permanent = !warning && xrc_call(*m_pDlg, "ID_ALWAYS", &wxCheckBox::GetValue);
-				certStore_.SetTrusted(notification, permanent, trustSANs);
+				certStore_.SetTrusted(info, permanent, trustSANs);
 			}
 		}
 		else {
-			notification.m_trusted = false;
+			notification.trusted_ = false;
 		}
 	}
 
@@ -720,7 +723,7 @@ void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & 
 	auto main = lay.createFlex(1);
 	outer->Add(main, 0, wxALL, lay.border);
 
-	bool const warning = certStore.HasCertificate(notification.server_.GetHost(), notification.server_.GetPort());
+	bool const warning = certStore.HasCertificate(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort());
 
 	if (warning) {
 		main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
@@ -773,6 +776,6 @@ void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & 
 	if (allow) {
 		notification.allow_ = true;
 
-		certStore.SetInsecure(notification.server_.GetHost(), notification.server_.GetPort(), always->GetValue());
+		certStore.SetInsecure(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort(), always->GetValue());
 	}
 }

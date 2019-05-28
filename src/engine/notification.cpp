@@ -78,80 +78,10 @@ char* CDataNotification::Detach(size_t& len)
 	return pData;
 }
 
-CCertificate::CCertificate(
-		std::vector<uint8_t> const& rawData,
-		fz::datetime const& activationTime, fz::datetime const& expirationTime,
-		std::wstring const& serial,
-		std::wstring const& pkalgoname, unsigned int bits,
-		std::wstring const& signalgoname,
-		std::wstring const& fingerprint_sha256,
-		std::wstring const& fingerprint_sha1,
-		std::wstring const& issuer,
-		std::wstring const& subject,
-		std::vector<SubjectName> const& altSubjectNames)
-	: m_activationTime(activationTime)
-	, m_expirationTime(expirationTime)
-	, raw_cert_(rawData)
-	, m_serial(serial)
-	, m_pkalgoname(pkalgoname)
-	, m_pkalgobits(bits)
-	, m_signalgoname(signalgoname)
-	, m_fingerprint_sha256(fingerprint_sha256)
-	, m_fingerprint_sha1(fingerprint_sha1)
-	, m_issuer(issuer)
-	, m_subject(subject)
-	, m_altSubjectNames(altSubjectNames)
+CCertificateNotification::CCertificateNotification(fz::tls_session_info&& info)
+	: info_(info)
 {
 }
-
-CCertificate::CCertificate(
-	std::vector<uint8_t> && rawData,
-	fz::datetime const& activationTime, fz::datetime const& expirationTime,
-	std::wstring const& serial,
-	std::wstring const& pkalgoname, unsigned int bits,
-	std::wstring const& signalgoname,
-	std::wstring const& fingerprint_sha256,
-	std::wstring const& fingerprint_sha1,
-	std::wstring const& issuer,
-	std::wstring const& subject,
-	std::vector<SubjectName> && altSubjectNames)
-	: m_activationTime(activationTime)
-	, m_expirationTime(expirationTime)
-	, raw_cert_(rawData)
-	, m_serial(serial)
-	, m_pkalgoname(pkalgoname)
-	, m_pkalgobits(bits)
-	, m_signalgoname(signalgoname)
-	, m_fingerprint_sha256(fingerprint_sha256)
-	, m_fingerprint_sha1(fingerprint_sha1)
-	, m_issuer(issuer)
-	, m_subject(subject)
-	, m_altSubjectNames(altSubjectNames)
-{
-}
-
-CCertificateNotification::CCertificateNotification(std::wstring const& host, unsigned int port,
-		std::wstring const& protocol,
-		std::wstring const& keyExchange,
-		std::wstring const& sessionCipher,
-		std::wstring const& sessionMac,
-		int algorithmWarnings,
-		std::vector<CCertificate> && certificates,
-		bool systemTrust,
-		bool hostnameMismatch)
-	: m_host(host)
-	, m_port(port)
-	, m_protocol(protocol)
-	, m_keyExchange(keyExchange)
-	, m_sessionCipher(sessionCipher)
-	, m_sessionMac(sessionMac)
-	, m_algorithmWarnings(algorithmWarnings)
-	, m_certificates(certificates)
-	, systemTrust_(systemTrust)
-	, hostnameMismatch_(hostnameMismatch)
-{
-}
-
 
 CInsecureFTPNotification::CInsecureFTPNotification(CServer const& server)
 	: server_(server)

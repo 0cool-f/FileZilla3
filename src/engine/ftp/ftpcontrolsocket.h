@@ -56,6 +56,8 @@ protected:
 
 	virtual void OnConnect() override;
 	virtual void OnReceive() override;
+	
+	void OnVerifyCert(CTlsSocket* source, fz::tls_session_info& info);
 
 	virtual void ResetSocket() override;
 

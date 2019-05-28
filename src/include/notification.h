@@ -21,6 +21,7 @@
 
 #include "local_path.h"
 #include "server.h"
+#include "tls_info.h"
 
 #include <libfilezilla/time.hpp>
 
@@ -337,139 +338,17 @@ protected:
 	size_t m_len;
 };
 
-class CCertificate final
-{
-public:
-	class SubjectName final
-	{
-	public:
-		std::wstring name;
-		bool isDns{};
-	};
-
-	CCertificate() = default;
-	CCertificate(CCertificate const& op) = default;
-
-	CCertificate(
-		std::vector<uint8_t> const& rawData,
-		fz::datetime const& activationTime, fz::datetime const& expirationTime,
-		std::wstring const& serial,
-		std::wstring const& pkalgoname, unsigned int bits,
-		std::wstring const& signalgoname,
-		std::wstring const& fingerprint_sha256,
-		std::wstring const& fingerprint_sha1,
-		std::wstring const& issuer,
-		std::wstring const& subject,
-		std::vector<SubjectName> const& altSubjectNames);
-
-	CCertificate(
-		std::vector<uint8_t> && rawdata,
-		fz::datetime const& activationTime, fz::datetime const& expirationTime,
-		std::wstring const& serial,
-		std::wstring const& pkalgoname, unsigned int bits,
-		std::wstring const& signalgoname,
-		std::wstring const& fingerprint_sha256,
-		std::wstring const& fingerprint_sha1,
-		std::wstring const& issuer,
-		std::wstring const& subject,
-		std::vector<SubjectName> && altSubjectNames);
-
-
-	std::vector<uint8_t> GetRawData() const { return raw_cert_; }
-	fz::datetime GetActivationTime() const { return m_activationTime; }
-	fz::datetime GetExpirationTime() const { return m_expirationTime; }
-
-	std::wstring const& GetSerial() const { return m_serial; }
-	std::wstring const& GetPkAlgoName() const { return m_pkalgoname; }
-	unsigned int GetPkAlgoBits() const { return m_pkalgobits; }
-
-	std::wstring const& GetSignatureAlgorithm() const { return m_signalgoname; }
-
-	std::wstring const& GetFingerPrintSHA256() const { return m_fingerprint_sha256; }
-	std::wstring const& GetFingerPrintSHA1() const { return m_fingerprint_sha1; }
-
-	std::wstring const& GetSubject() const { return m_subject; }
-	std::wstring const& GetIssuer() const { return m_issuer; }
-
-	std::vector<SubjectName> const& GetAltSubjectNames() const { return m_altSubjectNames; }
-
-	explicit operator bool() const { return !raw_cert_.empty(); }
-
-private:
-	fz::datetime m_activationTime;
-	fz::datetime m_expirationTime;
-
-	std::vector<uint8_t> raw_cert_;
-
-	std::wstring m_serial;
-	std::wstring m_pkalgoname;
-	unsigned int m_pkalgobits{};
-
-	std::wstring m_signalgoname;
-
-	std::wstring m_fingerprint_sha256;
-	std::wstring m_fingerprint_sha1;
-
-	std::wstring m_issuer;
-	std::wstring m_subject;
-
-	std::vector<SubjectName> m_altSubjectNames;
-};
-
 class CCertificateNotification final : public CAsyncRequestNotification
 {
 public:
-	CCertificateNotification(std::wstring const& host, unsigned int port,
-		std::wstring const& protocol,
-		std::wstring const& keyExchange,
-		std::wstring const& sessionCipher,
-		std::wstring const& sessionMac,
-		int algorithmWarnings,
-		std::vector<CCertificate> && certificates,
-		bool systemTrust,
-		bool hostnameMismatch);
+	CCertificateNotification(fz::tls_session_info && info);
 	virtual RequestId GetRequestID() const { return reqId_certificate; }
 
-	std::wstring const& GetHost() const { return m_host; }
-	unsigned int GetPort() const { return m_port; }
+	fz::tls_session_info info_;
 
-	std::wstring const& GetSessionCipher() const { return m_sessionCipher; }
-	std::wstring const& GetSessionMac() const { return m_sessionMac; }
-
-	bool m_trusted{};
-
-	const std::vector<CCertificate> GetCertificates() const { return m_certificates; }
-
-	std::wstring const& GetProtocol() const { return m_protocol; }
-	std::wstring const& GetKeyExchange() const { return m_keyExchange; }
-
-	enum algorithm_warnings_t
-	{
-		tlsver = 1,
-		cipher = 2,
-		mac = 4,
-		kex = 8
-	};
-
-	int GetAlgorithmWarnings() const { return m_algorithmWarnings; }
-
-	bool SystemTrust() const { return systemTrust_; }
-	bool MismatchedHostname() const { return hostnameMismatch_; }
+	bool trusted_{};
 
 private:
-	std::wstring m_host;
-	unsigned int m_port{};
-
-	std::wstring m_protocol;
-	std::wstring m_keyExchange;
-	std::wstring m_sessionCipher;
-	std::wstring m_sessionMac;
-	int m_algorithmWarnings{};
-
-	std::vector<CCertificate> m_certificates;
-
-	bool systemTrust_{};
-	bool hostnameMismatch_{};
 };
 
 class CSftpEncryptionNotification final : public CNotificationHelper<nId_sftp_encryption>, public CSftpEncryptionDetails

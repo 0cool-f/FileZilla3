@@ -26,7 +26,7 @@ public:
 
 protected:
 
-	// Returns falls if main window doesn't have focus or is minimized.
+	// Returns false if main window doesn't have focus or is minimized.
 	// Request attention if needed
 	bool CheckWindowState();
 

@@ -62,6 +62,7 @@ libengine_a_SOURCES = \
 		sftp/sftpcontrolsocket.cpp \
 		sizeformatting_base.cpp \
 		socket_errors.cpp \
+		tls_info.cpp \
 		tlssocket.cpp \
 		tlssocket_impl.cpp \
 		tls_system_trust_store.cpp \
