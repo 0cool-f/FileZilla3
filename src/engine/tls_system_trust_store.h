@@ -9,6 +9,8 @@
 
 #include <memory>
 
+class CTlsSocketImpl;
+
 namespace fz {
 class thread_pool;
 class tls_system_trust_store_impl;
