@@ -5,7 +5,7 @@
 
 CTlsSocket::CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, fz::tls_system_trust_store* systemTrustStore, CLogging & logger)
 	: event_handler(event_loop)
-	, SocketLayer(pEvtHandler, next_layer, false)
+	, fz::socket_layer(pEvtHandler, next_layer, false)
 {
 	impl_ = std::make_unique<CTlsSocketImpl>(*this, systemTrustStore, logger);
 	next_layer.set_event_handler(this);

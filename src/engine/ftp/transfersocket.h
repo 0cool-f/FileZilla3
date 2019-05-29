@@ -85,11 +85,11 @@ protected:
 	void TriggerPostponedEvents();
 
 	std::unique_ptr<fz::socket> socket_;
-	std::unique_ptr<CSocketBackend> ratelimit_layer_;
+	std::unique_ptr<CRatelimitLayer> ratelimit_layer_;
 	std::unique_ptr<CProxySocket> proxy_layer_;
 	std::unique_ptr<CTlsSocket> tls_layer_;
 
-	SocketLayer* active_layer_{};
+	fz::socket_layer* active_layer_{};
 
 
 	// Needed for the madeProgress field in CTransferStatus

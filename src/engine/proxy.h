@@ -16,7 +16,7 @@ enum class ProxyType {
 };
 
 class CControlSocket;
-class CProxySocket final : protected fz::event_handler, public SocketLayer
+class CProxySocket final : protected fz::event_handler, public fz::socket_layer
 {
 public:
 	CProxySocket(event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner,

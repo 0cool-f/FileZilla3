@@ -23,7 +23,7 @@ public:
 
 	x509_certificate(
 		std::vector<uint8_t> const& rawData,
-		fz::datetime const& activationTime, fz::datetime const& expirationTime,
+		fz::datetime const& activation_time, fz::datetime const& expiration_time,
 		std::string const& serial,
 		std::string const& pkalgoname, unsigned int bits,
 		std::string const& signalgoname,
@@ -35,7 +35,7 @@ public:
 
 	x509_certificate(
 		std::vector<uint8_t> && rawdata,
-		fz::datetime const& activationTime, fz::datetime const& expirationTime,
+		fz::datetime const& activation_time, fz::datetime const& expiration_time,
 		std::string const& serial,
 		std::string const& pkalgoname, unsigned int bits,
 		std::string const& signalgoname,

@@ -514,8 +514,8 @@ void CTlsSocketImpl::OnRead()
 		ContinueHandshake();
 	}
 	else if (state_ == fz::socket_state::connected || state_ == fz::socket_state::shutting_down || state_ == fz::socket_state::shut_down) {
-		if (tlsSocket_.m_pEvtHandler) {
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
+		if (tlsSocket_.event_handler_) {
+			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
 		}
 	}
 }
@@ -536,8 +536,8 @@ void CTlsSocketImpl::OnSend()
 	else if (state_ == fz::socket_state::shutting_down) {
 		int res = ContinueShutdown();
 		if (res != EAGAIN) {
-			if (tlsSocket_.m_pEvtHandler) {
-				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, res);
+			if (tlsSocket_.event_handler_) {
+				tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, res);
 			}
 		}
 	}
@@ -565,8 +565,8 @@ void CTlsSocketImpl::ContinueWrite()
 
 		m_writeSkip += static_cast<int>(res);
 		m_lastWriteFailed = false;
-		if (tlsSocket_.m_pEvtHandler) {
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
+		if (tlsSocket_.event_handler_) {
+			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
 		}
 	}
 }
@@ -785,16 +785,16 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 
 	Uninit();
 
-	if (send_close && tlsSocket_.m_pEvtHandler) {
+	if (send_close && tlsSocket_.event_handler_) {
 		int error = m_socket_error;
 		if (!error) {
 			error = ECONNABORTED;
 		}
 		if (oldState == fz::socket_state::connecting) {
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, error);
+			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, error);
 		}
 		else {
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, error);
+			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, error);
 		}
 	}
 }
@@ -865,13 +865,13 @@ void CTlsSocketImpl::set_verification_result(bool trusted)
 	if (trusted) {
 		state_ = fz::socket_state::connected;
 
-		if (tlsSocket_.m_pEvtHandler) {
-			tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, 0);
+		if (tlsSocket_.event_handler_) {
+			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, 0);
 			if (m_canReadFromSocket) {
-				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
+				tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
 			}
 			if (m_canWriteToSocket) {
-				tlsSocket_.m_pEvtHandler->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
+				tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
 			}
 		}
 

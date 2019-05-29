@@ -5,7 +5,7 @@
 namespace fz {
 x509_certificate::x509_certificate(
 		std::vector<uint8_t> const& rawData,
-		fz::datetime const& activationTime, fz::datetime const& expirationTime,
+		fz::datetime const& activation_time, fz::datetime const& expiration_time,
 		std::string const& serial,
 		std::string const& pkalgoname, unsigned int bits,
 		std::string const& signalgoname,
@@ -14,8 +14,8 @@ x509_certificate::x509_certificate(
 		std::string const& issuer,
 		std::string const& subject,
 		std::vector<SubjectName> const& altSubjectNames)
-	: activation_time_(activationTime)
-	, expiration_time_(expirationTime)
+	: activation_time_(activation_time)
+	, expiration_time_(expiration_time)
 	, raw_cert_(rawData)
 	, serial_(serial)
 	, pkalgoname_(pkalgoname)
@@ -31,7 +31,7 @@ x509_certificate::x509_certificate(
 
 x509_certificate::x509_certificate(
 	std::vector<uint8_t> && rawData,
-	fz::datetime const& activationTime, fz::datetime const& expirationTime,
+	fz::datetime const& activation_time, fz::datetime const& expiration_time,
 	std::string const& serial,
 	std::string const& pkalgoname, unsigned int bits,
 	std::string const& signalgoname,
@@ -40,8 +40,8 @@ x509_certificate::x509_certificate(
 	std::string const& issuer,
 	std::string const& subject,
 	std::vector<SubjectName> && altSubjectNames)
-	: activation_time_(activationTime)
-	, expiration_time_(expirationTime)
+	: activation_time_(activation_time)
+	, expiration_time_(expiration_time)
 	, raw_cert_(rawData)
 	, serial_(serial)
 	, pkalgoname_(pkalgoname)

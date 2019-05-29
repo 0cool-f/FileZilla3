@@ -15,7 +15,7 @@ struct certificate_verification_event_type;
 typedef simple_event<certificate_verification_event_type, CTlsSocket *, fz::tls_session_info> certificate_verification_event;
 }
 
-class CTlsSocket final : protected fz::event_handler, public SocketLayer
+class CTlsSocket final : protected fz::event_handler, public fz::socket_layer
 {
 public:
 	CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface& layer, fz::tls_system_trust_store * systemTrustStore, CLogging & logger);

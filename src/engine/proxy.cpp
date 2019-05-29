@@ -23,7 +23,7 @@ enum handshake_state
 
 CProxySocket::CProxySocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner, ProxyType t, fz::native_string const& proxy_host, unsigned int proxy_port, std::wstring const& user, std::wstring const& pass)
 	: fz::event_handler(pOwner->event_loop_)
-	, SocketLayer(pEvtHandler, next_layer, false)
+	, fz::socket_layer(pEvtHandler, next_layer, false)
 	, m_pOwner(pOwner)
 	, type_(t)
 	, proxy_host_(proxy_host)
@@ -246,8 +246,8 @@ void CProxySocket::OnReceive()
 		if (read < 0) {
 			if (error != EAGAIN) {
 				state_ = fz::socket_state::failed;
-				if (m_pEvtHandler) {
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
+				if (event_handler_) {
+					event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 				}
 			}
 			else {
@@ -257,8 +257,8 @@ void CProxySocket::OnReceive()
 		}
 		if (!read) {
 			state_ = fz::socket_state::failed;
-			if (m_pEvtHandler) {
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+			if (event_handler_) {
+				event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 			}
 			return;
 		}
@@ -280,8 +280,8 @@ void CProxySocket::OnReceive()
 					if (receiveBuffer_.size() >= 2048) {
 						state_ = fz::socket_state::failed;
 						m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming header too large");
-						if (m_pEvtHandler) {
-							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
+						if (event_handler_) {
+							event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
 						}
 						return;
 					}
@@ -296,14 +296,14 @@ void CProxySocket::OnReceive()
 
 				if (reply.substr(0, 10) != L"HTTP/1.1 2" && reply.substr(0, 10) != L"HTTP/1.0 2") {
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNRESET);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNRESET);
 					}
 				}
 				else {
 					state_ = fz::socket_state::connected;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 					}
 					receiveBuffer_.consume(i + 4);
 					set_event_passthrough();
@@ -335,14 +335,14 @@ void CProxySocket::OnReceive()
 					}
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: %s"), error);
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 				}
 				else {
 					state_ = fz::socket_state::connected;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 					}
 					receiveBuffer_.consume(8);
 					set_event_passthrough();
@@ -355,8 +355,8 @@ void CProxySocket::OnReceive()
 			if (sendBuffer_) {
 				m_pOwner->LogMessage(MessageType::Error, _("Proxy sent data while we haven't sent out request yet"));
 				state_ = fz::socket_state::failed;
-				if (m_pEvtHandler) {
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+				if (event_handler_) {
+					event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 				}
 				return;
 			}
@@ -367,8 +367,8 @@ void CProxySocket::OnReceive()
 				if (receiveBuffer_[0] != 5) {
 					m_pOwner->LogMessage(MessageType::Error, _("Unknown SOCKS protocol version: %d"), (int)receiveBuffer_[0]);
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 					return;
 				}
@@ -377,8 +377,8 @@ void CProxySocket::OnReceive()
 				if (receiveBuffer_[0] != 1) {
 					m_pOwner->LogMessage(MessageType::Error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), receiveBuffer_[0]);
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 					return;
 				}
@@ -403,8 +403,8 @@ void CProxySocket::OnReceive()
 					default:
 						m_pOwner->LogMessage(MessageType::Error, _("No supported SOCKS5 auth method"));
 						state_ = fz::socket_state::failed;
-						if (m_pEvtHandler) {
-							m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+						if (event_handler_) {
+							event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 						}
 						return;
 					}
@@ -418,8 +418,8 @@ void CProxySocket::OnReceive()
 				if (receiveBuffer_[1] != 0) {
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy authentication failed"));
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 					return;
 				}
@@ -465,8 +465,8 @@ void CProxySocket::OnReceive()
 
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed. Reply from proxy: %s"), errorMsg);
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 					return;
 				}
@@ -504,16 +504,16 @@ void CProxySocket::OnReceive()
 				default:
 					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: Unknown address type in CONNECT reply"));
 					state_ = fz::socket_state::failed;
-					if (m_pEvtHandler) {
-						m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+					if (event_handler_) {
+						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 					}
 					return;
 				}
 
 				// We're done
 				state_ = fz::socket_state::connected;
-				if (m_pEvtHandler) {
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
+				if (event_handler_) {
+					event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, 0);
 				}
 				set_event_passthrough();
 				return;
@@ -600,8 +600,8 @@ void CProxySocket::OnReceive()
 		default:
 			state_ = fz::socket_state::failed;
 			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Unhandled handshake state %d", m_handshakeState);
-			if (m_pEvtHandler) {
-				m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
+			if (event_handler_) {
+				event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 			}
 			return;
 		}
@@ -621,8 +621,8 @@ void CProxySocket::OnSend()
 		if (written == -1) {
 			if (error != EAGAIN) {
 				state_ = fz::socket_state::failed;
-				if (m_pEvtHandler) {
-					m_pEvtHandler->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
+				if (event_handler_) {
+					event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, error);
 				}
 			}
 			else {

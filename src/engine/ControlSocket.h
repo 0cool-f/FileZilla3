@@ -150,7 +150,9 @@ enum class TransferEndReason
 	failed_resumetest
 };
 
-class SocketLayer;
+namespace fz {
+class socket_layer;
+}
 class CTransferStatus;
 class CControlSocket: public CLogging, public fz::event_handler
 {
@@ -270,7 +272,7 @@ protected:
 };
 
 class CProxySocket;
-class CSocketBackend;
+class CRatelimitLayer;
 
 class CRealControlSocket : public CControlSocket
 {
@@ -301,9 +303,9 @@ protected:
 	}
 
 	std::unique_ptr<fz::socket> socket_;
-	std::unique_ptr<CSocketBackend> ratelimit_layer_;
+	std::unique_ptr<CRatelimitLayer> ratelimit_layer_;
 	std::unique_ptr<CProxySocket> proxy_layer_;
-	SocketLayer* active_layer_{};
+	fz::socket_layer* active_layer_{};
 
 	fz::buffer sendBuffer_;
 };
