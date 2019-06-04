@@ -53,7 +53,7 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 		m_engineList.push_back(this);
 	}
 
-	m_pLogging = new CLogging(*this);
+	logger_ = std::make_unique<CLogging>(*this);
 
 	{
 		bool queue_logs = ShouldQueueLogsFromOptions();
@@ -100,8 +100,6 @@ CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 			}
 		}
 	}
-
-	delete m_pLogging;
 }
 
 void CFileZillaEnginePrivate::OnEngineEvent(EngineNotificationType type)
@@ -231,11 +229,11 @@ void CFileZillaEnginePrivate::ClearQueuedLogs(bool reset_flag)
 int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 {
 	fz::scoped_lock lock(mutex_);
-	m_pLogging->log(logmsg::debug_debug, L"CFileZillaEnginePrivate::ResetOperation(%d)", nErrorCode);
+	logger_->log(logmsg::debug_debug, L"CFileZillaEnginePrivate::ResetOperation(%d)", nErrorCode);
 
 	if (m_pCurrentCommand) {
 		if ((nErrorCode & FZ_REPLY_NOTSUPPORTED) == FZ_REPLY_NOTSUPPORTED) {
-			m_pLogging->log(logmsg::error, _("Command not supported by this protocol"));
+			logger_->log(logmsg::error, _("Command not supported by this protocol"));
 		}
 
 		if (m_pCurrentCommand->GetId() == Command::connect) {
@@ -253,7 +251,7 @@ int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 						if (!delay) {
 							delay = fz::duration::from_seconds(1);
 						}
-						m_pLogging->log(logmsg::status, _("Waiting to retry..."));
+						logger_->log(logmsg::status, _("Waiting to retry..."));
 						stop_timer(m_retryTimer);
 						m_retryTimer = add_timer(delay, true);
 						return FZ_REPLY_WOULDBLOCK;
@@ -318,7 +316,7 @@ int CFileZillaEnginePrivate::Connect(CConnectCommand const& command)
 	if (server.GetPort() != CServer::GetDefaultPort(server.GetProtocol())) {
 		ServerProtocol protocol = CServer::GetProtocolFromPort(server.GetPort(), true);
 		if (protocol != UNKNOWN && protocol != server.GetProtocol()) {
-			m_pLogging->log(logmsg::status, _("Selected port usually in use by a different protocol."));
+			logger_->log(logmsg::status, _("Selected port usually in use by a different protocol."));
 		}
 	}
 
@@ -408,10 +406,10 @@ int CFileZillaEnginePrivate::RawCommand(CRawCommand const& command)
 int CFileZillaEnginePrivate::Delete(CDeleteCommand& command)
 {
 	if (command.GetFiles().size() == 1) {
-		m_pLogging->log(logmsg::status, _("Deleting \"%s\""), command.GetPath().FormatFilename(command.GetFiles().front()));
+		logger_->log(logmsg::status, _("Deleting \"%s\""), command.GetPath().FormatFilename(command.GetFiles().front()));
 	}
 	else {
-		m_pLogging->log(logmsg::status, _("Deleting %u files from \"%s\""), static_cast<unsigned int>(command.GetFiles().size()), command.GetPath().GetPath());
+		logger_->log(logmsg::status, _("Deleting %u files from \"%s\""), static_cast<unsigned int>(command.GetFiles().size()), command.GetPath().GetPath());
 	}
 	controlSocket_->Delete(command.GetPath(), command.ExtractFiles());
 	return FZ_REPLY_CONTINUE;
@@ -500,7 +498,7 @@ void CFileZillaEnginePrivate::OnTimer(fz::timer_id)
 	m_retryTimer = 0;
 
 	if (!m_pCurrentCommand || m_pCurrentCommand->GetId() != Command::connect) {
-		m_pLogging->log(logmsg::debug_warning, L"CFileZillaEnginePrivate::OnTimer called without pending Command::connect");
+		logger_->log(logmsg::debug_warning, L"CFileZillaEnginePrivate::OnTimer called without pending Command::connect");
 		return;
 	}
 
@@ -524,7 +522,7 @@ int CFileZillaEnginePrivate::ContinueConnect()
 	fz::scoped_lock lock(mutex_);
 
 	if (!m_pCurrentCommand || m_pCurrentCommand->GetId() != Command::connect) {
-		m_pLogging->log(logmsg::debug_warning, L"CFileZillaEnginePrivate::ContinueConnect called without pending Command::connect");
+		logger_->log(logmsg::debug_warning, L"CFileZillaEnginePrivate::ContinueConnect called without pending Command::connect");
 		return ResetOperation(FZ_REPLY_INTERNALERROR);
 	}
 
@@ -532,7 +530,7 @@ int CFileZillaEnginePrivate::ContinueConnect()
 	const CServer& server = pConnectCommand->GetServer();
 	fz::duration const& delay = GetRemainingReconnectDelay(server);
 	if (delay) {
-		m_pLogging->log(logmsg::status, fztranslate("Delaying connection for %d second due to previously failed connection attempt...", "Delaying connection for %d seconds due to previously failed connection attempt...", (delay.get_milliseconds() + 999) / 1000), (delay.get_milliseconds() + 999) / 1000);
+		logger_->log(logmsg::status, fztranslate("Delaying connection for %d second due to previously failed connection attempt...", "Delaying connection for %d seconds due to previously failed connection attempt...", (delay.get_milliseconds() + 999) / 1000), (delay.get_milliseconds() + 999) / 1000);
 		stop_timer(m_retryTimer);
 		m_retryTimer = add_timer(delay, true);
 		return FZ_REPLY_WOULDBLOCK;
@@ -559,7 +557,7 @@ int CFileZillaEnginePrivate::ContinueConnect()
 		break;
 #endif
 	default:
-		m_pLogging->log(logmsg::error, _("'%s' is not a supported protocol."), CServer::GetProtocolName(server.GetProtocol()));
+		logger_->log(logmsg::error, _("'%s' is not a supported protocol."), CServer::GetProtocolName(server.GetProtocol()));
 		return FZ_REPLY_SYNTAXERROR|FZ_REPLY_DISCONNECTED;
 	}
 
@@ -616,7 +614,7 @@ void CFileZillaEnginePrivate::operator()(fz::event_base const& ev)
 int CFileZillaEnginePrivate::CheckCommandPreconditions(CCommand const& command, bool checkBusy)
 {
 	if (!command.valid()) {
-		m_pLogging->log(logmsg::debug_warning, L"Command not valid");
+		logger_->log(logmsg::debug_warning, L"Command not valid");
 		return FZ_REPLY_SYNTAXERROR;
 	}
 	else if (checkBusy && IsBusy()) {
@@ -681,7 +679,7 @@ void CFileZillaEnginePrivate::OnCommandEvent()
 						res = FZ_REPLY_CONTINUE;
 					}
 					else {
-						m_pLogging->log(logmsg::error, _("Command not supported by this protocol"));
+						logger_->log(logmsg::error, _("Command not supported by this protocol"));
 						res = FZ_REPLY_NOTSUPPORTED;
 					}
 				}
@@ -726,7 +724,7 @@ void CFileZillaEnginePrivate::DoCancel()
 		stop_timer(m_retryTimer);
 		m_retryTimer = 0;
 
-		m_pLogging->log(logmsg::error, _("Connection attempt interrupted by user"));
+		logger_->log(logmsg::error, _("Connection attempt interrupted by user"));
 		COperationNotification *notification = new COperationNotification();
 		notification->nReplyCode = FZ_REPLY_DISCONNECTED | FZ_REPLY_CANCELED;
 		notification->commandId = Command::connect;
@@ -893,6 +891,11 @@ void CFileZillaEnginePrivate::OnOptionsChanged(changed_options_t const&)
 	else {
 		SendQueuedLogs(true);
 	}
+}
+
+fz::logger_interface& CFileZillaEnginePrivate::GetLogger()
+{
+	return *logger_;
 }
 
 

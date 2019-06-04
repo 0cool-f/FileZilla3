@@ -154,7 +154,7 @@ namespace fz {
 class socket_layer;
 }
 class CTransferStatus;
-class CControlSocket : public CLogging, public fz::event_handler
+class CControlSocket : public fz::event_handler
 {
 public:
 	CControlSocket(CFileZillaEnginePrivate & engine);
@@ -220,6 +220,14 @@ public:
 	virtual bool CanSendNextCommand() { return true; }
 	int SendNextCommand();
 
+	template<typename ...Args>
+	void log(Args&& ... args) {
+		logger_.log(std::forward<Args>(args)...);
+	}
+	template<typename ...Args>
+	void log_raw(Args&& ... args) {
+		logger_.log_raw(std::forward<Args>(args)...);
+	}
 protected:
 	void SendDirectoryListingNotification(CServerPath const& path, bool failed);
 
@@ -264,6 +272,8 @@ protected:
 
 	bool m_invalidateCurrentPath{};
 	ServerHandle handle_;
+
+	fz::logger_interface& logger_;
 
 	virtual void operator()(fz::event_base const& ev);
 

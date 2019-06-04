@@ -109,6 +109,9 @@ public:
 	CustomEncodingConverterBase const& GetEncodingConverter() const { return encoding_converter_; }
 
 	OpLockManager & opLockManager_;
+
+	fz::logger_interface& GetLogger();
+
 protected:
 	virtual void OnOptionsChanged(changed_options_t const& options);
 
@@ -177,7 +180,7 @@ protected:
 
 	COptionsBase& m_options;
 
-	CLogging* m_pLogging;
+	std::unique_ptr<CLogging> logger_;
 
 	// Everything related to the retry code
 	// ------------------------------------

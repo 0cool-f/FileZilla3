@@ -30,10 +30,10 @@
 #endif
 
 CControlSocket::CControlSocket(CFileZillaEnginePrivate & engine)
-	: CLogging(engine)
-	, event_handler(engine.event_loop_)
+	: event_handler(engine.event_loop_)
 	, engine_(engine)
 	, opLockManager_(engine.opLockManager_)
+	, logger_(engine.GetLogger())
 {
 }
 

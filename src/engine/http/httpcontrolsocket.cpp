@@ -201,7 +201,7 @@ void CHttpControlSocket::OnConnect()
 		if (!tls_layer_) {
 			log(logmsg::status, _("Connection established, initializing TLS..."));
 
-			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), *this);
+			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), logger_);
 			active_layer_ = tls_layer_.get();
 
 			if (!tls_layer_->client_handshake(&data)) {
