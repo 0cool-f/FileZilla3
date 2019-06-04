@@ -3,11 +3,11 @@
 
 #include "backend.h"
 
-class CLogging;
 class CTlsSocket;
 class CTlsSocketImpl;
 
 namespace fz {
+class logger_interface;
 class tls_system_trust_store;
 class tls_session_info;
 
@@ -18,7 +18,7 @@ typedef simple_event<certificate_verification_event_type, CTlsSocket *, fz::tls_
 class CTlsSocket final : protected fz::event_handler, public fz::socket_layer
 {
 public:
-	CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface& layer, fz::tls_system_trust_store * systemTrustStore, CLogging & logger);
+	CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface& layer, fz::tls_system_trust_store * systemTrustStore, fz::logger_interface& logger);
 	virtual ~CTlsSocket();
 
 	/**

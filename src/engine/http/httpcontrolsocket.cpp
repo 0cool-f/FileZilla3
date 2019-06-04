@@ -26,7 +26,7 @@ int simple_body::data_request(unsigned char* data, unsigned int & len)
 }
 
 
-file_body::file_body(fz::file & file, uint64_t start, uint64_t size, CLogging & logger)
+file_body::file_body(fz::file & file, uint64_t start, uint64_t size, fz::logger_interface & logger)
 	: file_(file)
 	, start_(start)
 	, size_(size)

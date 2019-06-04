@@ -3,10 +3,9 @@
 
 #include "httpheaders.h"
 
-class CLogging;
-
 namespace fz {
-class uri;
+	class logger_interface;
+	class uri;
 }
 
 
@@ -15,6 +14,6 @@ typedef std::map<std::string, HttpAuthParams, fz::less_insensitive_ascii> HttpAu
 
 HttpAuthChallenges ParseAuthChallenges(std::string const& header);
 
-std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int & nonceCounter, std::string const& verb, fz::uri const& uri, std::string const& user, Credentials const& credentials, CLogging & logger);
+std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int & nonceCounter, std::string const& verb, fz::uri const& uri, std::string const& user, Credentials const& credentials, fz::logger_interface & logger);
 
 #endif

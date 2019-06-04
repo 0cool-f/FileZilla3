@@ -29,7 +29,7 @@ char const ciphers[] = "@SYSTEM";
 #define TLSDEBUG 0
 #if TLSDEBUG
 // This is quite ugly
-CLogging* pLogging;
+fz::logger_interface* pLogging;
 void log_func(int level, char const* msg)
 {
 	if (!msg || !pLogging) {
@@ -172,7 +172,7 @@ void clone_cert(gnutls_x509_crt_t in, gnutls_x509_crt_t &out)
 }
 }
 
-CTlsSocketImpl::CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store* systemTrustStore, CLogging & logger)
+CTlsSocketImpl::CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store* systemTrustStore, fz::logger_interface & logger)
 	: tlsSocket_(tlsSocket)
 	, logger_(logger)
 	, systemTrustStore_(systemTrustStore)

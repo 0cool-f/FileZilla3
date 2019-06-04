@@ -3,7 +3,7 @@
 #include "tlssocket.h"
 #include "tlssocket_impl.h"
 
-CTlsSocket::CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, fz::tls_system_trust_store* systemTrustStore, CLogging & logger)
+CTlsSocket::CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, fz::tls_system_trust_store* systemTrustStore, fz::logger_interface & logger)
 	: event_handler(event_loop)
 	, fz::socket_layer(pEvtHandler, next_layer, false)
 {

@@ -61,7 +61,7 @@ private:
 class file_body final : public request_body
 {
 public:
-	file_body(fz::file & file, uint64_t start, uint64_t size, CLogging & logger);
+	file_body(fz::file & file, uint64_t start, uint64_t size, fz::logger_interface & logger);
 
 	virtual uint64_t size() const override { return size_; }
 
@@ -77,7 +77,7 @@ private:
 	uint64_t written_{};
 	uint64_t size_{};
 
-	CLogging & logger_;
+	fz::logger_interface & logger_;
 };
 
 #define HEADER_NAME_CONTENT_LENGTH "Content-Length"

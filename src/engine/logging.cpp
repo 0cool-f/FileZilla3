@@ -53,7 +53,6 @@ public:
 	virtual void OnOptionsChanged(changed_options_t const& options)
 	{
 		if (options.test(OPTION_LOGGING_DEBUGLEVEL) || options.test(OPTION_LOGGING_RAWLISTING)) {
-			//CLogging::UpdateLogLevel(options_); // In main thread
 			send_event<CLoggingOptionsChangedEvent>();
 		}
 	}
@@ -75,6 +74,7 @@ CLogging::CLogging(CFileZillaEnginePrivate & engine)
 		fz::scoped_lock l(mutex_);
 		m_refcount++;
 	}
+	UpdateLogLevel(engine.GetOptions());
 	optionChangeHandler_ = std::make_unique<CLoggingOptionsChanged>(*this, engine_.GetOptions(), engine.event_loop_);
 }
 

@@ -203,7 +203,7 @@ typename T::mapped_type get(T const& t, K && key)
 }
 }
 
-std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int & nonceCounter, std::string const& verb, fz::uri const& uri, std::string const& user, Credentials const& credentials, CLogging & logger)
+std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int & nonceCounter, std::string const& verb, fz::uri const& uri, std::string const& user, Credentials const& credentials, fz::logger_interface & logger)
 {
 	// See RFC 7616
 

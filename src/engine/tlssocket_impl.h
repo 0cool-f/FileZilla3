@@ -13,14 +13,14 @@ typedef std::make_signed_t<size_t> ssize_t;
 
 namespace fz {
 class tls_system_trust_store;
+class logger_interface;
 }
 
-class CLogging;
 class CTlsSocket;
 class CTlsSocketImpl final
 {
 public:
-	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store * systemTrustStore, CLogging & logger);
+	CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store * systemTrustStore, fz::logger_interface & logger);
 	~CTlsSocketImpl();
 
 	bool client_handshake(std::vector<uint8_t> const& session_to_resume, fz::native_string const& session_hostname, std::vector<uint8_t> const& required_certificate, fz::event_handler * verification_handler);
@@ -102,7 +102,7 @@ private:
 
 	fz::socket_state state_{};
 
-	CLogging& logger_;
+	fz::logger_interface & logger_;
 
 	bool m_initialized{};
 	gnutls_session_t m_session{};
