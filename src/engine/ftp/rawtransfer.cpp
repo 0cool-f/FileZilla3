@@ -150,11 +150,11 @@ int CFtpRawTransferOpData::ParseResponse()
 		}
 		break;
 	case rawtransfer_waitsocket:
-		LogMessage(MessageType::Debug_Warning, L"Extra reply received during rawtransfer_waitsocket.");
+		log(logmsg::debug_warning, L"Extra reply received during rawtransfer_waitsocket.");
 		error = true;
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown op state");
+		log(logmsg::debug_warning, L"Unknown op state");
 		error = true;
 	}
 	if (error) {
@@ -167,7 +167,7 @@ int CFtpRawTransferOpData::ParseResponse()
 int CFtpRawTransferOpData::Send()
 {
 	if (!controlSocket_.m_pTransferSocket) {
-		LogMessage(MessageType::Debug_Info, L"Empty m_pTransferSocket");
+		log(logmsg::debug_info, L"Empty m_pTransferSocket");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -210,10 +210,10 @@ int CFtpRawTransferOpData::Send()
 			}
 
 			if (!engine_.GetOptions().GetOptionVal(OPTION_ALLOW_TRANSFERMODEFALLBACK) || bTriedPasv) {
-				LogMessage(MessageType::Error, _("Failed to create listening socket for active mode transfer"));
+				log(logmsg::error, _("Failed to create listening socket for active mode transfer"));
 				return FZ_REPLY_ERROR;
 			}
-			LogMessage(MessageType::Debug_Warning, _("Failed to create listening socket for active mode transfer"));
+			log(logmsg::debug_warning, _("Failed to create listening socket for active mode transfer"));
 			bTriedActive = true;
 			bPasv = true;
 			cmd = GetPassiveCommand();
@@ -229,7 +229,7 @@ int CFtpRawTransferOpData::Send()
 	case rawtransfer_transfer:
 		if (bPasv) {
 			if (!controlSocket_.m_pTransferSocket->SetupPassiveTransfer(host_, port_)) {
-				LogMessage(MessageType::Error, _("Could not establish connection to server"));
+				log(logmsg::error, _("Could not establish connection to server"));
 				return FZ_REPLY_ERROR;
 			}
 		}
@@ -246,7 +246,7 @@ int CFtpRawTransferOpData::Send()
 	case rawtransfer_waitsocket:
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"invalid opstate");
+		log(logmsg::debug_warning, L"invalid opstate");
 		return FZ_REPLY_INTERNALERROR;
 	}
 	if (!cmd.empty()) {
@@ -335,13 +335,13 @@ bool CFtpRawTransferOpData::ParsePasvResponse()
 	std::wstring const peerIP = fz::to_wstring(controlSocket_.socket_->peer_ip());
 	if (!fz::is_routable_address(host_) && fz::is_routable_address(peerIP)) {
 		if (engine_.GetOptions().GetOptionVal(OPTION_PASVREPLYFALLBACKMODE) != 1 || bTriedActive) {
-			LogMessage(MessageType::Status, _("Server sent passive reply with unroutable address. Using server address instead."));
-			LogMessage(MessageType::Debug_Info, L"  Reply: %s, peer: %s", host_, peerIP);
+			log(logmsg::status, _("Server sent passive reply with unroutable address. Using server address instead."));
+			log(logmsg::debug_info, L"  Reply: %s, peer: %s", host_, peerIP);
 			host_ = peerIP;
 		}
 		else {
-			LogMessage(MessageType::Status, _("Server sent passive reply with unroutable address. Passive mode failed."));
-			LogMessage(MessageType::Debug_Info, L"  Reply: %s, peer: %s", host_, peerIP);
+			log(logmsg::status, _("Server sent passive reply with unroutable address. Passive mode failed."));
+			log(logmsg::debug_info, L"  Reply: %s, peer: %s", host_, peerIP);
 			return false;
 		}
 	}

@@ -29,17 +29,17 @@ int CStorjFileTransferOpData::Send()
 
 		if (!remotePath_.SegmentCount()) {
 			if (!download_) {
-				LogMessage(MessageType::Error, _("You cannot upload files into the root directory."));
+				log(logmsg::error, _("You cannot upload files into the root directory."));
 			}
 			return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
 		}
 
 		if (download_) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
-			LogMessage(MessageType::Status, _("Starting download of %s"), filename);
+			log(logmsg::status, _("Starting download of %s"), filename);
 		}
 		else {
-			LogMessage(MessageType::Status, _("Starting upload of %s"), localFile_);
+			log(logmsg::status, _("Starting upload of %s"), localFile_);
 		}
 
 		int64_t size;
@@ -99,7 +99,7 @@ int CStorjFileTransferOpData::Send()
 		return FZ_REPLY_WOULDBLOCK;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjFileTransferOpData::FileTransferSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::FileTransferSend()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -109,7 +109,7 @@ int CStorjFileTransferOpData::ParseResponse()
 		return controlSocket_.result_;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"CStorjFileTransferOpData::ParseResponse called at improper time: %d", opState);
+	log(logmsg::debug_warning, L"CStorjFileTransferOpData::ParseResponse called at improper time: %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -150,7 +150,7 @@ int CStorjFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 		return FZ_REPLY_CONTINUE;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjFileTransferOpData::SubcommandResult()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }
 

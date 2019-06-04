@@ -15,7 +15,7 @@ int CSftpListOpData::Send()
 {
 	if (opState == list_init) {
 		if (!currentServer_) {
-			LogMessage(MessageType::Debug_Warning, L"currenServer_ is empty");
+			log(logmsg::debug_warning, L"currenServer_ is empty");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
@@ -59,7 +59,7 @@ int CSftpListOpData::Send()
 		return controlSocket_.SendCommand(L"ls");
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CSftpControlSocket::ListSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CSftpControlSocket::ListSend()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -71,7 +71,7 @@ int CSftpListOpData::ParseResponse()
 		}
 
 		if (!listing_parser_) {
-			LogMessage(MessageType::Debug_Warning, L"listing_parser_ is empty");
+			log(logmsg::debug_warning, L"listing_parser_ is empty");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
@@ -82,7 +82,7 @@ int CSftpListOpData::ParseResponse()
 		return FZ_REPLY_OK;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"ListParseResponse called at improper time: %d", opState);
+	log(logmsg::debug_warning, L"ListParseResponse called at improper time: %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -115,14 +115,14 @@ int CSftpListOpData::SubcommandResult(int prevResult, COpData const&)
 int CSftpListOpData::ParseEntry(std::wstring && entry, uint64_t mtime, std::wstring && name)
 {
 	if (opState != list_list) {
-		controlSocket_.LogMessageRaw(MessageType::RawList, entry);
-		LogMessage(MessageType::Debug_Warning, L"CSftpListOpData::ParseEntry called at improper time: %d", opState);
+		controlSocket_.log_raw(logmsg::listing, entry);
+		log(logmsg::debug_warning, L"CSftpListOpData::ParseEntry called at improper time: %d", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 
 	if (!listing_parser_) {
-		controlSocket_.LogMessageRaw(MessageType::RawList, entry);
-		LogMessage(MessageType::Debug_Warning, L"listing_parser_ is null");
+		controlSocket_.log_raw(logmsg::listing, entry);
+		log(logmsg::debug_warning, L"listing_parser_ is null");
 		return FZ_REPLY_INTERNALERROR;
 	}
 

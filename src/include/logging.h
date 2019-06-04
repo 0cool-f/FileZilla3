@@ -1,21 +1,11 @@
 #ifndef FILEZILLA_ENGINE_LOGGING_HEADER
 #define FILEZILLA_ENGINE_LOGGING_HEADER
 
-enum class MessageType
-{
-	Status,
-	Error,
-	Command,
-	Response,
-	Debug_Warning,
-	Debug_Info,
-	Debug_Verbose,
-	Debug_Debug,
+#include <libfilezilla/logger.hpp>
 
-	RawList,
-
-	count
-};
+namespace logmsg {
+	using namespace fz::logmsg;
+	auto constexpr listing = private1;
+}
 
 #endif
-

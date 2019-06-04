@@ -20,13 +20,13 @@ int CFtpDeleteOpData::Send()
 	else if (opState == del_del) {
 		std::wstring const& file = files_.front();
 		if (file.empty()) {
-			LogMessage(MessageType::Debug_Info, L"Empty filename");
+			log(logmsg::debug_info, L"Empty filename");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
 		std::wstring filename = path_.FormatFilename(file, omitPath_);
 		if (filename.empty()) {
-			LogMessage(MessageType::Error, _("Filename cannot be constructed for directory %s and filename %s"), path_.GetPath(), file);
+			log(logmsg::error, _("Filename cannot be constructed for directory %s and filename %s"), path_.GetPath(), file);
 			return FZ_REPLY_ERROR;
 		}
 
@@ -35,7 +35,7 @@ int CFtpDeleteOpData::Send()
 		return controlSocket_.SendCommand(L"DELE " + filename);
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unkown op state %d", opState);
+	log(logmsg::debug_warning, L"Unkown op state %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 

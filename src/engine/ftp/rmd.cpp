@@ -23,7 +23,7 @@ int CFtpRemoveDirOpData::Send()
 		if (path.empty()) {
 			path = path_;
 			if (!path.AddSegment(subDir_)) {
-				LogMessage(MessageType::Error, _("Path cannot be constructed for directory %s and subdir %s"), path_.GetPath(), subDir_);
+				log(logmsg::error, _("Path cannot be constructed for directory %s and subdir %s"), path_.GetPath(), subDir_);
 				return FZ_REPLY_ERROR;
 			}
 		}
@@ -39,7 +39,7 @@ int CFtpRemoveDirOpData::Send()
 		}
 		else {
 			if (!fullPath_.AddSegment(subDir_)) {
-				LogMessage(MessageType::Error, _("Path cannot be constructed for directory %s and subdir %s"), path_.GetPath(), subDir_);
+				log(logmsg::error, _("Path cannot be constructed for directory %s and subdir %s"), path_.GetPath(), subDir_);
 				return FZ_REPLY_ERROR;
 			}
 
@@ -47,7 +47,7 @@ int CFtpRemoveDirOpData::Send()
 		}
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unkown op state %d", opState);
+	log(logmsg::debug_warning, L"Unkown op state %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 

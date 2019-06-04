@@ -89,19 +89,19 @@ protected:
 class CLogmsgNotification final : public CNotificationHelper<nId_logmsg>
 {
 public:
-	explicit CLogmsgNotification(MessageType t)
+	explicit CLogmsgNotification(logmsg::type t)
 		: msgType(t)
 	{}
 
 	template<typename String>
-	CLogmsgNotification(MessageType t, String && m)
+	CLogmsgNotification(logmsg::type t, String && m)
 		: msg(std::forward<String>(m))
 		, msgType(t)
 	{
 	}
 
 	std::wstring msg;
-	MessageType msgType{MessageType::Status}; // Type of message, see logging.h for details
+	logmsg::type msgType{logmsg::status}; // Type of message, see logging.h for details
 };
 
 // If CFileZillaEngine does return with FZ_REPLY_WOULDBLOCK, you will receive

@@ -154,7 +154,7 @@ int CFtpChangeDirOpData::ParseResponse()
 		break;
 	case cwd_pwd_cwd:
 		if (code != 2 && code != 3) {
-			LogMessage(MessageType::Debug_Warning, L"PWD failed, assuming path is '%s'.", path_.GetPath());
+			log(logmsg::debug_warning, L"PWD failed, assuming path is '%s'.", path_.GetPath());
 			currentPath_ = path_;
 
 			if (target_.empty()) {
@@ -190,7 +190,7 @@ int CFtpChangeDirOpData::ParseResponse()
 				tried_cdup_ = true;
 			}
 			else if (link_discovery_) {
-				LogMessage(MessageType::Debug_Info, L"Symlink does not link to a directory, probably a file");
+				log(logmsg::debug_info, L"Symlink does not link to a directory, probably a file");
 				return FZ_REPLY_LINKNOTDIR;
 			}
 			else {
@@ -218,7 +218,7 @@ int CFtpChangeDirOpData::ParseResponse()
 
 			if (code != 2 && code != 3) {
 				if (!assumedPath.empty()) {
-					LogMessage(MessageType::Debug_Warning, L"PWD failed, assuming path is '%s'.", assumedPath.GetPath());
+					log(logmsg::debug_warning, L"PWD failed, assuming path is '%s'.", assumedPath.GetPath());
 					currentPath_ = assumedPath;
 
 					if (target_.empty()) {
@@ -228,7 +228,7 @@ int CFtpChangeDirOpData::ParseResponse()
 					return FZ_REPLY_OK;
 				}
 				else {
-					LogMessage(MessageType::Debug_Warning, L"PWD failed, unable to guess current path.");
+					log(logmsg::debug_warning, L"PWD failed, unable to guess current path.");
 					error = true;
 				}
 			}

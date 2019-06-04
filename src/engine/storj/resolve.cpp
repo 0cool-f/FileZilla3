@@ -60,12 +60,12 @@ int CStorjResolveOpData::Send()
 				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
 				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
-					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
+					log(logmsg::debug_info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
 					return FZ_REPLY_CONTINUE;
 				}
 				else {
-					LogMessage(MessageType::Error, _("Bucket not found"));
+					log(logmsg::error, _("Bucket not found"));
 					return FZ_REPLY_ERROR;
 				}
 			}
@@ -93,7 +93,7 @@ int CStorjResolveOpData::Send()
 				if (pos != std::string::npos) {
 					*fileId_ = ExtractId(*listing[pos].ownerGroup);
 					if (!fileId_->empty()) {
-						LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file_), *fileId_);
+						log(logmsg::debug_info, L"File %s has id %s", path_.FormatFilename(file_), *fileId_);
 						return FZ_REPLY_OK;
 					}
 					else {
@@ -108,7 +108,7 @@ int CStorjResolveOpData::Send()
 					return FZ_REPLY_OK;
 				}
 
-				LogMessage(MessageType::Error, _("File not found"));
+				log(logmsg::error, _("File not found"));
 				return FZ_REPLY_ERROR;
 			}
 
@@ -119,7 +119,7 @@ int CStorjResolveOpData::Send()
 		break;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjResolveOpData::ResolveSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjResolveOpData::ResolveSend()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -139,13 +139,13 @@ int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
 				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
-					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
+					log(logmsg::debug_info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
 					return FZ_REPLY_CONTINUE;
 				}
 			}
 		}
-		LogMessage(MessageType::Error, _("Bucket not found"));
+		log(logmsg::error, _("Bucket not found"));
 		return FZ_REPLY_ERROR;
 	case resolve_waitlist:
 		if (prevResult != FZ_REPLY_OK) {
@@ -163,7 +163,7 @@ int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 				size_t pos = listing.FindFile_CmpCase(file_);
 				if (pos != std::string::npos) {
 					*fileId_ = ExtractId(*listing[pos].ownerGroup);
-					LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file_), *fileId_);
+					log(logmsg::debug_info, L"File %s has id %s", path_.FormatFilename(file_), *fileId_);
 					return FZ_REPLY_OK;
 				}
 				if (ignore_missing_file_) {
@@ -171,11 +171,11 @@ int CStorjResolveOpData::SubcommandResult(int prevResult, COpData const&)
 				}
 			}
 		}
-		LogMessage(MessageType::Error, _("File not found"));
+		log(logmsg::error, _("File not found"));
 		return FZ_REPLY_ERROR;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjResolveOpData::SubcommandResult()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjResolveOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -206,12 +206,12 @@ int CStorjResolveManyOpData::Send()
 				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
 				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
-					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
+					log(logmsg::debug_info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
 					return FZ_REPLY_CONTINUE;
 				}
 				else {
-					LogMessage(MessageType::Error, _("Bucket not found"));
+					log(logmsg::error, _("Bucket not found"));
 					return FZ_REPLY_ERROR;
 				}
 			}
@@ -232,7 +232,7 @@ int CStorjResolveManyOpData::Send()
 				for (auto const& file : files_ ) {
 					size_t pos = listing.FindFile_CmpCase(file);
 					if (pos != std::string::npos) {
-						LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file), *listing[pos].ownerGroup);
+						log(logmsg::debug_info, L"File %s has id %s", path_.FormatFilename(file), *listing[pos].ownerGroup);
 						fileIds_.emplace_back(ExtractId(*listing[pos].ownerGroup));
 					}
 					else {
@@ -249,7 +249,7 @@ int CStorjResolveManyOpData::Send()
 		break;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjResolveManyOpData::ResolveSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjResolveManyOpData::ResolveSend()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -270,13 +270,13 @@ int CStorjResolveManyOpData::SubcommandResult(int prevResult, COpData const&)
 				size_t pos = buckets.FindFile_CmpCase(path_.GetFirstSegment());
 				if (pos != std::string::npos) {
 					bucket_ = ExtractId(*buckets[pos].ownerGroup);
-					LogMessage(MessageType::Debug_Info, L"Directory is in bucket %s", bucket_);
+					log(logmsg::debug_info, L"Directory is in bucket %s", bucket_);
 					opState = resolve_id;
 					return FZ_REPLY_CONTINUE;
 				}
 			}
 		}
-		LogMessage(MessageType::Error, _("Bucket not found"));
+		log(logmsg::error, _("Bucket not found"));
 		return FZ_REPLY_ERROR;
 	case resolve_waitlist:
 		{
@@ -288,7 +288,7 @@ int CStorjResolveManyOpData::SubcommandResult(int prevResult, COpData const&)
 				for (auto const& file : files_ ) {
 					size_t pos = listing.FindFile_CmpCase(file);
 					if (pos != std::string::npos) {
-						LogMessage(MessageType::Debug_Info, L"File %s has id %s", path_.FormatFilename(file), *listing[pos].ownerGroup);
+						log(logmsg::debug_info, L"File %s has id %s", path_.FormatFilename(file), *listing[pos].ownerGroup);
 						fileIds_.emplace_back(ExtractId(*listing[pos].ownerGroup));
 					}
 					else {
@@ -298,10 +298,10 @@ int CStorjResolveManyOpData::SubcommandResult(int prevResult, COpData const&)
 				return FZ_REPLY_OK;
 			}
 		}
-		LogMessage(MessageType::Error, _("Files not found"));
+		log(logmsg::error, _("Files not found"));
 		return FZ_REPLY_ERROR;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjResolveManyOpData::SubcommandResult()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjResolveManyOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }

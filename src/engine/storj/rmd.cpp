@@ -19,7 +19,7 @@ int CStorjRemoveDirOpData::Send()
 	switch (opState) {
 	case rmd_init:
 		if (path_.SegmentCount() < 1) {
-			LogMessage(MessageType::Error, _("Invalid path"));
+			log(logmsg::error, _("Invalid path"));
 			return FZ_REPLY_CRITICALERROR;
 		}
 		controlSocket_.Resolve(path_, std::wstring(), bucket_);
@@ -37,7 +37,7 @@ int CStorjRemoveDirOpData::Send()
 		return controlSocket_.SendCommand(L"rm " + bucket_ + L" " + pathId_);
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjRemoveDirOpData::Send()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjRemoveDirOpData::Send()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -59,7 +59,7 @@ int CStorjRemoveDirOpData::ParseResponse()
 		return controlSocket_.result_;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjRemoveDirOpData::ParseResponse()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjRemoveDirOpData::ParseResponse()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -93,6 +93,6 @@ int CStorjRemoveDirOpData::SubcommandResult(int prevResult, COpData const& previ
 		return FZ_REPLY_CONTINUE;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjRemoveDirOpData::SubcommandResult()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjRemoveDirOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }

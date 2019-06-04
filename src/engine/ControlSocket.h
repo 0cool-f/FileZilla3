@@ -43,7 +43,7 @@ public:
 
 	wchar_t const* const name_;
 
-	MessageType sendLogLevel_{MessageType::Debug_Verbose};
+	logmsg::type sendLogLevel_{logmsg::debug_verbose};
 };
 
 template<typename T>
@@ -61,8 +61,8 @@ public:
 	virtual ~CProtocolOpData() = default;
 
 	template<typename...Args>
-	void LogMessage(Args&& ...args) const {
-		controlSocket_.LogMessage(std::forward<Args>(args)...);
+	void log(Args&& ...args) const {
+		controlSocket_.log(std::forward<Args>(args)...);
 	}
 
 	T & controlSocket_;
@@ -154,7 +154,7 @@ namespace fz {
 class socket_layer;
 }
 class CTransferStatus;
-class CControlSocket: public CLogging, public fz::event_handler
+class CControlSocket : public CLogging, public fz::event_handler
 {
 public:
 	CControlSocket(CFileZillaEnginePrivate & engine);
@@ -217,7 +217,7 @@ public:
 	// Only called from the engine, see there for description
 	void InvalidateCurrentWorkingDir(const CServerPath& path);
 
-	virtual bool CanSendNextCommand() const { return true; }
+	virtual bool CanSendNextCommand() { return true; }
 	int SendNextCommand();
 
 protected:

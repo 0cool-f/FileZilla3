@@ -18,17 +18,17 @@ int CStorjConnectOpData::Send()
 			if (executable.empty()) {
 				executable = fzT("fzstorj");
 			}
-			LogMessage(MessageType::Debug_Verbose, L"Going to execute %s", executable);
+			log(logmsg::debug_verbose, L"Going to execute %s", executable);
 
 			std::vector<fz::native_string> args;
 			if (!controlSocket_.process_->spawn(executable, args)) {
-				LogMessage(MessageType::Debug_Warning, L"Could not create process");
+				log(logmsg::debug_warning, L"Could not create process");
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;;
 			}
 
 			controlSocket_.input_thread_ = std::make_unique<CStorjInputThread>(controlSocket_, *controlSocket_.process_);
 			if (!controlSocket_.input_thread_->spawn(engine_.GetThreadPool())) {
-				LogMessage(MessageType::Debug_Warning, L"Thread creation failed");
+				log(logmsg::debug_warning, L"Thread creation failed");
 				controlSocket_.input_thread_.reset();
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;;
 			}
@@ -54,7 +54,7 @@ int CStorjConnectOpData::Send()
 				proxy_uri.scheme_ = "socks4a";
 				break;
 			default:
-				LogMessage(MessageType::Debug_Warning, L"Unsupported proxy type");
+				log(logmsg::debug_warning, L"Unsupported proxy type");
 				return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 			}
 
@@ -77,7 +77,7 @@ int CStorjConnectOpData::Send()
 			std::wstring pass = credentials_.GetPass();
 			size_t pos = pass.rfind('|');
 			if (pos == std::wstring::npos) {
-				LogMessage(MessageType::Error, _("Password or encryption key is not set"));
+				log(logmsg::error, _("Password or encryption key is not set"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			pass = pass.substr(0, pos);
@@ -88,14 +88,14 @@ int CStorjConnectOpData::Send()
 			std::wstring key = credentials_.GetPass();
 			size_t pos = key.rfind('|');
 			if (pos == std::wstring::npos) {
-				LogMessage(MessageType::Error, _("Password or encryption key is not set"));
+				log(logmsg::error, _("Password or encryption key is not set"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			key = key.substr(pos + 1);
 			return controlSocket_.SendCommand(fz::sprintf(L"key %s", key), fz::sprintf(L"key %s", std::wstring(key.size(), '*')));
 		}
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"Unknown op state: %d", opState);
 		break;
 	}
 
@@ -112,7 +112,7 @@ int CStorjConnectOpData::ParseResponse()
 	{
 	case connect_init:
 		if (controlSocket_.response_ != fz::sprintf(L"fzStorj started, protocol_version=%d", FZSTORJ_PROTOCOL_VERSION)) {
-			LogMessage(MessageType::Error, _("fzstorj belongs to a different version of FileZilla"));
+			log(logmsg::error, _("fzstorj belongs to a different version of FileZilla"));
 			return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 		}
 		opState = connect_timeout;
@@ -135,7 +135,7 @@ int CStorjConnectOpData::ParseResponse()
 	case connect_key:
 		return FZ_REPLY_OK;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"Unknown op state: %d", opState);
 		return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 	}
 

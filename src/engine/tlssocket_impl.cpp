@@ -37,7 +37,7 @@ void log_func(int level, char const* msg)
 	}
 	std::wstring s = fz::to_wstring(msg);
 	fz::trim(s);
-	pLogging->LogMessage(MessageType::Debug_Debug, L"tls: %d %s", level, s);
+	pLogging->log(logmsg::debug_debug, L"tls: %d %s", level, s);
 }
 #endif
 
@@ -95,7 +95,7 @@ public:
 
 		char const* name = gnutls_handshake_description_get_name(static_cast<gnutls_handshake_description_t>(htype));
 
-		tls->logger_.LogMessage(MessageType::Debug_Debug, L"TLS handshake: %s %s", prefix, name);
+		tls->logger_.log(logmsg::debug_debug, L"TLS handshake: %s %s", prefix, name);
 
 		return 0;
 	}
@@ -198,7 +198,7 @@ bool CTlsSocketImpl::Init()
 
 #if TLSDEBUG
 		if (!pLogging) {
-			pLogging = m_pOwner;
+			pLogging = &logger_;
 			gnutls_global_set_log_function(log_func);
 			gnutls_global_set_log_level(99);
 		}
@@ -298,7 +298,7 @@ void CTlsSocketImpl::Uninit()
 	state_ = fz::socket_state::failed;
 
 #if TLSDEBUG
-	if (pLogging == m_pOwner) {
+	if (pLogging == &logger_) {
 		pLogging = nullptr;
 	}
 #endif
@@ -317,10 +317,10 @@ void CTlsSocketImpl::UninitSession()
 }
 
 
-void CTlsSocketImpl::LogError(int code, std::wstring const& function, MessageType logLevel)
+void CTlsSocketImpl::LogError(int code, std::wstring const& function, logmsg::type logLevel)
 {
-	if (logLevel < MessageType::Debug_Warning && state_ >= fz::socket_state::shut_down && shutdown_silence_read_errors_) {
-		logLevel = MessageType::Debug_Warning;
+	if (logLevel < logmsg::debug_warning && state_ >= fz::socket_state::shut_down && shutdown_silence_read_errors_) {
+		logLevel = logmsg::debug_warning;
 	}
 
 	if (code == GNUTLS_E_WARNING_ALERT_RECEIVED || code == GNUTLS_E_FATAL_ALERT_RECEIVED) {
@@ -328,50 +328,50 @@ void CTlsSocketImpl::LogError(int code, std::wstring const& function, MessageTyp
 	}
 	else if (code == GNUTLS_E_PULL_ERROR) {
 		if (function.empty()) {
-			logger_.LogMessage(MessageType::Debug_Warning, L"GnuTLS could not read from socket: %s", fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not read from socket: %s", fz::socket_error_description(m_socket_error));
 		}
 		else {
-			logger_.LogMessage(MessageType::Debug_Warning, L"GnuTLS could not read from socket in %s: %s", function, fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not read from socket in %s: %s", function, fz::socket_error_description(m_socket_error));
 		}
 	}
 	else if (code == GNUTLS_E_PUSH_ERROR) {
 		if (function.empty()) {
-			logger_.LogMessage(MessageType::Debug_Warning, L"GnuTLS could not write to socket: %s", fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not write to socket: %s", fz::socket_error_description(m_socket_error));
 		}
 		else {
-			logger_.LogMessage(MessageType::Debug_Warning, L"GnuTLS could not write to socket in %s: %s", function, fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not write to socket in %s: %s", function, fz::socket_error_description(m_socket_error));
 		}
 	}
 	else {
 		char const* error = gnutls_strerror(code);
 		if (error) {
 			if (function.empty()) {
-				logger_.LogMessage(logLevel, _("GnuTLS error %d: %s"), code, error);
+				logger_.log(logLevel, _("GnuTLS error %d: %s"), code, error);
 			}
 			else {
-				logger_.LogMessage(logLevel, _("GnuTLS error %d in %s: %s"), code, function, error);
+				logger_.log(logLevel, _("GnuTLS error %d in %s: %s"), code, function, error);
 			}
 		}
 		else {
 			if (function.empty()) {
-				logger_.LogMessage(logLevel, _("GnuTLS error %d"), code);
+				logger_.log(logLevel, _("GnuTLS error %d"), code);
 			}
 			else {
-				logger_.LogMessage(logLevel, _("GnuTLS error %d in %s"), code, function);
+				logger_.log(logLevel, _("GnuTLS error %d in %s"), code, function);
 			}
 		}
 	}
 }
 
-void CTlsSocketImpl::PrintAlert(MessageType logLevel)
+void CTlsSocketImpl::PrintAlert(logmsg::type logLevel)
 {
 	gnutls_alert_description_t last_alert = gnutls_alert_get(m_session);
 	char const* alert = gnutls_alert_get_name(last_alert);
 	if (alert) {
-		logger_.LogMessage(logLevel, _("Received TLS alert from the server: %s (%d)"), alert, last_alert);
+		logger_.log(logLevel, _("Received TLS alert from the server: %s (%d)"), alert, last_alert);
 	}
 	else {
-		logger_.LogMessage(logLevel, _("Received unknown TLS alert %d from the server"), last_alert);
+		logger_.log(logLevel, _("Received unknown TLS alert %d from the server"), last_alert);
 	}
 }
 
@@ -388,7 +388,7 @@ ssize_t CTlsSocketImpl::PullFunction(gnutls_transport_ptr_t ptr, void* data, siz
 ssize_t CTlsSocketImpl::PushFunction(void const* data, size_t len)
 {
 #if TLSDEBUG
-	logger_.LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::PushFunction(%d)", len);
+	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::PushFunction(%d)", len);
 #endif
 	if (!m_canWriteToSocket) {
 		gnutls_transport_set_errno(m_session, EAGAIN);
@@ -405,13 +405,13 @@ ssize_t CTlsSocketImpl::PushFunction(void const* data, size_t len)
 		}
 		gnutls_transport_set_errno(m_session, error);
 #if TLSDEBUG
-		logger_.LogMessage(MessageType::Debug_Debug, L"  returning -1 due to %d", error);
+		logger_.log(logmsg::debug_debug, L"  returning -1 due to %d", error);
 #endif
 		return -1;
 	}
 
 #if TLSDEBUG
-	logger_.LogMessage(MessageType::Debug_Debug, L"  returning %d", written);
+	logger_.log(logmsg::debug_debug, L"  returning %d", written);
 #endif
 
 	return written;
@@ -420,7 +420,7 @@ ssize_t CTlsSocketImpl::PushFunction(void const* data, size_t len)
 ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 {
 #if TLSDEBUG
-	logger_.LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::PullFunction(%d)",  (int)len);
+	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::PullFunction(%d)",  (int)len);
 #endif
 
 	if (!m_canReadFromSocket) {
@@ -437,7 +437,7 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 		}
 		gnutls_transport_set_errno(m_session, error);
 #if TLSDEBUG
-		logger_.LogMessage(MessageType::Debug_Debug, L"  returning -1 due to %d", error);
+		logger_.log(logmsg::debug_debug, L"  returning -1 due to %d", error);
 #endif
 		return -1;
 	}
@@ -447,7 +447,7 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 	}
 
 #if TLSDEBUG
-	logger_.LogMessage(MessageType::Debug_Debug, L"  returning %d", read);
+	logger_.log(logmsg::debug_debug, L"  returning %d", read);
 #endif
 
 	return read;
@@ -502,7 +502,7 @@ void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source* s, fz::socket_event_
 
 void CTlsSocketImpl::OnRead()
 {
-	logger_.LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::OnRead()");
+	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::OnRead()");
 
 	m_canReadFromSocket = true;
 
@@ -522,7 +522,7 @@ void CTlsSocketImpl::OnRead()
 
 void CTlsSocketImpl::OnSend()
 {
-	logger_.LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::OnSend()");
+	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::OnSend()");
 
 	m_canWriteToSocket = true;
 
@@ -578,10 +578,10 @@ bool CTlsSocketImpl::ResumedSession() const
 
 bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_resume, fz::native_string const& session_hostname, std::vector<uint8_t> const& required_certificate, fz::event_handler *const verification_handler)
 {
-	logger_.LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::client_handshake()");
+	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::client_handshake()");
 
 	if (state_ != fz::socket_state::none) {
-		logger_.LogMessage(MessageType::Debug_Warning, L"Called CTlsSocketImpl::client_handshake on a socket that isn't idle");
+		logger_.log(logmsg::debug_warning, L"Called CTlsSocketImpl::client_handshake on a socket that isn't idle");
 		return false;
 	}
 
@@ -597,18 +597,18 @@ bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_res
 	if (!session_to_resume.empty()) {
 		int res = gnutls_session_set_data(m_session, session_to_resume.data(), session_to_resume.size());
 		if (res) {
-			logger_.LogMessage(MessageType::Debug_Info, L"gnutls_session_set_data failed: %d. Going to reinitialize session.", res);
+			logger_.log(logmsg::debug_info, L"gnutls_session_set_data failed: %d. Going to reinitialize session.", res);
 			UninitSession();
 			if (!InitSession()) {
 				return false;
 			}
 		}
 		else {
-			logger_.LogMessage(MessageType::Debug_Info, L"Trying to resume existing TLS session.");
+			logger_.log(logmsg::debug_info, L"Trying to resume existing TLS session.");
 		}
 	}
 
-	if (logger_.ShouldLog(MessageType::Debug_Debug)) {
+	if (logger_.should_log(logmsg::debug_debug)) {
 		gnutls_handshake_set_hook_function(m_session, GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_BOTH, &handshake_hook_func);
 	}
 
@@ -628,7 +628,7 @@ bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_res
 
 int CTlsSocketImpl::ContinueHandshake()
 {
-	logger_.LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::ContinueHandshake()");
+	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::ContinueHandshake()");
 	assert(m_session);
 	assert(state_ == fz::socket_state::connecting);
 
@@ -640,11 +640,11 @@ int CTlsSocketImpl::ContinueHandshake()
 		res = gnutls_handshake(m_session);
 	}
 	if (!res) {
-		logger_.LogMessage(MessageType::Debug_Info, L"TLS Handshake successful");
+		logger_.log(logmsg::debug_info, L"TLS Handshake successful");
 		handshake_successful_ = true;
 
 		if (ResumedSession()) {
-			logger_.LogMessage(MessageType::Debug_Info, L"TLS Session resumed");
+			logger_.log(logmsg::debug_info, L"TLS Session resumed");
 		}
 
 		std::string const protocol = GetProtocolName();
@@ -652,7 +652,7 @@ int CTlsSocketImpl::ContinueHandshake()
 		std::string const cipherName = GetCipherName();
 		std::string const macName = GetMacName();
 
-		logger_.LogMessage(MessageType::Debug_Info, L"Protocol: %s, Key exchange: %s, Cipher: %s, MAC: %s", protocol, keyExchange, cipherName, macName);
+		logger_.log(logmsg::debug_info, L"Protocol: %s, Key exchange: %s, Cipher: %s, MAC: %s", protocol, keyExchange, cipherName, macName);
 
 		return VerifyCertificate();
 	}
@@ -764,7 +764,7 @@ int CTlsSocketImpl::write(void const* buffer, unsigned int len, int& error)
 
 void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& function)
 {
-	logger_.LogMessage(MessageType::Debug_Debug, L"CTlsSocketImpl::Failure(%d)", code);
+	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::Failure(%d)", code);
 	if (code) {
 		LogError(code, function);
 		if (m_socket_eof) {
@@ -775,7 +775,7 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 				)
 			{
 				if (state_ != fz::socket_state::shut_down || !shutdown_silence_read_errors_) {
-					logger_.LogMessage(MessageType::Status, _("Server did not properly shut down TLS connection"));
+					logger_.log(logmsg::status, _("Server did not properly shut down TLS connection"));
 				}
 			}
 		}
@@ -801,7 +801,7 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 
 int CTlsSocketImpl::shutdown()
 {
-	logger_.LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::Shutdown()");
+	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::Shutdown()");
 
 	if (state_ == fz::socket_state::shut_down) {
 		return 0;
@@ -820,7 +820,7 @@ int CTlsSocketImpl::shutdown()
 
 int CTlsSocketImpl::ContinueShutdown()
 {
-	logger_.LogMessage(MessageType::Debug_Verbose, L"CTlsSocketImpl::ContinueShutdown()");
+	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::ContinueShutdown()");
 
 	if (!sent_closure_alert_) {
 		int res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
@@ -855,7 +855,7 @@ int CTlsSocketImpl::ContinueShutdown()
 void CTlsSocketImpl::set_verification_result(bool trusted)
 {
 	if (state_ != fz::socket_state::connecting && !handshake_successful_) {
-		logger_.LogMessage(MessageType::Debug_Warning, L"TrustCurrentCert called at wrong time.");
+		logger_.log(logmsg::debug_warning, L"TrustCurrentCert called at wrong time.");
 		return;
 	}
 
@@ -878,7 +878,7 @@ void CTlsSocketImpl::set_verification_result(bool trusted)
 		return;
 	}
 
-	logger_.LogMessage(MessageType::Error, _("Remote certificate not trusted."));
+	logger_.log(logmsg::error, _("Remote certificate not trusted."));
 	Failure(0, true);
 }
 
@@ -942,7 +942,7 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certifi
 		LogError(res, L"gnutls_x509_crt_get_dn3");
 	}
 	if (subject.empty()) {
-		logger_.LogMessage(MessageType::Error, _("Could not get distinguished name of certificate subject, gnutls_x509_get_dn failed"));
+		logger_.log(logmsg::error, _("Could not get distinguished name of certificate subject, gnutls_x509_get_dn failed"));
 		return false;
 	}
 
@@ -956,7 +956,7 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certifi
 		LogError(res, L"gnutls_x509_crt_get_issuer_dn3");
 	}
 	if (issuer.empty() ) {
-		logger_.LogMessage(MessageType::Error, _("Could not get distinguished name of certificate issuer, gnutls_x509_get_issuer_dn failed"));
+		logger_.log(logmsg::error, _("Could not get distinguished name of certificate issuer, gnutls_x509_get_issuer_dn failed"));
 		return false;
 	}
 
@@ -977,7 +977,7 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certifi
 
 	datum_holder der;
 	if (gnutls_x509_crt_export2(cert, GNUTLS_X509_FMT_DER, &der) != GNUTLS_E_SUCCESS || !der.data || !der.size) {
-		logger_.LogMessage(MessageType::Error, L"gnutls_x509_crt_get_issuer_dn");
+		logger_.log(logmsg::error, L"gnutls_x509_crt_get_issuer_dn");
 		return false;
 	}
 	std::vector<uint8_t> data(der.data, der.data + der.size);
@@ -1098,7 +1098,7 @@ bool CTlsSocketImpl::GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsig
 	unsigned int cert_list_size;
 	const gnutls_datum_t* cert_list = gnutls_certificate_get_peers(m_session, &cert_list_size);
 	if (!cert_list || !cert_list_size) {
-		logger_.LogMessage(MessageType::Error, _("gnutls_certificate_get_peers returned no certificates"));
+		logger_.log(logmsg::error, _("gnutls_certificate_get_peers returned no certificates"));
 		return false;
 	}
 
@@ -1110,7 +1110,7 @@ bool CTlsSocketImpl::GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsig
 				gnutls_free(pem_cert_list[j].data);
 			}
 			delete [] pem_cert_list;
-			logger_.LogMessage(MessageType::Error, _("gnutls_pem_base64_encode2 failed"));
+			logger_.log(logmsg::error, _("gnutls_pem_base64_encode2 failed"));
 			return false;
 		}
 	}
@@ -1135,7 +1135,7 @@ bool CTlsSocketImpl::GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsig
 	// And now import the certificates
 	int res = gnutls_x509_crt_list_import2(&certs, &certs_size, &concated_certs, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
 	if (res == GNUTLS_E_CERTIFICATE_LIST_UNSORTED) {
-		logger_.LogMessage(MessageType::Error, _("Server sent unsorted certificate chain in violation of the TLS specifications"));
+		logger_.log(logmsg::error, _("Server sent unsorted certificate chain in violation of the TLS specifications"));
 		res = gnutls_x509_crt_list_import2(&certs, &certs_size, &concated_certs, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_SORT);
 	}
 
@@ -1144,7 +1144,7 @@ bool CTlsSocketImpl::GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsig
 	if (res != GNUTLS_E_SUCCESS) {
 		certs = nullptr;
 		certs_size = 0;
-		logger_.LogMessage(MessageType::Error, _("Could not sort peer certificates"));
+		logger_.log(logmsg::error, _("Could not sort peer certificates"));
 		return false;
 	}
 
@@ -1156,40 +1156,40 @@ void CTlsSocketImpl::PrintVerificationError(int status)
 	gnutls_datum_t buffer{};
 	gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509, &buffer, 0);
 	if (buffer.data) {
-		logger_.LogMessage(MessageType::Debug_Warning, L"Gnutls Verification status: %s", buffer.data);
+		logger_.log(logmsg::debug_warning, L"Gnutls Verification status: %s", buffer.data);
 		gnutls_free(buffer.data);
 	}
 
 	if (status & GNUTLS_CERT_REVOKED) {
-		logger_.LogMessage(MessageType::Error, _("Beware! Certificate has been revoked"));
+		logger_.log(logmsg::error, _("Beware! Certificate has been revoked"));
 
 		// The remaining errors are no longer of interest
 		return;
 	}
 	if (status & GNUTLS_CERT_SIGNATURE_FAILURE) {
-		logger_.LogMessage(MessageType::Error, _("Certificate signature verification failed"));
+		logger_.log(logmsg::error, _("Certificate signature verification failed"));
 		status &= ~GNUTLS_CERT_SIGNATURE_FAILURE;
 	}
 	if (status & GNUTLS_CERT_INSECURE_ALGORITHM) {
-		logger_.LogMessage(MessageType::Error, _("A certificate in the chain was signed using an insecure algorithm"));
+		logger_.log(logmsg::error, _("A certificate in the chain was signed using an insecure algorithm"));
 		status &= ~GNUTLS_CERT_INSECURE_ALGORITHM;
 	}
 	if (status & GNUTLS_CERT_SIGNER_NOT_CA) {
-		logger_.LogMessage(MessageType::Error, _("An issuer in the certificate chain is not a certificate authority"));
+		logger_.log(logmsg::error, _("An issuer in the certificate chain is not a certificate authority"));
 		status &= ~GNUTLS_CERT_SIGNER_NOT_CA;
 	}
 	if (status & GNUTLS_CERT_UNEXPECTED_OWNER) {
-		logger_.LogMessage(MessageType::Error, _("The server's hostname does not match the certificate's hostname"));
+		logger_.log(logmsg::error, _("The server's hostname does not match the certificate's hostname"));
 		status &= ~GNUTLS_CERT_UNEXPECTED_OWNER;
 	}
 #ifdef GNUTLS_CERT_MISSING_OCSP_STATUS
 	if (status & GNUTLS_CERT_MISSING_OCSP_STATUS) {
-		logger_.LogMessage(MessageType::Error, _("The certificate requires the server to include an OCSP status in its response, but the OCSP status is missing."));
+		logger_.log(logmsg::error, _("The certificate requires the server to include an OCSP status in its response, but the OCSP status is missing."));
 		status &= ~GNUTLS_CERT_MISSING_OCSP_STATUS;
 	}
 #endif
 	if (status) {
-		logger_.LogMessage(MessageType::Error, _("Received certificate chain could not be verified. Verification status is %d."), status);
+		logger_.log(logmsg::error, _("Received certificate chain could not be verified. Verification status is %d."), status);
 	}
 
 }
@@ -1197,12 +1197,12 @@ void CTlsSocketImpl::PrintVerificationError(int status)
 int CTlsSocketImpl::VerifyCertificate()
 {
 	if (state_ != fz::socket_state::connecting) {
-		logger_.LogMessage(MessageType::Debug_Warning, L"VerifyCertificate called at wrong time");
+		logger_.log(logmsg::debug_warning, L"VerifyCertificate called at wrong time");
 		return ENOTCONN;
 	}
 
 	if (gnutls_certificate_type_get(m_session) != GNUTLS_CRT_X509) {
-		logger_.LogMessage(MessageType::Error, _("Unsupported certificate type"));
+		logger_.log(logmsg::error, _("Unsupported certificate type"));
 		Failure(0, true);
 		return EOPNOTSUPP;
 	}
@@ -1224,7 +1224,7 @@ int CTlsSocketImpl::VerifyCertificate()
 		if (required_certificate_.size() != cert_der.size ||
 			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
 		{
-			logger_.LogMessage(MessageType::Error, _("Certificate of connection does not match expected certificate."));
+			logger_.log(logmsg::error, _("Certificate of connection does not match expected certificate."));
 			Failure(0, true);
 			return EINVAL;
 		}
@@ -1268,8 +1268,8 @@ int CTlsSocketImpl::VerifyCertificate()
 			std::get<1>(lease).unlock();
 
 			if (verifyResult < 0) {
-				logger_.LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
-				logger_.LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
+				logger_.log(logmsg::debug_warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
+				logger_.log(logmsg::error, _("Failed to verify peer certificate"));
 				Failure(0, true);
 				return EINVAL;
 			}
@@ -1280,7 +1280,7 @@ int CTlsSocketImpl::VerifyCertificate()
 		}
 		else {
 			std::get<1>(lease).unlock();
-			logger_.LogMessage(MessageType::Debug_Warning, L"System trust store could not be loaded");
+			logger_.log(logmsg::debug_warning, L"System trust store could not be loaded");
 		}
 	}
 
@@ -1298,7 +1298,7 @@ int CTlsSocketImpl::VerifyCertificate()
 			gnutls_x509_crt_t root{};
 			clone_cert(certs.certs[certs.certs_size - 1], root);
 			if (!root) {
-				logger_.LogMessage(MessageType::Error, _("Could not copy certificate"));
+				logger_.log(logmsg::error, _("Could not copy certificate"));
 				Failure(0, true);
 				return ECONNABORTED;
 			}
@@ -1306,7 +1306,7 @@ int CTlsSocketImpl::VerifyCertificate()
 			gnutls_x509_trust_list_t tlist;
 			gnutls_certificate_get_trust_list(m_certCredentials, &tlist);
 			if (gnutls_x509_trust_list_add_cas(tlist, &root, 1, 0) != 1) {
-				logger_.LogMessage(MessageType::Error, _("Could not add certificate to temporary trust list"));
+				logger_.log(logmsg::error, _("Could not add certificate to temporary trust list"));
 				Failure(0, true);
 				return ECONNABORTED;
 			}
@@ -1319,8 +1319,8 @@ int CTlsSocketImpl::VerifyCertificate()
 			int verifyResult = gnutls_certificate_verify_peers2(m_session, &status);
 
 			if (verifyResult < 0) {
-				logger_.LogMessage(MessageType::Debug_Warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
-				logger_.LogMessage(MessageType::Error, _("Failed to verify peer certificate"));
+				logger_.log(logmsg::debug_warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
+				logger_.log(logmsg::error, _("Failed to verify peer certificate"));
 				Failure(0, true);
 				return EINVAL;
 			}
@@ -1336,12 +1336,12 @@ int CTlsSocketImpl::VerifyCertificate()
 			if (uses_hostname) {
 				if (!gnutls_x509_crt_check_hostname(certs.certs[0], fz::to_utf8(hostname_).c_str())) {
 					hostnameMismatch = true;
-					logger_.LogMessage(MessageType::Debug_Warning, L"Hostname does not match certificate SANs");
+					logger_.log(logmsg::debug_warning, L"Hostname does not match certificate SANs");
 				}
 			}
 		}
 
-		logger_.LogMessage(MessageType::Status, _("Verifying certificate..."));
+		logger_.log(logmsg::status, _("Verifying certificate..."));
 
 		std::vector<fz::x509_certificate> certificates;
 		certificates.reserve(certs.certs_size);
@@ -1508,7 +1508,7 @@ int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
 		// gnutls_record_recv is being called again.
 		// Manually call gnutls_record_recv as in case of eof on the socket,
 		// we are not getting another receive event.
-		logger_.LogMessage(MessageType::Debug_Verbose, L"gnutls_record_recv returned spurious EAGAIN");
+		logger_.log(logmsg::debug_verbose, L"gnutls_record_recv returned spurious EAGAIN");
 		res = gnutls_record_recv(m_session, data, len);
 	}
 
@@ -1533,7 +1533,7 @@ void CTlsSocketImpl::set_hostname(fz::native_string const& host)
 		if (!utf8.empty()) {
 			int res = gnutls_server_name_set(m_session, GNUTLS_NAME_DNS, utf8.c_str(), utf8.size());
 			if (res) {
-				LogError(res, L"gnutls_server_name_set", MessageType::Debug_Warning);
+				LogError(res, L"gnutls_server_name_set", logmsg::debug_warning);
 			}
 		}
 	}
@@ -1555,7 +1555,7 @@ std::vector<uint8_t> CTlsSocketImpl::get_session_parameters() const
 	datum_holder d;
 	int res = gnutls_session_get_data2(m_session, &d);
 	if (res) {
-		logger_.LogMessage(MessageType::Debug_Warning, L"gnutls_session_get_data2 failed: %d", res);
+		logger_.log(logmsg::debug_warning, L"gnutls_session_get_data2 failed: %d", res);
 	}
 	else {
 		ret.assign(d.data, d.data + d.size);

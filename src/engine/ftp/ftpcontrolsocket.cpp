@@ -45,7 +45,7 @@ CFtpControlSocket::~CFtpControlSocket()
 
 void CFtpControlSocket::OnReceive()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpControlSocket::OnReceive()");
+	log(logmsg::debug_verbose, L"CFtpControlSocket::OnReceive()");
 
 	for (;;) {
 		int error;
@@ -53,9 +53,9 @@ void CFtpControlSocket::OnReceive()
 
 		if (read < 0) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket_error_description(error));
+				log(logmsg::error, _("Could not read from socket: %s"), fz::socket_error_description(error));
 				if (GetCurrentCommandId() != Command::connect) {
-					LogMessage(MessageType::Error, _("Disconnected from server"));
+					log(logmsg::error, _("Disconnected from server"));
 				}
 				DoClose();
 			}
@@ -63,8 +63,8 @@ void CFtpControlSocket::OnReceive()
 		}
 
 		if (!read) {
-			auto messageType = (GetCurrentCommandId() == Command::none) ? MessageType::Status : MessageType::Error;
-			LogMessage(messageType, _("Connection closed by server"));
+			auto messageType = (GetCurrentCommandId() == Command::none) ? logmsg::status : logmsg::error;
+			log(messageType, _("Connection closed by server"));
 			DoClose();
 			return;
 		}
@@ -108,7 +108,7 @@ void CFtpControlSocket::OnReceive()
 void CFtpControlSocket::ParseLine(std::wstring line)
 {
 	m_rtt.Stop();
-	LogMessageRaw(MessageType::Response, line);
+	log_raw(logmsg::reply, line);
 	SetAlive();
 
 	if (!operations_.empty() && operations_.back()->opId == Command::connect) {
@@ -129,7 +129,7 @@ void CFtpControlSocket::ParseLine(std::wstring line)
 		else if (data.opState == LOGON_WELCOME) {
 			if (!data.gotFirstWelcomeLine) {
 				if (fz::str_tolower_ascii(line).substr(0, 3) == L"ssh") {
-					LogMessage(MessageType::Error, _("Cannot establish FTP connection to an SFTP server. Please select proper protocol."));
+					log(logmsg::error, _("Cannot establish FTP connection to an SFTP server. Please select proper protocol."));
 					DoClose(FZ_REPLY_CRITICALERROR);
 					return;
 				}
@@ -174,7 +174,7 @@ void CFtpControlSocket::OnConnect()
 
 	if (currentServer_.GetProtocol() == FTPS) {
 		if (!tls_layer_) {
-			LogMessage(MessageType::Status, _("Connection established, initializing TLS..."));
+			log(logmsg::status, _("Connection established, initializing TLS..."));
 
 			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), *this);
 			active_layer_ = tls_layer_.get();
@@ -186,16 +186,16 @@ void CFtpControlSocket::OnConnect()
 			return;
 		}
 		else {
-			LogMessage(MessageType::Status, _("TLS connection established, waiting for welcome message..."));
+			log(logmsg::status, _("TLS connection established, waiting for welcome message..."));
 		}
 	}
 	else if ((currentServer_.GetProtocol() == FTPES || currentServer_.GetProtocol() == FTP) && tls_layer_) {
-		LogMessage(MessageType::Status, _("TLS connection established."));
+		log(logmsg::status, _("TLS connection established."));
 		SendNextCommand();
 		return;
 	}
 	else {
-		LogMessage(MessageType::Status, _("Connection established, waiting for welcome message..."));
+		log(logmsg::status, _("Connection established, waiting for welcome message..."));
 	}
 	m_pendingReplies = 1;
 	m_repliesToSkip = 0;
@@ -204,7 +204,7 @@ void CFtpControlSocket::OnConnect()
 void CFtpControlSocket::ParseResponse()
 {
 	if (m_Response.empty()) {
-		LogMessage(MessageType::Debug_Warning, L"No reply in ParseResponse");
+		log(logmsg::debug_warning, L"No reply in ParseResponse");
 		return;
 	}
 
@@ -213,13 +213,13 @@ void CFtpControlSocket::ParseResponse()
 			m_pendingReplies--;
 		}
 		else {
-			LogMessage(MessageType::Debug_Warning, L"Unexpected reply, no reply was pending.");
+			log(logmsg::debug_warning, L"Unexpected reply, no reply was pending.");
 			return;
 		}
 	}
 
 	if (m_repliesToSkip) {
-		LogMessage(MessageType::Debug_Info, L"Skipping reply after cancelled operation or keepalive command.");
+		log(logmsg::debug_info, L"Skipping reply after cancelled operation or keepalive command.");
 		if (m_Response[0] != '1') {
 			--m_repliesToSkip;
 		}
@@ -238,12 +238,12 @@ void CFtpControlSocket::ParseResponse()
 	}
 
 	if (operations_.empty()) {
-		LogMessage(MessageType::Debug_Info, L"Skipping reply without active operation.");
+		log(logmsg::debug_info, L"Skipping reply without active operation.");
 		return;
 	}
 
 	auto & data = *operations_.back();
-	LogMessage(MessageType::Debug_Verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
+	log(logmsg::debug_verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
 	int res = data.ParseResponse();
 	if (res == FZ_REPLY_OK) {
 		ResetOperation(FZ_REPLY_OK);
@@ -282,15 +282,15 @@ int CFtpControlSocket::SendCommand(std::wstring const& str, bool maskArgs, bool 
 	size_t pos;
 	if (maskArgs && (pos = str.find(' ')) != std::wstring::npos) {
 		std::wstring stars(str.size() - pos - 1, '*');
-		LogMessageRaw(MessageType::Command, str.substr(0, pos + 1) + stars);
+		log_raw(logmsg::command, str.substr(0, pos + 1) + stars);
 	}
 	else {
-		LogMessageRaw(MessageType::Command, str);
+		log_raw(logmsg::command, str);
 	}
 
 	std::string buffer = ConvToServer(str);
 	if (buffer.empty()) {
-		LogMessage(MessageType::Error, _("Failed to convert command to 8 bit charset"));
+		log(logmsg::error, _("Failed to convert command to 8 bit charset"));
 		return FZ_REPLY_ERROR;
 	}
 	buffer += "\r\n";
@@ -317,10 +317,10 @@ void CFtpControlSocket::List(CServerPath const& path, std::wstring const& subDir
 	}
 
 	if (newPath.empty()) {
-		LogMessage(MessageType::Status, _("Retrieving directory listing..."));
+		log(logmsg::status, _("Retrieving directory listing..."));
 	}
 	else {
-		LogMessage(MessageType::Status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
+		log(logmsg::status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
 	}
 
 	Push(std::make_unique<CFtpListOpData>(*this, path, subDir, flags));
@@ -328,7 +328,7 @@ void CFtpControlSocket::List(CServerPath const& path, std::wstring const& subDir
 
 int CFtpControlSocket::ResetOperation(int nErrorCode)
 {
- 	LogMessage(MessageType::Debug_Verbose, L"CFtpControlSocket::ResetOperation(%d)", nErrorCode);
+ 	log(logmsg::debug_verbose, L"CFtpControlSocket::ResetOperation(%d)", nErrorCode);
 
 	m_pTransferSocket.reset();
 	m_pIPResolver.reset();
@@ -358,7 +358,7 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 				// Download failed and a new local file was created before, but
 				// nothing has been written to it. Remove it again, so we don't
 				// leave a bunch of empty files all over the place.
-				LogMessage(MessageType::Debug_Verbose, L"Deleting empty file");
+				log(logmsg::debug_verbose, L"Deleting empty file");
 				fz::remove_file(fz::to_native(data.localFile_));
 			}
 		}
@@ -393,10 +393,10 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 	return CControlSocket::ResetOperation(nErrorCode);
 }
 
-bool CFtpControlSocket::CanSendNextCommand() const
+bool CFtpControlSocket::CanSendNextCommand()
 {
 	if (m_repliesToSkip) {
-		LogMessage(MessageType::Status, L"Waiting for replies to skip before sending next command...");
+		log(logmsg::status, L"Waiting for replies to skip before sending next command...");
 		return false;
 	}
 
@@ -424,7 +424,7 @@ void CFtpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath 
 									std::wstring const& remoteFile, bool download,
 									CFileTransferCommand::t_transferSettings const& transferSettings)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpControlSocket::FileTransfer()");
+	log(logmsg::debug_verbose, L"CFtpControlSocket::FileTransfer()");
 
 	auto pData = std::make_unique<CFtpFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, transferSettings);
 	pData->binary = transferSettings.binary;
@@ -433,20 +433,20 @@ void CFtpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath 
 
 void CFtpControlSocket::TransferEnd()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpControlSocket::TransferEnd()");
+	log(logmsg::debug_verbose, L"CFtpControlSocket::TransferEnd()");
 
 	// If m_pTransferSocket is zero, the message was sent by the previous command.
 	// We can safely ignore it.
 	// It does not cause problems, since before creating the next transfer socket, other
 	// messages which were added to the queue later than this one will be processed first.
 	if (operations_.empty() || !m_pTransferSocket || operations_.back()->opId != PrivCommand::rawtransfer) {
-		LogMessage(MessageType::Debug_Verbose, L"Call to TransferEnd at unusual time, ignoring");
+		log(logmsg::debug_verbose, L"Call to TransferEnd at unusual time, ignoring");
 		return;
 	}
 
 	TransferEndReason reason = m_pTransferSocket->GetTransferEndreason();
 	if (reason == TransferEndReason::none) {
-		LogMessage(MessageType::Debug_Info, L"Call to TransferEnd at unusual time");
+		log(logmsg::debug_info, L"Call to TransferEnd at unusual time");
 		return;
 	}
 
@@ -471,7 +471,7 @@ void CFtpControlSocket::TransferEnd()
 		ResetOperation((reason == TransferEndReason::successful) ? FZ_REPLY_OK : FZ_REPLY_ERROR);
 		break;
 	default:
-		LogMessage(MessageType::Debug_Info, L"TransferEnd at unusual op state %d, ignoring", data.opState);
+		log(logmsg::debug_info, L"TransferEnd at unusual op state %d, ignoring", data.opState);
 		break;
 	}
 }
@@ -479,7 +479,7 @@ void CFtpControlSocket::TransferEnd()
 bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotification)
 {
 	if (operations_.empty() || !operations_.back()->waitForAsyncRequest) {
-		LogMessage(MessageType::Debug_Info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
+		log(logmsg::debug_info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
 		return false;
 	}
 	operations_.back()->waitForAsyncRequest = false;
@@ -490,7 +490,7 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 	case reqId_fileexists:
 		{
 			if (operations_.empty() || operations_.back()->opId != Command::transfer) {
-				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
+				log(logmsg::debug_info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
 				return false;
 			}
 
@@ -501,7 +501,7 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 	case reqId_interactiveLogin:
 		{
 			if (operations_.empty() || operations_.back()->opId != Command::connect) {
-				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
+				log(logmsg::debug_info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
 				return false;
 			}
 
@@ -519,7 +519,7 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 	case reqId_certificate:
 		{
 			if (!tls_layer_ || tls_layer_->get_state() != fz::socket_state::connecting) {
-				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
+				log(logmsg::debug_info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
 				return false;
 			}
 
@@ -551,7 +551,7 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 			}
 		}
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown request %d", pNotification->GetRequestID());
+		log(logmsg::debug_warning, L"Unknown request %d", pNotification->GetRequestID());
 		ResetOperation(FZ_REPLY_INTERNALERROR);
 		return false;
 	}
@@ -593,7 +593,7 @@ void CFtpControlSocket::Mkdir(CServerPath const& path)
 	 */
 
 	if (operations_.empty() && !path.empty()) {
-		LogMessage(MessageType::Status, _("Creating directory '%s'..."), path.GetPath());
+		log(logmsg::status, _("Creating directory '%s'..."), path.GetPath());
 	}
 
 	auto pData = std::make_unique<CFtpMkdirOpData>(*this);
@@ -604,14 +604,14 @@ void CFtpControlSocket::Mkdir(CServerPath const& path)
 
 void CFtpControlSocket::Rename(CRenameCommand const& command)
 {
-	LogMessage(MessageType::Status, _("Renaming '%s' to '%s'"), command.GetFromPath().FormatFilename(command.GetFromFile()), command.GetToPath().FormatFilename(command.GetToFile()));
+	log(logmsg::status, _("Renaming '%s' to '%s'"), command.GetFromPath().FormatFilename(command.GetFromFile()), command.GetToPath().FormatFilename(command.GetToFile()));
 
 	Push(std::make_unique<CFtpRenameOpData>(*this, command));
 }
 
 void CFtpControlSocket::Chmod(CChmodCommand const& command)
 {
-	LogMessage(MessageType::Status, _("Setting permissions of '%s' to '%s'"), command.GetPath().FormatFilename(command.GetFile()), command.GetPermission());
+	log(logmsg::status, _("Setting permissions of '%s' to '%s'"), command.GetPath().FormatFilename(command.GetFile()), command.GetPermission());
 
 	Push(std::make_unique<CFtpChmodOpData>(*this, command));
 }
@@ -637,14 +637,14 @@ int CFtpControlSocket::GetExternalIPAddress(std::string& address)
 				return FZ_REPLY_OK;
 			}
 
-			LogMessage(MessageType::Debug_Warning, _("No external IP address set, trying default."));
+			log(logmsg::debug_warning, _("No external IP address set, trying default."));
 		}
 		else if (mode == 2) {
 			if (!m_pIPResolver) {
 				std::string localAddress = socket_->local_ip(true);
 
 				if (!localAddress.empty() && localAddress == fz::to_string(engine_.GetOptions().GetOption(OPTION_LASTRESOLVEDIP))) {
-					LogMessage(MessageType::Debug_Verbose, L"Using cached external IP address");
+					log(logmsg::debug_verbose, L"Using cached external IP address");
 
 					address = localAddress;
 					return FZ_REPLY_OK;
@@ -652,22 +652,22 @@ int CFtpControlSocket::GetExternalIPAddress(std::string& address)
 
 				std::wstring resolverAddress = engine_.GetOptions().GetOption(OPTION_EXTERNALIPRESOLVER);
 
-				LogMessage(MessageType::Debug_Info, _("Retrieving external IP address from %s"), resolverAddress);
+				log(logmsg::debug_info, _("Retrieving external IP address from %s"), resolverAddress);
 
 				m_pIPResolver = std::make_unique<CExternalIPResolver>(engine_.GetThreadPool(), *this);
 				m_pIPResolver->GetExternalIP(resolverAddress, fz::address_type::ipv4);
 				if (!m_pIPResolver->Done()) {
-					LogMessage(MessageType::Debug_Verbose, L"Waiting for resolver thread");
+					log(logmsg::debug_verbose, L"Waiting for resolver thread");
 					return FZ_REPLY_WOULDBLOCK;
 				}
 			}
 			if (!m_pIPResolver->Successful()) {
 				m_pIPResolver.reset();
 
-				LogMessage(MessageType::Debug_Warning, _("Failed to retrieve external IP address, using local address"));
+				log(logmsg::debug_warning, _("Failed to retrieve external IP address, using local address"));
 			}
 			else {
-				LogMessage(MessageType::Debug_Info, L"Got external IP address");
+				log(logmsg::debug_info, L"Got external IP address");
 				address = m_pIPResolver->GetIP();
 
 				engine_.GetOptions().SetOption(OPTION_LASTRESOLVEDIP, fz::to_wstring(address));
@@ -682,7 +682,7 @@ int CFtpControlSocket::GetExternalIPAddress(std::string& address)
 getLocalIP:
 	address = socket_->local_ip(true);
 	if (address.empty()) {
-		LogMessage(MessageType::Error, _("Failed to retrieve local IP address."), 1);
+		log(logmsg::error, _("Failed to retrieve local IP address."), 1);
 		return FZ_REPLY_ERROR;
 	}
 
@@ -691,9 +691,9 @@ getLocalIP:
 
 void CFtpControlSocket::OnExternalIPAddress()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpControlSocket::OnExternalIPAddress()");
+	log(logmsg::debug_verbose, L"CFtpControlSocket::OnExternalIPAddress()");
 	if (!m_pIPResolver) {
-		LogMessage(MessageType::Debug_Info, L"Ignoring event");
+		log(logmsg::debug_info, L"Ignoring event");
 		return;
 	}
 
@@ -750,7 +750,7 @@ void CFtpControlSocket::Transfer(std::wstring const& cmd, CFtpTransferOpData* ol
 void CFtpControlSocket::Connect(CServer const& server, Credentials const& credentials)
 {
 	if (!operations_.empty()) {
-		LogMessage(MessageType::Debug_Warning, L"CFtpControlSocket::Connect(): deleting stale operations");
+		log(logmsg::debug_warning, L"CFtpControlSocket::Connect(): deleting stale operations");
 		operations_.clear();
 	}
 
@@ -774,7 +774,7 @@ void CFtpControlSocket::OnTimer(fz::timer_id id)
 		return;
 	}
 
-	LogMessage(MessageType::Status, _("Sending keep-alive command"));
+	log(logmsg::status, _("Sending keep-alive command"));
 
 	std::wstring cmd;
 	auto i = fz::random_number(0, 2);

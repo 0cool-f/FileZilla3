@@ -2094,7 +2094,7 @@ bool CDirectoryListingParser::AddData(char *pData, int len)
 bool CDirectoryListingParser::AddLine(std::wstring && line, std::wstring && name, fz::datetime const& time)
 {
 	if (m_pControlSocket) {
-		m_pControlSocket->LogMessageRaw(MessageType::RawList, line);
+		m_pControlSocket->log_raw(logmsg::listing, line);
 	}
 
 	CDirentry override;
@@ -2145,7 +2145,7 @@ CLine *CDirectoryListingParser::GetLine(bool breakAtEnd, bool &error)
 				if (iter == m_DataList.end()) {
 					if (reslen > 10000) {
 						if (m_pControlSocket) {
-							m_pControlSocket->LogMessage(MessageType::Error, _("Received a line exceeding 10000 characters, aborting."));
+							m_pControlSocket->log(logmsg::error, _("Received a line exceeding 10000 characters, aborting."));
 						}
 						error = true;
 						return nullptr;
@@ -2162,7 +2162,7 @@ CLine *CDirectoryListingParser::GetLine(bool breakAtEnd, bool &error)
 
 		if (reslen > 10000) {
 			if (m_pControlSocket) {
-				m_pControlSocket->LogMessage(MessageType::Error, _("Received a line exceeding 10000 characters, aborting."));
+				m_pControlSocket->log(logmsg::error, _("Received a line exceeding 10000 characters, aborting."));
 			}
 			error = true;
 			return nullptr;
@@ -2214,7 +2214,7 @@ CLine *CDirectoryListingParser::GetLine(bool breakAtEnd, bool &error)
 		std::wstring buffer;
 		if (m_pControlSocket) {
 			buffer = m_pControlSocket->ConvToLocal(res, buflen);
-			m_pControlSocket->LogMessageRaw(MessageType::RawList, buffer);
+			m_pControlSocket->log_raw(logmsg::listing, buffer);
 		}
 		else {
 			buffer = fz::to_wstring_from_utf8(res);
@@ -3180,7 +3180,7 @@ void CDirectoryListingParser::DeduceEncoding()
 
 	if ((count[0x1f] || count[0x15] || count[0x25]) && !count[0x0a] && count[static_cast<unsigned char>('@')] && count[static_cast<unsigned char>('@')] > count[static_cast<unsigned char>(' ')] && count_ebcdic > count_normal) {
 		if (m_pControlSocket) {
-			m_pControlSocket->LogMessage(MessageType::Status, _("Received a directory listing which appears to be encoded in EBCDIC."));
+			m_pControlSocket->log(logmsg::status, _("Received a directory listing which appears to be encoded in EBCDIC."));
 		}
 		m_listingEncoding = listingEncoding::ebcdic;
 		for (auto & data : m_DataList) {

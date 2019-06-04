@@ -40,13 +40,13 @@ CSftpControlSocket::~CSftpControlSocket()
 
 void CSftpControlSocket::Connect(CServer const& server, Credentials const& credentials)
 {
-	LogMessage(MessageType::Status, _("Connecting to %s..."), server.Format(ServerFormat::with_optional_port, credentials));
+	log(logmsg::status, _("Connecting to %s..."), server.Format(ServerFormat::with_optional_port, credentials));
 	SetWait(true);
 
 	m_sftpEncryptionDetails = CSftpEncryptionNotification();
 
 	if (server.GetEncodingType() == ENCODING_CUSTOM) {
-		LogMessage(MessageType::Debug_Info, L"Using custom encoding: %s", server.GetCustomEncoding());
+		log(logmsg::debug_info, L"Using custom encoding: %s", server.GetCustomEncoding());
 		m_useUTF8 = false;
 	}
 	else {
@@ -67,7 +67,7 @@ void CSftpControlSocket::Connect(CServer const& server, Credentials const& crede
 		std::remove_if(pData->keyfiles_.begin(), pData->keyfiles_.end(),
 			[this](std::wstring const& keyfile) {
 				if (fz::local_filesys::get_file_type(fz::to_native(keyfile), true) != fz::local_filesys::file) {
-					LogMessage(MessageType::Status, _("Skipping non-existing key file \"%s\""), keyfile);
+					log(logmsg::status, _("Skipping non-existing key file \"%s\""), keyfile);
 					return true;
 				}
 				return false;
@@ -94,7 +94,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 	switch (message.type)
 	{
 	case sftpEvent::Reply:
-		LogMessageRaw(MessageType::Response, message.text[0]);
+		log_raw(logmsg::reply, message.text[0]);
 		ProcessReply(FZ_REPLY_OK, message.text[0]);
 		break;
 	case sftpEvent::Done:
@@ -113,16 +113,16 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		}
 		break;
 	case sftpEvent::Error:
-		LogMessageRaw(MessageType::Error, message.text[0]);
+		log_raw(logmsg::error, message.text[0]);
 		break;
 	case sftpEvent::Verbose:
-		LogMessageRaw(MessageType::Debug_Info, message.text[0]);
+		log_raw(logmsg::debug_info, message.text[0]);
 		break;
 	case sftpEvent::Info:
-		LogMessageRaw(MessageType::Command, message.text[0]); // Not exactly the right message type, but it's a silent one.
+		log_raw(logmsg::command, message.text[0]); // Not exactly the right message type, but it's a silent one.
 		break;
 	case sftpEvent::Status:
-		LogMessageRaw(MessageType::Status, message.text[0]);
+		log_raw(logmsg::status, message.text[0]);
 		break;
 	case sftpEvent::Recv:
 		SetActive(CFileZillaEngine::recv);
@@ -167,12 +167,12 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		}
 		break;
 	case sftpEvent::AskHostkeyBetteralg:
-		LogMessage(MessageType::Error, L"Got sftpReqHostkeyBetteralg when we shouldn't have. Aborting connection.");
+		log(logmsg::error, L"Got sftpReqHostkeyBetteralg when we shouldn't have. Aborting connection.");
 		DoClose(FZ_REPLY_INTERNALERROR);
 		break;
 	case sftpEvent::AskPassword:
 		if (operations_.empty() || operations_.back()->opId != Command::connect) {
-			LogMessage(MessageType::Debug_Warning, L"sftpReqPassword outside connect operation, ignoring.");
+			log(logmsg::debug_warning, L"sftpReqPassword outside connect operation, ignoring.");
 			break;
 		}
 		else {
@@ -207,10 +207,10 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 				if (!data.lastChallenge.empty() && data.lastChallengeType != CInteractiveLoginNotification::keyfile) {
 					// Check for same challenge. Will most likely fail as well, so abort early.
 					if (data.lastChallenge == challengeIdentifier) {
-						LogMessage(MessageType::Error, _("Authentication failed."));
+						log(logmsg::error, _("Authentication failed."));
 					}
 					else {
-						LogMessage(MessageType::Error, _("Server sent an additional login prompt. You need to use the interactive login type."));
+						log(logmsg::error, _("Server sent an additional login prompt. You need to use the interactive login type."));
 					}
 					DoClose(FZ_REPLY_CRITICALERROR | FZ_REPLY_PASSWORDFAILED);
 					return;
@@ -278,7 +278,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Message type %d not handled", message.type);
+		log(logmsg::debug_warning, L"Message type %d not handled", message.type);
 		break;
 	}
 }
@@ -294,7 +294,7 @@ void CSftpControlSocket::OnSftpListEvent(sftp_list_message const& message)
 	}
 
 	if (operations_.empty() || operations_.back()->opId != Command::list) {
-		LogMessage(MessageType::Debug_Warning, L"sftpEvent::Listentry outside list operation, ignoring.");
+		log(logmsg::debug_warning, L"sftpEvent::Listentry outside list operation, ignoring.");
 		return;
 	}
 	else {
@@ -308,10 +308,10 @@ void CSftpControlSocket::OnSftpListEvent(sftp_list_message const& message)
 void CSftpControlSocket::OnTerminate(std::wstring const& error)
 {
 	if (!error.empty()) {
-		LogMessageRaw(MessageType::Error, error);
+		log_raw(logmsg::error, error);
 	}
 	else {
-		LogMessageRaw(MessageType::Debug_Info, L"CSftpControlSocket::OnTerminate without error");
+		log_raw(logmsg::debug_info, L"CSftpControlSocket::OnTerminate without error");
 	}
 	if (process_) {
 		DoClose();
@@ -322,14 +322,14 @@ int CSftpControlSocket::SendCommand(std::wstring const& cmd, std::wstring const&
 {
 	SetWait(true);
 
-	LogMessageRaw(MessageType::Command, show.empty() ? cmd : show);
+	log_raw(logmsg::command, show.empty() ? cmd : show);
 
 	// Check for newlines in command
 	// a command like "ls\nrm foo/bar" is dangerous
 	if (cmd.find('\n') != std::wstring::npos ||
 		cmd.find('\r') != std::wstring::npos)
 	{
-		LogMessage(MessageType::Debug_Warning, L"Command containing newline characters, aborting.");
+		log(logmsg::debug_warning, L"Command containing newline characters, aborting.");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -340,7 +340,7 @@ int CSftpControlSocket::AddToStream(std::wstring const& cmd)
 {
 	std::string const str = ConvToServer(cmd);
 	if (str.empty()) {
-		LogMessage(MessageType::Error, _("Could not convert command to server encoding"));
+		log(logmsg::error, _("Could not convert command to server encoding"));
 		return FZ_REPLY_ERROR;
 	}
 
@@ -363,7 +363,7 @@ int CSftpControlSocket::AddToStream(std::string const& cmd)
 bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotification)
 {
 	if (operations_.empty() || !operations_.back()->waitForAsyncRequest) {
-		LogMessage(MessageType::Debug_Info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
+		log(logmsg::debug_info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
 		return false;
 	}
 
@@ -383,7 +383,7 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 			if (GetCurrentCommandId() != Command::connect ||
 				!currentServer_)
 			{
-				LogMessage(MessageType::Debug_Info, L"SetAsyncRequestReply called to wrong time");
+				log(logmsg::debug_info, L"SetAsyncRequestReply called to wrong time");
 				return false;
 			}
 
@@ -414,7 +414,7 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 	case reqId_interactiveLogin:
 		{
 			if (operations_.empty() || operations_.back()->opId != Command::connect) {
-				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
+				log(logmsg::debug_info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
 				return false;
 			}
 
@@ -436,7 +436,7 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown async request reply id: %d", requestId);
+		log(logmsg::debug_warning, L"Unknown async request reply id: %d", requestId);
 		return false;
 	}
 
@@ -454,10 +454,10 @@ void CSftpControlSocket::List(CServerPath const& path, std::wstring const& subDi
 	}
 
 	if (newPath.empty()) {
-		LogMessage(MessageType::Status, _("Retrieving directory listing..."));
+		log(logmsg::status, _("Retrieving directory listing..."));
 	}
 	else {
-		LogMessage(MessageType::Status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
+		log(logmsg::status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
 	}
 
 	Push(std::make_unique<CSftpListOpData>(*this, path, subDir, flags));
@@ -486,12 +486,12 @@ void CSftpControlSocket::ProcessReply(int result, std::wstring const& reply)
 	response_ = reply;
 
 	if (operations_.empty()) {
-		LogMessage(MessageType::Debug_Info, L"Skipping reply without active operation.");
+		log(logmsg::debug_info, L"Skipping reply without active operation.");
 		return;
 	}
 
 	auto & data = *operations_.back();
-	LogMessage(MessageType::Debug_Verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
+	log(logmsg::debug_verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
 	int res = data.ParseResponse();
 	if (res == FZ_REPLY_OK) {
 		ResetOperation(FZ_REPLY_OK);
@@ -561,7 +561,7 @@ void CSftpControlSocket::Mkdir(CServerPath const& path)
 	 */
 
 	if (operations_.empty()) {
-		LogMessage(MessageType::Status, _("Creating directory '%s'..."), path.GetPath());
+		log(logmsg::status, _("Creating directory '%s'..."), path.GetPath());
 	}
 
 	auto pData = std::make_unique<CSftpMkdirOpData>(*this);
@@ -579,7 +579,7 @@ void CSftpControlSocket::Delete(const CServerPath& path, std::deque<std::wstring
 	// CFileZillaEnginePrivate should have checked this already
 	assert(!files.empty());
 
-	LogMessage(MessageType::Debug_Verbose, L"CSftpControlSocket::Delete");
+	log(logmsg::debug_verbose, L"CSftpControlSocket::Delete");
 	
 	auto pData = std::make_unique<CSftpDeleteOpData>(*this);
 	pData->path_ = path;
@@ -589,7 +589,7 @@ void CSftpControlSocket::Delete(const CServerPath& path, std::deque<std::wstring
 
 void CSftpControlSocket::RemoveDir(CServerPath const& path, std::wstring const& subDir)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CSftpControlSocket::RemoveDir");
+	log(logmsg::debug_verbose, L"CSftpControlSocket::RemoveDir");
 
 	auto pData = std::make_unique<CSftpRemoveDirOpData>(*this);
 	pData->path_ = path;
@@ -599,13 +599,13 @@ void CSftpControlSocket::RemoveDir(CServerPath const& path, std::wstring const& 
 
 void CSftpControlSocket::Chmod(CChmodCommand const& command)
 {
-	LogMessage(MessageType::Status, _("Setting permissions of '%s' to '%s'"), command.GetPath().FormatFilename(command.GetFile()), command.GetPermission());
+	log(logmsg::status, _("Setting permissions of '%s' to '%s'"), command.GetPath().FormatFilename(command.GetFile()), command.GetPermission());
 	Push(std::make_unique<CSftpChmodOpData>(*this, command));
 }
 
 void CSftpControlSocket::Rename(CRenameCommand const& command)
 {
-	LogMessage(MessageType::Status, _("Renaming '%s' to '%s'"), command.GetFromPath().FormatFilename(command.GetFromFile()), command.GetToPath().FormatFilename(command.GetToFile()));
+	log(logmsg::status, _("Renaming '%s' to '%s'"), command.GetFromPath().FormatFilename(command.GetFromFile()), command.GetToPath().FormatFilename(command.GetToFile()));
 	Push(std::make_unique<CSftpRenameOpData>(*this, command));
 }
 

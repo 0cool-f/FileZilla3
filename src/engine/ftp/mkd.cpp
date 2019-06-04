@@ -62,7 +62,7 @@ int CFtpMkdirOpData::Send()
 	case mkd_tryfull:
 		return controlSocket_.SendCommand(L"MKD " + path_.GetPath());
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 		break;
 	}
 
@@ -115,7 +115,7 @@ int CFtpMkdirOpData::ParseResponse()
 
 		{
 			if (segments_.empty()) {
-				LogMessage(MessageType::Debug_Warning, L"  segments is empty");
+				log(logmsg::debug_warning, L"  segments is empty");
 				return FZ_REPLY_INTERNALERROR;
 			}
 
@@ -161,7 +161,7 @@ int CFtpMkdirOpData::ParseResponse()
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 	}
 
 	return FZ_REPLY_INTERNALERROR;

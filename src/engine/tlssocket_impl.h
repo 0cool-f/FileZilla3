@@ -69,8 +69,8 @@ private:
 	int VerifyCertificate();
 	bool CertificateIsBlacklisted(std::vector<fz::x509_certificate> const& certificates);
 
-	void LogError(int code, std::wstring const& function, MessageType logLegel = MessageType::Error);
-	void PrintAlert(MessageType logLevel);
+	void LogError(int code, std::wstring const& function, logmsg::type logLevel = logmsg::error);
+	void PrintAlert(logmsg::type logLevel);
 
 	// Failure logs the error, uninits the session and sends a close event
 	void Failure(int code, bool send_close, std::wstring const& function = std::wstring());

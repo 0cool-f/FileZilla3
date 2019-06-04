@@ -44,7 +44,7 @@ int CSftpRenameOpData::Send()
 		return controlSocket_.SendCommand(L"mv " + controlSocket_.WildcardEscape(fromQuoted) + L" " + toQuoted, L"mv " + fromQuoted + L" " + toQuoted);
 	}
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 		break;
 	}
 

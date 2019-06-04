@@ -31,10 +31,10 @@ int CFtpFileTransferOpData::Send()
 
 		if (download_) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
-			LogMessage(MessageType::Status, _("Starting download of %s"), filename);
+			log(logmsg::status, _("Starting download of %s"), filename);
 		}
 		else {
-			LogMessage(MessageType::Status, _("Starting upload of %s"), localFile_);
+			log(logmsg::status, _("Starting upload of %s"), localFile_);
 		}
 
 		int64_t size;
@@ -62,7 +62,7 @@ int CFtpFileTransferOpData::Send()
 	case filetransfer_resumetest:
 	case filetransfer_transfer:
 		if (controlSocket_.m_pTransferSocket) {
-			LogMessage(MessageType::Debug_Verbose, L"m_pTransferSocket != 0");
+			log(logmsg::debug_verbose, L"m_pTransferSocket != 0");
 			controlSocket_.m_pTransferSocket.reset();
 		}
 
@@ -76,7 +76,7 @@ int CFtpFileTransferOpData::Send()
 
 				if (resume_) {
 					if (!pFile->open(fz::to_native(localFile_), fz::file::writing, fz::file::existing)) {
-						LogMessage(MessageType::Error, _("Failed to open \"%s\" for appending/writing"), localFile_);
+						log(logmsg::error, _("Failed to open \"%s\" for appending/writing"), localFile_);
 						return FZ_REPLY_ERROR;
 					}
 
@@ -85,7 +85,7 @@ int CFtpFileTransferOpData::Send()
 					startOffset = pFile->seek(0, fz::file::end);
 
 					if (startOffset == -1) {
-						LogMessage(MessageType::Error, _("Could not seek to the end of the file"));
+						log(logmsg::error, _("Could not seek to the end of the file"));
 						return FZ_REPLY_ERROR;
 					}
 					localFileSize_ = startOffset;
@@ -102,7 +102,7 @@ int CFtpFileTransferOpData::Send()
 					controlSocket_.CreateLocalDir(localFile_);
 
 					if (!pFile->open(fz::to_native(localFile_), fz::file::writing, fz::file::empty)) {
-						LogMessage(MessageType::Error, _("Failed to open \"%s\" for writing"), localFile_);
+						log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
 						return FZ_REPLY_ERROR;
 					}
 
@@ -118,16 +118,16 @@ int CFtpFileTransferOpData::Send()
 					// Try to preallocate the file in order to reduce fragmentation
 					int64_t sizeToPreallocate = remoteFileSize_ - startOffset;
 					if (sizeToPreallocate > 0) {
-						LogMessage(MessageType::Debug_Info, L"Preallocating %d bytes for the file \"%s\"", sizeToPreallocate, localFile_);
+						log(logmsg::debug_info, L"Preallocating %d bytes for the file \"%s\"", sizeToPreallocate, localFile_);
 						auto oldPos = pFile->seek(0, fz::file::current);
 						if (oldPos >= 0) {
 							if (pFile->seek(sizeToPreallocate, fz::file::end) == remoteFileSize_) {
 								if (!pFile->truncate()) {
-									LogMessage(MessageType::Debug_Warning, L"Could not preallocate the file");
+									log(logmsg::debug_warning, L"Could not preallocate the file");
 								}
 							}
 							if (pFile->seek(oldPos, fz::file::begin) != oldPos) {
-								LogMessage(MessageType::Error, _("Could not seek to offset %d within file"), oldPos);
+								log(logmsg::error, _("Could not seek to offset %d within file"), oldPos);
 								return FZ_REPLY_ERROR;
 							}
 						}
@@ -136,7 +136,7 @@ int CFtpFileTransferOpData::Send()
 			}
 			else {
 				if (!pFile->open(fz::to_native(localFile_), fz::file::reading)) {
-					LogMessage(MessageType::Error, _("Failed to open \"%s\" for reading"), localFile_);
+					log(logmsg::error, _("Failed to open \"%s\" for reading"), localFile_);
 					return FZ_REPLY_ERROR;
 				}
 
@@ -153,7 +153,7 @@ int CFtpFileTransferOpData::Send()
 						}
 
 						if (startOffset == localFileSize_ && binary) {
-							LogMessage(MessageType::Debug_Info, L"No need to resume, remote file size matches local file size.");
+							log(logmsg::debug_info, L"No need to resume, remote file size matches local file size.");
 
 							if (engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) &&
 								CServerCapabilities::GetCapability(currentServer_, mfmt_command) == yes)
@@ -169,7 +169,7 @@ int CFtpFileTransferOpData::Send()
 						}
 
 						if (pFile->seek(startOffset, fz::file::begin) == -1) {
-							LogMessage(MessageType::Error, _("Could not seek to offset %d within file"), startOffset);
+							log(logmsg::error, _("Could not seek to offset %d within file"), startOffset);
 							return FZ_REPLY_ERROR;
 						}
 					}
@@ -197,7 +197,7 @@ int CFtpFileTransferOpData::Send()
 			if (!ioThread_->Create(engine_.GetThreadPool(), std::move(pFile), !download_, binary)) {
 				// CIOThread will delete pFile
 				ioThread_.reset();
-				LogMessage(MessageType::Error, _("Could not spawn IO thread"));
+				log(logmsg::error, _("Could not spawn IO thread"));
 				return FZ_REPLY_ERROR;
 			}
 		}
@@ -237,7 +237,7 @@ int CFtpFileTransferOpData::Send()
 		break;
 	}
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unhandled opState: %d", opState);
+		log(logmsg::debug_warning, L"Unhandled opState: %d", opState);
 		return FZ_REPLY_ERROR;
 	}
 
@@ -250,7 +250,7 @@ int CFtpFileTransferOpData::Send()
 
 int CFtpFileTransferOpData::TestResumeCapability()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CFtpFileTransferOpData::TestResumeCapability()");
+	log(logmsg::debug_verbose, L"CFtpFileTransferOpData::TestResumeCapability()");
 
 	if (!download_) {
 		return FZ_REPLY_CONTINUE;
@@ -262,10 +262,10 @@ int CFtpFileTransferOpData::TestResumeCapability()
 			{
 			case yes:
 				if (remoteFileSize_ == localFileSize_) {
-					LogMessage(MessageType::Debug_Info, _("Server does not support resume of files > %d GB. End transfer since file sizes match."), i ? 2 : 4);
+					log(logmsg::debug_info, _("Server does not support resume of files > %d GB. End transfer since file sizes match."), i ? 2 : 4);
 					return FZ_REPLY_OK;
 				}
-				LogMessage(MessageType::Error, _("Server does not support resume of files > %d GB."), i ? 2 : 4);
+				log(logmsg::error, _("Server does not support resume of files > %d GB."), i ? 2 : 4);
 				return FZ_REPLY_CRITICALERROR;
 			case unknown:
 				if (remoteFileSize_ < localFileSize_) {
@@ -273,11 +273,11 @@ int CFtpFileTransferOpData::TestResumeCapability()
 					break;
 				}
 				if (remoteFileSize_ == localFileSize_) {
-					LogMessage(MessageType::Debug_Info, _("Server may not support resume of files > %d GB. End transfer since file sizes match."), i ? 2 : 4);
+					log(logmsg::debug_info, _("Server may not support resume of files > %d GB. End transfer since file sizes match."), i ? 2 : 4);
 					return FZ_REPLY_OK;
 				}
 				else if (remoteFileSize_ > localFileSize_) {
-					LogMessage(MessageType::Status, _("Testing resume capabilities of server"));
+					log(logmsg::status, _("Testing resume capabilities of server"));
 
 					opState = filetransfer_waitresumetest;
 					resumeOffset = remoteFileSize_ - 1;
@@ -343,7 +343,7 @@ int CFtpFileTransferOpData::ParseResponse()
 				remoteFileSize_ = size;
 			}
 			else {
-				LogMessage(MessageType::Debug_Info, L"Invalid SIZE reply");
+				log(logmsg::debug_info, L"Invalid SIZE reply");
 			}
 		}
 		break;
@@ -367,7 +367,7 @@ int CFtpFileTransferOpData::ParseResponse()
 	case filetransfer_mfmt:
 		return FZ_REPLY_OK;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown op state");
+		log(logmsg::debug_warning, L"Unknown op state");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -505,7 +505,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 			else if (download_ && !fileTime_.empty()) {
 				ioThread_.reset();
 				if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_)) {
-					LogMessage(MessageType::Debug_Warning, L"Could not set modification time");
+					log(logmsg::debug_warning, L"Could not set modification time");
 				}
 			}
 		}
@@ -516,11 +516,11 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 			if (transferEndReason == TransferEndReason::failed_resumetest) {
 				if (localFileSize_ > (1ll << 32)) {
 					CServerCapabilities::SetCapability(currentServer_, resume4GBbug, yes);
-					LogMessage(MessageType::Error, _("Server does not support resume of files > 4GB."));
+					log(logmsg::error, _("Server does not support resume of files > 4GB."));
 				}
 				else {
 					CServerCapabilities::SetCapability(currentServer_, resume2GBbug, yes);
-					LogMessage(MessageType::Error, _("Server does not support resume of files > 2GB."));
+					log(logmsg::error, _("Server does not support resume of files > 2GB."));
 				}
 
 				prevResult |= FZ_REPLY_CRITICALERROR;

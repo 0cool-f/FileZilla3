@@ -46,7 +46,7 @@ int CStorjDeleteOpData::Send()
 		return controlSocket_.SendCommand(L"rm " + bucket_ + L" " + id);
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjDeleteOpData::FileTransferSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjDeleteOpData::FileTransferSend()");
 	return FZ_REPLY_INTERNALERROR;
 }
 

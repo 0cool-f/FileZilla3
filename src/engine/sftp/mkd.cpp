@@ -62,7 +62,7 @@ int CSftpMkdirOpData::Send()
 	case mkd_tryfull:
 		return controlSocket_.SendCommand(L"mkdir " + controlSocket_.QuoteFilename(path_.GetPath()));
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 	}
 
 	return FZ_REPLY_INTERNALERROR;
@@ -92,7 +92,7 @@ int CSftpMkdirOpData::ParseResponse()
 	case mkd_mkdsub:
 		if (successful) {
 			if (segments_.empty()) {
-				LogMessage(MessageType::Debug_Warning, L"  segments_ is empty");
+				log(logmsg::debug_warning, L"  segments_ is empty");
 				return FZ_REPLY_INTERNALERROR;
 			}
 			engine_.GetDirectoryCache().UpdateFile(currentServer_, currentMkdPath_, segments_.back(), true, CDirectoryCache::dir);
@@ -124,7 +124,7 @@ int CSftpMkdirOpData::ParseResponse()
 	case mkd_tryfull:
 		return successful ? FZ_REPLY_OK : FZ_REPLY_ERROR;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 	}
 
 	return FZ_REPLY_INTERNALERROR;

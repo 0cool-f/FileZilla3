@@ -7,13 +7,13 @@ int CSftpDeleteOpData::Send()
 {
 	std::wstring const& file = files_.front();
 	if (file.empty()) {
-		LogMessage(MessageType::Debug_Info, L"Empty filename");
+		log(logmsg::debug_info, L"Empty filename");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
 	std::wstring filename = path_.FormatFilename(file);
 	if (filename.empty()) {
-		LogMessage(MessageType::Error, _("Filename cannot be constructed for directory %s and filename %s"), path_.GetPath(), file);
+		log(logmsg::error, _("Filename cannot be constructed for directory %s and filename %s"), path_.GetPath(), file);
 		return FZ_REPLY_ERROR;
 	}
 

@@ -142,7 +142,7 @@ int CSftpChangeDirOpData::ParseResponse()
 	case cwd_cwd_subdir:
 		if (!successful || controlSocket_.response_.empty()) {
 			if (link_discovery_) {
-				LogMessage(MessageType::Debug_Info, L"Symlink does not link to a directory, probably a file");
+				log(logmsg::debug_info, L"Symlink does not link to a directory, probably a file");
 				return FZ_REPLY_LINKNOTDIR;
 			}
 			else {
@@ -156,7 +156,7 @@ int CSftpChangeDirOpData::ParseResponse()
 		}
 		return FZ_REPLY_ERROR;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown opState %d", opState);
+		log(logmsg::debug_warning, L"Unknown opState %d", opState);
 		break;
 	}
 

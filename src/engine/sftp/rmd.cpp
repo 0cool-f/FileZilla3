@@ -11,7 +11,7 @@ int CSftpRemoveDirOpData::Send()
 		fullPath = path_;
 
 		if (!fullPath.AddSegment(subDir_)) {
-			LogMessage(MessageType::Error, _("Path cannot be constructed for directory %s and subdir %s"), path_.GetPath(), subDir_);
+			log(logmsg::error, _("Path cannot be constructed for directory %s and subdir %s"), path_.GetPath(), subDir_);
 			return FZ_REPLY_ERROR;
 		}
 	}
@@ -32,7 +32,7 @@ int CSftpRemoveDirOpData::ParseResponse()
 	}
 
 	if (path_.empty()) {
-		LogMessage(MessageType::Debug_Info, L"Empty pData->path");
+		log(logmsg::debug_info, L"Empty pData->path");
 		return FZ_REPLY_INTERNALERROR;
 	}
 

@@ -3,6 +3,8 @@
 #include "Options.h"
 #include "state.h"
 
+#include <libfilezilla/util.hpp>
+
 #include <wx/dcclient.h>
 
 #define MAX_LINECOUNT 1000
@@ -130,7 +132,7 @@ void CStatusView::AddToLog(CLogmsgNotification const& notification)
 	AddToLog(notification.msgType, notification.msg, fz::datetime::now());
 }
 
-void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message, fz::datetime const& time)
+void CStatusView::AddToLog(logmsg::type messagetype, std::wstring const& message, fz::datetime const& time)
 {
 	if (!m_shown) {
 		if (m_hiddenLines.size() >= MAX_LINECOUNT) {
@@ -155,12 +157,13 @@ void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message,
 	// This does not clear storage
 	m_formattedMessage.clear();
 
-	if (m_nLineCount)
+	if (m_nLineCount) {
 #ifdef __WXMSW__
 		m_formattedMessage = _T("\r\n");
 #else
 		m_formattedMessage = _T("\n");
 #endif
+	}
 
 	if (m_nLineCount >= MAX_LINECOUNT) {
 #ifndef __WXGTK__
@@ -180,7 +183,9 @@ void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message,
 	}
 #endif
 
-	size_t lineLength = m_attributeCache[static_cast<int>(messagetype)].len + messageLength;
+	uint64_t const cache_index = fz::bitscan_reverse(messagetype);
+
+	size_t lineLength = m_attributeCache[cache_index].len + messageLength;
 
 	if (m_showTimestamps) {
 		if (time != m_lastTime) {
@@ -197,12 +202,12 @@ void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message,
 	}
 
 #ifdef __WXMAC__
-	m_pTextCtrl->SetDefaultStyle(m_attributeCache[static_cast<int>(messagetype)].attr);
+	m_pTextCtrl->SetDefaultStyle(m_attributeCache[cache_index].attr);
 #elif __WXGTK__
-	m_pTextCtrl->SetDefaultColor(m_attributeCache[static_cast<int>(messagetype)].attr.GetTextColour());
+	m_pTextCtrl->SetDefaultColor(m_attributeCache[cache_index].attr.GetTextColour());
 #endif
 
-	m_formattedMessage += m_attributeCache[static_cast<int>(messagetype)].prefix;
+	m_formattedMessage += m_attributeCache[cache_index].prefix;
 
 	if (m_rtl) {
 		// Unicode control characters that control reading direction
@@ -214,7 +219,7 @@ void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message,
 		//const wxChar LTR_OVERRIDE = 0x202D;
 		//const wxChar RTL_OVERRIDE = 0x202E;
 
-		if (messagetype == MessageType::Command || messagetype == MessageType::Response || messagetype >= MessageType::Debug_Warning) {
+		if (messagetype == logmsg::command || messagetype == logmsg::reply || messagetype >= logmsg::debug_warning) {
 			// Commands, responses and debug message contain English text,
 			// set LTR reading order for them.
 			m_formattedMessage += LTR_MARK;
@@ -227,10 +232,12 @@ void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message,
 #if defined(__WXGTK__)
 	// AppendText always calls SetInsertionPointEnd, which is very expensive.
 	// This check however is negligible.
-	if (m_pTextCtrl->GetInsertionPoint() != m_pTextCtrl->GetLastPosition())
+	if (m_pTextCtrl->GetInsertionPoint() != m_pTextCtrl->GetLastPosition()) {
 		m_pTextCtrl->AppendText(m_formattedMessage);
-	else
+	}
+	else {
 		m_pTextCtrl->WriteText(m_formattedMessage);
+	}
 	#ifdef __WXGTK3__
 		// Some smooth scrolling oddities prevent auto-scrolling. Manuall tell it to scroll.
 		m_pTextCtrl->ShowPosition(m_pTextCtrl->GetInsertionPoint());
@@ -238,7 +245,7 @@ void CStatusView::AddToLog(MessageType messagetype, std::wstring const& message,
 #elif defined(__WXMAC__)
 	m_pTextCtrl->WriteText(m_formattedMessage);
 #else
-	m_pTextCtrl->AppendText(m_formattedMessage, m_nLineCount, m_attributeCache[static_cast<int>(messagetype)].cf);
+	m_pTextCtrl->AppendText(m_formattedMessage, m_nLineCount, m_attributeCache[cache_index].cf);
 #endif
 
 	if (m_nLineCount >= MAX_LINECOUNT) {
@@ -337,41 +344,41 @@ void CStatusView::InitDefAttr()
 	m_pTextCtrl->SetSelection(m_pTextCtrl->GetInsertionPoint(), m_pTextCtrl->GetInsertionPoint());
 #endif
 
-	for (int i = 0; i < static_cast<int>(MessageType::count); i++) {
+	for (size_t i = 0; i < sizeof(logmsg::type) * 8; ++i) {
 		t_attributeCache& entry = m_attributeCache[i];
 #ifndef __WXMAC__
 		entry.attr = defAttr;
 #endif
-		switch (static_cast<MessageType>(i)) {
-		case MessageType::Error:
+		switch (1 << i) {
+		case logmsg::error:
 			entry.prefix = _("Error:").ToStdWstring();
 			entry.attr.SetTextColour(wxColour(255, 0, 0));
 			break;
-		case MessageType::Command:
+		case logmsg::command:
 			entry.prefix = _("Command:").ToStdWstring();
 			if (is_dark)
 				entry.attr.SetTextColour(wxColour(128, 128, 255));
 			else
 				entry.attr.SetTextColour(wxColour(0, 0, 128));
 			break;
-		case MessageType::Response:
+		case logmsg::reply:
 			entry.prefix = _("Response:").ToStdWstring();
 			if (is_dark)
 				entry.attr.SetTextColour(wxColour(128, 255, 128));
 			else
 				entry.attr.SetTextColour(wxColour(0, 128, 0));
 			break;
-		case MessageType::Debug_Warning:
-		case MessageType::Debug_Info:
-		case MessageType::Debug_Verbose:
-		case MessageType::Debug_Debug:
+		case logmsg::debug_warning:
+		case logmsg::debug_info:
+		case logmsg::debug_verbose:
+		case logmsg::debug_debug:
 			entry.prefix = _("Trace:").ToStdWstring();
 			if (is_dark)
 				entry.attr.SetTextColour(wxColour(255, 128, 255));
 			else
 				entry.attr.SetTextColour(wxColour(128, 0, 128));
 			break;
-		case MessageType::RawList:
+		case logmsg::listing:
 			entry.prefix = _("Listing:").ToStdWstring();
 			if (is_dark)
 				entry.attr.SetTextColour(wxColour(128, 255, 255));

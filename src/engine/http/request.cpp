@@ -83,7 +83,7 @@ int CHttpRequestOpData::Send()
 		}
 
 		if (req.verb_.empty()) {
-			LogMessage(MessageType::Debug_Warning, L"No request verb");
+			log(logmsg::debug_warning, L"No request verb");
 			return FZ_REPLY_INTERNALERROR;
 		}
 		std::string host_header = req.uri_.host_;
@@ -117,7 +117,7 @@ int CHttpRequestOpData::Send()
 
 	if (opState & request_wait_connect) {
 		if (send_pos_ >= requests_.size()) {
-			LogMessage(MessageType::Debug_Warning, L"Bad state: opState & request_wait_connect yet send_pos_ >= requests_.size()");
+			log(logmsg::debug_warning, L"Bad state: opState & request_wait_connect yet send_pos_ >= requests_.size()");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
@@ -157,7 +157,7 @@ int CHttpRequestOpData::Send()
 				if (!cl.empty()) {
 					int64_t requestContentLength = fz::to_integral<int64_t>(cl, -1);
 					if (requestContentLength < 0) {
-						LogMessage(MessageType::Error, _("Malformed request header: %s"), _("Invalid Content-Length"));
+						log(logmsg::error, _("Malformed request header: %s"), _("Invalid Content-Length"));
 						return FZ_REPLY_INTERNALERROR;
 					}
 					dataToSend_ = static_cast<uint64_t>(requestContentLength);
@@ -165,16 +165,16 @@ int CHttpRequestOpData::Send()
 
 				// Assemble request and headers
 				std::string command = fz::sprintf("%s %s HTTP/1.1", req.verb_, req.uri_.get_request());
-				LogMessage(MessageType::Command, "%s", command);
+				log(logmsg::command, "%s", command);
 				command += "\r\n";
 
 				for (auto const& header : req.headers_) {
 					std::string line = fz::sprintf("%s: %s", header.first, header.second);
 					if (header.first == "Authorization") {
-						LogMessage(MessageType::Command, "%s: %s", header.first, std::string(header.second.size(), '*'));
+						log(logmsg::command, "%s: %s", header.first, std::string(header.second.size(), '*'));
 					}
 					else {
-						LogMessage(MessageType::Command, "%s", line);
+						log(logmsg::command, "%s", line);
 					}
 					command += line + "\r\n";
 				}
@@ -183,13 +183,13 @@ int CHttpRequestOpData::Send()
 
 				req.flags_ |= HttpRequest::flag_sent_header;
 				if (!req.body_) {
-					LogMessage(MessageType::Debug_Info, "Finished sending request header. Request has no body");
+					log(logmsg::debug_info, "Finished sending request header. Request has no body");
 					opState &= ~request_send;
 					++send_pos_;
 					if (send_pos_ < requests_.size()) {
 						if (!req.keep_alive()) {
 							opState |= request_send_wait_for_read;
-							LogMessage(MessageType::Debug_Info, L"Request did not ask for keep-alive. Waiting for response to finish before sending next request a new connection.");
+							log(logmsg::debug_info, L"Request did not ask for keep-alive. Waiting for response to finish before sending next request a new connection.");
 						}
 						else {
 							opState |= request_init;
@@ -197,8 +197,8 @@ int CHttpRequestOpData::Send()
 					}
 				}
 				else {
-					LogMessage(MessageType::Debug_Info, "Finished sending request header.");
-					sendLogLevel_ = MessageType::Debug_Debug;
+					log(logmsg::debug_info, "Finished sending request header.");
+					sendLogLevel_ = logmsg::debug_debug;
 				}
 
 				auto result = controlSocket_.Send(command.c_str(), command.size());
@@ -222,7 +222,7 @@ int CHttpRequestOpData::Send()
 							return res;
 						}
 						if (len > dataToSend_) {
-							LogMessage(MessageType::Debug_Warning, L"req.body_ returned too much data");
+							log(logmsg::debug_warning, L"req.body_ returned too much data");
 							return FZ_REPLY_INTERNALERROR;
 						}
 
@@ -234,8 +234,8 @@ int CHttpRequestOpData::Send()
 					int written = controlSocket_.active_layer_->write(controlSocket_.sendBuffer_.get(), controlSocket_.sendBuffer_.size(), error);
 					if (written < 0) {
 						if (error != EAGAIN) {
-							LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
-							LogMessage(MessageType::Error, _("Disconnected from server"));
+							log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
+							log(logmsg::error, _("Disconnected from server"));
 							return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 						}
 						return FZ_REPLY_WOULDBLOCK;
@@ -248,11 +248,11 @@ int CHttpRequestOpData::Send()
 					}
 				}
 
-				LogMessage(MessageType::Debug_Info, "Finished sending request body");
+				log(logmsg::debug_info, "Finished sending request body");
 
 				req.flags_ |= HttpRequest::flag_sent_body;
 
-				sendLogLevel_ = MessageType::Debug_Verbose;
+				sendLogLevel_ = logmsg::debug_verbose;
 
 				opState &= ~request_send;
 				++send_pos_;
@@ -260,7 +260,7 @@ int CHttpRequestOpData::Send()
 				if (send_pos_ < requests_.size()) {
 					if (!req.keep_alive()) {
 						opState |= request_send_wait_for_read;
-						LogMessage(MessageType::Debug_Info, L"Request did not ask for keep-alive. Waiting for response to finish before sending next request a new connection.");
+						log(logmsg::debug_info, L"Request did not ask for keep-alive. Waiting for response to finish before sending next request a new connection.");
 					}
 					else {
 						opState |= request_init;
@@ -295,12 +295,12 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 		auto & request = shared_response->request();
 		if (!(request.flags_ & HttpRequest::flag_sent_header)) {
 			if (eof) {
-				LogMessage(MessageType::Debug_Verbose, L"Socket closed before request got sent");
-				LogMessage(MessageType::Error, _("Connection closed by server"));
+				log(logmsg::debug_verbose, L"Socket closed before request got sent");
+				log(logmsg::error, _("Connection closed by server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			else if (!recv_buffer_.empty()) {
-				LogMessage(MessageType::Error, _("Server sent data even before request headers were sent"));
+				log(logmsg::error, _("Server sent data even before request headers were sent"));
 				return FZ_REPLY_ERROR;
 			}
 		}
@@ -308,8 +308,8 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 
 		if (!response.got_header()) {
 			if (eof) {
-				LogMessage(MessageType::Debug_Verbose, L"Socket closed before headers got received");
-				LogMessage(MessageType::Error, _("Connection closed by server"));
+				log(logmsg::debug_verbose, L"Socket closed before headers got received");
+				log(logmsg::error, _("Connection closed by server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 
@@ -319,8 +319,8 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 
 	if (read_state_.transfer_encoding_ == chunked) {
 		if (eof) {
-			LogMessage(MessageType::Debug_Verbose, L"Socket closed, chunk incomplete");
-			LogMessage(MessageType::Error, _("Connection closed by server"));
+			log(logmsg::debug_verbose, L"Socket closed, chunk incomplete");
+			log(logmsg::error, _("Connection closed by server"));
 			return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 		}
 		return ParseChunkedData();
@@ -330,8 +330,8 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 			assert(recv_buffer_.empty());
 
 			if (read_state_.responseContentLength_ != -1 && read_state_.receivedData_ != read_state_.responseContentLength_) {
-				LogMessage(MessageType::Debug_Verbose, L"Socket closed, content length not reached");
-				LogMessage(MessageType::Error, _("Connection closed by server"));
+				log(logmsg::debug_verbose, L"Socket closed, content length not reached");
+				log(logmsg::error, _("Connection closed by server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			else {
@@ -368,7 +368,7 @@ int CHttpRequestOpData::OnReceive()
 		int read = controlSocket_.active_layer_->read(recv_buffer_.get(recv_size), recv_size, error);
 		if (read <= -1) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not read from socket: %s"), fz::socket_error_description(error));
+				log(logmsg::error, _("Could not read from socket: %s"), fz::socket_error_description(error));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			return FZ_REPLY_WOULDBLOCK;
@@ -388,14 +388,14 @@ int CHttpRequestOpData::OnReceive()
 			}
 
 			if (res == FZ_REPLY_OK) {
-				LogMessage(MessageType::Debug_Info, L"Finished a response");
+				log(logmsg::debug_info, L"Finished a response");
 				requests_.pop_front();
 				--send_pos_;
 
 				bool keep_alive = read_state_.keep_alive_;
 				if (!keep_alive || eof) {
 					if (!recv_buffer_.empty()) {
-						LogMessage(MessageType::Error, _("Malformed response: %s"), _("Server sent too much data."));
+						log(logmsg::error, _("Malformed response: %s"), _("Server sent too much data."));
 						return FZ_REPLY_ERROR;
 					}
 
@@ -405,11 +405,11 @@ int CHttpRequestOpData::OnReceive()
 				read_state_ = read_state();
 
 				if (requests_.empty()) {
-					LogMessage(MessageType::Debug_Info, L"Done reading last response");
+					log(logmsg::debug_info, L"Done reading last response");
 					opState &= ~request_reading;
 
 					if (!recv_buffer_.empty()) {
-						LogMessage(MessageType::Error, _("Malformed response: %s"), _("Server sent too much data."));
+						log(logmsg::error, _("Malformed response: %s"), _("Server sent too much data."));
 						return FZ_REPLY_ERROR;
 					}
 					return FZ_REPLY_OK;
@@ -427,7 +427,7 @@ int CHttpRequestOpData::OnReceive()
 		}
 
 		if (requests_.empty() && !recv_buffer_.empty()) {
-			LogMessage(MessageType::Error, _("Malformed response: %s"), _("Server sent too much data."));
+			log(logmsg::error, _("Malformed response: %s"), _("Server sent too much data."));
 			return FZ_REPLY_ERROR;
 		}
 	}
@@ -437,7 +437,7 @@ int CHttpRequestOpData::OnReceive()
 
 int CHttpRequestOpData::ParseHeader()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpRequestOpData::ParseHeader()");
+	log(logmsg::debug_verbose, L"CHttpRequestOpData::ParseHeader()");
 
 	// Parse the HTTP header.
 	// We do just the neccessary parsing and silently ignore most header fields
@@ -448,20 +448,20 @@ int CHttpRequestOpData::ParseHeader()
 		for (i = 0; (i + 1) < recv_buffer_.size(); ++i) {
 			if (recv_buffer_[i] == '\r') {
 				if (recv_buffer_[i + 1] != '\n') {
-					LogMessage(MessageType::Error, _("Malformed response header: %s"), _("Server not sending proper line endings"));
+					log(logmsg::error, _("Malformed response header: %s"), _("Server not sending proper line endings"));
 					return FZ_REPLY_ERROR;
 				}
 				break;
 			}
 			if (!recv_buffer_[i]) {
-				LogMessage(MessageType::Error, _("Malformed response header: %s"), _("Null character in line"));
+				log(logmsg::error, _("Malformed response header: %s"), _("Null character in line"));
 				return FZ_REPLY_ERROR;
 			}
 		}
 		if ((i + 1) >= recv_buffer_.size()) {
 			size_t const max_line_size = 8192;
 			if (recv_buffer_.size() >= max_line_size) {
-				LogMessage(MessageType::Error, _("Too long header line"));
+				log(logmsg::error, _("Too long header line"));
 				return FZ_REPLY_ERROR;
 			}
 			return FZ_REPLY_WOULDBLOCK;
@@ -472,14 +472,14 @@ int CHttpRequestOpData::ParseHeader()
 			wline = fz::to_wstring(std::string(recv_buffer_.get(), recv_buffer_.get() + i));
 		}
 		if (!wline.empty()) {
-			controlSocket_.LogMessageRaw(MessageType::Response, wline);
+			controlSocket_.log_raw(logmsg::reply, wline);
 		}
 
 		auto & response = requests_.front()->response();
 		if (!response.got_code()) {
 			if (recv_buffer_.size() < 15 || memcmp(recv_buffer_.get(), "HTTP/1.", 7)) {
 				// Invalid HTTP Status-Line
-				LogMessage(MessageType::Error, _("Invalid HTTP Response"));
+				log(logmsg::error, _("Invalid HTTP Response"));
 				return FZ_REPLY_ERROR;
 			}
 
@@ -488,7 +488,7 @@ int CHttpRequestOpData::ParseHeader()
 				recv_buffer_[11] < '0' || recv_buffer_[11] > '9')
 			{
 				// Invalid response code
-				LogMessage(MessageType::Error, _("Invalid response code"));
+				log(logmsg::error, _("Invalid response code"));
 				return FZ_REPLY_ERROR;
 			}
 
@@ -507,7 +507,7 @@ int CHttpRequestOpData::ParseHeader()
 
 			auto delim_pos = line.find(':');
 			if (delim_pos == std::string::npos || !delim_pos) {
-				LogMessage(MessageType::Error, _("Malformed response header: %s"), _("Invalid line"));
+				log(logmsg::error, _("Malformed response header: %s"), _("Invalid line"));
 				return FZ_REPLY_ERROR;
 			}
 
@@ -539,7 +539,7 @@ int CHttpRequestOpData::ParseHeader()
 
 int CHttpRequestOpData::ProcessCompleteHeader()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpRequestOpData::ParseHeader()");
+	log(logmsg::debug_verbose, L"CHttpRequestOpData::ParseHeader()");
 
 	auto & srr = requests_.front();
 	auto & request = srr->request();
@@ -563,7 +563,7 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 		read_state_.transfer_encoding_ = identity;
 	}
 	else {
-		LogMessage(MessageType::Error, _("Malformed response header: %s"), _("Unknown transfer encoding"));
+		log(logmsg::error, _("Malformed response header: %s"), _("Unknown transfer encoding"));
 		return FZ_REPLY_ERROR;
 	}
 	
@@ -573,7 +573,7 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 	if (!cl.empty()) {
 		length = fz::to_integral<int64_t>(cl, -1);
 		if (length < 0) {
-			LogMessage(MessageType::Error, _("Malformed response header: %s"), _("Invalid Content-Length"));
+			log(logmsg::error, _("Malformed response header: %s"), _("Invalid Content-Length"));
 			return FZ_REPLY_ERROR;
 		}
 	}
@@ -637,20 +637,20 @@ int CHttpRequestOpData::ParseChunkedData()
 		for (i = 0; (i + 1) < recv_buffer_.size(); ++i) {
 			if (recv_buffer_[i] == '\r') {
 				if (recv_buffer_[i + 1] != '\n') {
-					LogMessage(MessageType::Error, _("Malformed chunk data: %s"), _("Wrong line endings"));
+					log(logmsg::error, _("Malformed chunk data: %s"), _("Wrong line endings"));
 					return FZ_REPLY_ERROR;
 				}
 				break;
 			}
 			if (!recv_buffer_[i]) {
-				LogMessage(MessageType::Error, _("Malformed chunk data: %s"), _("Null character in line"));
+				log(logmsg::error, _("Malformed chunk data: %s"), _("Null character in line"));
 				return FZ_REPLY_ERROR;
 			}
 		}
 		if ((i + 1) >= recv_buffer_.size()) {
 			size_t const max_line_size = 8192;
 			if (recv_buffer_.size() >= max_line_size) {
-				LogMessage(MessageType::Error, _("Malformed chunk data: %s"), _("Line length exceeded"));
+				log(logmsg::error, _("Malformed chunk data: %s"), _("Line length exceeded"));
 				return FZ_REPLY_ERROR;
 			}
 			break;
@@ -660,8 +660,8 @@ int CHttpRequestOpData::ParseChunkedData()
 			if (i) {
 				// The chunk data has to end with CRLF. If i is nonzero,
 				// it didn't end with just CRLF.
-				LogMessage(MessageType::Debug_Debug, L"%u characters preceeding line-ending with value %s", i, fz::hex_encode<std::string>(std::string(recv_buffer_.get(), recv_buffer_.get() + recv_buffer_.size())));
-				LogMessage(MessageType::Error, _("Malformed chunk data: %s"), _("Chunk data improperly terminated"));
+				log(logmsg::debug_debug, L"%u characters preceeding line-ending with value %s", i, fz::hex_encode<std::string>(std::string(recv_buffer_.get(), recv_buffer_.get() + recv_buffer_.size())));
+				log(logmsg::error, _("Malformed chunk data: %s"), _("Chunk data improperly terminated"));
 				return FZ_REPLY_ERROR;
 			}
 			read_state_.chunk_data_.terminateChunk = false;
@@ -696,7 +696,7 @@ int CHttpRequestOpData::ParseChunkedData()
 				}
 				else {
 					// Invalid size
-					LogMessage(MessageType::Error, _("Malformed chunk data: %s"), _("Invalid chunk size"));
+					log(logmsg::error, _("Malformed chunk data: %s"), _("Invalid chunk size"));
 					return FZ_REPLY_ERROR;
 				}
 			}
@@ -755,7 +755,7 @@ int CHttpRequestOpData::Reset(int result)
 		controlSocket_.ResetSocket();
 	}
 	else if (!recv_buffer_.empty()) {
-		LogMessage(MessageType::Debug_Verbose, L"Closing connection, the receive buffer isn't empty but at %d", recv_buffer_.size());
+		log(logmsg::debug_verbose, L"Closing connection, the receive buffer isn't empty but at %d", recv_buffer_.size());
 		controlSocket_.ResetSocket();
 	}
 	else {

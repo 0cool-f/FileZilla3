@@ -116,18 +116,18 @@ int CProxySocket::connect(fz::native_string const& host, unsigned int port, fz::
 		std::string ip;
 		auto const addressType = fz::get_address_type(host_);
 		if (addressType == fz::address_type::ipv6) {
-			m_pOwner->LogMessage(MessageType::Error, _("IPv6 addresses are not supported with SOCKS4 proxy"));
+			m_pOwner->log(logmsg::error, _("IPv6 addresses are not supported with SOCKS4 proxy"));
 			return EINVAL;
 		}
 		else if (addressType == fz::address_type::ipv4) {
 			ip = fz::to_string(host_);
 		}
 		else {
-			m_pOwner->LogMessage(MessageType::Error, L"Cannot use hostnames for use with SOCKS4 proxy.");
+			m_pOwner->log(logmsg::error, L"Cannot use hostnames for use with SOCKS4 proxy.");
 			return EINVAL;
 		}
 
-		m_pOwner->LogMessage(MessageType::Status, _("SOCKS4 proxy will connect to: %s"), ip);
+		m_pOwner->log(logmsg::status, _("SOCKS4 proxy will connect to: %s"), ip);
 
 		unsigned char* out = sendBuffer_.get(9);
 		out[0] = 4; // Protocol version
@@ -151,7 +151,7 @@ int CProxySocket::connect(fz::native_string const& host, unsigned int port, fz::
 	}
 	else {
 		if (user_.size() > 255 || pass_.size() > 255) {
-			m_pOwner->LogMessage(MessageType::Status, _("SOCKS5 does not support usernames or passwords longer than 255 characters."));
+			m_pOwner->log(logmsg::status, _("SOCKS5 does not support usernames or passwords longer than 255 characters."));
 			return EINVAL;
 		}
 
@@ -214,7 +214,7 @@ void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t
 
 	switch (t) {
 	case fz::socket_event_flag::connection:
-		m_pOwner->LogMessage(MessageType::Status, _("Connection with proxy established, performing handshake..."));
+		m_pOwner->log(logmsg::status, _("Connection with proxy established, performing handshake..."));
 		break;
 	case fz::socket_event_flag::read:
 		OnReceive();
@@ -279,7 +279,7 @@ void CProxySocket::OnReceive()
 					// Not found yet
 					if (receiveBuffer_.size() >= 2048) {
 						state_ = fz::socket_state::failed;
-						m_pOwner->LogMessage(MessageType::Debug_Warning, L"Incoming header too large");
+						m_pOwner->log(logmsg::debug_warning, L"Incoming header too large");
 						if (event_handler_) {
 							event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ENOMEM);
 						}
@@ -292,7 +292,7 @@ void CProxySocket::OnReceive()
 				unsigned char* eol = reinterpret_cast<unsigned char*>(strchr(reinterpret_cast<char*>(buf), '\r')); // Never fails as old buf ends on CRLFCRLF
 				*eol = 0;
 				std::wstring const reply = fz::to_wstring_from_utf8(std::string(reinterpret_cast<char*>(buf))); // Terminate at first emedded null
-				m_pOwner->LogMessage(MessageType::Response, _("Proxy reply: %s"), reply);
+				m_pOwner->log(logmsg::reply, _("Proxy reply: %s"), reply);
 
 				if (reply.substr(0, 10) != L"HTTP/1.1 2" && reply.substr(0, 10) != L"HTTP/1.0 2") {
 					state_ = fz::socket_state::failed;
@@ -333,7 +333,7 @@ void CProxySocket::OnReceive()
 							error = fz::sprintf(_("Unassigned error code %d"), (int)buf[1]);
 							break;
 					}
-					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: %s"), error);
+					m_pOwner->log(logmsg::error, _("Proxy request failed: %s"), error);
 					state_ = fz::socket_state::failed;
 					if (event_handler_) {
 						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -353,7 +353,7 @@ void CProxySocket::OnReceive()
 		case socks5_auth:
 		case socks5_request:
 			if (sendBuffer_) {
-				m_pOwner->LogMessage(MessageType::Error, _("Proxy sent data while we haven't sent out request yet"));
+				m_pOwner->log(logmsg::error, _("Proxy sent data while we haven't sent out request yet"));
 				state_ = fz::socket_state::failed;
 				if (event_handler_) {
 					event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -365,7 +365,7 @@ void CProxySocket::OnReceive()
 			switch (m_handshakeState) {
 			default:
 				if (receiveBuffer_[0] != 5) {
-					m_pOwner->LogMessage(MessageType::Error, _("Unknown SOCKS protocol version: %d"), (int)receiveBuffer_[0]);
+					m_pOwner->log(logmsg::error, _("Unknown SOCKS protocol version: %d"), (int)receiveBuffer_[0]);
 					state_ = fz::socket_state::failed;
 					if (event_handler_) {
 						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -375,7 +375,7 @@ void CProxySocket::OnReceive()
 				break;
 			case socks5_auth:
 				if (receiveBuffer_[0] != 1) {
-					m_pOwner->LogMessage(MessageType::Error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), receiveBuffer_[0]);
+					m_pOwner->log(logmsg::error, _("Unknown protocol version of SOCKS Username/Password Authentication subnegotiation: %d"), receiveBuffer_[0]);
 					state_ = fz::socket_state::failed;
 					if (event_handler_) {
 						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -401,7 +401,7 @@ void CProxySocket::OnReceive()
 						m_handshakeState = socks5_auth;
 						break;
 					default:
-						m_pOwner->LogMessage(MessageType::Error, _("No supported SOCKS5 auth method"));
+						m_pOwner->log(logmsg::error, _("No supported SOCKS5 auth method"));
 						state_ = fz::socket_state::failed;
 						if (event_handler_) {
 							event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -416,7 +416,7 @@ void CProxySocket::OnReceive()
 					goto loop;
 				}
 				if (receiveBuffer_[1] != 0) {
-					m_pOwner->LogMessage(MessageType::Error, _("Proxy authentication failed"));
+					m_pOwner->log(logmsg::error, _("Proxy authentication failed"));
 					state_ = fz::socket_state::failed;
 					if (event_handler_) {
 						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -463,7 +463,7 @@ void CProxySocket::OnReceive()
 						break;
 					}
 
-					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed. Reply from proxy: %s"), errorMsg);
+					m_pOwner->log(logmsg::error, _("Proxy request failed. Reply from proxy: %s"), errorMsg);
 					state_ = fz::socket_state::failed;
 					if (event_handler_) {
 						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -502,7 +502,7 @@ void CProxySocket::OnReceive()
 					receiveBuffer_.consume(22);
 					break;
 				default:
-					m_pOwner->LogMessage(MessageType::Error, _("Proxy request failed: Unknown address type in CONNECT reply"));
+					m_pOwner->log(logmsg::error, _("Proxy request failed: Unknown address type in CONNECT reply"));
 					state_ = fz::socket_state::failed;
 					if (event_handler_) {
 						event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
@@ -599,7 +599,7 @@ void CProxySocket::OnReceive()
 			break;
 		default:
 			state_ = fz::socket_state::failed;
-			m_pOwner->LogMessage(MessageType::Debug_Warning, L"Unhandled handshake state %d", m_handshakeState);
+			m_pOwner->log(logmsg::debug_warning, L"Unhandled handshake state %d", m_handshakeState);
 			if (event_handler_) {
 				event_handler_->send_event<fz::socket_event>(this, fz::socket_event_flag::connection, ECONNABORTED);
 			}

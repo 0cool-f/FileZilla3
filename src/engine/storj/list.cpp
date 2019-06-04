@@ -16,7 +16,7 @@ int CStorjListOpData::Send()
 	switch (opState) {
 	case list_init:
 		if (!subDir_.empty()) {
-			LogMessage(MessageType::Error, _("Invalid path"));
+			log(logmsg::error, _("Invalid path"));
 			return FZ_REPLY_ERROR;
 		}
 
@@ -27,12 +27,12 @@ int CStorjListOpData::Send()
 		currentPath_ = path_;
 
 		if (!currentServer_) {
-			LogMessage(MessageType::Debug_Warning, L"CStorjControlSocket::List called with m_pCurrenServer == 0");
+			log(logmsg::debug_warning, L"CStorjControlSocket::List called with m_pCurrenServer == 0");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
 		if (currentPath_.GetType() != ServerType::UNIX) {
-			LogMessage(MessageType::Debug_Warning, L"CStorControlSocket::List called with incompatible server type %d in path", currentPath_.GetType());
+			log(logmsg::debug_warning, L"CStorControlSocket::List called with incompatible server type %d in path", currentPath_.GetType());
 			return FZ_REPLY_INTERNALERROR;
 		}
 
@@ -41,7 +41,7 @@ int CStorjListOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case list_waitlock:
 		if (!opLock_) {
-			LogMessage(MessageType::Debug_Warning, L"Not holding the lock as expected");
+			log(logmsg::debug_warning, L"Not holding the lock as expected");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
@@ -77,7 +77,7 @@ int CStorjListOpData::Send()
 		}
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjListOpData::ListSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjListOpData::ListSend()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -99,7 +99,7 @@ int CStorjListOpData::ParseResponse()
 		return FZ_REPLY_OK;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"CStorjListOpData::ParseResponse called at improper time: %d", opState);
+	log(logmsg::debug_warning, L"CStorjListOpData::ParseResponse called at improper time: %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -124,14 +124,14 @@ int CStorjListOpData::SubcommandResult(int prevResult, COpData const&)
 		return FZ_REPLY_CONTINUE;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjListOpData::SubcommandResult()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjListOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
 int CStorjListOpData::ParseEntry(std::wstring && name, std::wstring const& size, std::wstring && id, std::wstring const& created)
 {
 	if (opState != list_list) {
-		LogMessage(MessageType::Debug_Warning, L"CStorjListOpData::ParseEntry called at improper time: %d", opState);
+		log(logmsg::debug_warning, L"CStorjListOpData::ParseEntry called at improper time: %d", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 

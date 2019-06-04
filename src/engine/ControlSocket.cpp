@@ -46,7 +46,7 @@ CControlSocket::~CControlSocket()
 
 int CControlSocket::Disconnect()
 {
-	LogMessage(MessageType::Status, _("Disconnected from server"));
+	log(logmsg::status, _("Disconnected from server"));
 
 	DoClose();
 	return FZ_REPLY_OK;
@@ -76,10 +76,10 @@ void CControlSocket::LogTransferResultMessage(int nErrorCode, CFileTransferOpDat
 		int64_t transferred = status.currentOffset - status.startOffset;
 		std::wstring size = CSizeFormatBase::Format(&engine_.GetOptions(), transferred, true);
 
-		MessageType msgType = MessageType::Error;
+		logmsg::type msgType = logmsg::error;
 		std::wstring msg;
 		if (nErrorCode == FZ_REPLY_OK) {
-			msgType = MessageType::Status;
+			msgType = logmsg::status;
 			msg = _("File transfer successful, transferred %s in %s");
 		}
 		else if ((nErrorCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
@@ -91,25 +91,25 @@ void CControlSocket::LogTransferResultMessage(int nErrorCode, CFileTransferOpDat
 		else {
 			msg = _("File transfer failed after transferring %s in %s");
 		}
-		LogMessage(msgType, msg, size, time);
+		log(msgType, msg, size, time);
 	}
 	else {
 		if ((nErrorCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
-			LogMessage(MessageType::Error, _("File transfer aborted by user"));
+			log(logmsg::error, _("File transfer aborted by user"));
 		}
 		else if (nErrorCode == FZ_REPLY_OK) {
 			if (pData->transferInitiated_) {
-				LogMessage(MessageType::Status, _("File transfer successful"));
+				log(logmsg::status, _("File transfer successful"));
 			}
 			else {
-				LogMessage(MessageType::Status, _("File transfer skipped"));
+				log(logmsg::status, _("File transfer skipped"));
 			}
 		}
 		else if ((nErrorCode & FZ_REPLY_CRITICALERROR) == FZ_REPLY_CRITICALERROR) {
-			LogMessage(MessageType::Error, _("Critical file transfer error"));
+			log(logmsg::error, _("Critical file transfer error"));
 		}
 		else {
-			LogMessage(MessageType::Error, _("File transfer failed"));
+			log(logmsg::error, _("File transfer failed"));
 		}
 	}
 }
@@ -121,10 +121,10 @@ void CControlSocket::Push(std::unique_ptr<COpData> && operation)
 
 int CControlSocket::ResetOperation(int nErrorCode)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CControlSocket::ResetOperation(%d)", nErrorCode);
+	log(logmsg::debug_verbose, L"CControlSocket::ResetOperation(%d)", nErrorCode);
 
 	if (nErrorCode & FZ_REPLY_WOULDBLOCK) {
-		LogMessage(MessageType::Debug_Warning, L"ResetOperation with FZ_REPLY_WOULDBLOCK in nErrorCode (%d)", nErrorCode);
+		log(logmsg::debug_warning, L"ResetOperation with FZ_REPLY_WOULDBLOCK in nErrorCode (%d)", nErrorCode);
 	}
 
 	std::unique_ptr<COpData> oldOperation;
@@ -132,7 +132,7 @@ int CControlSocket::ResetOperation(int nErrorCode)
 		oldOperation = std::move(operations_.back());
 		operations_.pop_back();
 
-		LogMessage(MessageType::Debug_Verbose, L"%s::Reset(%d) in state %d", oldOperation->name_, nErrorCode, oldOperation->opState);
+		log(logmsg::debug_verbose, L"%s::Reset(%d) in state %d", oldOperation->name_, nErrorCode, oldOperation->opState);
 		nErrorCode = oldOperation->Reset(nErrorCode);
 	}
 	if (!operations_.empty()) {
@@ -162,30 +162,30 @@ int CControlSocket::ResetOperation(int nErrorCode)
 		{
 		case Command::none:
 			if (!prefix.empty()) {
-				LogMessage(MessageType::Error, _("Critical error"));
+				log(logmsg::error, _("Critical error"));
 			}
 			break;
 		case Command::connect:
 			if ((nErrorCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
-				LogMessage(MessageType::Error, prefix + _("Connection attempt interrupted by user"));
+				log(logmsg::error, prefix + _("Connection attempt interrupted by user"));
 			}
 			else if (nErrorCode != FZ_REPLY_OK) {
-				LogMessage(MessageType::Error, prefix + _("Could not connect to server"));
+				log(logmsg::error, prefix + _("Could not connect to server"));
 			}
 			break;
 		case Command::list:
 			if ((nErrorCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
-				LogMessage(MessageType::Error, prefix + _("Directory listing aborted by user"));
+				log(logmsg::error, prefix + _("Directory listing aborted by user"));
 			}
 			else if (nErrorCode != FZ_REPLY_OK) {
-				LogMessage(MessageType::Error, prefix + _("Failed to retrieve directory listing"));
+				log(logmsg::error, prefix + _("Failed to retrieve directory listing"));
 			}
 			else {
 				if (currentPath_.empty()) {
-					LogMessage(MessageType::Status, _("Directory listing successful"));
+					log(logmsg::status, _("Directory listing successful"));
 				}
 				else {
-					LogMessage(MessageType::Status, _("Directory listing of \"%s\" successful"), currentPath_.GetPath());
+					log(logmsg::status, _("Directory listing of \"%s\" successful"), currentPath_.GetPath());
 				}
 			}
 			break;
@@ -194,7 +194,7 @@ int CControlSocket::ResetOperation(int nErrorCode)
 				auto & data = static_cast<CFileTransferOpData &>(*oldOperation);
 				if (!data.download_ && data.transferInitiated_) {
 					if (!currentServer_) {
-						LogMessage(MessageType::Debug_Warning, L"currentServer_ is empty");
+						log(logmsg::debug_warning, L"currentServer_ is empty");
 					}
 					else {
 						UpdateCache(data, data.remotePath_, data.remoteFile_, (nErrorCode == FZ_REPLY_OK) ? data.localFileSize_ : -1);
@@ -205,7 +205,7 @@ int CControlSocket::ResetOperation(int nErrorCode)
 			break;
 		default:
 			if ((nErrorCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
-				LogMessage(MessageType::Error, prefix + _("Interrupted by user"));
+				log(logmsg::error, prefix + _("Interrupted by user"));
 			}
 			break;
 		}
@@ -233,7 +233,7 @@ void CControlSocket::UpdateCache(COpData const &, CServerPath const& serverPath,
 
 int CControlSocket::DoClose(int nErrorCode)
 {
-	LogMessage(MessageType::Debug_Debug, L"CControlSocket::DoClose(%d)", nErrorCode);
+	log(logmsg::debug_debug, L"CControlSocket::DoClose(%d)", nErrorCode);
 	if (m_closed) {
 		assert(operations_.empty());
 		return nErrorCode;
@@ -253,7 +253,7 @@ std::wstring CControlSocket::ConvertDomainName(std::wstring const& domain)
 #ifdef FZ_WINDOWS
 	int len = IdnToAscii(IDN_ALLOW_UNASSIGNED, domain.c_str(), domain.size() + 1, nullptr, 0);
 	if (!len) {
-		LogMessage(MessageType::Debug_Warning, L"Could not convert domain name");
+		log(logmsg::debug_warning, L"Could not convert domain name");
 		return domain;
 	}
 
@@ -261,7 +261,7 @@ std::wstring CControlSocket::ConvertDomainName(std::wstring const& domain)
 	int res = IdnToAscii(IDN_ALLOW_UNASSIGNED, domain.c_str(), domain.size() + 1, output, len);
 	if (!res) {
 		delete [] output;
-		LogMessage(MessageType::Debug_Warning, L"Could not convert domain name");
+		log(logmsg::debug_warning, L"Could not convert domain name");
 		return domain;
 	}
 
@@ -275,7 +275,7 @@ std::wstring CControlSocket::ConvertDomainName(std::wstring const& domain)
 
 	char *output = 0;
 	if (idna_to_ascii_8z(utf8.c_str(), &output, IDNA_ALLOW_UNASSIGNED)) {
-		LogMessage(MessageType::Debug_Warning, L"Could not convert domain name");
+		log(logmsg::debug_warning, L"Could not convert domain name");
 		return domain;
 	}
 
@@ -314,11 +314,11 @@ bool CControlSocket::ParsePwdReply(std::wstring reply, bool unquoted, CServerPat
 			pos2 = reply.rfind('\'');
 
 			if (pos1 != std::wstring::npos && pos1 < pos2) {
-				LogMessage(MessageType::Debug_Info, L"Broken server sending single-quoted path instead of double-quoted path.");
+				log(logmsg::debug_info, L"Broken server sending single-quoted path instead of double-quoted path.");
 			}
 		}
 		if (pos1 == std::wstring::npos || pos1 >= pos2) {
-			LogMessage(MessageType::Debug_Info, L"Broken server, no quoted path found in pwd reply, trying first token as path");
+			log(logmsg::debug_info, L"Broken server, no quoted path found in pwd reply, trying first token as path");
 			pos1 = reply.find(' ');
 			if (pos1 != std::wstring::npos) {
 				reply = reply.substr(pos1 + 1);
@@ -339,14 +339,14 @@ bool CControlSocket::ParsePwdReply(std::wstring reply, bool unquoted, CServerPat
 	currentPath_.SetType(currentServer_.GetType());
 	if (reply.empty() || !currentPath_.SetPath(reply)) {
 		if (reply.empty()) {
-			LogMessage(MessageType::Error, _("Server returned empty path."));
+			log(logmsg::error, _("Server returned empty path."));
 		}
 		else {
-			LogMessage(MessageType::Error, _("Failed to parse returned path."));
+			log(logmsg::error, _("Failed to parse returned path."));
 		}
 
 		if (!defaultPath.empty()) {
-			LogMessage(MessageType::Debug_Warning, L"Assuming path is '%s'.", defaultPath.GetPath());
+			log(logmsg::debug_warning, L"Assuming path is '%s'.", defaultPath.GetPath());
 			currentPath_ = defaultPath;
 			return true;
 		}
@@ -358,9 +358,9 @@ bool CControlSocket::ParsePwdReply(std::wstring reply, bool unquoted, CServerPat
 
 int CControlSocket::CheckOverwriteFile()
 {
-	LogMessage(MessageType::Debug_Debug, L"CControlSocket::CheckOverwriteFile()");
+	log(logmsg::debug_debug, L"CControlSocket::CheckOverwriteFile()");
 	if (operations_.empty() || operations_.back()->opId != Command::transfer) {
-		LogMessage(MessageType::Debug_Info, L"CheckOverwriteFile called without active transfer.");
+		log(logmsg::debug_info, L"CheckOverwriteFile called without active transfer.");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -452,7 +452,7 @@ std::wstring CControlSocket::ConvToLocal(char const* buffer, size_t len)
 		}
 			
 		if (currentServer_.GetEncodingType() != ENCODING_UTF8) {
-			LogMessage(MessageType::Status, _("Invalid character sequence received, disabling UTF-8. Select UTF-8 option in site manager to force UTF-8."));
+			log(logmsg::status, _("Invalid character sequence received, disabling UTF-8. Select UTF-8 option in site manager to force UTF-8."));
 			m_useUTF8 = false;
 		}
 	}
@@ -509,7 +509,7 @@ void CControlSocket::OnTimer(fz::timer_id)
 
 		if ((operations_.empty() || !operations_.back()->waitForAsyncRequest) && !opLockManager_.Waiting(this)) {
 			if (elapsed > fz::duration::from_seconds(timeout)) {
-				LogMessage(MessageType::Error, fztranslate("Connection timed out after %d second of inactivity", "Connection timed out after %d seconds of inactivity", timeout), timeout);
+				log(logmsg::error, fztranslate("Connection timed out after %d second of inactivity", "Connection timed out after %d seconds of inactivity", timeout), timeout);
 				DoClose(FZ_REPLY_TIMEOUT);
 				return;
 			}
@@ -551,9 +551,9 @@ void CControlSocket::SetWait(bool wait)
 
 int CControlSocket::SendNextCommand()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CControlSocket::SendNextCommand()");
+	log(logmsg::debug_verbose, L"CControlSocket::SendNextCommand()");
 	if (operations_.empty()) {
-		LogMessage(MessageType::Debug_Warning, L"SendNextCommand called without active operation");
+		log(logmsg::debug_warning, L"SendNextCommand called without active operation");
 		ResetOperation(FZ_REPLY_ERROR);
 		return FZ_REPLY_ERROR;
 	}
@@ -561,7 +561,7 @@ int CControlSocket::SendNextCommand()
 	while (!operations_.empty()) {
 		auto & data = *operations_.back();
 		if (data.waitForAsyncRequest) {
-			LogMessage(MessageType::Debug_Info, L"Waiting for async request, ignoring SendNextCommand...");
+			log(logmsg::debug_info, L"Waiting for async request, ignoring SendNextCommand...");
 			return FZ_REPLY_WOULDBLOCK;
 		}
 
@@ -570,7 +570,7 @@ int CControlSocket::SendNextCommand()
 			return FZ_REPLY_WOULDBLOCK;
 		}
 
-		LogMessage(data.sendLogLevel_, L"%s::Send() in state %d", data.name_, data.opState);
+		log(data.sendLogLevel_, L"%s::Send() in state %d", data.name_, data.opState);
 		int res = data.Send();
 		if (res != FZ_REPLY_CONTINUE) {
 			if (res == FZ_REPLY_OK) {
@@ -586,7 +586,7 @@ int CControlSocket::SendNextCommand()
 				return FZ_REPLY_WOULDBLOCK;
 			}
 			else if (res != FZ_REPLY_CONTINUE) {
-				LogMessage(MessageType::Debug_Warning, L"Unknown result %d returned by COpData::Send()", res);
+				log(logmsg::debug_warning, L"Unknown result %d returned by COpData::Send()", res);
 				return ResetOperation(FZ_REPLY_INTERNALERROR);
 			}
 		}
@@ -598,13 +598,13 @@ int CControlSocket::SendNextCommand()
 int CControlSocket::ParseSubcommandResult(int prevResult, COpData const& opData)
 {
 	if (operations_.empty()) {
-		LogMessage(MessageType::Debug_Warning, L"CControlSocket::ParseSubcommandResult(%d) called without active operation", prevResult);
+		log(logmsg::debug_warning, L"CControlSocket::ParseSubcommandResult(%d) called without active operation", prevResult);
 		ResetOperation(FZ_REPLY_ERROR);
 		return FZ_REPLY_ERROR;
 	}
 
 	auto & data = *operations_.back();
-	LogMessage(MessageType::Debug_Verbose, L"%s::SubcommandResult(%d) in state %d", data.name_, prevResult, data.opState);
+	log(logmsg::debug_verbose, L"%s::SubcommandResult(%d) in state %d", data.name_, prevResult, data.opState);
 	int res = data.SubcommandResult(prevResult, opData);
 	if (res == FZ_REPLY_WOULDBLOCK) {
 		return FZ_REPLY_WOULDBLOCK;
@@ -693,7 +693,7 @@ bool CRealControlSocket::Connected() const
 int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 {
 	if (!active_layer_) {
-		LogMessage(MessageType::Debug_Warning, L"Called internal CRealControlSocket::Send without m_pBackend");
+		log(logmsg::debug_warning, L"Called internal CRealControlSocket::Send without m_pBackend");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -706,8 +706,8 @@ int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 		int written = active_layer_->write(buffer, len, error);
 		if (written < 0) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
-				LogMessage(MessageType::Error, _("Disconnected from server"));
+				log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
+				log(logmsg::error, _("Disconnected from server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			written = 0;
@@ -745,13 +745,13 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 	{
 	case fz::socket_event_flag::connection_next:
 		if (error) {
-			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket_error_description(error));
+			log(logmsg::status, _("Connection attempt failed with \"%s\", trying next address."), fz::socket_error_description(error));
 		}
 		SetAlive();
 		break;
 	case fz::socket_event_flag::connection:
 		if (error) {
-			LogMessage(MessageType::Status, _("Connection attempt failed with \"%s\"."), fz::socket_error_description(error));
+			log(logmsg::status, _("Connection attempt failed with \"%s\"."), fz::socket_error_description(error));
 			OnSocketError(error);
 		}
 		else {
@@ -775,7 +775,7 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unhandled socket event %d", t);
+		log(logmsg::debug_warning, L"Unhandled socket event %d", t);
 		break;
 	}
 }
@@ -786,7 +786,7 @@ void CRealControlSocket::OnHostAddress(fz::socket_event_source*, std::string con
 		return;
 	}
 
-	LogMessage(MessageType::Status, _("Connecting to %s..."), address);
+	log(logmsg::status, _("Connecting to %s..."), address);
 }
 
 void CRealControlSocket::OnConnect()
@@ -804,9 +804,9 @@ int CRealControlSocket::OnSend()
 		int written = active_layer_->write(sendBuffer_.get(), sendBuffer_.size(), error);
 		if (written < 0) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Error, _("Could not write to socket: %s"), fz::socket_error_description(error));
+				log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
 				if (GetCurrentCommandId() != Command::connect) {
-					LogMessage(MessageType::Error, _("Disconnected from server"));
+					log(logmsg::error, _("Disconnected from server"));
 				}
 				DoClose();
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
@@ -826,12 +826,12 @@ int CRealControlSocket::OnSend()
 
 void CRealControlSocket::OnSocketError(int error)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CRealControlSocket::OnSocketError(%d)", error);
+	log(logmsg::debug_verbose, L"CRealControlSocket::OnSocketError(%d)", error);
 
 	auto cmd = GetCurrentCommandId();
 	if (cmd != Command::connect) {
-		auto messageType = (cmd == Command::none) ? MessageType::Status : MessageType::Error;
-		LogMessage(messageType, _("Disconnected from server: %s"), fz::socket_error_description(error));
+		auto messageType = (cmd == Command::none) ? logmsg::status : logmsg::error;
+		log(messageType, _("Disconnected from server: %s"), fz::socket_error_description(error));
 	}
 	DoClose();
 }
@@ -841,7 +841,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 	SetWait(true);
 
 	if (currentServer_.GetEncodingType() == ENCODING_CUSTOM) {
-		LogMessage(MessageType::Debug_Info, L"Using custom encoding: %s", currentServer_.GetCustomEncoding());
+		log(logmsg::debug_info, L"Using custom encoding: %s", currentServer_.GetCustomEncoding());
 	}
 
 	ResetSocket();
@@ -851,7 +851,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 
 	const int proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
 	if (proxy_type > static_cast<int>(ProxyType::NONE) && proxy_type < static_cast<int>(ProxyType::count) && !currentServer_.GetBypassProxy()) {
-		LogMessage(MessageType::Status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<ProxyType>(proxy_type)));
+		log(logmsg::status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<ProxyType>(proxy_type)));
 
 		fz::native_string proxy_host = fz::to_native(engine_.GetOptions().GetOption(OPTION_PROXY_HOST));
 
@@ -862,12 +862,12 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 		active_layer_ = proxy_layer_.get();
 
 		if (fz::get_address_type(proxy_host) == fz::address_type::unknown) {
-			LogMessage(MessageType::Status, _("Resolving address of %s"), proxy_host);
+			log(logmsg::status, _("Resolving address of %s"), proxy_host);
 		}
 	}
 	else {
 		if (fz::get_address_type(host) == fz::address_type::unknown) {
-			LogMessage(MessageType::Status, _("Resolving address of %s"), host);
+			log(logmsg::status, _("Resolving address of %s"), host);
 		}
 	}
 
@@ -876,7 +876,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 	int res = active_layer_->connect(fz::to_native(ConvertDomainName(host)), port);
 
 	if (res) {
-		LogMessage(MessageType::Error, _("Could not connect to server: %s"), fz::socket_error_description(res));
+		log(logmsg::error, _("Could not connect to server: %s"), fz::socket_error_description(res));
 		return FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR; 
 	}
 
@@ -885,7 +885,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 
 int CRealControlSocket::DoClose(int nErrorCode)
 {
-	LogMessage(MessageType::Debug_Debug, L"CRealControlSocket::DoClose(%d)", nErrorCode);
+	log(logmsg::debug_debug, L"CRealControlSocket::DoClose(%d)", nErrorCode);
 	ResetSocket();
 
 	return CControlSocket::DoClose(nErrorCode);
@@ -906,7 +906,7 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 	assert(pFileExistsNotification);
 
 	if (operations_.empty() || operations_.back()->opId != Command::transfer) {
-		LogMessage(MessageType::Debug_Info, L"SetFileExistsAction: No or invalid operation in progress, ignoring request reply %f", pFileExistsNotification->GetRequestID());
+		log(logmsg::debug_info, L"SetFileExistsAction: No or invalid operation in progress, ignoring request reply %f", pFileExistsNotification->GetRequestID());
 		return false;
 	}
 
@@ -930,10 +930,10 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 		else {
 			if (data.download_) {
 				std::wstring filename = data.remotePath_.FormatFilename(data.remoteFile_);
-				LogMessage(MessageType::Status, _("Skipping download of %s"), filename);
+				log(logmsg::status, _("Skipping download of %s"), filename);
 			}
 			else {
-				LogMessage(MessageType::Status, _("Skipping upload of %s"), data.localFile_);
+				log(logmsg::status, _("Skipping upload of %s"), data.localFile_);
 			}
 			ResetOperation(FZ_REPLY_OK);
 		}
@@ -947,10 +947,10 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 		else {
 			if (data.download_) {
 				std::wstring filename = data.remotePath_.FormatFilename(data.remoteFile_);
-				LogMessage(MessageType::Status, _("Skipping download of %s"), filename);
+				log(logmsg::status, _("Skipping download of %s"), filename);
 			}
 			else {
-				LogMessage(MessageType::Status, _("Skipping upload of %s"), data.localFile_);
+				log(logmsg::status, _("Skipping upload of %s"), data.localFile_);
 			}
 			ResetOperation(FZ_REPLY_OK);
 		}
@@ -973,10 +973,10 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 		else {
 			if (data.download_) {
 				auto const filename = data.remotePath_.FormatFilename(data.remoteFile_);
-				LogMessage(MessageType::Status, _("Skipping download of %s"), filename);
+				log(logmsg::status, _("Skipping download of %s"), filename);
 			}
 			else {
-				LogMessage(MessageType::Status, _("Skipping upload of %s"), data.localFile_);
+				log(logmsg::status, _("Skipping upload of %s"), data.localFile_);
 			}
 			ResetOperation(FZ_REPLY_OK);
 		}
@@ -1051,15 +1051,15 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 	case CFileExistsNotification::skip:
 		if (data.download_) {
 			std::wstring filename = data.remotePath_.FormatFilename(data.remoteFile_);
-			LogMessage(MessageType::Status, _("Skipping download of %s"), filename);
+			log(logmsg::status, _("Skipping download of %s"), filename);
 		}
 		else {
-			LogMessage(MessageType::Status, _("Skipping upload of %s"), data.localFile_);
+			log(logmsg::status, _("Skipping upload of %s"), data.localFile_);
 		}
 		ResetOperation(FZ_REPLY_OK);
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown file exists action: %d", pFileExistsNotification->overwriteAction);
+		log(logmsg::debug_warning, L"Unknown file exists action: %d", pFileExistsNotification->overwriteAction);
 		ResetOperation(FZ_REPLY_INTERNALERROR);
 		return false;
 	}

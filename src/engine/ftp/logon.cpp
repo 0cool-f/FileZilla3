@@ -60,12 +60,12 @@ int CFtpLogonOpData::Send()
 					// Probably IPv6 address
 					pos = host_.find(']');
 					if (pos == std::wstring::npos) {
-						LogMessage(MessageType::Error, _("Proxy host starts with '[' but no closing bracket found."));
+						log(logmsg::error, _("Proxy host starts with '[' but no closing bracket found."));
 						return FZ_REPLY_DISCONNECTED | FZ_REPLY_CRITICALERROR;
 					}
 					if (host_.size() > (pos + 1) && host_[pos + 1]) {
 						if (host_[pos + 1] != ':') {
-							LogMessage(MessageType::Error, _("Invalid proxy host, after closing bracket only colon and port may follow."));
+							log(logmsg::error, _("Invalid proxy host, after closing bracket only colon and port may follow."));
 							return FZ_REPLY_DISCONNECTED | FZ_REPLY_CRITICALERROR;
 						}
 						++pos;
@@ -87,11 +87,11 @@ int CFtpLogonOpData::Send()
 				}
 
 				if (host_.empty() || port_ < 1 || port_ > 65535) {
-					LogMessage(MessageType::Error, _("Proxy set but proxy host or port invalid"));
+					log(logmsg::error, _("Proxy set but proxy host or port invalid"));
 					return FZ_REPLY_DISCONNECTED | FZ_REPLY_CRITICALERROR;
 				}
 
-				LogMessage(MessageType::Status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port, credentials_), L"FTP"); // @translator: Connecting to ftp.example.com through SOCKS5 proxy
+				log(logmsg::status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port, credentials_), L"FTP"); // @translator: Connecting to ftp.example.com through SOCKS5 proxy
 			}
 			else {
 				host_ = currentServer_.GetHost();
@@ -114,7 +114,7 @@ int CFtpLogonOpData::Send()
 			return ret;
 		}
 	case LOGON_AUTH_WAIT:
-		LogMessage(MessageType::Debug_Info, L"LogonSend() called during LOGON_AUTH_WAIT, ignoring");
+		log(logmsg::debug_info, L"LogonSend() called during LOGON_AUTH_WAIT, ignoring");
 		return FZ_REPLY_WOULDBLOCK;
 	case LOGON_AUTH_TLS:
 		return controlSocket_.SendCommand(L"AUTH TLS", false, false);
@@ -204,7 +204,7 @@ int CFtpLogonOpData::Send()
 		return controlSocket_.SendCommand(L"PROT P");
 	case LOGON_CUSTOMCOMMANDS:
 		if (customCommandIndex >= currentServer_.GetPostLoginCommands().size()) {
-			LogMessage(MessageType::Debug_Warning, L"pData->customCommandIndex >= m_pCurrentServer->GetPostLoginCommands().size()");
+			log(logmsg::debug_warning, L"pData->customCommandIndex >= m_pCurrentServer->GetPostLoginCommands().size()");
 			return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 		}
 		return controlSocket_.SendCommand(currentServer_.GetPostLoginCommands()[customCommandIndex]);
@@ -216,7 +216,7 @@ int CFtpLogonOpData::Send()
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 		break;
 	}
 
@@ -240,7 +240,7 @@ int CFtpLogonOpData::ParseResponse()
 			CServerCapabilities::SetCapability(currentServer_, (opState == LOGON_AUTH_TLS) ? auth_tls_command : auth_ssl_command, no);
 			if (opState == LOGON_AUTH_SSL) {
 				if (currentServer_.GetProtocol() == FTP) {
-					LogMessage(MessageType::Status, _("Insecure server, it does not support FTP over TLS."));
+					log(logmsg::status, _("Insecure server, it does not support FTP over TLS."));
 					neededCommands[LOGON_PBSZ] = 0;
 					neededCommands[LOGON_PROT] = 0;
 
@@ -257,7 +257,7 @@ int CFtpLogonOpData::ParseResponse()
 		else {
 			CServerCapabilities::SetCapability(currentServer_, (opState == LOGON_AUTH_TLS) ? auth_tls_command : auth_ssl_command, yes);
 
-			LogMessage(MessageType::Status, _("Initializing TLS..."));
+			log(logmsg::status, _("Initializing TLS..."));
 
 			controlSocket_.tls_layer_ = std::make_unique<CTlsSocket>(controlSocket_.event_loop_, &controlSocket_, *controlSocket_.active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), controlSocket_);
 			controlSocket_.active_layer_ = controlSocket_.tls_layer_.get();
@@ -279,11 +279,11 @@ int CFtpLogonOpData::ParseResponse()
 			if (cmd.type == loginCommandType::user || cmd.type == loginCommandType::pass) {
 				auto const user = currentServer_.GetUser();
 				if (!user.empty() && (user.front() == ' ' || user.back() == ' ')) {
-					LogMessage(MessageType::Status, _("Check your login credentials. The entered username starts or ends with a space character."));
+					log(logmsg::status, _("Check your login credentials. The entered username starts or ends with a space character."));
 				}
 				auto const pw = credentials_.GetPass();
 				if (!pw.empty() && (pw.front() == ' ' || pw.back() == ' ')) {
-					LogMessage(MessageType::Status, _("Check your login credentials. The entered password starts or ends with a space character."));
+					log(logmsg::status, _("Check your login credentials. The entered password starts or ends with a space character."));
 				}
 			}
 
@@ -302,14 +302,14 @@ int CFtpLogonOpData::ParseResponse()
 				}
 				if (!asciiOnly) {
 					if (ftp_proxy_type_) {
-						LogMessage(MessageType::Status, _("Login data contains non-ASCII characters and server might not be UTF-8 aware. Cannot fall back to local charset since using proxy."));
+						log(logmsg::status, _("Login data contains non-ASCII characters and server might not be UTF-8 aware. Cannot fall back to local charset since using proxy."));
 						int error = FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR;
 						if (cmd.type == loginCommandType::pass && code == 5) {
 							error |= FZ_REPLY_PASSWORDFAILED;
 						}
 						return error;
 					}
-					LogMessage(MessageType::Status, _("Login data contains non-ASCII characters and server might not be UTF-8 aware. Trying local charset."));
+					log(logmsg::status, _("Login data contains non-ASCII characters and server might not be UTF-8 aware. Trying local charset."));
 					controlSocket_.m_useUTF8 = false;
 					if (!PrepareLoginSequence()) {
 						int error = FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR;
@@ -336,9 +336,9 @@ int CFtpLogonOpData::ParseResponse()
 			}
 		}
 		else if (code == 3 && loginSequence.empty()) {
-			LogMessage(MessageType::Error, _("Login sequence fully executed yet not logged in, aborting."));
+			log(logmsg::error, _("Login sequence fully executed yet not logged in, aborting."));
 			if (cmd.type == loginCommandType::pass && credentials_.account_.empty()) {
-				LogMessage(MessageType::Error, _("Server might require an account. Try specifying an account using the Site Manager"));
+				log(logmsg::error, _("Server might require an account. Try specifying an account using the Site Manager"));
 			}
 			return FZ_REPLY_CRITICALERROR | FZ_REPLY_DISCONNECTED;
 		}
@@ -396,7 +396,7 @@ int CFtpLogonOpData::ParseResponse()
 
 		const CharsetEncoding encoding = currentServer_.GetEncodingType();
 		if (encoding == ENCODING_AUTO && CServerCapabilities::GetCapability(currentServer_, utf8_command) != yes) {
-			LogMessage(MessageType::Status, _("Server does not support non-ASCII characters."));
+			log(logmsg::status, _("Server does not support non-ASCII characters."));
 			controlSocket_.m_useUTF8 = false;
 		}
 	}
@@ -416,8 +416,8 @@ int CFtpLogonOpData::ParseResponse()
 		++opState;
 
 		if (opState == LOGON_DONE) {
-			LogMessage(MessageType::Status, _("Logged in"));
-			LogMessage(MessageType::Debug_Info, L"Measured latency of %d ms", controlSocket_.m_rtt.GetLatency());
+			log(logmsg::status, _("Logged in"));
+			log(logmsg::debug_info, L"Measured latency of %d ms", controlSocket_.m_rtt.GetLatency());
 			return FZ_REPLY_OK;
 		}
 
@@ -456,7 +456,7 @@ int CFtpLogonOpData::ParseResponse()
 			}
 			const CharsetEncoding encoding = currentServer_.GetEncodingType();
 			if (encoding == ENCODING_AUTO && CServerCapabilities::GetCapability(currentServer_, utf8_command) != yes) {
-				LogMessage(MessageType::Status, _("Server does not support non-ASCII characters."));
+				log(logmsg::status, _("Server does not support non-ASCII characters."));
 				controlSocket_.m_useUTF8 = false;
 			}
 		}
@@ -749,12 +749,12 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 		}
 
 		if (loginSequence.empty()) {
-			LogMessage(MessageType::Error, _("Could not generate custom login sequence."));
+			log(logmsg::error, _("Could not generate custom login sequence."));
 			return false;
 		}
 	}
 	else {
-		LogMessage(MessageType::Error, _("Unknown FTP proxy type, cannot generate login sequence."));
+		log(logmsg::error, _("Unknown FTP proxy type, cannot generate login sequence."));
 		return false;
 	}
 

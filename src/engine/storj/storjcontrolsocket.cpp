@@ -39,7 +39,7 @@ CStorjControlSocket::~CStorjControlSocket()
 
 void CStorjControlSocket::Connect(CServer const &server, Credentials const& credentials)
 {
-	LogMessage(MessageType::Status, _("Connecting to %s..."), server.Format(ServerFormat::with_optional_port));
+	log(logmsg::status, _("Connecting to %s..."), server.Format(ServerFormat::with_optional_port));
 	SetWait(true);
 
 	currentServer_ = server;
@@ -61,10 +61,10 @@ void CStorjControlSocket::List(CServerPath const& path, std::wstring const& subD
 	}
 
 	if (newPath.empty()) {
-		LogMessage(MessageType::Status, _("Retrieving directory listing..."));
+		log(logmsg::status, _("Retrieving directory listing..."));
 	}
 	else {
-		LogMessage(MessageType::Status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
+		log(logmsg::status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
 	}
 
 	Push(std::make_unique<CStorjListOpData>(*this, newPath, std::wstring(), flags));
@@ -84,7 +84,7 @@ void CStorjControlSocket::Delete(CServerPath const& path, std::deque<std::wstrin
 	// CFileZillaEnginePrivate should have checked this already
 	assert(!files.empty());
 
-	LogMessage(MessageType::Debug_Verbose, L"CStorjControlSocket::Delete");
+	log(logmsg::debug_verbose, L"CStorjControlSocket::Delete");
 
 	Push(std::make_unique<CStorjDeleteOpData>(*this, path, std::move(files)));
 }
@@ -102,7 +102,7 @@ void CStorjControlSocket::Resolve(CServerPath const& path, std::deque<std::wstri
 void CStorjControlSocket::Mkdir(CServerPath const& path)
 {
 	if (operations_.empty()) {
-		LogMessage(MessageType::Status, _("Creating directory '%s'..."), path.GetPath());
+		log(logmsg::status, _("Creating directory '%s'..."), path.GetPath());
 	}
 
 	auto pData = std::make_unique<CStorjMkdirOpData>(*this);
@@ -112,7 +112,7 @@ void CStorjControlSocket::Mkdir(CServerPath const& path)
 
 void CStorjControlSocket::RemoveDir(CServerPath const& path, std::wstring const& subDir)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CStorjControlSocket::RemoveDir");
+	log(logmsg::debug_verbose, L"CStorjControlSocket::RemoveDir");
 
 	auto pData = std::make_unique<CStorjRemoveDirOpData>(*this);
 	pData->path_ = path;
@@ -135,27 +135,27 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 	switch (message.type)
 	{
 	case storjEvent::Reply:
-		LogMessageRaw(MessageType::Response, message.text[0]);
+		log_raw(logmsg::reply, message.text[0]);
 		ProcessReply(FZ_REPLY_OK, message.text[0]);
 		break;
 	case storjEvent::Done:
 		ProcessReply(FZ_REPLY_OK, std::wstring());
 		break;
 	case storjEvent::Error:
-		LogMessageRaw(MessageType::Error, message.text[0]);
+		log_raw(logmsg::error, message.text[0]);
 		ProcessReply(FZ_REPLY_ERROR, message.text[0]);
 		break;
 	case storjEvent::ErrorMsg:
-		LogMessageRaw(MessageType::Error, message.text[0]);
+		log_raw(logmsg::error, message.text[0]);
 		break;
 	case storjEvent::Verbose:
-		LogMessageRaw(MessageType::Debug_Info, message.text[0]);
+		log_raw(logmsg::debug_info, message.text[0]);
 		break;
 	case storjEvent::Info:
-		LogMessageRaw(MessageType::Command, message.text[0]); // Not exactly the right message type, but it's a silent one.
+		log_raw(logmsg::command, message.text[0]); // Not exactly the right message type, but it's a silent one.
 		break;
 	case storjEvent::Status:
-		LogMessageRaw(MessageType::Status, message.text[0]);
+		log_raw(logmsg::status, message.text[0]);
 		break;
 	case storjEvent::Recv:
 		SetActive(CFileZillaEngine::recv);
@@ -165,7 +165,7 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 		break;
 	case storjEvent::Listentry:
 		if (operations_.empty() || operations_.back()->opId != Command::list) {
-			LogMessage(MessageType::Debug_Warning, L"storjEvent::Listentry outside list operation, ignoring.");
+			log(logmsg::debug_warning, L"storjEvent::Listentry outside list operation, ignoring.");
 			break;
 		}
 		else {
@@ -210,7 +210,7 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Message type %d not handled", message.type);
+		log(logmsg::debug_warning, L"Message type %d not handled", message.type);
 		break;
 	}
 }
@@ -218,10 +218,10 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 void CStorjControlSocket::OnTerminate(std::wstring const& error)
 {
 	if (!error.empty()) {
-		LogMessageRaw(MessageType::Error, error);
+		log_raw(logmsg::error, error);
 	}
 	else {
-		LogMessageRaw(MessageType::Debug_Info, L"CStorjControlSocket::OnTerminate without error");
+		log_raw(logmsg::debug_info, L"CStorjControlSocket::OnTerminate without error");
 	}
 	if (process_) {
 		DoClose();
@@ -234,14 +234,14 @@ int CStorjControlSocket::SendCommand(std::wstring const& cmd, std::wstring const
 		SetWait(true);
 	}
 
-	LogMessageRaw(MessageType::Command, show.empty() ? cmd : show);
+	log_raw(logmsg::command, show.empty() ? cmd : show);
 
 	// Check for newlines in command
 	// a command like "ls\nrm foo/bar" is dangerous
 	if (cmd.find('\n') != std::wstring::npos ||
 		cmd.find('\r') != std::wstring::npos)
 	{
-		LogMessage(MessageType::Debug_Warning, L"Command containing newline characters, aborting.");
+		log(logmsg::debug_warning, L"Command containing newline characters, aborting.");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -257,7 +257,7 @@ int CStorjControlSocket::AddToStream(std::wstring const& cmd)
 
 	std::string const str = ConvToServer(cmd, true);
 	if (str.empty()) {
-		LogMessage(MessageType::Error, _("Could not convert command to server encoding"));
+		log(logmsg::error, _("Could not convert command to server encoding"));
 		return FZ_REPLY_ERROR;
 	}
 
@@ -271,7 +271,7 @@ int CStorjControlSocket::AddToStream(std::wstring const& cmd)
 bool CStorjControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotification)
 {
 	if (operations_.empty() || !operations_.back()->waitForAsyncRequest) {
-		LogMessage(MessageType::Debug_Info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
+		log(logmsg::debug_info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
 		return false;
 	}
 
@@ -286,7 +286,7 @@ bool CStorjControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotif
 			return SetFileExistsAction(pFileExistsNotification);
 		}
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown async request reply id: %d", requestId);
+		log(logmsg::debug_warning, L"Unknown async request reply id: %d", requestId);
 		return false;
 	}
 
@@ -301,12 +301,12 @@ void CStorjControlSocket::ProcessReply(int result, std::wstring const& reply)
 	SetWait(false);
 
 	if (operations_.empty()) {
-		LogMessage(MessageType::Debug_Info, L"Skipping reply without active operation.");
+		log(logmsg::debug_info, L"Skipping reply without active operation.");
 		return;
 	}
 
 	auto & data = *operations_.back();
-	LogMessage(MessageType::Debug_Verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
+	log(logmsg::debug_verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
 	int res = data.ParseResponse();
 	if (res == FZ_REPLY_OK) {
 		ResetOperation(FZ_REPLY_OK);
@@ -332,7 +332,7 @@ int CStorjControlSocket::ResetOperation(int nErrorCode)
 	if (!operations_.empty() && operations_.back()->opId == Command::connect) {
 		auto &data = static_cast<CStorjConnectOpData &>(*operations_.back());
 		if (data.opState == connect_init && nErrorCode & FZ_REPLY_ERROR && (nErrorCode & FZ_REPLY_CANCELED) != FZ_REPLY_CANCELED) {
-			LogMessage(MessageType::Error, _("fzstorj could not be started"));
+			log(logmsg::error, _("fzstorj could not be started"));
 		}
 	}
 	if (!operations_.empty() && operations_.back()->opId == Command::del && !(nErrorCode & FZ_REPLY_DISCONNECTED)) {

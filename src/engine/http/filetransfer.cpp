@@ -42,7 +42,7 @@ int CHttpFileTransferOpData::Send()
 		}
 
 		if (rr_.request_.uri_.empty()) {
-			LogMessage(MessageType::Error, _("Could not create URI for this transfer."));
+			log(logmsg::error, _("Could not create URI for this transfer."));
 			return FZ_REPLY_ERROR;
 		}
 
@@ -86,7 +86,7 @@ int CHttpFileTransferOpData::Send()
 
 int CHttpFileTransferOpData::OpenFile()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpFileTransferOpData::OpenFile");
+	log(logmsg::debug_verbose, L"CHttpFileTransferOpData::OpenFile");
 	if (file_.opened()) {
 		if (transferSettings_.fsync) {
 			file_.fsync();
@@ -100,14 +100,14 @@ int CHttpFileTransferOpData::OpenFile()
 		download_ ? fz::file::writing : fz::file::reading,
 		fz::file::existing))
 	{
-		LogMessage(MessageType::Error, _("Failed to open \"%s\" for writing"), localFile_);
+		log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
 		return FZ_REPLY_ERROR;
 	}
 
 	assert(download_);
 	int64_t end = file_.seek(0, fz::file::end);
 	if (end < 0) {
-		LogMessage(MessageType::Error, _("Could not seek to the end of the file"));
+		log(logmsg::error, _("Could not seek to the end of the file"));
 		return FZ_REPLY_ERROR;
 	}
 	if (!end) {
@@ -119,12 +119,12 @@ int CHttpFileTransferOpData::OpenFile()
 
 int CHttpFileTransferOpData::OnHeader()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpFileTransferOpData::OnHeader");
+	log(logmsg::debug_verbose, L"CHttpFileTransferOpData::OnHeader");
 
 	if (rr_.response_.code_ == 416 && resume_) {
 		assert(file_.opened());
 		if (file_.seek(0, fz::file::begin) != 0) {
-			LogMessage(MessageType::Error, _("Could not seek to the beginning of the file"));
+			log(logmsg::error, _("Could not seek to the beginning of the file"));
 			return FZ_REPLY_ERROR;
 		}
 		resume_ = false;
@@ -141,12 +141,12 @@ int CHttpFileTransferOpData::OnHeader()
 	if (rr_.response_.code_ >= 300) {
 
 		if (++redirectCount_ >= 6) {
-			LogMessage(MessageType::Error, _("Too many redirects"));
+			log(logmsg::error, _("Too many redirects"));
 			return FZ_REPLY_ERROR;
 		}
 
 		if (rr_.response_.code_ == 305) {
-			LogMessage(MessageType::Error, _("Unsupported redirect"));
+			log(logmsg::error, _("Unsupported redirect"));
 			return FZ_REPLY_ERROR;
 		}
 
@@ -156,20 +156,20 @@ int CHttpFileTransferOpData::OnHeader()
 		}
 		
 		if (location.scheme_.empty() || location.host_.empty() || !location.is_absolute()) {
-			LogMessage(MessageType::Error, _("Redirection to invalid or unsupported URI: %s"), location.to_string());
+			log(logmsg::error, _("Redirection to invalid or unsupported URI: %s"), location.to_string());
 			return FZ_REPLY_ERROR;
 		}
 
 		ServerProtocol protocol = CServer::GetProtocolFromPrefix(fz::to_wstring_from_utf8(location.scheme_));
 		if (protocol != HTTP && protocol != HTTPS) {
-			LogMessage(MessageType::Error, _("Redirection to invalid or unsupported address: %s"), location.to_string());
+			log(logmsg::error, _("Redirection to invalid or unsupported address: %s"), location.to_string());
 			return FZ_REPLY_ERROR;
 		}
 
 		// International domain names
 		std::wstring host = fz::to_wstring_from_utf8(location.host_);
 		if (host.empty()) {
-			LogMessage(MessageType::Error, _("Invalid hostname: %s"), location.to_string());
+			log(logmsg::error, _("Invalid hostname: %s"), location.to_string());
 			return FZ_REPLY_ERROR;
 		}
 
@@ -183,7 +183,7 @@ int CHttpFileTransferOpData::OnHeader()
 	if (resume_ && rr_.response_.code_ != 206) {
 		assert(file_.opened());
 		if (file_.seek(0, fz::file::begin) != 0) {
-			LogMessage(MessageType::Error, _("Could not seek to the beginning of the file"));
+			log(logmsg::error, _("Could not seek to the beginning of the file"));
 			return FZ_REPLY_ERROR;
 		}
 		resume_ = false;
@@ -220,7 +220,7 @@ int CHttpFileTransferOpData::OnData(unsigned char const* data, unsigned int len)
 
 		auto write = static_cast<int64_t>(len);
 		if (file_.write(data, write) != write) {
-			LogMessage(MessageType::Error, _("Failed to write to file %s"), localFile_);
+			log(logmsg::error, _("Failed to write to file %s"), localFile_);
 			return FZ_REPLY_ERROR;
 		}
 	}

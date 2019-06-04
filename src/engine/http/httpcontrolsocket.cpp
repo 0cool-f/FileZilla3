@@ -42,7 +42,7 @@ int file_body::data_request(unsigned char* data, unsigned int & len)
 	auto bytes_read = file_.read(data, len);
 	if (bytes_read < 0) {
 		len = 0;
-		logger_.LogMessage(MessageType::Error, _("Reading from local file failed"));
+		logger_.log(logmsg::error, _("Reading from local file failed"));
 		return FZ_REPLY_ERROR;
 	}
 	else if (bytes_read == 0) {
@@ -69,10 +69,10 @@ int file_body::rewind()
 	int64_t s = static_cast<int64_t>(start_);
 	if (file_.seek(s, fz::file::begin) != s) {
 		if (!start_) {
-			logger_.LogMessage(MessageType::Error, _("Could not seek to the beginning of the file"));
+			logger_.log(logmsg::error, _("Could not seek to the beginning of the file"));
 		}
 		else {
-			logger_.LogMessage(MessageType::Error, _("Could not seek to offset %d within file"), start_);
+			logger_.log(logmsg::error, _("Could not seek to offset %d within file"), start_);
 		}
 		return FZ_REPLY_ERROR;
 	}
@@ -117,7 +117,7 @@ CHttpControlSocket::~CHttpControlSocket()
 bool CHttpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotification)
 {
 	if (operations_.empty() || !operations_.back()->waitForAsyncRequest) {
-		LogMessage(MessageType::Debug_Info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
+		log(logmsg::debug_info, L"Not waiting for request reply, ignoring request reply %d", pNotification->GetRequestID());
 	}
 
 	operations_.back()->waitForAsyncRequest = false;
@@ -127,7 +127,7 @@ bool CHttpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 	case reqId_fileexists:
 		{
 			if (operations_.back()->opId != Command::transfer) {
-				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %f", pNotification->GetRequestID());
+				log(logmsg::debug_info, L"No or invalid operation in progress, ignoring request reply %f", pNotification->GetRequestID());
 				return false;
 			}
 
@@ -138,7 +138,7 @@ bool CHttpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 	case reqId_certificate:
 		{
 			if (!tls_layer_ || tls_layer_->get_state() != fz::socket_state::connecting) {
-				LogMessage(MessageType::Debug_Info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
+				log(logmsg::debug_info, L"No or invalid operation in progress, ignoring request reply %d", pNotification->GetRequestID());
 				return false;
 			}
 
@@ -147,7 +147,7 @@ bool CHttpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 		}
 		break;
 	default:
-		LogMessage(MessageType::Debug_Warning, L"Unknown request %d", pNotification->GetRequestID());
+		log(logmsg::debug_warning, L"Unknown request %d", pNotification->GetRequestID());
 		ResetOperation(FZ_REPLY_INTERNALERROR);
 		return false;
 	}
@@ -163,17 +163,17 @@ void CHttpControlSocket::OnReceive()
 		int error{};
 		int read = active_layer_->read(&buffer, 1, error);
 		if (!read) {
-			LogMessage(MessageType::Debug_Warning, L"Idle socket got closed");
+			log(logmsg::debug_warning, L"Idle socket got closed");
 			ResetSocket();
 		}
 		else if (read == -1) {
 			if (error != EAGAIN) {
-				LogMessage(MessageType::Debug_Warning, L"OnReceive called while not processing http request. Reading fails with error %d, closing socket.", error);
+				log(logmsg::debug_warning, L"OnReceive called while not processing http request. Reading fails with error %d, closing socket.", error);
 				ResetSocket();
 			}
 		}
 		else if (read) {
-			LogMessage(MessageType::Debug_Warning, L"Server sent data while not in an active HTTP request, closing socket.");
+			log(logmsg::debug_warning, L"Server sent data while not in an active HTTP request, closing socket.");
 			ResetSocket();
 		}
 		return;
@@ -191,7 +191,7 @@ void CHttpControlSocket::OnReceive()
 void CHttpControlSocket::OnConnect()
 {
 	if (operations_.empty() || operations_.back()->opId != PrivCommand::http_connect) {
-		LogMessage(MessageType::Debug_Warning, L"Discarding stale OnConnect");
+		log(logmsg::debug_warning, L"Discarding stale OnConnect");
 		return;
 	}
 
@@ -199,7 +199,7 @@ void CHttpControlSocket::OnConnect()
 
 	if (data.tls_) {
 		if (!tls_layer_) {
-			LogMessage(MessageType::Status, _("Connection established, initializing TLS..."));
+			log(logmsg::status, _("Connection established, initializing TLS..."));
 
 			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), *this);
 			active_layer_ = tls_layer_.get();
@@ -209,12 +209,12 @@ void CHttpControlSocket::OnConnect()
 			}
 		}
 		else {
-			LogMessage(MessageType::Status, _("TLS connection established, sending HTTP request"));
+			log(logmsg::status, _("TLS connection established, sending HTTP request"));
 			ResetOperation(FZ_REPLY_OK);
 		}
 	}
 	else {
-		LogMessage(MessageType::Status, _("Connection established, sending HTTP request"));
+		log(logmsg::status, _("Connection established, sending HTTP request"));
 		ResetOperation(FZ_REPLY_OK);
 	}
 }
@@ -223,10 +223,10 @@ void CHttpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath
 									std::wstring const& remoteFile, bool download,
 									CFileTransferCommand::t_transferSettings const& settings)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::FileTransfer()");
+	log(logmsg::debug_verbose, L"CHttpControlSocket::FileTransfer()");
 
 	if (download) {
-		LogMessage(MessageType::Status, _("Downloading %s"), remotePath.FormatFilename(remoteFile));
+		log(logmsg::status, _("Downloading %s"), remotePath.FormatFilename(remoteFile));
 	}
 
 	Push(std::make_unique<CHttpFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, settings));
@@ -234,16 +234,16 @@ void CHttpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath
 
 void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::FileTransfer()");
+	log(logmsg::debug_verbose, L"CHttpControlSocket::FileTransfer()");
 
-	LogMessage(MessageType::Status, _("Requesting %s"), command.uri_.to_string());
+	log(logmsg::status, _("Requesting %s"), command.uri_.to_string());
 
 	Push(std::make_unique<CHttpFileTransferOpData>(*this, command.uri_, command.verb_, command.body_));
 }
 
 void CHttpControlSocket::Request(std::shared_ptr<HttpRequestResponseInterface> const& request)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::Request()");
+	log(logmsg::debug_verbose, L"CHttpControlSocket::Request()");
 
 	auto op = dynamic_cast<CHttpRequestOpData*>(operations_.empty() ? nullptr : operations_.back().get());
 	if (op) {
@@ -256,13 +256,13 @@ void CHttpControlSocket::Request(std::shared_ptr<HttpRequestResponseInterface> c
 
 void CHttpControlSocket::Request(std::deque<std::shared_ptr<HttpRequestResponseInterface>> && requests)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::Request()");
+	log(logmsg::debug_verbose, L"CHttpControlSocket::Request()");
 	Push(std::make_unique<CHttpRequestOpData>(*this, std::move(requests)));
 }
 
 int CHttpControlSocket::InternalConnect(std::wstring const& host, unsigned short port, bool tls, bool allowDisconnect)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::InternalConnect()");
+	log(logmsg::debug_verbose, L"CHttpControlSocket::InternalConnect()");
 
 	if (!Connected()) {
 		return FZ_REPLY_INTERNALERROR;
@@ -270,7 +270,7 @@ int CHttpControlSocket::InternalConnect(std::wstring const& host, unsigned short
 
 	if (active_layer_) {
 		if (host == connected_host_ && port == connected_port_ && tls == connected_tls_) {
-			LogMessage(MessageType::Debug_Verbose, L"Reusing an existing connection");
+			log(logmsg::debug_verbose, L"Reusing an existing connection");
 			return FZ_REPLY_OK;
 		}
 		if (!allowDisconnect) {
@@ -289,21 +289,21 @@ int CHttpControlSocket::InternalConnect(std::wstring const& host, unsigned short
 
 void CHttpControlSocket::OnSocketError(int error)
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::OnClose(%d)", error);
+	log(logmsg::debug_verbose, L"CHttpControlSocket::OnClose(%d)", error);
 
 	if (operations_.empty() || (operations_.back()->opId != PrivCommand::http_connect && operations_.back()->opId != PrivCommand::http_request)) {
-		LogMessage(MessageType::Debug_Warning, L"Idle socket got closed");
+		log(logmsg::debug_warning, L"Idle socket got closed");
 		ResetSocket();
 		return;
 	}
 
-	LogMessage(MessageType::Error, _("Disconnected from server: %s"), fz::socket_error_description(error));
+	log(logmsg::error, _("Disconnected from server: %s"), fz::socket_error_description(error));
 	ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
 }
 
 void CHttpControlSocket::ResetSocket()
 {
-	LogMessage(MessageType::Debug_Verbose, L"CHttpControlSocket::ResetSocket()");
+	log(logmsg::debug_verbose, L"CHttpControlSocket::ResetSocket()");
 
 	active_layer_ = nullptr;
 

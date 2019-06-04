@@ -40,7 +40,7 @@ int CFtpRenameOpData::Send()
 		return controlSocket_.SendCommand(L"RNTO " + command_.GetToPath().FormatFilename(command_.GetToFile(), !useAbsolute_ && command_.GetFromPath() == command_.GetToPath()));
 	}
 	default:
-		LogMessage(MessageType::Debug_Warning, L"unknown op state: %d", opState);
+		log(logmsg::debug_warning, L"unknown op state: %d", opState);
 		break;
 	}
 

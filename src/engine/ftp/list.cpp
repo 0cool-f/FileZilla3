@@ -104,7 +104,7 @@ int CFtpListOpData::Send()
 					viewHidden_ = true;
 				}
 				else {
-					LogMessage(MessageType::Debug_Info, _("View hidden option set, but unsupported by server"));
+					log(logmsg::debug_info, _("View hidden option set, but unsupported by server"));
 				}
 			}
 
@@ -118,12 +118,12 @@ int CFtpListOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	}
 	if (opState == list_mdtm) {
-		LogMessage(MessageType::Status, _("Calculating timezone offset of server..."));
+		log(logmsg::status, _("Calculating timezone offset of server..."));
 		std::wstring cmd = L"MDTM " + currentPath_.FormatFilename(directoryListing_[mdtm_index_].name, true);
 		return controlSocket_.SendCommand(cmd);
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"invalid opstate %d", opState);
+	log(logmsg::debug_warning, L"invalid opstate %d", opState);
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -131,7 +131,7 @@ int CFtpListOpData::Send()
 int CFtpListOpData::ParseResponse()
 {
 	if (opState != list_mdtm) {
-		LogMessage(MessageType::Debug_Warning, "CFtpListOpData::ParseResponse should never be called if opState != list_mdtm");
+		log(logmsg::debug_warning, "CFtpListOpData::ParseResponse should never be called if opState != list_mdtm");
 		return FZ_REPLY_INTERNALERROR;
 	}
 
@@ -156,7 +156,7 @@ int CFtpListOpData::ParseResponse()
 				serveroffset -= serveroffset % 60;
 			}
 
-			LogMessage(MessageType::Status, L"Timezone offset of server is %d seconds.", -serveroffset);
+			log(logmsg::status, L"Timezone offset of server is %d seconds.", -serveroffset);
 
 			fz::duration span = fz::duration::from_seconds(serveroffset);
 			size_t const count = directoryListing_.size();
@@ -234,11 +234,11 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 				}
 				else {
 					if (CheckInclusion(listing, directoryListing_)) {
-						LogMessage(MessageType::Debug_Info, L"Server seems to support LIST -a");
+						log(logmsg::debug_info, L"Server seems to support LIST -a");
 						CServerCapabilities::SetCapability(currentServer_, list_hidden_support, yes);
 					}
 					else {
-						LogMessage(MessageType::Debug_Info, L"Server does not seem to support LIST -a");
+						log(logmsg::debug_info, L"Server does not seem to support LIST -a");
 						CServerCapabilities::SetCapability(currentServer_, list_hidden_support, no);
 						listing = directoryListing_;
 					}
@@ -269,12 +269,12 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 						if (directoryListing_.size()) {
 							// Less files with LIST -a
 							// Not supported
-							LogMessage(MessageType::Debug_Info, L"Server does not seem to support LIST -a");
+							log(logmsg::debug_info, L"Server does not seem to support LIST -a");
 							CServerCapabilities::SetCapability(currentServer_, list_hidden_support, no);
 							listing = directoryListing_;
 						}
 						else {
-							LogMessage(MessageType::Debug_Info, L"Server seems to support LIST -a");
+							log(logmsg::debug_info, L"Server seems to support LIST -a");
 							CServerCapabilities::SetCapability(currentServer_, list_hidden_support, yes);
 						}
 					}
@@ -338,7 +338,7 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 		}
 	}
 	else {
-		LogMessage(MessageType::Debug_Warning, L"Wrong opState: %d", opState);
+		log(logmsg::debug_warning, L"Wrong opState: %d", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 }

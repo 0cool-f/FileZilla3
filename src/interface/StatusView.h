@@ -17,7 +17,7 @@ public:
 	virtual ~CStatusView();
 
 	void AddToLog(CLogmsgNotification const& pNotification);
-	void AddToLog(MessageType messagetype, std::wstring const& message, fz::datetime const& time);
+	void AddToLog(logmsg::type messagetype, std::wstring const& message, fz::datetime const& time);
 
 	void InitDefAttr();
 
@@ -45,12 +45,12 @@ private:
 	struct t_attributeCache
 	{
 		std::wstring prefix;
-		size_t len;
+		size_t len{};
 		wxTextAttr attr;
 #ifdef __WXMSW__
-		CHARFORMAT2 cf;
+		CHARFORMAT2 cf{};
 #endif
-	} m_attributeCache[static_cast<int>(MessageType::count)];
+	} m_attributeCache[sizeof(logmsg::type) * 8];
 
 	bool m_rtl{};
 
@@ -60,7 +60,7 @@ private:
 	// do it later when showing the window.
 	struct t_line
 	{
-		MessageType messagetype;
+		logmsg::type messagetype;
 		std::wstring message;
 		fz::datetime time;
 	};

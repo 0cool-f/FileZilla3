@@ -248,7 +248,7 @@ std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int 
 		h = &fz::sha256;
 	}
 	else {
-		logger.LogMessage(MessageType::Error, _("Server requested unsupported digest authentication algorithm: %s"), fullAlgorithm);
+		logger.log(logmsg::error, _("Server requested unsupported digest authentication algorithm: %s"), fullAlgorithm);
 		return std::string();
 	}
 
@@ -256,7 +256,7 @@ std::string BuildDigestAuthorization(HttpAuthParams const& params, unsigned int 
 	auto qops = fz::strtok(get(params, "qop"), ",");
 	if (!qops.empty()) {
 		if (std::find(qops.cbegin(), qops.cend(), "auth") == qops.cend()) {
-			logger.LogMessage(MessageType::Error, _("Server requested unsupported quality-of-protection: %s"), get(params, "qop"));
+			logger.log(logmsg::error, _("Server requested unsupported quality-of-protection: %s"), get(params, "qop"));
 			return std::string();
 		}
 		qop = true;

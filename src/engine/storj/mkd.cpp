@@ -17,7 +17,7 @@ int CStorjMkdirOpData::Send()
 	switch (opState) {
 	case mkd_init:
 		if (path_.SegmentCount() < 1) {
-			LogMessage(MessageType::Error, _("Invalid path"));
+			log(logmsg::error, _("Invalid path"));
 			return FZ_REPLY_CRITICALERROR;
 		}
 		opState = mkd_mkbucket;
@@ -38,7 +38,7 @@ int CStorjMkdirOpData::Send()
 		}
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjMkdirOpData::Send()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjMkdirOpData::Send()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -72,7 +72,7 @@ int CStorjMkdirOpData::ParseResponse()
 		return controlSocket_.result_;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjMkdirOpData::ParseResponse()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjMkdirOpData::ParseResponse()");
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -88,6 +88,6 @@ int CStorjMkdirOpData::SubcommandResult(int prevResult, COpData const&)
 		return FZ_REPLY_CONTINUE;
 	}
 
-	LogMessage(MessageType::Debug_Warning, L"Unknown opState in CStorjMkdirOpData::SubcommandResult()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjMkdirOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }

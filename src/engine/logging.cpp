@@ -2,6 +2,8 @@
 
 #include "logging_private.h"
 
+#include <libfilezilla/util.hpp>
+
 #include <errno.h>
 
 #ifndef FZ_WINDOWS
@@ -16,7 +18,7 @@ HANDLE CLogging::m_log_fd = INVALID_HANDLE_VALUE;
 #else
 int CLogging::m_log_fd = -1;
 #endif
-std::string CLogging::m_prefixes[static_cast<int>(MessageType::count)];
+std::string CLogging::m_prefixes[sizeof(logmsg::type) * 8];
 unsigned int CLogging::m_pid;
 int CLogging::m_max_size;
 fz::native_string CLogging::m_file;
@@ -24,14 +26,56 @@ fz::native_string CLogging::m_file;
 int CLogging::m_refcount = 0;
 fz::mutex CLogging::mutex_(false);
 
-thread_local int CLogging::debug_level_{};
-thread_local int CLogging::raw_listing_{};
+
+namespace {
+struct logging_options_changed_event_type;
+typedef fz::simple_event<logging_options_changed_event_type> CLoggingOptionsChangedEvent;
+
+class CLoggingOptionsChanged final : public fz::event_handler, COptionChangeEventHandler
+{
+public:
+	CLoggingOptionsChanged(CLogging& logger, COptionsBase& options, fz::event_loop& loop)
+		: fz::event_handler(loop)
+		, logger_(logger)
+		, options_(options)
+	{
+		RegisterOption(OPTION_LOGGING_DEBUGLEVEL);
+		RegisterOption(OPTION_LOGGING_RAWLISTING);
+		send_event<CLoggingOptionsChangedEvent>();
+	}
+
+	virtual ~CLoggingOptionsChanged()
+	{
+		UnregisterAllOptions();
+		remove_handler();
+	}
+
+	virtual void OnOptionsChanged(changed_options_t const& options)
+	{
+		if (options.test(OPTION_LOGGING_DEBUGLEVEL) || options.test(OPTION_LOGGING_RAWLISTING)) {
+			//CLogging::UpdateLogLevel(options_); // In main thread
+			send_event<CLoggingOptionsChangedEvent>();
+		}
+	}
+
+	virtual void operator()(const fz::event_base&)
+	{
+		logger_.UpdateLogLevel(options_); // In worker thread
+	}
+
+	CLogging & logger_;
+	COptionsBase& options_;
+};
+}
 
 CLogging::CLogging(CFileZillaEnginePrivate & engine)
 	: engine_(engine)
 {
-	fz::scoped_lock l(mutex_);
-	m_refcount++;
+	{
+		fz::scoped_lock l(mutex_);
+		m_refcount++;
+	}
+	optionChangeHandler_ = std::make_unique<CLoggingOptionsChanged>(*this, engine_.GetOptions(), engine.event_loop_);
 }
 
 CLogging::~CLogging()
@@ -55,45 +99,18 @@ CLogging::~CLogging()
 	}
 }
 
-bool CLogging::ShouldLog(MessageType nMessageType) const
+bool CLogging::InitLogFile(fz::scoped_lock& l)
 {
-	switch (nMessageType) {
-	case MessageType::Debug_Warning:
-		if (!debug_level_)
-			return false;
-		break;
-	case MessageType::Debug_Info:
-		if (debug_level_ < 2)
-			return false;
-		break;
-	case MessageType::Debug_Verbose:
-		if (debug_level_ < 3)
-			return false;
-		break;
-	case MessageType::Debug_Debug:
-		if (debug_level_ != 4)
-			return false;
-		break;
-	case MessageType::RawList:
-		if (!raw_listing_)
-			return false;
-		break;
-	default:
-		break;
-	}
-	return true;
-}
-
-bool CLogging::InitLogFile(fz::scoped_lock& l) const
-{
-	if (m_logfile_initialized)
+	if (m_logfile_initialized) {
 		return true;
+	}
 
 	m_logfile_initialized = true;
 
 	m_file = fz::to_native(engine_.GetOptions().GetOption(OPTION_LOGGING_FILE));
-	if (m_file.empty())
+	if (m_file.empty()) {
 		return false;
+	}
 
 #ifdef FZ_WINDOWS
 	m_log_fd = CreateFile(m_file.c_str(), FILE_APPEND_DATA, FILE_SHARE_DELETE | FILE_SHARE_WRITE | FILE_SHARE_READ, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -105,19 +122,19 @@ bool CLogging::InitLogFile(fz::scoped_lock& l) const
 		int err = errno;
 #endif
 		l.unlock(); //Avoid recursion
-		LogMessage(MessageType::Error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
+		log(logmsg::error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
 		return false;
 	}
 
-	m_prefixes[static_cast<int>(MessageType::Status)] = fz::to_utf8(_("Status:"));
-	m_prefixes[static_cast<int>(MessageType::Error)] = fz::to_utf8(_("Error:"));
-	m_prefixes[static_cast<int>(MessageType::Command)] = fz::to_utf8(_("Command:"));
-	m_prefixes[static_cast<int>(MessageType::Response)] = fz::to_utf8(_("Response:"));
-	m_prefixes[static_cast<int>(MessageType::Debug_Warning)] = fz::to_utf8(_("Trace:"));
-	m_prefixes[static_cast<int>(MessageType::Debug_Info)] = m_prefixes[static_cast<int>(MessageType::Debug_Warning)];
-	m_prefixes[static_cast<int>(MessageType::Debug_Verbose)] = m_prefixes[static_cast<int>(MessageType::Debug_Warning)];
-	m_prefixes[static_cast<int>(MessageType::Debug_Debug)] = m_prefixes[static_cast<int>(MessageType::Debug_Warning)];
-	m_prefixes[static_cast<int>(MessageType::RawList)] = fz::to_utf8(_("Listing:"));
+	m_prefixes[fz::bitscan_reverse(logmsg::status)] = fz::to_utf8(_("Status:"));
+	m_prefixes[fz::bitscan_reverse(logmsg::error)] = fz::to_utf8(_("Error:"));
+	m_prefixes[fz::bitscan_reverse(logmsg::command)] = fz::to_utf8(_("Command:"));
+	m_prefixes[fz::bitscan_reverse(logmsg::reply)] = fz::to_utf8(_("Response:"));
+	m_prefixes[fz::bitscan_reverse(logmsg::debug_warning)] = fz::to_utf8(_("Trace:"));
+	m_prefixes[fz::bitscan_reverse(logmsg::debug_info)] = m_prefixes[fz::bitscan_reverse(logmsg::debug_warning)];
+	m_prefixes[fz::bitscan_reverse(logmsg::debug_verbose)] = m_prefixes[fz::bitscan_reverse(logmsg::debug_warning)];
+	m_prefixes[fz::bitscan_reverse(logmsg::debug_debug)] = m_prefixes[fz::bitscan_reverse(logmsg::debug_warning)];
+	m_prefixes[fz::bitscan_reverse(logmsg::listing)] = fz::to_utf8(_("Listing:"));
 
 #if FZ_WINDOWS
 	m_pid = static_cast<unsigned int>(GetCurrentProcessId());
@@ -126,16 +143,18 @@ bool CLogging::InitLogFile(fz::scoped_lock& l) const
 #endif
 
 	m_max_size = engine_.GetOptions().GetOptionVal(OPTION_LOGGING_FILE_SIZELIMIT);
-	if (m_max_size < 0)
+	if (m_max_size < 0) {
 		m_max_size = 0;
-	else if (m_max_size > 2000)
+	}
+	else if (m_max_size > 2000) {
 		m_max_size = 2000;
+	}
 	m_max_size *= 1024 * 1024;
 
 	return true;
 }
 
-void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) const
+void CLogging::LogToFile(logmsg::type nMessageType, std::wstring const& msg)
 {
 	fz::scoped_lock l(mutex_);
 
@@ -161,7 +180,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 #else
 		"\n",
 #endif
-		now.format("%Y-%m-%d %H:%M:%S", fz::datetime::local), m_pid, engine_.GetEngineId(), m_prefixes[static_cast<int>(nMessageType)], fz::to_utf8(msg));
+		now.format("%Y-%m-%d %H:%M:%S", fz::datetime::local), m_pid, engine_.GetEngineId(), m_prefixes[fz::bitscan_reverse(nMessageType)], fz::to_utf8(msg));
 
 #ifdef FZ_WINDOWS
 	if (m_max_size) {
@@ -176,7 +195,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 			if (!hMutex) {
 				DWORD err = GetLastError();
 				l.unlock();
-				LogMessage(MessageType::Error, _("Could not create logging mutex: %s"), GetSystemErrorDescription(err));
+				log(logmsg::error, _("Could not create logging mutex: %s"), GetSystemErrorDescription(err));
 				return;
 			}
 
@@ -189,7 +208,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 				CloseHandle(hMutex);
 
 				l.unlock(); // Avoid recursion
-				LogMessage(MessageType::Error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
+				log(logmsg::error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
 				return;
 			}
 
@@ -233,7 +252,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 
 			if (err) {
 				l.unlock(); // Avoid recursion
-				LogMessage(MessageType::Error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
+				log(logmsg::error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
 				return;
 			}
 		}
@@ -246,7 +265,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 		CloseHandle(m_log_fd);
 		m_log_fd = INVALID_HANDLE_VALUE;
 		l.unlock(); // Avoid recursion
-		LogMessage(MessageType::Error, _("Could not write to log file: %s"), GetSystemErrorDescription(err));
+		log(logmsg::error, _("Could not write to log file: %s"), GetSystemErrorDescription(err));
 	}
 #else
 	if (m_max_size) {
@@ -271,7 +290,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 				m_log_fd = -1;
 
 				l.unlock(); // Avoid recursion
-				LogMessage(MessageType::Error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
+				log(logmsg::error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
 				return;
 			}
 			struct stat buf2;
@@ -297,7 +316,7 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 			if (m_log_fd == -1) {
 				int err = errno;
 				l.unlock(); // Avoid recursion
-				LogMessage(MessageType::Error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
+				log(logmsg::error, _("Could not open log file: %s"), GetSystemErrorDescription(err));
 				return;
 			}
 
@@ -314,13 +333,36 @@ void CLogging::LogToFile(MessageType nMessageType, std::wstring const& msg) cons
 		m_log_fd = -1;
 
 		l.unlock(); // Avoid recursion
-		LogMessage(MessageType::Error, _("Could not write to log file: %s"), GetSystemErrorDescription(err));
+		log(logmsg::error, _("Could not write to log file: %s"), GetSystemErrorDescription(err));
 	}
 #endif
 }
 
 void CLogging::UpdateLogLevel(COptionsBase & options)
 {
-	debug_level_ = options.GetOptionVal(OPTION_LOGGING_DEBUGLEVEL);
-	raw_listing_ = options.GetOptionVal(OPTION_LOGGING_RAWLISTING);
+	logmsg::type enabled{};
+	switch (options.GetOptionVal(OPTION_LOGGING_DEBUGLEVEL)) {
+	case 1:
+		enabled = logmsg::debug_warning;
+		break;
+	case 2:
+		enabled = static_cast<logmsg::type>(logmsg::debug_warning | logmsg::debug_info);
+		break;
+	case 3:
+		enabled = static_cast<logmsg::type>(logmsg::debug_warning | logmsg::debug_info | logmsg::debug_verbose);
+		break;
+	case 4:
+		enabled = static_cast<logmsg::type>(logmsg::debug_warning | logmsg::debug_info | logmsg::debug_verbose | logmsg::debug_debug);
+		break;
+	default:
+		break;
+	}
+	if (options.GetOptionVal(OPTION_LOGGING_RAWLISTING) != 0) {
+		enabled = static_cast<logmsg::type>(enabled | logmsg::listing);
+	}
+
+	logmsg::type disabled{ (logmsg::debug_warning | logmsg::debug_info | logmsg::debug_verbose | logmsg::debug_debug | logmsg::listing) & ~enabled };
+
+	enable(enabled);
+	disable(disabled);
 }

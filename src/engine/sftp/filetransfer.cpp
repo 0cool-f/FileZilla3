@@ -30,10 +30,10 @@ int CSftpFileTransferOpData::Send()
 
 		if (download_) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
-			LogMessage(MessageType::Status, _("Starting download of %s"), filename);
+			log(logmsg::status, _("Starting download of %s"), filename);
 		}
 		else {
-			LogMessage(MessageType::Status, _("Starting upload of %s"), localFile_);
+			log(logmsg::status, _("Starting upload of %s"), localFile_);
 		}
 
 		int64_t size;
@@ -71,7 +71,7 @@ int CSftpFileTransferOpData::Send()
 			
 			std::string remoteFile = controlSocket_.ConvToServer(controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_, !tryAbsolutePath_)));
 			if (remoteFile.empty()) {
-				LogMessage(MessageType::Error, _("Could not convert command to server encoding"));
+				log(logmsg::error, _("Could not convert command to server encoding"));
 				return FZ_REPLY_ERROR;
 			}
 			cmd += remoteFile + " ";
@@ -92,7 +92,7 @@ int CSftpFileTransferOpData::Send()
 
 			std::string remoteFile = controlSocket_.ConvToServer(controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_, !tryAbsolutePath_)));
 			if (remoteFile.empty()) {
-				LogMessage(MessageType::Error, _("Could not convert command to server encoding"));
+				log(logmsg::error, _("Could not convert command to server encoding"));
 				return FZ_REPLY_ERROR;
 			}
 			cmd += remoteFile;
@@ -102,7 +102,7 @@ int CSftpFileTransferOpData::Send()
 		transferInitiated_ = true;
 		controlSocket_.SetWait(true);
 
-		controlSocket_.LogMessageRaw(MessageType::Command, logstr);
+		controlSocket_.log_raw(logmsg::command, logstr);
 		return controlSocket_.AddToStream(cmd + "\r\n");
 	}
 	else if (opState == filetransfer_mtime) {
@@ -112,7 +112,7 @@ int CSftpFileTransferOpData::Send()
 	else if (opState == filetransfer_chmtime) {
 		assert(!fileTime_.empty());
 		if (download_) {
-			LogMessage(MessageType::Debug_Info, L"  filetransfer_chmtime during download");
+			log(logmsg::debug_info, L"  filetransfer_chmtime during download");
 			return FZ_REPLY_INTERNALERROR;
 		}
 
@@ -137,7 +137,7 @@ int CSftpFileTransferOpData::ParseResponse()
 			if (download_) {
 				if (!fileTime_.empty()) {
 					if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_))
-						LogMessage(MessageType::Debug_Warning, L"Could not set modification time");
+						log(logmsg::debug_warning, L"Could not set modification time");
 				}
 			}
 			else {
@@ -180,13 +180,13 @@ int CSftpFileTransferOpData::ParseResponse()
 	}
 	else if (opState == filetransfer_chmtime) {
 		if (download_) {
-			LogMessage(MessageType::Debug_Info, L"  filetransfer_chmtime during download");
+			log(logmsg::debug_info, L"  filetransfer_chmtime during download");
 			return FZ_REPLY_INTERNALERROR;
 		}
 		return FZ_REPLY_OK;
 	}
 	else {
-		LogMessage(MessageType::Debug_Info, L"  Called at improper time: opState == %d", opState);
+		log(logmsg::debug_info, L"  Called at improper time: opState == %d", opState);
 	}
 
 	return FZ_REPLY_INTERNALERROR;
@@ -303,7 +303,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 		}
 	}
 	else {
-		LogMessage(MessageType::Debug_Warning, L"  Unknown opState (%d)", opState);
+		log(logmsg::debug_warning, L"  Unknown opState (%d)", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 
