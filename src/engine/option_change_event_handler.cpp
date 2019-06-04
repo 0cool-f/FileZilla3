@@ -5,6 +5,7 @@
 
 std::vector<COptionChangeEventHandler*> COptionChangeEventHandler::m_handlers;
 std::size_t COptionChangeEventHandler::notify_index_ = 0;
+fz::mutex COptionChangeEventHandler::m_{false};
 
 COptionChangeEventHandler::~COptionChangeEventHandler()
 {
@@ -13,6 +14,7 @@ COptionChangeEventHandler::~COptionChangeEventHandler()
 
 void COptionChangeEventHandler::UnregisterAllOptions()
 {
+	fz::scoped_lock l(m_);
 	if (m_handled_options.any()) {
 		auto it = std::find(m_handlers.begin(), m_handlers.end(), this);
 		if (it != m_handlers.end()) {
@@ -27,6 +29,7 @@ void COptionChangeEventHandler::RegisterOption(int option)
 		return;
 	}
 
+	fz::scoped_lock l(m_);
 	if (m_handled_options.none()) {
 		m_handlers.push_back(this);
 	}
@@ -35,6 +38,7 @@ void COptionChangeEventHandler::RegisterOption(int option)
 
 void COptionChangeEventHandler::UnregisterOption(int option)
 {
+	fz::scoped_lock l(m_);
 	m_handled_options.set(option, false);
 	if (m_handled_options.none()) {
 		auto it = std::find(m_handlers.begin(), m_handlers.end(), this);
@@ -51,6 +55,7 @@ void COptionChangeEventHandler::UnregisterOption(int option)
 
 void COptionChangeEventHandler::UnregisterAllHandlers()
 {
+	fz::scoped_lock l(m_);
 	for (auto & handler : m_handlers) {
 		handler->m_handled_options.reset();
 	}
@@ -59,6 +64,8 @@ void COptionChangeEventHandler::UnregisterAllHandlers()
 
 void COptionChangeEventHandler::DoNotify(changed_options_t const& options)
 {
+	fz::scoped_lock l(m_);
+
 	// Going over notify_index_ which may be changed by UnregisterOption
 	// Bit ugly but otherwise has reentrancy issues.
 	for (notify_index_ = 0; notify_index_ < m_handlers.size(); ++notify_index_) {

@@ -37,6 +37,8 @@ private:
 	static void UnregisterAllHandlers();
 
 	static std::vector<COptionChangeEventHandler*> m_handlers;
+
+	static fz::mutex m_;
 };
 
 #endif
