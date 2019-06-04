@@ -6,7 +6,7 @@
 #include <libfilezilla/util.hpp>
 
 std::vector<COptionChangeEventHandler*> COptionChangeEventHandler::m_handlers;
-std::size_t COptionChangeEventHandler::notify_index_{};
+std::size_t COptionChangeEventHandler::notify_index_{npos};
 fz::mutex COptionChangeEventHandler::m_{false};
 COptionChangeEventHandler* COptionChangeEventHandler::active_handler_{};
 fz::thread::id COptionChangeEventHandler::thread_id_;
@@ -19,11 +19,10 @@ COptionChangeEventHandler::~COptionChangeEventHandler()
 void COptionChangeEventHandler::UnregisterAllOptions()
 {
 	fz::scoped_lock l(m_);
-	if (m_handled_options.any()) {
-		auto it = std::find(m_handlers.begin(), m_handlers.end(), this);
-		if (it != m_handlers.end()) {
-			m_handlers.erase(it);
-		}
+
+	if (index_ != npos) {
+		m_handled_options.reset();
+		RemoveHandler();
 	}
 
 	if (active_handler_ == this) {
@@ -44,7 +43,8 @@ void COptionChangeEventHandler::RegisterOption(int option)
 	}
 
 	fz::scoped_lock l(m_);
-	if (m_handled_options.none()) {
+	if (index_ == npos) {
+		index_ = m_handlers.size();
 		m_handlers.push_back(this);
 	}
 	m_handled_options.set(option);
@@ -55,15 +55,26 @@ void COptionChangeEventHandler::UnregisterOption(int option)
 	fz::scoped_lock l(m_);
 	m_handled_options.set(option, false);
 	if (m_handled_options.none()) {
-		auto it = std::find(m_handlers.begin(), m_handlers.end(), this);
-		if (it != m_handlers.end()) {
-			m_handlers.erase(it);
+		RemoveHandler();
+	}
+}
 
-			// If this had been called in the context of DoNotify, make sure all handlers get called
-			if (static_cast<std::size_t>(std::distance(m_handlers.begin(), it)) <= notify_index_) {
-				--notify_index_;
-			}
+void COptionChangeEventHandler::RemoveHandler()
+{
+	if (index_ != npos) {
+		if (notify_index_ < m_handlers.size() && index_ < notify_index_) {
+			--notify_index_;
+			m_handlers[index_] = m_handlers[notify_index_];
+			m_handlers[index_]->index_ = index_;
+			m_handlers[notify_index_] = m_handlers.back();
+			m_handlers[notify_index_]->index_ = notify_index_;
 		}
+		else {
+			m_handlers[index_] = m_handlers.back();
+			m_handlers[index_]->index_ = index_;
+		}
+		m_handlers.pop_back();
+		index_ = npos;
 	}
 }
 
@@ -84,8 +95,8 @@ void COptionChangeEventHandler::DoNotify(changed_options_t const& options)
 
 	// Going over notify_index_ which may be changed by UnregisterOption
 	// Bit ugly but otherwise has reentrancy issues.
-	for (notify_index_ = 0; notify_index_ < m_handlers.size(); ++notify_index_) {
-		auto & handler = m_handlers[notify_index_];
+	for (notify_index_ = 0; notify_index_ < m_handlers.size();) {
+		auto & handler = m_handlers[notify_index_++];
 		auto hoptions = options & handler->m_handled_options;
 		if (hoptions.any()) {
 			active_handler_ = handler;
@@ -98,4 +109,5 @@ void COptionChangeEventHandler::DoNotify(changed_options_t const& options)
 			active_handler_ = nullptr;
 		}
 	}
+	notify_index_ = npos;
 }

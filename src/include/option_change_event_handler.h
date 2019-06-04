@@ -28,7 +28,12 @@ protected:
 	virtual void OnOptionsChanged(changed_options_t const& options) = 0;
 
 private:
+	void RemoveHandler();
+
 	changed_options_t m_handled_options;
+
+	static constexpr auto npos{static_cast<size_t>(-1)};
+	size_t index_{npos};
 
 	// Very important: Never ever call this if there's OnOptionsChanged on the stack.
 	static void DoNotify(changed_options_t const& options);
