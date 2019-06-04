@@ -83,6 +83,7 @@ void COptionChangeEventHandler::UnregisterAllHandlers()
 	fz::scoped_lock l(m_);
 	for (auto & handler : m_handlers) {
 		handler->m_handled_options.reset();
+		handler->index_ = npos;
 	}
 	m_handlers.clear();
 }
