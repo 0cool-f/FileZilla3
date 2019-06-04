@@ -22,6 +22,7 @@ CRateLimiter::CRateLimiter(fz::event_loop& loop, COptionsBase& options)
 CRateLimiter::~CRateLimiter()
 {
 	remove_handler();
+	UnregisterAllOptions();
 }
 
 void CRateLimiter::UpdateLimits()

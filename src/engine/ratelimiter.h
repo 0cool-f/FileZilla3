@@ -12,7 +12,7 @@ class CRateLimiter final : protected fz::event_handler, COptionChangeEventHandle
 {
 public:
 	CRateLimiter(fz::event_loop& loop, COptionsBase& options);
-	~CRateLimiter();
+	virtual ~CRateLimiter();
 
 	enum rate_direction
 	{

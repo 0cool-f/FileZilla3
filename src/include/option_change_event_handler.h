@@ -39,6 +39,9 @@ private:
 	static std::vector<COptionChangeEventHandler*> m_handlers;
 
 	static fz::mutex m_;
+
+	static COptionChangeEventHandler* active_handler_;
+	static fz::thread::id thread_id_;
 };
 
 #endif

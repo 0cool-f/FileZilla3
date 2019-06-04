@@ -77,6 +77,7 @@ bool CFileZillaEnginePrivate::ShouldQueueLogsFromOptions() const
 CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 {
 	remove_handler();
+	UnregisterAllOptions();
 
 	m_maySendNotificationEvent = false;
 
