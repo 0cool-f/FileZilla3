@@ -349,41 +349,49 @@ void CStatusView::InitDefAttr()
 #ifndef __WXMAC__
 		entry.attr = defAttr;
 #endif
-		switch (1 << i) {
+		switch (1ull << i) {
 		case logmsg::error:
 			entry.prefix = _("Error:").ToStdWstring();
 			entry.attr.SetTextColour(wxColour(255, 0, 0));
 			break;
 		case logmsg::command:
 			entry.prefix = _("Command:").ToStdWstring();
-			if (is_dark)
+			if (is_dark) {
 				entry.attr.SetTextColour(wxColour(128, 128, 255));
-			else
+			}
+			else {
 				entry.attr.SetTextColour(wxColour(0, 0, 128));
+			}
 			break;
 		case logmsg::reply:
 			entry.prefix = _("Response:").ToStdWstring();
-			if (is_dark)
+			if (is_dark) {
 				entry.attr.SetTextColour(wxColour(128, 255, 128));
-			else
+			}
+			else {
 				entry.attr.SetTextColour(wxColour(0, 128, 0));
+			}
 			break;
 		case logmsg::debug_warning:
 		case logmsg::debug_info:
 		case logmsg::debug_verbose:
 		case logmsg::debug_debug:
 			entry.prefix = _("Trace:").ToStdWstring();
-			if (is_dark)
+			if (is_dark) {
 				entry.attr.SetTextColour(wxColour(255, 128, 255));
-			else
+			}
+			else {
 				entry.attr.SetTextColour(wxColour(128, 0, 128));
+			}
 			break;
 		case logmsg::listing:
 			entry.prefix = _("Listing:").ToStdWstring();
-			if (is_dark)
+			if (is_dark) {
 				entry.attr.SetTextColour(wxColour(128, 255, 255));
-			else
+			}
+			else {
 				entry.attr.SetTextColour(wxColour(0, 128, 128));
+			}
 			break;
 		default:
 			entry.prefix = _("Status:").ToStdWstring();
