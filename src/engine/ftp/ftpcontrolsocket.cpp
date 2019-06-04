@@ -176,7 +176,7 @@ void CFtpControlSocket::OnConnect()
 		if (!tls_layer_) {
 			log(logmsg::status, _("Connection established, initializing TLS..."));
 
-			tls_layer_ = std::make_unique<CTlsSocket>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), logger_);
+			tls_layer_ = std::make_unique<fz::tls_layer>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), logger_);
 			active_layer_ = tls_layer_.get();
 
 			if (!tls_layer_->client_handshake(this)) {
@@ -852,7 +852,7 @@ void CFtpControlSocket::ResetSocket()
 	CRealControlSocket::ResetSocket();
 }
 
-void CFtpControlSocket::OnVerifyCert(CTlsSocket* source, fz::tls_session_info & info)
+void CFtpControlSocket::OnVerifyCert(fz::tls_layer* source, fz::tls_session_info & info)
 {
 	if (!tls_layer_ || source != tls_layer_.get()) {
 		return;

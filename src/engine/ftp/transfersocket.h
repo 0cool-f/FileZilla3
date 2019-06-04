@@ -18,7 +18,11 @@ enum class TransferMode
 };
 
 class CIOThread;
-class CTlsSocket;
+
+namespace fz {
+class tls_layer;
+}
+
 class CTransferSocket final : public fz::event_handler
 {
 public:
@@ -87,7 +91,7 @@ protected:
 	std::unique_ptr<fz::socket> socket_;
 	std::unique_ptr<CRatelimitLayer> ratelimit_layer_;
 	std::unique_ptr<CProxySocket> proxy_layer_;
-	std::unique_ptr<CTlsSocket> tls_layer_;
+	std::unique_ptr<fz::tls_layer> tls_layer_;
 
 	fz::socket_layer* active_layer_{};
 

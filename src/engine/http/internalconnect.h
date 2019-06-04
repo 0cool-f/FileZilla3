@@ -32,7 +32,7 @@ public:
 		}
 	}
 
-	void OnVerifyCert(CTlsSocket* source, fz::tls_session_info& info)
+	void OnVerifyCert(fz::tls_layer* source, fz::tls_session_info& info)
 	{
 		if (!controlSocket_.tls_layer_ || source != controlSocket_.tls_layer_.get()) {
 			return;

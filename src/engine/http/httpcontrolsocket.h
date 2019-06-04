@@ -222,7 +222,10 @@ std::shared_ptr<R> make_simple_rr(T * rr)
 	return std::shared_ptr<R>(rr, &null_deleter<R>);
 }
 
-class CTlsSocket;
+namespace fz {
+class tls_layer;
+}
+
 class CHttpControlSocket : public CRealControlSocket
 {
 public:
@@ -260,7 +263,7 @@ protected:
 
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) override;
 
-	std::unique_ptr<CTlsSocket> tls_layer_;
+	std::unique_ptr<fz::tls_layer> tls_layer_;
 
 	virtual void OnConnect() override;
 	virtual void OnSocketError(int error) override;

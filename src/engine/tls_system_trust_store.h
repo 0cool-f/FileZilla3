@@ -9,11 +9,11 @@
 
 #include <memory>
 
-class CTlsSocketImpl;
 
 namespace fz {
 class thread_pool;
 class tls_system_trust_store_impl;
+class tls_layer_impl;
 
 /**
  * Loading system trust store can take a significant amount of time
@@ -27,7 +27,7 @@ public:
 	~tls_system_trust_store();
 
 private:
-	friend class ::CTlsSocketImpl;
+	friend class tls_layer_impl;
 	std::unique_ptr<tls_system_trust_store_impl> impl_;
 };
 }

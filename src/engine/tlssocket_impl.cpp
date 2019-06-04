@@ -16,6 +16,10 @@
 
 static_assert(GNUTLS_VERSION_NUMBER != 0x030604, "Using TLS 1.3 with this version of GnuTLS does not work, update your version of GnuTLS");
 
+namespace fz {
+
+namespace {
+
 #if FZ_USE_GNUTLS_SYSTEM_CIPHERS
 char const ciphers[] = "@SYSTEM";
 #else
@@ -29,40 +33,49 @@ char const ciphers[] = "@SYSTEM";
 #define TLSDEBUG 0
 #if TLSDEBUG
 // This is quite ugly
-fz::logger_interface* pLogging;
-void log_func(int level, char const* msg)
+logger_interface* pLogging;
+extern "C" void log_func(int level, char const* msg)
 {
 	if (!msg || !pLogging) {
 		return;
 	}
-	std::wstring s = fz::to_wstring(msg);
-	fz::trim(s);
+	std::wstring s = to_wstring(msg);
+	trim(s);
 	pLogging->log(logmsg::debug_debug, L"tls: %d %s", level, s);
 }
 #endif
 
-namespace {
-void remove_verification_events(fz::event_handler* handler, CTlsSocket const* const source)
+void remove_verification_events(event_handler* handler, tls_layer const* const source)
 {
 	if (!handler) {
 		return;
 	}
 
-	auto event_filter = [&](fz::event_loop::Events::value_type const& ev) -> bool {
+	auto event_filter = [&](event_loop::Events::value_type const& ev) -> bool {
 		if (ev.first != handler) {
 			return false;
 		}
-		else if (ev.second->derived_type() == fz::certificate_verification_event::type()) {
-			return std::get<0>(static_cast<fz::certificate_verification_event const&>(*ev.second).v_) == source;
+		else if (ev.second->derived_type() == certificate_verification_event::type()) {
+			return std::get<0>(static_cast<certificate_verification_event const&>(*ev.second).v_) == source;
 		}
 		return false;
 	};
 
 	handler->event_loop_.filter_events(event_filter);
 }
+
+extern "C" ssize_t c_push_function(gnutls_transport_ptr_t ptr, const void* data, size_t len)
+{
+	return ((tls_layer_impl*)ptr)->push_function(data, len);
 }
 
-class CTlsSocketCallbacks
+extern "C" ssize_t c_pull_function(gnutls_transport_ptr_t ptr, void* data, size_t len)
+{
+	return ((tls_layer_impl*)ptr)->pull_function(data, len);
+}
+}
+
+class tls_layerCallbacks
 {
 public:
 	static int handshake_hook_func(gnutls_session_t session, unsigned int htype, unsigned int post, unsigned int incoming)
@@ -70,7 +83,7 @@ public:
 		if (!session) {
 			return 0;
 		}
-		auto* tls = reinterpret_cast<CTlsSocketImpl*>(gnutls_session_get_ptr(session));
+		auto* tls = reinterpret_cast<tls_layer_impl*>(gnutls_session_get_ptr(session));
 		if (!tls) {
 			return 0;
 		}
@@ -104,7 +117,7 @@ public:
 namespace {
 extern "C" int handshake_hook_func(gnutls_session_t session, unsigned int htype, unsigned int post, unsigned int incoming, gnutls_datum_t const*)
 {
-	return CTlsSocketCallbacks::handshake_hook_func(session, htype, post, incoming);
+	return tls_layerCallbacks::handshake_hook_func(session, htype, post, incoming);
 }
 
 struct cert_list_holder final
@@ -172,27 +185,27 @@ void clone_cert(gnutls_x509_crt_t in, gnutls_x509_crt_t &out)
 }
 }
 
-CTlsSocketImpl::CTlsSocketImpl(CTlsSocket& tlsSocket, fz::tls_system_trust_store* systemTrustStore, fz::logger_interface & logger)
-	: tlsSocket_(tlsSocket)
+tls_layer_impl::tls_layer_impl(tls_layer& layer, tls_system_trust_store* systemTrustStore, logger_interface & logger)
+	: tls_layer_(layer)
 	, logger_(logger)
-	, systemTrustStore_(systemTrustStore)
+	, system_trust_store_(systemTrustStore)
 {
 }
 
-CTlsSocketImpl::~CTlsSocketImpl()
+tls_layer_impl::~tls_layer_impl()
 {
-	Uninit();
+	deinit();
 }
 
-bool CTlsSocketImpl::Init()
+bool tls_layer_impl::init()
 {
 	// This function initializes GnuTLS
-	if (!m_initialized) {
-		m_initialized = true;
+	if (!initialized_) {
+		initialized_ = true;
 		int res = gnutls_global_init();
 		if (res) {
-			LogError(res, L"gnutls_global_init");
-			Uninit();
+			log_error(res, L"gnutls_global_init");
+			deinit();
 			return false;
 		}
 
@@ -205,97 +218,96 @@ bool CTlsSocketImpl::Init()
 #endif
 	}
 
-	if (!m_certCredentials) {
-		int res = gnutls_certificate_allocate_credentials(&m_certCredentials);
+	if (!cert_credentials_) {
+		int res = gnutls_certificate_allocate_credentials(&cert_credentials_);
 		if (res < 0) {
-			LogError(res, L"gnutls_certificate_allocate_credentials");
-			Uninit();
+			log_error(res, L"gnutls_certificate_allocate_credentials");
+			deinit();
 			return false;
 		}
 	}
 
-	if (!InitSession()) {
-		return false;
-	}
-
-	// At this point, we can start shaking hands.
 	return true;
 }
 
-bool CTlsSocketImpl::SetClientCertificate(fz::native_string const& keyfile, fz::native_string const& certs, fz::native_string const& password)
+bool tls_layer_impl::set_client_certificate(native_string const& keyfile, native_string const& certs, native_string const& password)
 {
-	if (!m_certCredentials) {
+	if (!init()) {
 		return false;
 	}
 
-	int res = gnutls_certificate_set_x509_key_file2(m_certCredentials, fz::to_string(certs).c_str(),
-		fz::to_string(keyfile).c_str(), GNUTLS_X509_FMT_PEM, password.empty() ? nullptr : fz::to_utf8(password).c_str(), 0);
+	if (!cert_credentials_) {
+		return false;
+	}
+
+	int res = gnutls_certificate_set_x509_key_file2(cert_credentials_, to_string(certs).c_str(),
+		to_string(keyfile).c_str(), GNUTLS_X509_FMT_PEM, password.empty() ? nullptr : to_utf8(password).c_str(), 0);
 	if (res < 0) {
-		LogError(res, L"gnutls_certificate_set_x509_key_file2");
-		Uninit();
+		log_error(res, L"gnutls_certificate_set_x509_key_file2");
+		deinit();
 		return false;
 	}
 
 	return true;
 }
 
-bool CTlsSocketImpl::InitSession()
+bool tls_layer_impl::init_session()
 {
-	if (!m_certCredentials) {
-		Uninit();
+	if (!cert_credentials_) {
+		deinit();
 		return false;
 	}
 
-	int res = gnutls_init(&m_session, GNUTLS_CLIENT);
+	int res = gnutls_init(&session_, GNUTLS_CLIENT);
 	if (res) {
-		LogError(res, L"gnutls_init");
-		Uninit();
+		log_error(res, L"gnutls_init");
+		deinit();
 		return false;
 	}
 
 	// For use in callbacks
-	gnutls_session_set_ptr(m_session, this);
+	gnutls_session_set_ptr(session_, this);
 
 	// Even though the name gnutls_db_set_cache_expiration
 	// implies expiration of some cache, it also governs
 	// the actual session lifetime, independend whether the
 	// session is cached or not.
-	gnutls_db_set_cache_expiration(m_session, 100000000);
+	gnutls_db_set_cache_expiration(session_, 100000000);
 
-	res = gnutls_priority_set_direct(m_session, ciphers, nullptr);
+	res = gnutls_priority_set_direct(session_, ciphers, nullptr);
 	if (res) {
-		LogError(res, L"gnutls_priority_set_direct");
-		Uninit();
+		log_error(res, L"gnutls_priority_set_direct");
+		deinit();
 		return false;
 	}
 
-	gnutls_dh_set_prime_bits(m_session, 1024);
+	gnutls_dh_set_prime_bits(session_, 1024);
 
-	gnutls_credentials_set(m_session, GNUTLS_CRD_CERTIFICATE, m_certCredentials);
+	gnutls_credentials_set(session_, GNUTLS_CRD_CERTIFICATE, cert_credentials_);
 
 	// Setup transport functions
-	gnutls_transport_set_push_function(m_session, PushFunction);
-	gnutls_transport_set_pull_function(m_session, PullFunction);
-	gnutls_transport_set_ptr(m_session, (gnutls_transport_ptr_t)this);
+	gnutls_transport_set_push_function(session_, c_push_function);
+	gnutls_transport_set_pull_function(session_, c_pull_function);
+	gnutls_transport_set_ptr(session_, (gnutls_transport_ptr_t)this);
 
 	return true;
 }
 
-void CTlsSocketImpl::Uninit()
+void tls_layer_impl::deinit()
 {
-	UninitSession();
+	deinit_session();
 
-	if (m_certCredentials) {
-		gnutls_certificate_free_credentials(m_certCredentials);
-		m_certCredentials = nullptr;
+	if (cert_credentials_) {
+		gnutls_certificate_free_credentials(cert_credentials_);
+		cert_credentials_ = nullptr;
 	}
 
-	if (m_initialized) {
-		m_initialized = false;
+	if (initialized_) {
+		initialized_ = false;
 		gnutls_global_deinit();
 	}
 
-	state_ = fz::socket_state::failed;
+	state_ = socket_state::failed;
 
 #if TLSDEBUG
 	if (pLogging == &logger_) {
@@ -303,43 +315,43 @@ void CTlsSocketImpl::Uninit()
 	}
 #endif
 
-	remove_verification_events(verification_handler_, &tlsSocket_);
+	remove_verification_events(verification_handler_, &tls_layer_);
 	verification_handler_ = nullptr;
 }
 
 
-void CTlsSocketImpl::UninitSession()
+void tls_layer_impl::deinit_session()
 {
-	if (m_session) {
-		gnutls_deinit(m_session);
-		m_session = nullptr;
+	if (session_) {
+		gnutls_deinit(session_);
+		session_ = nullptr;
 	}
 }
 
 
-void CTlsSocketImpl::LogError(int code, std::wstring const& function, logmsg::type logLevel)
+void tls_layer_impl::log_error(int code, std::wstring const& function, logmsg::type logLevel)
 {
-	if (logLevel < logmsg::debug_warning && state_ >= fz::socket_state::shut_down && shutdown_silence_read_errors_) {
+	if (logLevel < logmsg::debug_warning && state_ >= socket_state::shut_down && shutdown_silence_read_errors_) {
 		logLevel = logmsg::debug_warning;
 	}
 
 	if (code == GNUTLS_E_WARNING_ALERT_RECEIVED || code == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-		PrintAlert(logLevel);
+		log_alert(logLevel);
 	}
 	else if (code == GNUTLS_E_PULL_ERROR) {
 		if (function.empty()) {
-			logger_.log(logmsg::debug_warning, L"GnuTLS could not read from socket: %s", fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not read from socket: %s", socket_error_description(socket_error_));
 		}
 		else {
-			logger_.log(logmsg::debug_warning, L"GnuTLS could not read from socket in %s: %s", function, fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not read from socket in %s: %s", function, socket_error_description(socket_error_));
 		}
 	}
 	else if (code == GNUTLS_E_PUSH_ERROR) {
 		if (function.empty()) {
-			logger_.log(logmsg::debug_warning, L"GnuTLS could not write to socket: %s", fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not write to socket: %s", socket_error_description(socket_error_));
 		}
 		else {
-			logger_.log(logmsg::debug_warning, L"GnuTLS could not write to socket in %s: %s", function, fz::socket_error_description(m_socket_error));
+			logger_.log(logmsg::debug_warning, L"GnuTLS could not write to socket in %s: %s", function, socket_error_description(socket_error_));
 		}
 	}
 	else {
@@ -363,9 +375,9 @@ void CTlsSocketImpl::LogError(int code, std::wstring const& function, logmsg::ty
 	}
 }
 
-void CTlsSocketImpl::PrintAlert(logmsg::type logLevel)
+void tls_layer_impl::log_alert(logmsg::type logLevel)
 {
-	gnutls_alert_description_t last_alert = gnutls_alert_get(m_session);
+	gnutls_alert_description_t last_alert = gnutls_alert_get(session_);
 	char const* alert = gnutls_alert_get_name(last_alert);
 	if (alert) {
 		logger_.log(logLevel, _("Received TLS alert from the server: %s (%d)"), alert, last_alert);
@@ -375,35 +387,25 @@ void CTlsSocketImpl::PrintAlert(logmsg::type logLevel)
 	}
 }
 
-ssize_t CTlsSocketImpl::PushFunction(gnutls_transport_ptr_t ptr, const void* data, size_t len)
-{
-	return ((CTlsSocketImpl*)ptr)->PushFunction(data, len);
-}
-
-ssize_t CTlsSocketImpl::PullFunction(gnutls_transport_ptr_t ptr, void* data, size_t len)
-{
-	return ((CTlsSocketImpl*)ptr)->PullFunction(data, len);
-}
-
-ssize_t CTlsSocketImpl::PushFunction(void const* data, size_t len)
+ssize_t tls_layer_impl::push_function(void const* data, size_t len)
 {
 #if TLSDEBUG
-	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::PushFunction(%d)", len);
+	logger_.log(logmsg::debug_debug, L"tls_layer_impl::push_function(%d)", len);
 #endif
-	if (!m_canWriteToSocket) {
-		gnutls_transport_set_errno(m_session, EAGAIN);
+	if (!can_write_to_socket_) {
+		gnutls_transport_set_errno(session_, EAGAIN);
 		return -1;
 	}
 
 	int error;
-	int written = tlsSocket_.next_layer_.write(data, static_cast<unsigned int>(len), error);
+	int written = tls_layer_.next_layer_.write(data, static_cast<unsigned int>(len), error);
 
 	if (written < 0) {
-		m_canWriteToSocket = false;
+		can_write_to_socket_ = false;
 		if (error == EAGAIN) {
-			m_socket_error = error;
+			socket_error_ = error;
 		}
-		gnutls_transport_set_errno(m_session, error);
+		gnutls_transport_set_errno(session_, error);
 #if TLSDEBUG
 		logger_.log(logmsg::debug_debug, L"  returning -1 due to %d", error);
 #endif
@@ -417,25 +419,25 @@ ssize_t CTlsSocketImpl::PushFunction(void const* data, size_t len)
 	return written;
 }
 
-ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
+ssize_t tls_layer_impl::pull_function(void* data, size_t len)
 {
 #if TLSDEBUG
-	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::PullFunction(%d)",  (int)len);
+	logger_.log(logmsg::debug_debug, L"tls_layer_impl::pull_function(%d)",  (int)len);
 #endif
 
-	if (!m_canReadFromSocket) {
-		gnutls_transport_set_errno(m_session, EAGAIN);
+	if (!can_read_from_socket_) {
+		gnutls_transport_set_errno(session_, EAGAIN);
 		return -1;
 	}
 
 	int error;
-	int read = tlsSocket_.next_layer_.read(data, static_cast<unsigned int>(len), error);
+	int read = tls_layer_.next_layer_.read(data, static_cast<unsigned int>(len), error);
 	if (read < 0) {
-		m_canReadFromSocket = false;
+		can_read_from_socket_ = false;
 		if (error != EAGAIN) {
-			m_socket_error = error;
+			socket_error_ = error;
 		}
-		gnutls_transport_set_errno(m_session, error);
+		gnutls_transport_set_errno(session_, error);
 #if TLSDEBUG
 		logger_.log(logmsg::debug_debug, L"  returning -1 due to %d", error);
 #endif
@@ -443,7 +445,7 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 	}
 
 	if (!read) {
-		m_socket_eof = true;
+		socket_eof_ = true;
 	}
 
 #if TLSDEBUG
@@ -453,105 +455,105 @@ ssize_t CTlsSocketImpl::PullFunction(void* data, size_t len)
 	return read;
 }
 
-void CTlsSocketImpl::operator()(fz::event_base const& ev)
+void tls_layer_impl::operator()(event_base const& ev)
 {
-	fz::dispatch<fz::socket_event, fz::hostaddress_event>(ev, this
-		, &CTlsSocketImpl::OnSocketEvent
-		, &CTlsSocketImpl::forward_hostaddress_event);
+	dispatch<socket_event, hostaddress_event>(ev, this
+		, &tls_layer_impl::on_socket_event
+		, &tls_layer_impl::forward_hostaddress_event);
 }
 
-void CTlsSocketImpl::forward_hostaddress_event(fz::socket_event_source* source, std::string const& address)
+void tls_layer_impl::forward_hostaddress_event(socket_event_source* source, std::string const& address)
 {
-	tlsSocket_.forward_hostaddress_event(source, address);
+	tls_layer_.forward_hostaddress_event(source, address);
 }
 
-void CTlsSocketImpl::OnSocketEvent(fz::socket_event_source* s, fz::socket_event_flag t, int error)
+void tls_layer_impl::on_socket_event(socket_event_source* s, socket_event_flag t, int error)
 {
-	if (!m_session) {
+	if (!session_) {
 		return;
 	}
 
-	if (t == fz::socket_event_flag::connection_next) {
-		tlsSocket_.forward_socket_event(s, t, error);
+	if (t == socket_event_flag::connection_next) {
+		tls_layer_.forward_socket_event(s, t, error);
 		return;
 	}
 
 	if (error) {
-		m_socket_error = error;
-		Uninit();
-		tlsSocket_.forward_socket_event(s, t, error);
+		socket_error_ = error;
+		deinit();
+		tls_layer_.forward_socket_event(s, t, error);
 		return;
 	}
 
 	switch (t)
 	{
-	case fz::socket_event_flag::read:
-		OnRead();
+	case socket_event_flag::read:
+		on_read();
 		break;
-	case fz::socket_event_flag::write:
-		OnSend();
+	case socket_event_flag::write:
+		on_send();
 		break;
-	case fz::socket_event_flag::connection:
+	case socket_event_flag::connection:
 		if (hostname_.empty()) {
-			set_hostname(tlsSocket_.next_layer_.peer_host());
+			set_hostname(tls_layer_.next_layer_.peer_host());
 		}
 	default:
 		break;
 	}
 }
 
-void CTlsSocketImpl::OnRead()
+void tls_layer_impl::on_read()
 {
-	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::OnRead()");
+	logger_.log(logmsg::debug_debug, L"tls_layer_impl::on_read()");
 
-	m_canReadFromSocket = true;
+	can_read_from_socket_ = true;
 
-	if (!m_session) {
+	if (!session_) {
 		return;
 	}
 
-	if (state_ == fz::socket_state::connecting) {
-		ContinueHandshake();
+	if (state_ == socket_state::connecting) {
+		continue_handshake();
 	}
-	else if (state_ == fz::socket_state::connected || state_ == fz::socket_state::shutting_down || state_ == fz::socket_state::shut_down) {
-		if (tlsSocket_.event_handler_) {
-			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
+	else if (state_ == socket_state::connected || state_ == socket_state::shutting_down || state_ == socket_state::shut_down) {
+		if (tls_layer_.event_handler_) {
+			tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::read, 0);
 		}
 	}
 }
 
-void CTlsSocketImpl::OnSend()
+void tls_layer_impl::on_send()
 {
-	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::OnSend()");
+	logger_.log(logmsg::debug_debug, L"tls_layer_impl::on_send()");
 
-	m_canWriteToSocket = true;
+	can_write_to_socket_ = true;
 
-	if (!m_session) {
+	if (!session_) {
 		return;
 	}
 
-	if (state_ == fz::socket_state::connecting) {
-		ContinueHandshake();
+	if (state_ == socket_state::connecting) {
+		continue_handshake();
 	}
-	else if (state_ == fz::socket_state::shutting_down) {
-		int res = ContinueShutdown();
+	else if (state_ == socket_state::shutting_down) {
+		int res = continue_shutdown();
 		if (res != EAGAIN) {
-			if (tlsSocket_.event_handler_) {
-				tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, res);
+			if (tls_layer_.event_handler_) {
+				tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::write, res);
 			}
 		}
 	}
-	else if (state_ == fz::socket_state::connected) {
-		ContinueWrite();
+	else if (state_ == socket_state::connected) {
+		continue_write();
 	}
 }
 
-void CTlsSocketImpl::ContinueWrite()
+void tls_layer_impl::continue_write()
 {
-	if (m_lastWriteFailed) {
+	if (last_write_failed_) {
 		ssize_t res = GNUTLS_E_AGAIN;
-		while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
-			res = gnutls_record_send(m_session, nullptr, 0);
+		while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && can_write_to_socket_) {
+			res = gnutls_record_send(session_, nullptr, 0);
 		}
 
 		if (res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) {
@@ -559,47 +561,47 @@ void CTlsSocketImpl::ContinueWrite()
 		}
 
 		if (res < 0) {
-			Failure(static_cast<int>(res), true);
+			failure(static_cast<int>(res), true);
 			return;
 		}
 
-		m_writeSkip += static_cast<int>(res);
-		m_lastWriteFailed = false;
-		if (tlsSocket_.event_handler_) {
-			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
+		write_skip_ += static_cast<int>(res);
+		last_write_failed_ = false;
+		if (tls_layer_.event_handler_) {
+			tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::write, 0);
 		}
 	}
 }
 
-bool CTlsSocketImpl::ResumedSession() const
+bool tls_layer_impl::resumed_session() const
 {
-	return gnutls_session_is_resumed(m_session) != 0;
+	return gnutls_session_is_resumed(session_) != 0;
 }
 
-bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_resume, fz::native_string const& session_hostname, std::vector<uint8_t> const& required_certificate, fz::event_handler *const verification_handler)
+bool tls_layer_impl::client_handshake(std::vector<uint8_t> const& session_to_resume, native_string const& session_hostname, std::vector<uint8_t> const& required_certificate, event_handler *const verification_handler)
 {
-	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::client_handshake()");
+	logger_.log(logmsg::debug_verbose, L"tls_layer_impl::client_handshake()");
 
-	if (state_ != fz::socket_state::none) {
-		logger_.log(logmsg::debug_warning, L"Called CTlsSocketImpl::client_handshake on a socket that isn't idle");
+	if (state_ != socket_state::none) {
+		logger_.log(logmsg::debug_warning, L"Called tls_layer_impl::client_handshake on a socket that isn't idle");
 		return false;
 	}
 
-	if (!Init()) {
+	if (!init() || !init_session()) {
 		return false;
 	}
 
-	state_ = fz::socket_state::connecting;
+	state_ = socket_state::connecting;
 
 	required_certificate_ = required_certificate;
 	verification_handler_ = verification_handler;
 
 	if (!session_to_resume.empty()) {
-		int res = gnutls_session_set_data(m_session, session_to_resume.data(), session_to_resume.size());
+		int res = gnutls_session_set_data(session_, session_to_resume.data(), session_to_resume.size());
 		if (res) {
 			logger_.log(logmsg::debug_info, L"gnutls_session_set_data failed: %d. Going to reinitialize session.", res);
-			UninitSession();
-			if (!InitSession()) {
+			deinit_session();
+			if (!init_session()) {
 				return false;
 			}
 		}
@@ -609,78 +611,78 @@ bool CTlsSocketImpl::client_handshake(std::vector<uint8_t> const& session_to_res
 	}
 
 	if (logger_.should_log(logmsg::debug_debug)) {
-		gnutls_handshake_set_hook_function(m_session, GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_BOTH, &handshake_hook_func);
+		gnutls_handshake_set_hook_function(session_, GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_BOTH, &handshake_hook_func);
 	}
 
 	if (!session_hostname.empty()) {
 		set_hostname(session_hostname);
 	}
 
-	if (tlsSocket_.next_layer_.get_state() != fz::socket_state::connected) {
+	if (tls_layer_.next_layer_.get_state() != socket_state::connected) {
 		return true;
 	}
 
 	if (hostname_.empty()) {
-		set_hostname(tlsSocket_.next_layer_.peer_host());
+		set_hostname(tls_layer_.next_layer_.peer_host());
 	}
-	return ContinueHandshake() == EAGAIN;
+	return continue_handshake() == EAGAIN;
 }
 
-int CTlsSocketImpl::ContinueHandshake()
+int tls_layer_impl::continue_handshake()
 {
-	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::ContinueHandshake()");
-	assert(m_session);
-	assert(state_ == fz::socket_state::connecting);
+	logger_.log(logmsg::debug_verbose, L"tls_layer_impl::continue_handshake()");
+	assert(session_);
+	assert(state_ == socket_state::connecting);
 
-	int res = gnutls_handshake(m_session);
+	int res = gnutls_handshake(session_);
 	while (res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) {
-		if (!(gnutls_record_get_direction(m_session) ? m_canWriteToSocket : m_canReadFromSocket)) {
+		if (!(gnutls_record_get_direction(session_) ? can_write_to_socket_ : can_read_from_socket_)) {
 			break;
 		}
-		res = gnutls_handshake(m_session);
+		res = gnutls_handshake(session_);
 	}
 	if (!res) {
 		logger_.log(logmsg::debug_info, L"TLS Handshake successful");
 		handshake_successful_ = true;
 
-		if (ResumedSession()) {
+		if (resumed_session()) {
 			logger_.log(logmsg::debug_info, L"TLS Session resumed");
 		}
 
-		std::string const protocol = GetProtocolName();
-		std::string const keyExchange = GetKeyExchange();
-		std::string const cipherName = GetCipherName();
-		std::string const macName = GetMacName();
+		std::string const protocol = get_protocol();
+		std::string const keyExchange = get_key_exchange();
+		std::string const cipherName = get_cipher();
+		std::string const macName = get_mac();
 
 		logger_.log(logmsg::debug_info, L"Protocol: %s, Key exchange: %s, Cipher: %s, MAC: %s", protocol, keyExchange, cipherName, macName);
 
-		return VerifyCertificate();
+		return verify_certificate();
 	}
 	else if (res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) {
 		return EAGAIN;
 	}
 
-	Failure(res, true);
+	failure(res, true);
 
-	return m_socket_error ? m_socket_error : ECONNABORTED;
+	return socket_error_ ? socket_error_ : ECONNABORTED;
 }
 
-int CTlsSocketImpl::read(void *buffer, unsigned int len, int& error)
+int tls_layer_impl::read(void *buffer, unsigned int len, int& error)
 {
-	if (state_ == fz::socket_state::connecting) {
+	if (state_ == socket_state::connecting) {
 		error = EAGAIN;
 		return -1;
 	}
-	else if (state_ != fz::socket_state::connected && state_ != fz::socket_state::shutting_down && state_ != fz::socket_state::shut_down) {
+	else if (state_ != socket_state::connected && state_ != socket_state::shutting_down && state_ != socket_state::shut_down) {
 		error = ENOTCONN;
 		return -1;
 	}
 
-	int res = DoCallGnutlsRecordRecv(buffer, len);
+	int res = do_call_gnutls_record_recv(buffer, len);
 	if (res >= 0) {
 		if (!res) {
 			// Peer did already initiate a shutdown, reply to it
-			gnutls_bye(m_session, GNUTLS_SHUT_WR);
+			gnutls_bye(session_, GNUTLS_SHUT_WR);
 			// Note: Theoretically this could return a write error.
 			// But we ignore it, since it is perfectly valid for peer
 			// to close the connection after sending its shutdown
@@ -694,87 +696,87 @@ int CTlsSocketImpl::read(void *buffer, unsigned int len, int& error)
 		error = EAGAIN;
 	}
 	else {
-		Failure(res, false, L"gnutls_record_recv");
-		error = m_socket_error;
+		failure(res, false, L"gnutls_record_recv");
+		error = socket_error_;
 	}
 
 	return -1;
 }
 
-int CTlsSocketImpl::write(void const* buffer, unsigned int len, int& error)
+int tls_layer_impl::write(void const* buffer, unsigned int len, int& error)
 {
-	if (state_ == fz::socket_state::connecting) {
+	if (state_ == socket_state::connecting) {
 		error = EAGAIN;
 		return -1;
 	}
-	else if (state_ == fz::socket_state::shutting_down || state_ == fz::socket_state::shut_down) {
+	else if (state_ == socket_state::shutting_down || state_ == socket_state::shut_down) {
 		error = ESHUTDOWN;
 		return -1;
 	}
-	else if (state_ != fz::socket_state::connected) {
+	else if (state_ != socket_state::connected) {
 		error = ENOTCONN;
 		return -1;
 	}
 
-	if (m_lastWriteFailed) {
+	if (last_write_failed_) {
 		error = EAGAIN;
 		return -1;
 	}
 
-	if (m_writeSkip >= len) {
-		m_writeSkip -= len;
+	if (write_skip_ >= len) {
+		write_skip_ -= len;
 		return len;
 	}
 
-	len -= m_writeSkip;
-	buffer = (char*)buffer + m_writeSkip;
+	len -= write_skip_;
+	buffer = (char*)buffer + write_skip_;
 
-	ssize_t res = gnutls_record_send(m_session, buffer, len);
+	ssize_t res = gnutls_record_send(session_, buffer, len);
 
-	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
-		res = gnutls_record_send(m_session, nullptr, 0);
+	while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && can_write_to_socket_) {
+		res = gnutls_record_send(session_, nullptr, 0);
 	}
 
 	if (res >= 0) {
 		error = 0;
-		int written = static_cast<int>(res) + m_writeSkip;
-		m_writeSkip = 0;
+		int written = static_cast<int>(res) + write_skip_;
+		write_skip_ = 0;
 		return written;
 	}
 
 	if (res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) {
-		if (m_writeSkip) {
+		if (write_skip_) {
 			error = 0;
-			int written = m_writeSkip;
-			m_writeSkip = 0;
+			int written = write_skip_;
+			write_skip_ = 0;
 			return written;
 		}
 		else {
 			error = EAGAIN;
-			m_lastWriteFailed = true;
+			last_write_failed_ = true;
 			return -1;
 		}
 	}
 	else {
-		Failure(static_cast<int>(res), false, L"gnutls_record_send");
-		error = m_socket_error;
+		failure(static_cast<int>(res), false, L"gnutls_record_send");
+		error = socket_error_;
 		return -1;
 	}
 }
 
-void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& function)
+void tls_layer_impl::failure(int code, bool send_close, std::wstring const& function)
 {
-	logger_.log(logmsg::debug_debug, L"CTlsSocketImpl::Failure(%d)", code);
+	logger_.log(logmsg::debug_debug, L"tls_layer_impl::failure(%d)", code);
 	if (code) {
-		LogError(code, function);
-		if (m_socket_eof) {
+		log_error(code, function);
+		if (socket_eof_) {
 			if (code == GNUTLS_E_UNEXPECTED_PACKET_LENGTH
 #ifdef GNUTLS_E_PREMATURE_TERMINATION
 				|| code == GNUTLS_E_PREMATURE_TERMINATION
 #endif
 				)
 			{
-				if (state_ != fz::socket_state::shut_down || !shutdown_silence_read_errors_) {
+				if (state_ != socket_state::shut_down || !shutdown_silence_read_errors_) {
 					logger_.log(logmsg::status, _("Server did not properly shut down TLS connection"));
 				}
 			}
@@ -783,95 +785,95 @@ void CTlsSocketImpl::Failure(int code, bool send_close, std::wstring const& func
 
 	auto const oldState = state_;
 
-	Uninit();
+	deinit();
 
-	if (send_close && tlsSocket_.event_handler_) {
-		int error = m_socket_error;
+	if (send_close && tls_layer_.event_handler_) {
+		int error = socket_error_;
 		if (!error) {
 			error = ECONNABORTED;
 		}
-		if (oldState == fz::socket_state::connecting) {
-			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, error);
+		if (oldState == socket_state::connecting) {
+			tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::connection, error);
 		}
 		else {
-			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, error);
+			tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::read, error);
 		}
 	}
 }
 
-int CTlsSocketImpl::shutdown()
+int tls_layer_impl::shutdown()
 {
-	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::Shutdown()");
+	logger_.log(logmsg::debug_verbose, L"tls_layer_impl::Shutdown()");
 
-	if (state_ == fz::socket_state::shut_down) {
+	if (state_ == socket_state::shut_down) {
 		return 0;
 	}
-	else if (state_ == fz::socket_state::shutting_down) {
+	else if (state_ == socket_state::shutting_down) {
 		return EAGAIN;
 	}
-	else if (state_ != fz::socket_state::connected) {
+	else if (state_ != socket_state::connected) {
 		return ENOTCONN;
 	}
 
-	state_ = fz::socket_state::shutting_down;
+	state_ = socket_state::shutting_down;
 
-	return ContinueShutdown();
+	return continue_shutdown();
 }
 
-int CTlsSocketImpl::ContinueShutdown()
+int tls_layer_impl::continue_shutdown()
 {
-	logger_.log(logmsg::debug_verbose, L"CTlsSocketImpl::ContinueShutdown()");
+	logger_.log(logmsg::debug_verbose, L"tls_layer_impl::continue_shutdown()");
 
 	if (!sent_closure_alert_) {
-		int res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
-		while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && m_canWriteToSocket) {
-			res = gnutls_bye(m_session, GNUTLS_SHUT_WR);
+		int res = gnutls_bye(session_, GNUTLS_SHUT_WR);
+		while ((res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) && can_write_to_socket_) {
+			res = gnutls_bye(session_, GNUTLS_SHUT_WR);
 		}
 		if (res == GNUTLS_E_INTERRUPTED || res == GNUTLS_E_AGAIN) {
 			return EAGAIN;
 		}
 		else if (res) {
-			Failure(res, false, L"gnutls_bye");
-			return m_socket_error ? m_socket_error : ECONNABORTED;
+			failure(res, false, L"gnutls_bye");
+			return socket_error_ ? socket_error_ : ECONNABORTED;
 		}
 		sent_closure_alert_ = true;
 	}
 	
-	int res = tlsSocket_.next_layer_.shutdown();
+	int res = tls_layer_.next_layer_.shutdown();
 	if (res == EAGAIN) {
 		return EAGAIN;
 	}
 
 	if (!res) {
-		state_ = fz::socket_state::shut_down;
+		state_ = socket_state::shut_down;
 	}
 	else {
-		m_socket_error = res;
-		Failure(0, false);
+		socket_error_ = res;
+		failure(0, false);
 	}
 	return res;
 }
 
-void CTlsSocketImpl::set_verification_result(bool trusted)
+void tls_layer_impl::set_verification_result(bool trusted)
 {
-	if (state_ != fz::socket_state::connecting && !handshake_successful_) {
+	if (state_ != socket_state::connecting && !handshake_successful_) {
 		logger_.log(logmsg::debug_warning, L"TrustCurrentCert called at wrong time.");
 		return;
 	}
 
-	remove_verification_events(verification_handler_, &tlsSocket_);
+	remove_verification_events(verification_handler_, &tls_layer_);
 	verification_handler_ = nullptr;
 
 	if (trusted) {
-		state_ = fz::socket_state::connected;
+		state_ = socket_state::connected;
 
-		if (tlsSocket_.event_handler_) {
-			tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::connection, 0);
-			if (m_canReadFromSocket) {
-				tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::read, 0);
+		if (tls_layer_.event_handler_) {
+			tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::connection, 0);
+			if (can_read_from_socket_) {
+				tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::read, 0);
 			}
-			if (m_canWriteToSocket) {
-				tlsSocket_.event_handler_->send_event<fz::socket_event>(&tlsSocket_, fz::socket_event_flag::write, 0);
+			if (can_write_to_socket_) {
+				tls_layer_.event_handler_->send_event<socket_event>(&tls_layer_, socket_event_flag::write, 0);
 			}
 		}
 
@@ -879,7 +881,7 @@ void CTlsSocketImpl::set_verification_result(bool trusted)
 	}
 
 	logger_.log(logmsg::error, _("Remote certificate not trusted."));
-	Failure(0, true);
+	failure(0, true);
 }
 
 static std::string bin2hex(unsigned char const* in, size_t size)
@@ -890,18 +892,18 @@ static std::string bin2hex(unsigned char const* in, size_t size)
 		if (i) {
 			str += ':';
 		}
-		str += fz::int_to_hex_char<char>(in[i] >> 4);
-		str += fz::int_to_hex_char<char>(in[i] & 0xf);
+		str += int_to_hex_char<char>(in[i] >> 4);
+		str += int_to_hex_char<char>(in[i] & 0xf);
 	}
 
 	return str;
 }
 
 
-bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certificate& out)
+bool tls_layer_impl::extract_cert(gnutls_x509_crt_t const& cert, x509_certificate& out)
 {
-	fz::datetime expirationTime(gnutls_x509_crt_get_expiration_time(cert), fz::datetime::seconds);
-	fz::datetime activationTime(gnutls_x509_crt_get_activation_time(cert), fz::datetime::seconds);
+	datetime expiration_time(gnutls_x509_crt_get_expiration_time(cert), datetime::seconds);
+	datetime activation_time(gnutls_x509_crt_get_activation_time(cert), datetime::seconds);
 
 	// Get the serial number of the certificate
 	unsigned char buffer[40];
@@ -939,21 +941,21 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certifi
 		subject = raw_subject.to_string_view();
 	}
 	else {
-		LogError(res, L"gnutls_x509_crt_get_dn3");
+		log_error(res, L"gnutls_x509_crt_get_dn3");
 	}
 	if (subject.empty()) {
 		logger_.log(logmsg::error, _("Could not get distinguished name of certificate subject, gnutls_x509_get_dn failed"));
 		return false;
 	}
 
-	std::vector<fz::x509_certificate::SubjectName> alt_subject_names = GetCertSubjectAltNames(cert);
+	std::vector<x509_certificate::SubjectName> alt_subject_names = get_cert_subject_alt_names(cert);
 
 	datum_holder raw_issuer;
 	if (!gnutls_x509_crt_get_issuer_dn3(cert, &raw_issuer, 0)) {
 		issuer = raw_issuer.to_string_view();
 	}
 	else {
-		LogError(res, L"gnutls_x509_crt_get_issuer_dn3");
+		log_error(res, L"gnutls_x509_crt_get_issuer_dn3");
 	}
 	if (issuer.empty() ) {
 		logger_.log(logmsg::error, _("Could not get distinguished name of certificate issuer, gnutls_x509_get_issuer_dn failed"));
@@ -982,9 +984,9 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certifi
 	}
 	std::vector<uint8_t> data(der.data, der.data + der.size);
 
-	out = fz::x509_certificate(
+	out = x509_certificate(
 		std::move(data),
-		activationTime, expirationTime,
+		activation_time, expiration_time,
 		serial,
 		pkAlgoName, pkBits,
 		signAlgoName,
@@ -998,9 +1000,9 @@ bool CTlsSocketImpl::ExtractCert(gnutls_x509_crt_t const& cert, fz::x509_certifi
 }
 
 
-std::vector<fz::x509_certificate::SubjectName> CTlsSocketImpl::GetCertSubjectAltNames(gnutls_x509_crt_t cert)
+std::vector<x509_certificate::SubjectName> tls_layer_impl::get_cert_subject_alt_names(gnutls_x509_crt_t cert)
 {
-	std::vector<fz::x509_certificate::SubjectName> ret;
+	std::vector<x509_certificate::SubjectName> ret;
 
 	char san[4096];
 	for (unsigned int i = 0; i < 10000; ++i) { // I assume this is a sane limit
@@ -1016,40 +1018,40 @@ std::vector<fz::x509_certificate::SubjectName> CTlsSocketImpl::GetCertSubjectAlt
 		if (type_or_error == GNUTLS_SAN_DNSNAME || type_or_error == GNUTLS_SAN_RFC822NAME) {
 			std::string dns = san;
 			if (!dns.empty()) {
-				ret.emplace_back(fz::x509_certificate::SubjectName{std::move(dns), type_or_error == GNUTLS_SAN_DNSNAME});
+				ret.emplace_back(x509_certificate::SubjectName{std::move(dns), type_or_error == GNUTLS_SAN_DNSNAME});
 			}
 		}
 		else if (type_or_error == GNUTLS_SAN_IPADDRESS) {
-			std::string ip = fz::socket::address_to_string(san, static_cast<int>(san_size));
+			std::string ip = socket::address_to_string(san, static_cast<int>(san_size));
 			if (!ip.empty()) {
-				ret.emplace_back(fz::x509_certificate::SubjectName{std::move(ip), false});
+				ret.emplace_back(x509_certificate::SubjectName{std::move(ip), false});
 			}
 		}
 	}
 	return ret;
 }
 
-bool CTlsSocketImpl::CertificateIsBlacklisted(std::vector<fz::x509_certificate> const&)
+bool tls_layer_impl::certificate_is_blacklisted(std::vector<x509_certificate> const&)
 {
 	return false;
 }
 
 
-int CTlsSocketImpl::GetAlgorithmWarnings()
+int tls_layer_impl::get_algorithm_warnings() const
 {
 	int algorithmWarnings{};
 
-	switch (gnutls_protocol_get_version(m_session))
+	switch (gnutls_protocol_get_version(session_))
 	{
 		case GNUTLS_SSL3:
 		case GNUTLS_VERSION_UNKNOWN:
-			algorithmWarnings |= fz::tls_session_info::tlsver;
+			algorithmWarnings |= tls_session_info::tlsver;
 			break;
 		default:
 			break;
 	}
 
-	switch (gnutls_cipher_get(m_session)) {
+	switch (gnutls_cipher_get(session_)) {
 		case GNUTLS_CIPHER_UNKNOWN:
 		case GNUTLS_CIPHER_NULL:
 		case GNUTLS_CIPHER_ARCFOUR_128:
@@ -1057,30 +1059,30 @@ int CTlsSocketImpl::GetAlgorithmWarnings()
 		case GNUTLS_CIPHER_ARCFOUR_40:
 		case GNUTLS_CIPHER_RC2_40_CBC:
 		case GNUTLS_CIPHER_DES_CBC:
-			algorithmWarnings |= fz::tls_session_info::cipher;
+			algorithmWarnings |= tls_session_info::cipher;
 			break;
 		default:
 			break;
 	}
 
-	switch (gnutls_mac_get(m_session)) {
+	switch (gnutls_mac_get(session_)) {
 		case GNUTLS_MAC_UNKNOWN:
 		case GNUTLS_MAC_NULL:
 		case GNUTLS_MAC_MD5:
 		case GNUTLS_MAC_MD2:
 		case GNUTLS_MAC_UMAC_96:
-			algorithmWarnings |= fz::tls_session_info::mac;
+			algorithmWarnings |= tls_session_info::mac;
 			break;
 		default:
 			break;
 	}
 
-	switch (gnutls_kx_get(m_session)) {
+	switch (gnutls_kx_get(session_)) {
 		case GNUTLS_KX_UNKNOWN:
 		case GNUTLS_KX_ANON_DH:
 		case GNUTLS_KX_RSA_EXPORT:
 		case GNUTLS_KX_ANON_ECDH:
-			algorithmWarnings |= fz::tls_session_info::kex;
+			algorithmWarnings |= tls_session_info::kex;
 		default:
 			break;
 	}
@@ -1089,14 +1091,14 @@ int CTlsSocketImpl::GetAlgorithmWarnings()
 }
 
 
-bool CTlsSocketImpl::GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsigned int & certs_size)
+bool tls_layer_impl::get_sorted_peer_certificates(gnutls_x509_crt_t *& certs, unsigned int & certs_size)
 {
 	certs = nullptr;
 	certs_size = 0;
 
 	// First get unsorted list of peer certificates in DER
 	unsigned int cert_list_size;
-	const gnutls_datum_t* cert_list = gnutls_certificate_get_peers(m_session, &cert_list_size);
+	const gnutls_datum_t* cert_list = gnutls_certificate_get_peers(session_, &cert_list_size);
 	if (!cert_list || !cert_list_size) {
 		logger_.log(logmsg::error, _("gnutls_certificate_get_peers returned no certificates"));
 		return false;
@@ -1151,7 +1153,7 @@ bool CTlsSocketImpl::GetSortedPeerCertificates(gnutls_x509_crt_t *& certs, unsig
 	return true;
 }
 
-void CTlsSocketImpl::PrintVerificationError(int status)
+void tls_layer_impl::log_verification_error(int status)
 {
 	gnutls_datum_t buffer{};
 	gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509, &buffer, 0);
@@ -1194,29 +1196,29 @@ void CTlsSocketImpl::PrintVerificationError(int status)
 
 }
 
-int CTlsSocketImpl::VerifyCertificate()
+int tls_layer_impl::verify_certificate()
 {
-	if (state_ != fz::socket_state::connecting) {
-		logger_.log(logmsg::debug_warning, L"VerifyCertificate called at wrong time");
+	if (state_ != socket_state::connecting) {
+		logger_.log(logmsg::debug_warning, L"verify_certificate called at wrong time");
 		return ENOTCONN;
 	}
 
-	if (gnutls_certificate_type_get(m_session) != GNUTLS_CRT_X509) {
+	if (gnutls_certificate_type_get(session_) != GNUTLS_CRT_X509) {
 		logger_.log(logmsg::error, _("Unsupported certificate type"));
-		Failure(0, true);
+		failure(0, true);
 		return EOPNOTSUPP;
 	}
 
 	cert_list_holder certs;
-	if (!GetSortedPeerCertificates(certs.certs, certs.certs_size)) {
-		Failure(0, true);
+	if (!get_sorted_peer_certificates(certs.certs, certs.certs_size)) {
+		failure(0, true);
 		return EINVAL;
 	}
 
 	datum_holder cert_der{};
 	int res = gnutls_x509_crt_export2(certs.certs[0], GNUTLS_X509_FMT_DER, &cert_der);
 	if (res != GNUTLS_E_SUCCESS) {
-		Failure(res, true, L"gnutls_x509_crt_export2");
+		failure(res, true, L"gnutls_x509_crt_export2");
 		return ECONNABORTED;
 	}
 
@@ -1225,19 +1227,19 @@ int CTlsSocketImpl::VerifyCertificate()
 			memcmp(required_certificate_.data(), cert_der.data, cert_der.size))
 		{
 			logger_.log(logmsg::error, _("Certificate of connection does not match expected certificate."));
-			Failure(0, true);
+			failure(0, true);
 			return EINVAL;
 		}
 
 		set_verification_result(true);
 
-		if (state_ != fz::socket_state::connected && state_ != fz::socket_state::shutting_down && state_ != fz::socket_state::shut_down) {
+		if (state_ != socket_state::connected && state_ != socket_state::shutting_down && state_ != socket_state::shut_down) {
 			return ECONNABORTED;
 		}
 		return 0;
 	}
 
-	bool const uses_hostname = !hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown;
+	bool const uses_hostname = !hostname_.empty() && get_address_type(hostname_) == address_type::unknown;
 
 	bool systemTrust = false;
 	bool hostnameMismatch = false;
@@ -1256,21 +1258,21 @@ int CTlsSocketImpl::VerifyCertificate()
 
 
 	// First, check system trust
-	if (uses_hostname && systemTrustStore_) {
+	if (uses_hostname && system_trust_store_) {
 
-		auto lease = systemTrustStore_->impl_->lease();
+		auto lease = system_trust_store_->impl_->lease();
 		auto cred = std::get<0>(lease);
 		if (cred) {
-			gnutls_credentials_set(m_session, GNUTLS_CRD_CERTIFICATE, cred);
+			gnutls_credentials_set(session_, GNUTLS_CRD_CERTIFICATE, cred);
 			unsigned int status = 0;
-			int verifyResult = gnutls_certificate_verify_peers3(m_session, fz::to_utf8(hostname_).c_str(), &status);
-			gnutls_credentials_set(m_session, GNUTLS_CRD_CERTIFICATE, m_certCredentials);
+			int verifyResult = gnutls_certificate_verify_peers3(session_, to_utf8(hostname_).c_str(), &status);
+			gnutls_credentials_set(session_, GNUTLS_CRD_CERTIFICATE, cert_credentials_);
 			std::get<1>(lease).unlock();
 
 			if (verifyResult < 0) {
 				logger_.log(logmsg::debug_warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
 				logger_.log(logmsg::error, _("Failed to verify peer certificate"));
-				Failure(0, true);
+				failure(0, true);
 				return EINVAL;
 			}
 
@@ -1299,42 +1301,42 @@ int CTlsSocketImpl::VerifyCertificate()
 			clone_cert(certs.certs[certs.certs_size - 1], root);
 			if (!root) {
 				logger_.log(logmsg::error, _("Could not copy certificate"));
-				Failure(0, true);
+				failure(0, true);
 				return ECONNABORTED;
 			}
 
 			gnutls_x509_trust_list_t tlist;
-			gnutls_certificate_get_trust_list(m_certCredentials, &tlist);
+			gnutls_certificate_get_trust_list(cert_credentials_, &tlist);
 			if (gnutls_x509_trust_list_add_cas(tlist, &root, 1, 0) != 1) {
 				logger_.log(logmsg::error, _("Could not add certificate to temporary trust list"));
-				Failure(0, true);
+				failure(0, true);
 				return ECONNABORTED;
 			}
 
 			// 2. Also disable time checks. We allow expired/not yet valid certificates, though only
 			// after explicit user confirmation.
-			gnutls_certificate_set_verify_flags(m_certCredentials, gnutls_certificate_get_verify_flags(m_certCredentials) | GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS);
+			gnutls_certificate_set_verify_flags(cert_credentials_, gnutls_certificate_get_verify_flags(cert_credentials_) | GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS);
 
 			unsigned int status = 0;
-			int verifyResult = gnutls_certificate_verify_peers2(m_session, &status);
+			int verifyResult = gnutls_certificate_verify_peers2(session_, &status);
 
 			if (verifyResult < 0) {
 				logger_.log(logmsg::debug_warning, L"gnutls_certificate_verify_peers2 returned %d with status %u", verifyResult, status);
 				logger_.log(logmsg::error, _("Failed to verify peer certificate"));
-				Failure(0, true);
+				failure(0, true);
 				return EINVAL;
 			}
 
 			if (status != 0) {
-				PrintVerificationError(status);
+				log_verification_error(status);
 
-				Failure(0, true);
+				failure(0, true);
 				return EINVAL;
 			}
 
 			// 3. Hostname mismatch
 			if (uses_hostname) {
-				if (!gnutls_x509_crt_check_hostname(certs.certs[0], fz::to_utf8(hostname_).c_str())) {
+				if (!gnutls_x509_crt_check_hostname(certs.certs[0], to_utf8(hostname_).c_str())) {
 					hostnameMismatch = true;
 					logger_.log(logmsg::debug_warning, L"Hostname does not match certificate SANs");
 				}
@@ -1343,130 +1345,126 @@ int CTlsSocketImpl::VerifyCertificate()
 
 		logger_.log(logmsg::status, _("Verifying certificate..."));
 
-		std::vector<fz::x509_certificate> certificates;
+		std::vector<x509_certificate> certificates;
 		certificates.reserve(certs.certs_size);
 		for (unsigned int i = 0; i < certs.certs_size; ++i) {
-			fz::x509_certificate cert;
-			if (ExtractCert(certs.certs[i], cert)) {
+			x509_certificate cert;
+			if (extract_cert(certs.certs[i], cert)) {
 				certificates.push_back(cert);
 			}
 			else {
-				Failure(0, true);
+				failure(0, true);
 				return ECONNABORTED;
 			}
 		}
 
-		if (CertificateIsBlacklisted(certificates)) {
-			Failure(0, true);
+		if (certificate_is_blacklisted(certificates)) {
+			failure(0, true);
 			return EINVAL;
 		}
 
-		int const algorithmWarnings = GetAlgorithmWarnings();
+		int const algorithmWarnings = get_algorithm_warnings();
 
 		int error;
-		auto port = tlsSocket_.peer_port(error);
+		auto port = tls_layer_.peer_port(error);
 		if (port == -1) {
-			m_socket_error = error;
-			Failure(0, true);
+			socket_error_ = error;
+			failure(0, true);
 			return ECONNABORTED;
 		}
 
-		fz::tls_session_info session_info(
-			fz::to_utf8(fz::to_wstring(hostname_)),
+		tls_session_info session_info(
+			to_utf8(to_wstring(hostname_)),
 			port,
-			GetProtocolName(),
-			GetKeyExchange(),
-			GetCipherName(),
-			GetMacName(),
+			get_protocol(),
+			get_key_exchange(),
+			get_cipher(),
+			get_mac(),
 			algorithmWarnings,
 			std::move(certificates),
 			systemTrust,
 			hostnameMismatch
 		);
 
-		verification_handler_->send_event<fz::certificate_verification_event>(&tlsSocket_, std::move(session_info));
+		verification_handler_->send_event<certificate_verification_event>(&tls_layer_, std::move(session_info));
 
 		return EAGAIN;
 	}
 }
 
-std::string CTlsSocketImpl::GetProtocolName()
+std::string tls_layer_impl::get_protocol() const
 {
 	std::string ret;
 
-	char const* s = gnutls_protocol_get_name( gnutls_protocol_get_version( m_session ) );
+	char const* s = gnutls_protocol_get_name(gnutls_protocol_get_version(session_));
 	if (s && *s) {
 		ret = s;
 	}
 
 	if (ret.empty()) {
-		ret = fz::to_utf8(_("unknown"));
+		ret = to_utf8(_("unknown"));
 	}
 
 	return ret;
 }
 
-std::string CTlsSocketImpl::GetKeyExchange()
+std::string tls_layer_impl::get_key_exchange() const
 {
 	std::string ret;
 
-	char const* s = gnutls_kx_get_name(gnutls_kx_get( m_session ));
+	char const* s = gnutls_kx_get_name(gnutls_kx_get(session_));
 	if (s && *s) {
 		ret = s;
 	}
 
 	if (ret.empty()) {
-		ret = fz::to_utf8(_("unknown"));
+		ret = to_utf8(_("unknown"));
 	}
 
 	return ret;
 }
 
-std::string CTlsSocketImpl::GetCipherName()
+std::string tls_layer_impl::get_cipher() const
 {
 	std::string ret;
 
-	char const* cipher = gnutls_cipher_get_name(gnutls_cipher_get(m_session));
+	char const* cipher = gnutls_cipher_get_name(gnutls_cipher_get(session_));
 	if (cipher && *cipher) {
 		ret = cipher;
 	}
 
 	if (ret.empty()) {
-		ret = fz::to_utf8(_("unknown"));
+		ret = to_utf8(_("unknown"));
 	}
 
 	return ret;
 }
 
-std::string CTlsSocketImpl::GetMacName()
+std::string tls_layer_impl::get_mac() const
 {
 	std::string ret;
 
-	char const* mac = gnutls_mac_get_name(gnutls_mac_get(m_session));
+	char const* mac = gnutls_mac_get_name(gnutls_mac_get(session_));
 	if (mac && *mac) {
 		ret = mac;
 	}
 
 	if (ret.empty()) {
-		ret = fz::to_utf8(_("unknown"));
+		ret = to_utf8(_("unknown"));
 	}
 
 	return ret;
 }
 
-std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
+std::string tls_layer_impl::list_tls_ciphers(std::string const& priority)
 {
-	if (priority.empty()) {
-		priority = ciphers;
-	}
-
-	auto list = fz::sprintf("Ciphers for %s:\n", priority);
+	auto list = sprintf("Ciphers for %s:\n", priority.empty() ? ciphers : priority);
 
 	gnutls_priority_t pcache;
 	char const* err = nullptr;
-	int ret = gnutls_priority_init(&pcache, priority.c_str(), &err);
+	int ret = gnutls_priority_init(&pcache, priority.empty() ? ciphers : priority.c_str(), &err);
 	if (ret < 0) {
-		list += fz::sprintf("gnutls_priority_init failed with code %d: %s", ret, err ? err : "Unknown error");
+		list += sprintf("gnutls_priority_init failed with code %d: %s", ret, err ? err : "Unknown error");
 		return list;
 	}
 	else {
@@ -1485,7 +1483,7 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 			char const* name = gnutls_cipher_suite_info(idx, id, nullptr, nullptr, nullptr, &version);
 
 			if (name != nullptr) {
-				list += fz::sprintf(
+				list += sprintf(
 					"%-50s    0x%02x, 0x%02x    %s\n",
 					name,
 					(unsigned char)id[0],
@@ -1498,10 +1496,10 @@ std::string CTlsSocketImpl::ListTlsCiphers(std::string priority)
 	return list;
 }
 
-int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
+int tls_layer_impl::do_call_gnutls_record_recv(void* data, size_t len)
 {
-	ssize_t res = gnutls_record_recv(m_session, data, len);
-	while ((res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) && m_canReadFromSocket && !gnutls_record_get_direction(m_session)) {
+	ssize_t res = gnutls_record_recv(session_, data, len);
+	while ((res == GNUTLS_E_AGAIN || res == GNUTLS_E_INTERRUPTED) && can_read_from_socket_ && !gnutls_record_get_direction(session_)) {
 		// Spurious EAGAIN. Can happen if GnuTLS gets a partial
 		// record and the socket got closed.
 		// The unexpected close is being ignored in this case, unless
@@ -1509,51 +1507,51 @@ int CTlsSocketImpl::DoCallGnutlsRecordRecv(void* data, size_t len)
 		// Manually call gnutls_record_recv as in case of eof on the socket,
 		// we are not getting another receive event.
 		logger_.log(logmsg::debug_verbose, L"gnutls_record_recv returned spurious EAGAIN");
-		res = gnutls_record_recv(m_session, data, len);
+		res = gnutls_record_recv(session_, data, len);
 	}
 
 	return static_cast<int>(res);
 }
 
-std::wstring CTlsSocketImpl::GetGnutlsVersion()
+std::string tls_layer_impl::get_gnutls_version()
 {
 	char const* v = gnutls_check_version(nullptr);
 	if (!v || !*v) {
-		return L"unknown";
+		return "unknown";
 	}
 
-	return fz::to_wstring(v);
+	return v;
 }
 
-void CTlsSocketImpl::set_hostname(fz::native_string const& host)
+void tls_layer_impl::set_hostname(native_string const& host)
 {
 	hostname_ = host;
-	if (!hostname_.empty() && fz::get_address_type(hostname_) == fz::address_type::unknown) {
-		auto const utf8 = fz::to_utf8(hostname_);
+	if (!hostname_.empty() && get_address_type(hostname_) == address_type::unknown) {
+		auto const utf8 = to_utf8(hostname_);
 		if (!utf8.empty()) {
-			int res = gnutls_server_name_set(m_session, GNUTLS_NAME_DNS, utf8.c_str(), utf8.size());
+			int res = gnutls_server_name_set(session_, GNUTLS_NAME_DNS, utf8.c_str(), utf8.size());
 			if (res) {
-				LogError(res, L"gnutls_server_name_set", logmsg::debug_warning);
+				log_error(res, L"gnutls_server_name_set", logmsg::debug_warning);
 			}
 		}
 	}
 }
 
-int CTlsSocketImpl::connect(fz::native_string const& host, unsigned int port, fz::address_type family)
+int tls_layer_impl::connect(native_string const& host, unsigned int port, address_type family)
 {
 	if (hostname_.empty()) {
 		set_hostname(host);
 	}
 
-	return tlsSocket_.next_layer_.connect(host, port, family);
+	return tls_layer_.next_layer_.connect(host, port, family);
 }
 
-std::vector<uint8_t> CTlsSocketImpl::get_session_parameters() const
+std::vector<uint8_t> tls_layer_impl::get_session_parameters() const
 {
 	std::vector<uint8_t> ret;
 
 	datum_holder d;
-	int res = gnutls_session_get_data2(m_session, &d);
+	int res = gnutls_session_get_data2(session_, &d);
 	if (res) {
 		logger_.log(logmsg::debug_warning, L"gnutls_session_get_data2 failed: %d", res);
 	}
@@ -1564,16 +1562,18 @@ std::vector<uint8_t> CTlsSocketImpl::get_session_parameters() const
 	return ret;
 }
 
-std::vector<uint8_t> CTlsSocketImpl::get_raw_certificate() const
+std::vector<uint8_t> tls_layer_impl::get_raw_certificate() const
 {
 	std::vector<uint8_t> ret;
 
 	// Implicitly trust certificate of primary socket
 	unsigned int cert_list_size;
-	gnutls_datum_t const* const cert_list = gnutls_certificate_get_peers(m_session, &cert_list_size);
+	gnutls_datum_t const* const cert_list = gnutls_certificate_get_peers(session_, &cert_list_size);
 	if (cert_list && cert_list_size) {
 		ret.assign(cert_list[0].data, cert_list[0].data + cert_list[0].size);
 	}
 
 	return ret;
+}
+
 }

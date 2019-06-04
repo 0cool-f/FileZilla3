@@ -19,7 +19,10 @@ auto const rawtransfer = Command::private2;
 class CTransferSocket;
 class CFtpTransferOpData;
 class CFtpRawTransferOpData;
-class CTlsSocket;
+
+namespace fz {
+class tls_layer;
+}
 
 struct filezilla_engine_ftp_transfer_end_event;
 typedef fz::simple_event<filezilla_engine_ftp_transfer_end_event> TransferEndEvent;
@@ -57,7 +60,7 @@ protected:
 	virtual void OnConnect() override;
 	virtual void OnReceive() override;
 	
-	void OnVerifyCert(CTlsSocket* source, fz::tls_session_info& info);
+	void OnVerifyCert(fz::tls_layer* source, fz::tls_session_info& info);
 
 	virtual void ResetSocket() override;
 
@@ -96,7 +99,7 @@ protected:
 
 	std::unique_ptr<CExternalIPResolver> m_pIPResolver;
 
-	std::unique_ptr<CTlsSocket> tls_layer_;
+	std::unique_ptr<fz::tls_layer> tls_layer_;
 	bool m_protectDataChannel{};
 
 	int m_lastTypeBinary{-1};

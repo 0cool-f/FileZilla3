@@ -14,7 +14,7 @@ std::wstring GetDependencyVersion(lib_dependency d)
 {
 	switch (d) {
 	case lib_dependency::gnutls:
-		return CTlsSocket::GetGnutlsVersion();
+		return fz::to_wstring(fz::tls_layer::get_gnutls_version());
 	default:
 		return std::wstring();
 	}
@@ -32,7 +32,7 @@ std::wstring GetDependencyName(lib_dependency d)
 
 std::string ListTlsCiphers(std::string const& priority)
 {
-	return CTlsSocket::ListTlsCiphers(priority);
+	return fz::tls_layer::list_tls_ciphers(priority);
 }
 
 #if FZ_WINDOWS

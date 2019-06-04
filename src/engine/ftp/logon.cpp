@@ -259,7 +259,7 @@ int CFtpLogonOpData::ParseResponse()
 
 			log(logmsg::status, _("Initializing TLS..."));
 
-			controlSocket_.tls_layer_ = std::make_unique<CTlsSocket>(controlSocket_.event_loop_, &controlSocket_, *controlSocket_.active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), controlSocket_.logger_);
+			controlSocket_.tls_layer_ = std::make_unique<fz::tls_layer>(controlSocket_.event_loop_, &controlSocket_, *controlSocket_.active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), controlSocket_.logger_);
 			controlSocket_.active_layer_ = controlSocket_.tls_layer_.get();
 
 			if (!controlSocket_.tls_layer_->client_handshake(&controlSocket_)) {

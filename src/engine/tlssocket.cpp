@@ -3,115 +3,119 @@
 #include "tlssocket.h"
 #include "tlssocket_impl.h"
 
-CTlsSocket::CTlsSocket(fz::event_loop& event_loop, fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, fz::tls_system_trust_store* systemTrustStore, fz::logger_interface & logger)
+namespace fz {
+
+tls_layer::tls_layer(event_loop& event_loop, event_handler* evt_handler, socket_interface & next_layer, tls_system_trust_store* system_trust_store, logger_interface & logger)
 	: event_handler(event_loop)
-	, fz::socket_layer(pEvtHandler, next_layer, false)
+	, socket_layer(evt_handler, next_layer, false)
 {
-	impl_ = std::make_unique<CTlsSocketImpl>(*this, systemTrustStore, logger);
+	impl_ = std::make_unique<tls_layer_impl>(*this, system_trust_store, logger);
 	next_layer.set_event_handler(this);
 }
 
-CTlsSocket::~CTlsSocket()
+tls_layer::~tls_layer()
 {
 	remove_handler();
 }
 
-bool CTlsSocket::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, fz::native_string const& session_hostname)
+bool tls_layer::client_handshake(std::vector<uint8_t> const& session_to_resume, std::vector<uint8_t> const& required_certificate, native_string const& session_hostname)
 {
 	return impl_->client_handshake(session_to_resume, session_hostname, required_certificate, nullptr);
 }
 
-bool CTlsSocket::client_handshake(fz::event_handler* const verification_handler, std::vector<uint8_t> const& session_to_resume, fz::native_string const& session_hostname)
+bool tls_layer::client_handshake(event_handler* const verification_handler, std::vector<uint8_t> const& session_to_resume, native_string const& session_hostname)
 {
 	return impl_->client_handshake(session_to_resume, session_hostname, std::vector<uint8_t>(), verification_handler);
 }
 
-int CTlsSocket::read(void *buffer, unsigned int size, int& error)
+int tls_layer::read(void *buffer, unsigned int size, int& error)
 {
 	return impl_->read(buffer, size, error);
 }
 
-int CTlsSocket::write(void const* buffer, unsigned int size, int& error)
+int tls_layer::write(void const* buffer, unsigned int size, int& error)
 {
 	return impl_->write(buffer, size, error);
 }
 
-int CTlsSocket::shutdown()
+int tls_layer::shutdown()
 {
 	return impl_->shutdown();
 }
 
-void CTlsSocket::set_verification_result(bool trusted)
+void tls_layer::set_verification_result(bool trusted)
 {
 	return impl_->set_verification_result(trusted);
 }
 
-fz::socket_state CTlsSocket::get_state() const
+socket_state tls_layer::get_state() const
 {
 	return impl_->get_state();
 }
 
-std::string CTlsSocket::GetProtocolName()
+std::string tls_layer::get_protocol() const
 {
-	return impl_->GetProtocolName();
+	return impl_->get_protocol();
 }
 
-std::string CTlsSocket::GetKeyExchange()
+std::string tls_layer::get_key_exchange() const
 {
-	return impl_->GetKeyExchange();
+	return impl_->get_key_exchange();
 }
 
-std::string CTlsSocket::GetCipherName()
+std::string tls_layer::get_cipher() const
 {
-	return impl_->GetCipherName();
+	return impl_->get_cipher();
 }
 
-std::string CTlsSocket::GetMacName()
+std::string tls_layer::get_mac() const
 {
-	return impl_->GetMacName();
+	return impl_->get_mac();
 }
 
-int CTlsSocket::GetAlgorithmWarnings()
+int tls_layer::get_algorithm_warnings() const
 {
-	return impl_->GetAlgorithmWarnings();
+	return impl_->get_algorithm_warnings();
 }
 
-bool CTlsSocket::ResumedSession() const
+bool tls_layer::resumed_session() const
 {
-	return impl_->ResumedSession();
+	return impl_->resumed_session();
 }
 
-std::string CTlsSocket::ListTlsCiphers(std::string const& priority)
+std::string tls_layer::list_tls_ciphers(std::string const& priority)
 {
-	return CTlsSocketImpl::ListTlsCiphers(priority);
+	return tls_layer_impl::list_tls_ciphers(priority);
 }
 
-bool CTlsSocket::SetClientCertificate(fz::native_string const& keyfile, fz::native_string const& certs, fz::native_string const& password)
+bool tls_layer::set_client_certificate(native_string const& keyfile, native_string const& certs, native_string const& password)
 {
-	return impl_->SetClientCertificate(keyfile, certs, password);
+	return impl_->set_client_certificate(keyfile, certs, password);
 }
 
-void CTlsSocket::operator()(fz::event_base const& ev)
+void tls_layer::operator()(event_base const& ev)
 {
 	return impl_->operator()(ev);
 }
 
-std::wstring CTlsSocket::GetGnutlsVersion()
+std::string tls_layer::get_gnutls_version()
 {
-	return CTlsSocketImpl::GetGnutlsVersion();
+	return tls_layer_impl::get_gnutls_version();
 }
 
-std::vector<uint8_t> CTlsSocket::get_session_parameters() const
+std::vector<uint8_t> tls_layer::get_session_parameters() const
 {
 	return impl_->get_session_parameters();
 }
 
-std::vector<uint8_t> CTlsSocket::get_raw_certificate() const
+std::vector<uint8_t> tls_layer::get_raw_certificate() const
 {
 	return impl_->get_raw_certificate();
 }
 
-int CTlsSocket::connect(fz::native_string const& host, unsigned int port, fz::address_type family)
+int tls_layer::connect(native_string const& host, unsigned int port, address_type family)
 {
 	return impl_->connect(host, port, family);
+}
+
 }

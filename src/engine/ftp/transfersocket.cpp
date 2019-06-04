@@ -493,7 +493,7 @@ bool CTransferSocket::InitLayers(bool active)
 		// Disable Nagle's algorithm during TLS handshake
 		socket_->set_flags(socket_->flags() | fz::socket::flag_nodelay);
 
-		tls_layer_ = std::make_unique<CTlsSocket>(controlSocket_.event_loop_, nullptr, *active_layer_, nullptr, controlSocket_.logger_);
+		tls_layer_ = std::make_unique<fz::tls_layer>(controlSocket_.event_loop_, nullptr, *active_layer_, nullptr, controlSocket_.logger_);
 		active_layer_ = tls_layer_.get();
 
 		if (!tls_layer_->client_handshake(controlSocket_.tls_layer_->get_session_parameters(), controlSocket_.tls_layer_->get_raw_certificate(), controlSocket_.tls_layer_->peer_host())) {
